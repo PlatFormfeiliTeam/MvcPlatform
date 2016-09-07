@@ -51,6 +51,13 @@
 
                 initSearch();  //查询区域
 
+                if (busitypeid == '50-51') {
+                    Ext.getCmp('CONDITION2').setValue('DECLNO');
+                }
+                else {
+                    Ext.getCmp('CONDITION2').setValue('CUSNO');
+                }
+
                 store_busitype = Ext.create('Ext.data.JsonStore', {
                     fields: ['CODE', 'NAME'],
                     data: common_data_busitype
