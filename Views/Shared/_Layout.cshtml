@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title - 我的 ASP.NET MVC 应用程序</title>
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/bootstrap32/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/css/superfish.css" rel="stylesheet" />
+    <script src="~/js/jquery-1.8.2.min.js"></script>
+    <script src="~/js/hoverIntent.js"></script>
+    <script src="~/js/superfish.js"></script>
+    <link href="~/Content/iconfont/iconfont.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+        <div style="margin:10px 0px">
+            <img src="~/Images/fld_logo.png" />
+            <div class="fr" style="font-size:12px">
+                <i class="icon iconfont">&#xe605;</i> 
+                <span>当前用户：@Html.Action("CurrentUser", "Common")</span>&nbsp;&nbsp;
+                <a style="cursor:pointer" href="/Account/SignOut"><i class="icon iconfont">&#xe609;</i><span>退出</span></a>
+            </div>
+        </div>
+        <div>
+            <ul class="sf-menu" id="na_menu" style="font-size:14px">
+                @Html.Action("Header", "Common")
+            </ul>
+        </div>
+    </div>
+    <div class="container">
+        @RenderSection("featured", required: false)
+        <section class="content-wrapper main-content clear-fix">
+            @RenderBody()
+        </section>
+    </div>
+    <footer>
+        <div class="content-wrapper">
+            <div class="float-left">
+                <p>&copy; @DateTime.Now.Year - 我的 ASP.NET MVC 应用程序</p>
+            </div>
+        </div>
+    </footer>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // initialise plugin
+            $('#na_menu').superfish({
+                //add options here if required
+            });
+        });
+
+    </script>
+</body>
+</html>

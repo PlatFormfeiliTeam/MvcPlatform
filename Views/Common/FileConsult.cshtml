@@ -1,0 +1,127 @@
+﻿@{
+    ViewBag.Title = "文件调阅";
+    Layout = "~/Views/Shared/Empty.cshtml";
+}
+<link href="~/js/Extjs42/resources/css/ext-all-neptune.css" rel="stylesheet" />
+<script src="/js/Extjs42/bootstrap.js" type="text/javascript"></script>
+<script src="/js/pan.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+    var ordercode = getQueryString("ORDERCODE");
+    var busitype = getQueryString("BUSITYPE");
+    var predeclcode = getQueryString("PREDECLCODE");//预制报关单号
+    var preinspcode = getQueryString("PREINSPCODE");//预制报检单号
+    var source = getQueryString("source");
+    var fileid = "";
+    Ext.onReady(function () {
+        var store_fc = new Ext.data.TreeStore({
+            fields: ['id', 'fileid', 'filename', 'typename', 'leaf', 'url'],
+            nodeParam: 'id',
+            proxy: {
+                type: 'ajax',
+                url: '/Common/ConsultInfo?ordercode=' + ordercode,
+                reader: 'json'
+            },
+            root: {
+                name: '功能菜单',
+                id: '-1'
+            }
+        });
+        var treepanel_fc = Ext.create('Ext.tree.Panel', {
+            useArrows: true,
+            region: 'west',
+            rootVisible: false,
+            width: 350,
+            store: store_fc,
+            hideHeaders: true,
+            columns: [
+            { text: 'id', dataIndex: 'id', hidden: true },
+            { text: 'leaf', dataIndex: 'leaf', hidden: true },
+            { xtype: 'treecolumn', text: '名称', dataIndex: 'typename', width: 300 }
+            ],
+            hrefTarget: 'mainContent',
+            listeners: {
+                select: function (view, rec, item, index, e) {
+                    Ext.getDom("contentIframe").src = rec.get("url");
+                    fileid = rec.get("fileid");//如果是报关单或者报关单文件节点
+                    tb_print.setDisabled(!Ext.String.startsWith(rec.get("id"), 'G'));
+                }
+            }
+        });
+        var cbg_printtmp = Ext.create('Ext.form.CheckboxGroup', {
+            width: 350,
+            columns: 3,
+            items: [
+                { id: 'zuoyelian', boxLabel: '海关作业联', name: 'declaretmp', inputValue: '海关作业联', checked: true },
+                { id: 'liucunlian', boxLabel: '企业留存联', name: 'declaretmp', inputValue: '企业留存联' },
+                { id: 'hexiaolian', boxLabel: '海关核销联', name: 'declaretmp', inputValue: '海关核销联' }
+            ]
+        })
+        var tb_print = Ext.create('Ext.toolbar.Toolbar', {
+            disabled: true,
+            items: [cbg_printtmp, {
+                text: '<i class="fa fa-print" aria-hidden="true"></i>&nbsp;标准打印', handler: function (btn) {
+                    Ext.Ajax.request({
+                        url: '/Common/SinglePrint',
+                        params: { fileid: fileid, printtype: 'standardprint', printtmp: cbg_printtmp.getValue(), busitype: busitype },
+                        success: function (response, success) {
+                            Ext.getDom("contentIframe").src = response.responseText;
+                        }
+                    })
+                }
+            }, {
+                id: 'btn_taoda', text: '<i class="fa fa-print" aria-hidden="true"></i>&nbsp;套打打印', handler: function (btn) {
+                    Ext.Ajax.request({
+                        url: '/Common/SinglePrint',
+                        params: { fileid: fileid, printtype: 'templateprint' },
+                        success: function (response, success) {
+                            Ext.getDom("contentIframe").src = response.responseText;
+                        }
+                    })
+                }
+            }]
+        })
+        var viewport = new Ext.container.Viewport({
+            layout: 'border',
+            items: [treepanel_fc,
+            {
+                xtype: 'panel',
+                tbar: tb_print,
+                region: 'center',
+                layout: 'fit',
+                id: 'mainContent',
+                contentEl: 'contentIframe'
+            }]
+        })
+        treepanel_fc.expandAll(function () {
+        });
+
+        var task = new Ext.util.DelayedTask(function () {
+            var node_id = "order";
+            var node;
+            if (predeclcode) {
+                node_id = predeclcode + '_1';//需要修改
+                node = store_fc.getNodeById(node_id);
+            }
+            if (preinspcode) {
+                if (store_fc.getNodeById("62_" + preinspcode)) {//如果预制报检单节点存在
+                    node_id = "62_" + preinspcode;
+                }
+                else if (store_fc.getNodeById("121_" + preinspcode)) {//如果报检核准单节点存在
+                    node_id = "121_" + preinspcode;
+                }
+                var node_sp = store_fc.getNodeById(node_id);
+                if (node_sp.getChildAt(0)) {
+                    node = node_sp.getChildAt(0);
+                }
+            }
+            if (node) {
+                treepanel_fc.selectPath(node.getPath());
+                treepanel_fc.getSelectionModel().select([node]);
+            }
+        });
+        task.delay(2000);
+    })
+</script>
+
+<iframe id="contentIframe" width="100%" height="100%" name="mainContent" frameborder="no" border="0" marginwidth="0" marginheight="0"></iframe>
