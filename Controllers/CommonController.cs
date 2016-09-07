@@ -1561,6 +1561,114 @@ namespace MvcPlatform.Controllers
 
         #endregion
 
+        /*报检单管理 列表页展示*/
+        public string LoadInspectionList()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            string where = "";
+            string role = Request["role"]; string busitypeid = Request["busitypeid"];
+
+            if (!string.IsNullOrEmpty(Request["VALUE1"]))//判断查询条件1是否有值
+            {
+                switch (Request["CONDITION1"])
+                {
+                    case "BUSIUNITCODE"://经营单位
+                        where += " and lp.UPCN='" + Request["VALUE1"] + "' ";
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(Request["VALUE2"]))//判断查询条件2是否有值
+            {
+                switch (Request["CONDITION2"])
+                {
+                    case "CUSNO"://客户编号
+                        where += " and instr(lo.CUSNO,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "BLNO"://提运单号
+                        where += " and instr(lp.LADINGNO,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "ORDERCODE"://订单编号
+                        where += " and instr(li.ORDERCODE,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(Request["VALUE3"]))//判断查询条件3是否有值
+            {
+                switch (Request["CONDITION3"])
+                {
+                    case "DYBZ"://打印标志
+                        where += " and li.ISPRINT='" + Request["VALUE3"] + "' ";
+                        break;
+                }
+            }
+            switch (Request["CONDITION4"])
+            {
+                case "SUBMITTIME"://订单委托日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and lo.SUBMITTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and lo.SUBMITTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "REPTIME"://申报时间
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and li.REPTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and li.REPTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+            }
+            if (role == "supplier") //如果是现场服务
+            {
+                where += @" and lo.SCENEINSPECTID ='" + json_user.Value<string>("CUSTOMERID") + "' ";
+            }
+            if (role == "enterprise") //如果是企业服务
+            {
+                where += @" and lo.BUSIUNITCODE IN (
+                                    SELECT b.incode QUANCODE FROM USER_RENAME_COMPANY a 
+                                    left join BASE_COMPANY b on a.companyid = b.id 
+                                    where b.incode is not null and a.companyenname is not null and a.customerid = " + json_user.Value<string>("CUSTOMERID") + ") ";
+            }
+            if (role == "customer")
+            {
+                where += @" and lo.customercode ='" + json_user.Value<string>("CUSTOMERCODE") + "' ";
+            }
+            //申报库别基础表sys_REPORTLIBRARY
+            string sql = @"SELECT li.ID,li.CODE,li.PREINSPCODE, li.APPROVALCODE,li.INSPECTIONCODE,li.REPFINISHTIME,lp.UPCNNAME,lp.INSPTYPE,
+                         lp.ENTRYPORT,lp.TRANSTOOL,lp.LADINGNO,lp.TOTALNO,lp.TRADE,lp.CONTRACTNO,lo.INSPUNITNAME,li.BUSITYPE,
+                         li.ISFORCELAW,lo.WOODPACKINGID,li.GOODSNUM,bi.NAME PACKAGETYPENAME,sr.NAME DECLTYPENAME,li.ORDERCODE,lo.CUSNO,li.ISPRINT,
+                         lp.FOBPORT,lp.FOBPORTNAME,li.CUSTOMSSTATUS
+                         FROM list_inspection li 
+                         LEFT JOIN list_preinspection lp ON li.preinspcode = lp.preinspcode
+                         LEFT JOIN list_order lo ON li.ordercode = lo.code 
+                         left join base_insppackage bi on lp.packagetype=bi.code
+                         left join sys_REPORTLIBRARY sr on sr.code=lp.DECLTYPE 
+                         WHERE li.STATUS >=103 and INSTR('" + busitypeid + "',li.busitype)>0 " + where;
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "REPFINISHTIME", "DESC"));
+            var json = JsonConvert.SerializeObject(dt, iso);
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
+        public string LoadInspectReceipt()
+        {
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            string sql = @"select l.TIMES ,l.STATUS from list_inspreceiptstatus l  
+                         where l.code = '" + Request["bjdcode"] + "' order by l.times asc ";
+            DataTable dt = DBMgr.GetDataTable(sql);
+            string json = JsonConvert.SerializeObject(dt, iso);
+            return "{rows:" + json + "}";
+        }
+
         #region ERP 导入
 
         //验证该账号是否开通了ERP接口

@@ -3908,6 +3908,7 @@
     <Content Include="Views\Common\FileConsult.cshtml" />
     <None Include="Service References\FMService\FMService.wsdl" />
     <Content Include="Views\Common\MultiPrint.cshtml" />
+    <Content Include="Views\Common\InspectList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
