@@ -207,6 +207,7 @@
     <Compile Include="Common\SeRedis.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CommonController.cs" />
+    <Compile Include="Controllers\EnterpriseOrderController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\OrderAirInController.cs" />
     <Compile Include="Controllers\OrderAirOutController.cs" />
@@ -3857,6 +3858,7 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+    <Content Include="Views\EnterpriseOrder\createwinjs.js" />
     <Content Include="Views\OrderAirIn\form.js" />
     <Content Include="Views\OrderAirOut\form.js" />
     <Content Include="Views\OrderDomestic\form2_export.js" />
@@ -3909,6 +3911,7 @@
     <None Include="Service References\FMService\FMService.wsdl" />
     <Content Include="Views\Common\MultiPrint.cshtml" />
     <Content Include="Views\Common\InspectList.cshtml" />
+    <Content Include="Views\EnterpriseOrder\EntOrderList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
