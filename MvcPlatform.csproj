@@ -324,6 +324,20 @@
     <Content Include="Images\shadow.png" />
     <Content Include="js\commondata.js" />
     <Content Include="js\declaraInspectsearch.js" />
+    <Content Include="js\echart\chart\bar.js" />
+    <Content Include="js\echart\chart\chord.js" />
+    <Content Include="js\echart\chart\eventRiver.js" />
+    <Content Include="js\echart\chart\force.js" />
+    <Content Include="js\echart\chart\funnel.js" />
+    <Content Include="js\echart\chart\gauge.js" />
+    <Content Include="js\echart\chart\k.js" />
+    <Content Include="js\echart\chart\line.js" />
+    <Content Include="js\echart\chart\map.js" />
+    <Content Include="js\echart\chart\pie.js" />
+    <Content Include="js\echart\chart\radar.js" />
+    <Content Include="js\echart\chart\scatter.js" />
+    <Content Include="js\echart\echarts-all.js" />
+    <Content Include="js\echart\green.js" />
     <Content Include="js\Extjs42\bootstrap.js" />
     <Content Include="js\Extjs42\ext-all-debug.js" />
     <Content Include="js\Extjs42\ext-all-dev.js" />
@@ -3912,6 +3926,7 @@
     <Content Include="Views\Common\MultiPrint.cshtml" />
     <Content Include="Views\Common\InspectList.cshtml" />
     <Content Include="Views\EnterpriseOrder\EntOrderList.cshtml" />
+    <Content Include="Views\EnterpriseOrder\EnterpriseHome.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

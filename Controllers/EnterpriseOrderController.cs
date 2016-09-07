@@ -18,7 +18,12 @@ namespace MvcPlatform.Controllers
         //
         // GET: /EnterpriseOrder/
 
-        public ActionResult EntOrderList()
+        public ActionResult EntOrderList()  //文件委托
+        {
+            return View();
+        }
+
+        public ActionResult EnterpriseHome()//企业服务
         {
             return View();
         }
@@ -243,7 +248,32 @@ namespace MvcPlatform.Controllers
 
         #endregion
 
-
+        public string IniChart()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string sql = "";
+            DataTable dt = new DataTable();
+            DataColumn dc = new DataColumn("date");
+            dt.Columns.Add(dc);
+            dc = new DataColumn("total");
+            dt.Columns.Add(dc);
+            dc = new DataColumn("submit");
+            dt.Columns.Add(dc);
+            DataTable tmp_dt;
+            for (int i = 0; i < 7; i++)
+            {
+                DataRow dr = dt.NewRow();
+                dr["date"] = DateTime.Now.AddDays(-i).ToShortDateString();
+                sql = "select count(1) from ent_order where  to_char(CREATETIME, 'yyyy-MM-dd')=to_char(sysdate-" + i + ",'yyyy-MM-dd') and ENTERPRISECODE='" + json_user.Value<string>("CUSTOMERCODE") + "'";
+                tmp_dt = DBMgr.GetDataTable(sql);
+                dr["total"] = tmp_dt.Rows[0][0];
+                sql = "select count(1) from ent_order where  to_char(SUBMITTIME, 'yyyy-MM-dd')=to_char(sysdate-" + i + ",'yyyy-MM-dd') and ENTERPRISECODE='" + json_user.Value<string>("CUSTOMERCODE") + "'";
+                tmp_dt = DBMgr.GetDataTable(sql);
+                dr["submit"] = tmp_dt.Rows[0][0];
+                dt.Rows.Add(dr);
+            }
+            return "{result:" + JsonConvert.SerializeObject(dt) + "}";
+        }
 
     }
 }
