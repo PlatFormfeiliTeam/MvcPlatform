@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://tempuri.org/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+      <s:element name="ReturnFileInfo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="businessNo" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnFileInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnFileInfoResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnMainFile">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="businessNo" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReturnMainFileResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReturnMainFileResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TransferFile2">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="addressNo" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="dt">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TransferFile2Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="TransferFile2Result">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TransferMainFile">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="addressNo" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="businessNo" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="newName" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TransferMainFileResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="TransferMainFileResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="ReturnFileInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnFileInfo" />
+  </wsdl:message>
+  <wsdl:message name="ReturnFileInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnFileInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMainFileSoapIn">
+    <wsdl:part name="parameters" element="tns:ReturnMainFile" />
+  </wsdl:message>
+  <wsdl:message name="ReturnMainFileSoapOut">
+    <wsdl:part name="parameters" element="tns:ReturnMainFileResponse" />
+  </wsdl:message>
+  <wsdl:message name="TransferFile2SoapIn">
+    <wsdl:part name="parameters" element="tns:TransferFile2" />
+  </wsdl:message>
+  <wsdl:message name="TransferFile2SoapOut">
+    <wsdl:part name="parameters" element="tns:TransferFile2Response" />
+  </wsdl:message>
+  <wsdl:message name="TransferMainFileSoapIn">
+    <wsdl:part name="parameters" element="tns:TransferMainFile" />
+  </wsdl:message>
+  <wsdl:message name="TransferMainFileSoapOut">
+    <wsdl:part name="parameters" element="tns:TransferMainFileResponse" />
+  </wsdl:message>
+  <wsdl:portType name="FMService1Soap">
+    <wsdl:operation name="ReturnFileInfo">
+      <wsdl:input message="tns:ReturnFileInfoSoapIn" />
+      <wsdl:output message="tns:ReturnFileInfoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMainFile">
+      <wsdl:input message="tns:ReturnMainFileSoapIn" />
+      <wsdl:output message="tns:ReturnMainFileSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="TransferFile2">
+      <wsdl:input message="tns:TransferFile2SoapIn" />
+      <wsdl:output message="tns:TransferFile2SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="TransferMainFile">
+      <wsdl:input message="tns:TransferMainFileSoapIn" />
+      <wsdl:output message="tns:TransferMainFileSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="FMService1Soap" type="tns:FMService1Soap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="ReturnFileInfo">
+      <soap:operation soapAction="http://tempuri.org/ReturnFileInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMainFile">
+      <soap:operation soapAction="http://tempuri.org/ReturnMainFile" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TransferFile2">
+      <soap:operation soapAction="http://tempuri.org/TransferFile2" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TransferMainFile">
+      <soap:operation soapAction="http://tempuri.org/TransferMainFile" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="FMService1Soap12" type="tns:FMService1Soap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="ReturnFileInfo">
+      <soap12:operation soapAction="http://tempuri.org/ReturnFileInfo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReturnMainFile">
+      <soap12:operation soapAction="http://tempuri.org/ReturnMainFile" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TransferFile2">
+      <soap12:operation soapAction="http://tempuri.org/TransferFile2" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TransferMainFile">
+      <soap12:operation soapAction="http://tempuri.org/TransferMainFile" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="FMService1">
+    <wsdl:port name="FMService1Soap" binding="tns:FMService1Soap">
+      <soap:address location="http://172.20.70.98:7003/Services/FMService.asmx" />
+    </wsdl:port>
+    <wsdl:port name="FMService1Soap12" binding="tns:FMService1Soap12">
+      <soap12:address location="http://172.20.70.98:7003/Services/FMService.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
