@@ -19,7 +19,7 @@
         <div style="margin:10px 0px">
             <img src="~/Images/fld_logo.png" />
             <div class="fr" style="font-size:12px">
-                <i class="icon iconfont">&#xe605;</i> 
+                <i class="icon iconfont">&#xe605;</i>
                 <span>当前用户：@Html.Action("CurrentUser", "Common")</span>&nbsp;&nbsp;
                 <a style="cursor:pointer" href="/Account/SignOut"><i class="icon iconfont">&#xe609;</i><span>退出</span></a>
             </div>
@@ -30,27 +30,45 @@
             </ul>
         </div>
     </div>
-    <div class="container">
+    <div class="container" style="height:600px">
         @RenderSection("featured", required: false)
         <section class="content-wrapper main-content clear-fix">
             @RenderBody()
         </section>
     </div>
-    <footer>
-        <div class="content-wrapper">
-            <div class="float-left">
-                <p>&copy; @DateTime.Now.Year - 我的 ASP.NET MVC 应用程序</p>
-            </div>
+    <div style="background-color: #CFDEFF; height: 70px; ">
+        <div class="container">
+            <table class="table" style="margin-bottom:0px">
+                <tr>
+                    <td rowspan="2" style="width:25%">
+                        <span class="icon iconfont iconsize">&#xe612;</span>
+                        <span class="icon iconfont iconsize">&#xe613;</span>
+                        <span class="icon iconfont iconsize">&#xe60f;</span>
+                    </td>
+                    <td>
+                        <a class="footer">关于我们</a>
+                        <a class="footer">用户协议</a>
+                        <a class="footer">法律声明</a>
+                        <a class="footer">常用下载</a>
+                        <a class="footer">意见反馈</a>
+                        <a class="footer">网站地图</a>
+                    </td>
+                    <td rowspan="2" style="width:25%">
+                        <span class="icon iconfont iconsize">&#xe614;</span><span>0512-57313261</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="footer">苏ICP备05048421号&copy; 江苏飞力达国际物流股份有限公司</span></td>
+                </tr>
+            </table>
+
         </div>
-    </footer>
+    </div>
     <script type="text/javascript">
         $(document).ready(function () {
-            // initialise plugin
             $('#na_menu').superfish({
-                //add options here if required
             });
         });
-
     </script>
 </body>
 </html>
