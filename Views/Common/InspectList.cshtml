@@ -9,20 +9,16 @@
 <script src="/js/commondata.js"></script>
 <script src="/js/declaraInspectsearch.js" type="text/javascript"></script>
 
-<script type="text/javascript">
-    var combo_1, combo_1_1, combo_2, field_2_1, combo_3, combo_3_1, combo_4, date_4_1, date_4_2;
-    var formpanel, pgbar;//因为查询区需要调用对象，故申明为全局
-    var showIndex = 1;
-    var bjdcode;
-    var busitypeid = getQueryString("busitypeid");
-    var module = getQueryString("module");
+<script type="text/javascript">    
+    var busitypeid = getQueryString("busitypeid"); var module = getQueryString("module"); var role = getQueryString("role");
+    var pgbar; var store_busitype;
+    var common_data_jydw = [];
 
-    var common_data_insptype = [{ code: 15, name: '验证' }, { code: 21, name: '预检' }, { code: 24, name: '出境检验检疫' }, { code: 25, name: '核查货证' }, { code: 28, name: '出境验证' }, { code: 13, name: '入境检验检疫' }, { code: 14, name: '流向' }];
+
     var json_data_insptype = { '15': '验证', '21': '预检', '24': '出境检验检疫', '25': '核查货证', '28': '出境验证', '13': '入境检验检疫', '14': '流向' };
     var json_data_woodpacking = { '9': '无木', '1': '天然木制作的小木箱(架)', '2': '天然木制作的中木箱(架)', '3': '天然木制作的大木箱(架)', '4': '再生木制作的木箱', '5': '天然木制作的木托及板', '6': '再生木制作的木托及板', '7': '其他植物性包装及铺垫材料', '8': '动物性材料的包装及铺垫材料' };
-    var json_data_busitype = { '11': '空运进口', '31': '陆运进口', '41': '国内进口', '50': '特殊区域出口', '20': '海运出口', '60': '国内结转', '40': '国内出口', '21': '海运进口', '30': '陆运出口', '10': '空运出口', '51': '特殊区域进口' };
-    var role = getQueryString("role");
-    var common_data_jydw = [];
+  
+    
     var busitype = "";
     switch (busitypeid) {
         case "10":
@@ -43,16 +39,23 @@
             busitype = "特殊区域"; break;
     }
     Ext.onReady(function () {
-        initCompetenceTree(module);//初始化权限菜单
+
         Ext.Ajax.request({
-            url: "/OrderDomestic/Ini_Base_Data",
+            url: "/Common/Ini_Base_Data",
             params: {
                 busitype: busitype
             },
             success: function (response, opts) {
                 var commondata = Ext.decode(response.responseText)
                 common_data_jydw = commondata.jydw;//经营单位  查询区要用
+
                 initSearch();  //查询区域
+
+                store_busitype = Ext.create('Ext.data.JsonStore', {
+                    fields: ['CODE', 'NAME'],
+                    data: common_data_busitype
+                });
+
                 var store = Ext.create('Ext.data.JsonStore', {
                     fields: ['ID', 'PREINSPCODE', 'CODE', 'CUSTOMSSTATUS', 'ISPRINT', 'APPROVALCODE', 'INSPECTIONCODE', 'REPFINISHTIME',
                         'UPCNNAME', 'INSPTYPE', 'ENTRYPORT', 'TRANSTOOL', 'LADINGNO', 'TOTALNO', 'TRADE', 'CONTRACTNO', 'INSPUNITNAME', 'BUSITYPE',
@@ -122,9 +125,6 @@
                         enableTextSelection: true
                     }
                 })
-                //初始化加载海关状态记录
-                //设置title
-                settitle();
             }
         });
     })
@@ -152,35 +152,18 @@
         if (dataindex == "WOODPACKINGID") {
             rtn = json_data_woodpacking[value];
         }
-        if (dataindex == "BUSITYPE") {
-            rtn = json_data_busitype[value];
+        if (dataindex == "BUSITYPE" && value) {
+            var rec = store_busitype.findRecord('CODE', value);
+            if (rec) {
+                rtn = rec.get("NAME");
+            }
         }
         return rtn;
-    }
-    //重置
-    function Reset() {
-        combo_1.setValue("BUSIUNITCODE");
-        combo_1_1.setValue("");
-        combo_2.setValue("CUSNO");
-        field_2_1.setValue("");
-        combo_3.setValue("DYBZ");
-        combo_3_1.setValue("");
-        combo_4.setValue("SUBMITTIME");
-        date_4_1.setValue("");
-        date_4_2.setValue("");
     }
 
     //查询
     function Select() {
         pgbar.moveFirst();
-    }
-    //打开海关状态记录
-    function showwin(val) {
-        bjdcode = val;
-        store_Tradestatus.reload();
-        recordViewWin.items.add(gridstatuspanel);
-        recordViewWin.doLayout();
-        recordViewWin.show();
     }
 
     //打开调阅信息
@@ -197,35 +180,7 @@
         }
         opencenterwin("/Common/FileConsult?source=inspect&ORDERCODE=" + recs[0].get("ORDERCODE") + "&BUSITYPE=" + recs[0].get("BUSITYPE") + "&PREINSPCODE=" + recs[0].get("CODE"), 1200, 900);
     }
-    //报关单类型title
-    function settitle() {
-        if (busitypeid == '11') {
-            Ext.get('navigator').setHTML('当前位置:空进订单》报检单管理');
-        }
-        if (busitypeid == '10') {
-            Ext.get('navigator').setHTML("当前位置:空出订单》报检单管理");
-        }
-        if (busitypeid == '21') {
-            document.getElementById('ywtype').innerHTML = "当前位置:海进订单》报检单管理";
-        }
-        if (busitypeid == '20') {
-            Ext.get('navigator').setHTML("当前位置:海出订单》报检单管理");
-        }
-        if (busitypeid == '31') {
-            Ext.get('navigator').setHTML("当前位置:陆进订单》报检单管理");
-        }
-        if (busitypeid == '30') {
-            Ext.get('navigator').setHTML("当前位置:陆出订单》报检单管理");
-            //gridpanel.columns[7].text = "出口口岸";
-            //gridpanel.columns[8].text = "提运单号(运抵编号)";
-        }
-        if (busitypeid == '40-41') {
-            Ext.get('navigator').setHTML("当前位置:国内订单》报检单管理");
-        }
-        if (busitypeid == '50-51') {
-            Ext.get('navigator').setHTML("当前位置:特殊区域订单》报检单管理");
-        }
-    }
+    
     //显示国检状态回执记录
     function showinspect_receipt(code_bjd) {
         var store_inspect = Ext.create('Ext.data.JsonStore', {
