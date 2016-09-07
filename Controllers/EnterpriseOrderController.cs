@@ -28,6 +28,11 @@ namespace MvcPlatform.Controllers
             return View();
         }
 
+        public ActionResult ProcessOrder()//订单暂存区
+        {
+            return View();
+        }
+
         #region 文件委托
         public string GetCode(string combin)
         {
@@ -273,6 +278,50 @@ namespace MvcPlatform.Controllers
                 dt.Rows.Add(dr);
             }
             return "{result:" + JsonConvert.SerializeObject(dt) + "}";
+        }
+
+
+        //报关行角色查看订单暂存区数据时 加载申报单位与之对应的数据 by panhuaguo 2016-08-12
+        public string LoadProcess()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string where = "";
+            if (!string.IsNullOrEmpty(Request["FILERECEVIEUNIT"]))//判断查询条件是否有值
+            {
+                where += " and t.FILERECEVIEUNITCODE='" + GetCode(Request["FILERECEVIEUNIT"]) + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["CODE"]))//判断查询条件是否有值
+            {
+                where += " and instr(t.CODE,'" + Request["CODE"].ToString().Trim() + "')>0 ";
+            }
+            if (!string.IsNullOrEmpty(Request["STATUS"]))//判断查询条件是否有值
+            {
+                where += " and  t.STATUS= " + Request["STATUS"];
+            }
+            if (!string.IsNullOrEmpty(Request["STARTDATE"]))//如果开始时间有值
+            {
+                where += " and t.SUBMITTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+            }
+            if (!string.IsNullOrEmpty(Request["ENDDATE"]))//如果结束时间有值
+            {
+                where += " and t.SUBMITTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+            }
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+            string sql = @"select * from ENT_ORDER t where t.FILEDECLAREUNITCODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where;
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
+            var json = JsonConvert.SerializeObject(dt, iso);
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
+        //报关行在看到已提交的委托后,可以直接标记为已受理，打印或者抓取电子档文件后,可以从其他渠道进行报关报检
+        public string SignProcess()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string sql = "update ent_order set acceptid='" + json_user.Value<string>("ID") + "',acceptname='" + json_user.Value<string>("REALNAME") + "',accepttime=sysdate,status=15 where instr('" + Request["ids"] + "',ID)>0";
+            int result = DBMgr.ExecuteNonQuery(sql);
+            return result == 1 ? "{success:true}" : "{success:false}";
         }
 
     }

@@ -3927,6 +3927,7 @@
     <Content Include="Views\Common\InspectList.cshtml" />
     <Content Include="Views\EnterpriseOrder\EntOrderList.cshtml" />
     <Content Include="Views\EnterpriseOrder\EnterpriseHome.cshtml" />
+    <Content Include="Views\EnterpriseOrder\ProcessOrder.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
