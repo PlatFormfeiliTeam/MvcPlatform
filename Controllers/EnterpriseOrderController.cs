@@ -61,6 +61,18 @@ namespace MvcPlatform.Controllers
             }
         }
 
+        public string Ini_Base_Data_REPWAY()
+        {
+            string sql = "";
+            string json_sbfs = "[]";//申报方式
+            string busitype = Request["busitype"];
+
+            sql = "select CODE,NAME||'('||CODE||')' NAME from SYS_REPWAY where Enabled=1 and instr(busitype,'" + busitype + "')>0";
+            json_sbfs = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+            
+            return "{sbfs:" + json_sbfs + "}";
+        }
+
         public string LoadList()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
@@ -105,7 +117,7 @@ namespace MvcPlatform.Controllers
             string sql = @"select t.ID, t.FILERECEVIEUNITCODE, t.FILERECEVIEUNITNAME, t.FILEDECLAREUNITCODE, t.FILEDECLAREUNITNAME, t.BUSITYPEID
                             , t.CUSTOMDISTRICTCODE, t.CUSTOMDISTRICTNAME, t.REPWAYID, t.STATUS
                             ,t.CODE, t.CREATEID, t.CREATENAME, t.CREATETIME, t.ASSOCIATENO, t.ORDERCODE, t.ENTERPRISECODE, t.ENTERPRISENAME, t.ACCEPTID, t.ACCEPTNAME
-                            ,t.ACCEPTTIME, t.SUBMITTIME 
+                            ,t.ACCEPTTIME, t.UNITCODE, t.CREATEMODE, t.REMARK 
                         from ENT_ORDER t                
                         where ENTERPRISECODE='" + json_user.Value<string>("CUSTOMERCODE") + "' " + where;
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql,"CREATETIME","desc"));
@@ -124,7 +136,7 @@ namespace MvcPlatform.Controllers
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             if (string.IsNullOrEmpty(ID))//如果为空、即新增的时候
             {
-                string result = "{STATUS:5,BUSITYPEID:'" + busitype + "'}";
+                string result = "{STATUS:0,BUSITYPEID:'" + busitype + "'}";
                 return "{data:" + result + ",filedata:" + filedata + "}";
             }
             else
@@ -136,6 +148,7 @@ namespace MvcPlatform.Controllers
                                     , filedeclareunitname
                                     , busitypeid, customdistrictcode, customdistrictname, repwayid, status, files, associateno
                                     , createid, createname, createtime, enterprisecode, enterprisename ,remark, code, isupload
+                                    , unitcode, createmode
                                 from ENT_ORDER a where ID = '" + ID + "'";
 
                 dt = DBMgr.GetDataTable(sql);
@@ -169,53 +182,72 @@ namespace MvcPlatform.Controllers
             JObject json_data = (JObject)JsonConvert.DeserializeObject(Request["data"]);
             string filedata = Request["filedata"].ToString();
 
-            if (Request["action"] + "" == "submit")
-            {
-                json_data.Remove("STATUS"); json_data.Add("STATUS", 10);
-                json_data.Add("SUBMITTIME", "sysdate");
-            }
-            else
-            {
-                json_data.Add("SUBMITTIME", "null");
-            }
+            string CREATEMODE = json_data.Value<string>("CREATEMODE");            
 
             string AssociateNo = "";//两单关联号          
-            string sql = "";
+            string insert_sql = "", update_sql = "", sql = "";
 
-            string exe_desc = "";//订单保存时记录各订单的执行情况
+            string exe_desc = ""; int order_res = 0;//订单保存时记录各订单的执行情况
 
             if (string.IsNullOrEmpty(ID))//新增
             {
-                DataTable dtid = DBMgr.GetDataTable("select ENT_ORDER_ID.Nextval from dual");
-                ID = dtid.Rows[0][0].ToString();
+                DataTable dtid = new DataTable();
+                insert_sql = @"insert into ENT_ORDER (id,  filerecevieunitcode, filerecevieunitname, filedeclareunitcode, filedeclareunitname, busitypeid
+                                            , customdistrictcode, customdistrictname, repwayid, status, files
+                                            , associateno, createid, createname, createtime, enterprisecode, enterprisename
+                                            , remark, code, unitcode, createmode) 
+                        values ('{0}','{1}','{2}','{3}','{4}','{5}'
+                                ,'{6}','{7}','{8}','{9}','{10}'
+                                ,'{11}','{12}','{13}',sysdate,'{14}','{15}'
+                                ,'{16}','{17}',(select fun_AutoQYBH(sysdate) from dual),'{18}')";
 
-                //(select fun_AutoQYBH(sysdate) from dual)
+                if (CREATEMODE == "按批次")
+                {
+                    dtid = DBMgr.GetDataTable("select ENT_ORDER_ID.Nextval from dual");
+                    ID = dtid.Rows[0][0].ToString();
 
-                sql = @"insert into ENT_ORDER (id, code, filerecevieunitcode, filerecevieunitname, filedeclareunitcode, filedeclareunitname, busitypeid, customdistrictcode, customdistrictname, repwayid
-                                                , status, files, associateno, createid, createname, createtime, enterprisecode, enterprisename,submittime, remark) 
-                        values ('{15}','{18}','{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}'
-                                                ,'{8}','{9}','{10}','{11}','{12}',sysdate,'{13}','{14}',{16},'{17}')";
-                sql = string.Format(sql, GetCode(json_data.Value<string>("FILERECEVIEUNIT")), GetName(json_data.Value<string>("FILERECEVIEUNIT")), GetCode(json_data.Value<string>("FILEDECLAREUNIT"))
-                        , GetName(json_data.Value<string>("FILEDECLAREUNIT")), json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE")
-                        , json_data.Value<string>("CUSTOMDISTRICTNAME"), json_data.Value<string>("REPWAYID"), json_data.Value<string>("STATUS"), filedata
-                        , AssociateNo, json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
-                        , ID, json_data.Value<string>("SUBMITTIME"), json_data.Value<string>("REMARK"), json_data.Value<string>("CODE")
-                        );
+                    sql = string.Format(insert_sql, ID, GetCode(json_data.Value<string>("FILERECEVIEUNIT")), GetName(json_data.Value<string>("FILERECEVIEUNIT")), GetCode(json_data.Value<string>("FILEDECLAREUNIT")), GetName(json_data.Value<string>("FILEDECLAREUNIT")), json_data.Value<string>("BUSITYPEID")
+                       , json_data.Value<string>("CUSTOMDISTRICTCODE"), json_data.Value<string>("CUSTOMDISTRICTNAME"), json_data.Value<string>("REPWAYID"), json_data.Value<string>("STATUS"), filedata
+                       , AssociateNo, json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
+                       , json_data.Value<string>("REMARK"), json_data.Value<string>("CODE"), CREATEMODE
+                       );
+                    order_res = DBMgr.ExecuteNonQuery(sql);
+                }
+
+                if (CREATEMODE == "按文件")
+                {
+                    JArray jarry = JsonConvert.DeserializeObject<JArray>(filedata);
+                    foreach (JObject json in jarry)
+                    {
+                        dtid = DBMgr.GetDataTable("select ENT_ORDER_ID.Nextval from dual");
+                        ID = dtid.Rows[0][0].ToString();
+
+                        sql = string.Format(insert_sql, ID, GetCode(json_data.Value<string>("FILERECEVIEUNIT")), GetName(json_data.Value<string>("FILERECEVIEUNIT")), GetCode(json_data.Value<string>("FILEDECLAREUNIT")), GetName(json_data.Value<string>("FILEDECLAREUNIT")), json_data.Value<string>("BUSITYPEID")
+                                                    , json_data.Value<string>("CUSTOMDISTRICTCODE"), json_data.Value<string>("CUSTOMDISTRICTNAME"), json_data.Value<string>("REPWAYID"), json_data.Value<string>("STATUS"), "[" + JsonConvert.SerializeObject(json) + "]"
+                                                    , AssociateNo, json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
+                                                    , json_data.Value<string>("REMARK"), json_data.Value<string>("CODE"), CREATEMODE
+                                                    );
+                        order_res = DBMgr.ExecuteNonQuery(sql);
+                    }
+                }
+
+
             }
             else
             {
-                sql = @"update ENT_ORDER  set filerecevieunitcode='{0}',filerecevieunitname='{1}',filedeclareunitcode='{2}',filedeclareunitname='{3}',busitypeid='{4}',customdistrictcode='{5}',
-                            customdistrictname='{6}',repwayid='{7}',status='{8}' ,files='{9}',associateno='{10}',createid='{11}',
-                            createname='{12}',createtime=sysdate,enterprisecode='{13}',enterprisename='{14}',submittime={16},remark='{17}',code='{18}' where id='{15}'";
-                sql = string.Format(sql, GetCode(json_data.Value<string>("FILERECEVIEUNIT")), GetName(json_data.Value<string>("FILERECEVIEUNIT")), GetCode(json_data.Value<string>("FILEDECLAREUNIT"))
+                update_sql = @"update ENT_ORDER  set filerecevieunitcode='{1}',filerecevieunitname='{2}',filedeclareunitcode='{3}',filedeclareunitname='{4}',busitypeid='{5}',customdistrictcode='{6}',
+                            customdistrictname='{7}',repwayid='{8}' ,files='{9}',associateno='{10}',createid='{11}',
+                            createname='{12}',createtime=sysdate,enterprisecode='{13}',enterprisename='{14}',remark='{15}',code='{16}' where id='{0}'";
+                sql = string.Format(update_sql, ID, GetCode(json_data.Value<string>("FILERECEVIEUNIT")), GetName(json_data.Value<string>("FILERECEVIEUNIT")), GetCode(json_data.Value<string>("FILEDECLAREUNIT"))
                         , GetName(json_data.Value<string>("FILEDECLAREUNIT")), json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE")
-                        , json_data.Value<string>("CUSTOMDISTRICTNAME"), json_data.Value<string>("REPWAYID"), json_data.Value<string>("STATUS"), filedata
-                        , AssociateNo, json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
-                        , ID, json_data.Value<string>("SUBMITTIME"), json_data.Value<string>("REMARK"), json_data.Value<string>("CODE")
+                        , json_data.Value<string>("CUSTOMDISTRICTNAME"), json_data.Value<string>("REPWAYID"), filedata, AssociateNo, json_user.Value<string>("ID")
+                        , json_user.Value<string>("REALNAME"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
+                        , json_data.Value<string>("REMARK"), json_data.Value<string>("CODE")
                         );
+                order_res = DBMgr.ExecuteNonQuery(sql);
             }
 
-            int order_res = DBMgr.ExecuteNonQuery(sql);
+
             if (order_res == 0)
             {
                 exe_desc = "保存失败!";
@@ -224,20 +256,19 @@ namespace MvcPlatform.Controllers
             return "{ID:'" + ID + "',result:'" + exe_desc + "'}";
         }
 
-        public ActionResult Delete(string id)
+        public string Delete()
         {
-            string ids = id.TrimEnd(',');
-            string msg = "删除失败！";
+            string ids = Request["id"].ToString().TrimEnd(',');
+            string json = "{success:false}";
 
-            string sql = @"delete from ENT_ORDER where id in (" + ids + ")";
-            sql = string.Format(sql, id);
-
+            string sql = "delete from ENT_ORDER where id in (" + ids + ")";
             int i = DBMgr.ExecuteNonQuery(sql);
             if (i > 0)
             {
-                msg = "删除成功！";
+                json = "{success:true}";
             }
-            return Json(msg, JsonRequestBehavior.AllowGet);
+            
+            return json;
         }
 
         private string GetPageSql(string tempsql, string order, string asc)

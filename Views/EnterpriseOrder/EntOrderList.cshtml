@@ -57,7 +57,7 @@
                 var store_Trade = Ext.create('Ext.data.JsonStore', {
                     fields: ['ID', 'FILERECEVIEUNITCODE', 'FILERECEVIEUNITNAME', 'FILEDECLAREUNITCODE', 'FILEDECLAREUNITNAME', 'BUSITYPEID', 'CUSTOMDISTRICTCODE', 'CUSTOMDISTRICTNAME', 'REPWAYID', 'STATUS',
                          'CODE', 'CREATEID', 'CREATENAME', 'CREATETIME', 'ASSOCIATENO', 'ORDERCODE', 'ENTERPRISECODE', 'ENTERPRISENAME', 'ACCEPTID', 'ACCEPTNAME',
-                         'ACCEPTTIME', 'SUBMITTIME'],
+                         'ACCEPTTIME', 'UNITCODE', 'CREATEMODE', 'REMARK'],
                     pageSize: 20,
                     proxy: {
                         type: 'ajax',
@@ -97,6 +97,7 @@
                     columns: [
                     { xtype: 'rownumberer', width: 35 },
                     { header: 'ID', dataIndex: 'ID', hidden: true },
+                    { header: '统一编号', dataIndex: 'UNITCODE', width: 120 },
                     { header: '企业编号', dataIndex: 'CODE', width: 120 },
                     { header: '文件接收单位', dataIndex: 'FILERECEVIEUNITNAME', width: 150 },
                     { header: '文件申报单位', dataIndex: 'FILEDECLAREUNITNAME', width: 150 },
@@ -104,7 +105,8 @@
                     { header: '申报关区', dataIndex: 'CUSTOMDISTRICTCODE', width: 70 },
                     { header: '状态', dataIndex: 'STATUS', width: 70, renderer: render },
                     { header: '创建时间', dataIndex: 'CREATETIME', width: 120 },
-                    { header: '提交时间', dataIndex: 'SUBMITTIME', width: 120 },
+                    { header: '生成方式', dataIndex: 'CREATEMODE', width: 120 },
+                    { header: '备注', dataIndex: 'REMARK', width: 200 },
                     ],
                     listeners:
                     {
@@ -174,7 +176,7 @@
 
         var store_status_S = Ext.create('Ext.data.JsonStore', {
             fields: ['CODE', 'NAME'],
-            data: [{ "CODE": 5, "NAME": "未提交" }, { "CODE": 10, "NAME": "已提交" }, { "CODE": 15, "NAME": "已受理" }]
+            data: [{ "CODE": 0, "NAME": "未关联" }, { "CODE": 1, "NAME": "已关联" }]
         })
 
         var combo_status = Ext.create('Ext.form.field.ComboBox', {//业务状态
@@ -192,7 +194,7 @@
         var start_date = Ext.create('Ext.form.field.Date', {
             id: 'start_date',
             format: 'Y-m-d',
-            fieldLabel: '提交日期从',
+            fieldLabel: '创建日期从',
             labelWidth: 65, columnWidth: .15,
         })
         var end_date = Ext.create('Ext.form.field.Date', {
@@ -231,9 +233,8 @@
 
         switch (dataindex) {
             case "STATUS":
-                if (value == "5") { rtn = "未提交"; }
-                if (value == "10") { rtn = "已提交"; }
-                if (value == "15") { rtn = "已受理"; }
+                if (value == "0") { rtn = "未关联"; }
+                if (value == "1") { rtn = "已关联"; }
                 break;
             case "BUSITYPEID":
                 var rec = store_busitype.findRecord('CODE', value);
@@ -258,8 +259,8 @@
             return;
         }
         for (var i = 0; i < recs.length; i++) {
-            if (recs[i].data.STATUS != '5') {
-                Ext.MessageBox.alert('提示', '已提交的订单不能删除！');
+            if (recs[i].data.STATUS != '0') {
+                Ext.MessageBox.alert('提示', '已关联的订单不能删除！');
                 return;
             }
         }
@@ -269,15 +270,18 @@
                 for (var i = 0; i < recs.length; i++) {
                     ids += recs[i].data.ID + ',';
                 }
-                $.ajax({
-                    type: "GET",
+                Ext.Ajax.request({
                     url: '/EnterpriseOrder/Delete',
-                    data: { 'id': ids },
-                    dataType: "json",
-                    success: function (data, textStatus) {
-                        gridpanel.store.reload();
-                    }, error: function (XMLResponse) {
-                        alert("保存失败！");
+                    params: { id: ids },
+                    success: function (response, success, option) {
+                        var res = Ext.decode(response.responseText);
+                        if (res.success) {
+                            Ext.MessageBox.alert('提示', '删除成功！');
+                            gridpanel.store.reload();
+                        }
+                        else {
+                            Ext.MessageBox.alert('提示', '删除失败！');
+                        }
                     }
                 });
             }
