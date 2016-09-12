@@ -45,6 +45,10 @@
     <Reference Include="itextsharp">
       <HintPath>Lib\itextsharp.dll</HintPath>
     </Reference>
+    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Oracle.ManagedDataAccess, Version=4.121.1.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -206,6 +210,7 @@
     <Compile Include="Common\ftphelper.cs" />
     <Compile Include="Common\SeRedis.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AccountManagementController.cs" />
     <Compile Include="Controllers\CommonController.cs" />
     <Compile Include="Controllers\EnterpriseOrderController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -221,6 +226,7 @@
     <Compile Include="Models\OrderEn.cs" />
     <Compile Include="Models\PostEnum.cs" />
     <Compile Include="Models\PreOrderEn.cs" />
+    <Compile Include="Models\Sysmodule.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />
     <Compile Include="obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs" />
@@ -3872,6 +3878,11 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+    <Content Include="Views\AccountManagement\form_user.js" />
+    <Content Include="Views\AccountManagement\modifypassword.js" />
+    <Content Include="Views\AccountManagement\subaccount.js" />
+    <Content Include="Views\AccountManagement\supplier.js" />
+    <Content Include="Views\AccountManagement\sysconfig.js" />
     <Content Include="Views\EnterpriseOrder\createwinjs.js" />
     <Content Include="Views\OrderAirIn\form.js" />
     <Content Include="Views\OrderAirOut\form.js" />
@@ -3928,6 +3939,9 @@
     <Content Include="Views\EnterpriseOrder\EntOrderList.cshtml" />
     <Content Include="Views\EnterpriseOrder\EnterpriseHome.cshtml" />
     <Content Include="Views\EnterpriseOrder\ProcessOrder.cshtml" />
+    <Content Include="Views\AccountManagement\ChildAccount.cshtml" />
+    <Content Include="Views\AccountManagement\ChildEdit.cshtml" />
+    <Content Include="Views\AccountManagement\Authorization.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

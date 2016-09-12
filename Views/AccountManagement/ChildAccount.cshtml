@@ -1,0 +1,84 @@
+﻿<link href="/js/Extjs42/resources/css/ext-all-neptune.css" rel="stylesheet" />
+<script src="/js/Extjs42/bootstrap.js" type="text/javascript"></script>
+<script src="/js/pan.js" type="text/javascript"></script>
+<script type="text/javascript" src="/js/upload/plupload.full.min.js"></script>
+<script src="~/Views/AccountManagement/form_user.js"></script>
+<script src="~/Views/AccountManagement/subaccount.js"></script>
+<script src="~/Views/AccountManagement/supplier.js"></script>
+<script src="~/Views/AccountManagement/modifypassword.js"></script>
+<script src="~/Views/AccountManagement/sysconfig.js"></script>
+<style type="text/css">
+    .x-panel-header-default {
+        background-image: none;
+        background-color: #57638b;
+        border: 1px solid #57638b;
+    }
+</style>
+<script type="text/javascript">
+    var store_user, field_ID, field_PASSWORD, field_TYPE, treepanel;
+    var formpanel, form_supplier, gridpanel, form_sysconfig;
+    Ext.onReady(function () {
+        Ext.Ajax.request({
+            url: "/AccountManagement/LoadCurrentUser",
+            success: function (response, option) {
+                var data = Ext.decode(response.responseText);
+                form_user_init();
+                var items = [{ title: '基本信息', items: [formpanel] }];
+                if (data.data.TYPE == 1 && !data.data.PARENTID) {//如果是主账户
+                    subaccount_init();
+                    supplier_ini();
+                    sysconfig_ini();
+                    items.push({ title: '子账户信息', items: [gridpanel] });
+                    //如果CUSTOMER的角色包含客户
+                    if (data.data.ISCUSTOMER) {
+                        items.push({ title: '供应商设置', items: [form_supplier] });
+                        items.push({ title: '系统参数', items: [form_sysconfig] });
+                    }
+                }
+                var tabpanel = Ext.create('Ext.tab.Panel', {
+                    items: items,
+                    renderTo: 'appConId'
+                });
+                var uploader = new plupload.Uploader({
+                    runtimes: 'html5,flash,silverlight,html4',
+                    browse_button: 'img_upload', // you can pass an id...
+                    url: '/AccountManagement/Upload',
+                    flash_swf_url: '/js/upload/Moxie.swf',
+                    silverlight_xap_url: '/js/upload/Moxie.xap',
+                    filters: {
+                        max_file_size: '5000mb',
+                        mime_types: [
+                            { title: "Image files", extensions: "*" },
+                            { title: "Zip files", extensions: "zip,rar" }
+                        ]
+                    }
+                });
+                uploader.init();
+                uploader.bind('FilesAdded', function (up, files) {
+                    uploader.start();
+                });
+                uploader.bind("FileUploaded", function (uploader, file, responseObject) {
+                    var ext_img = Ext.getCmp('user_img');
+                    ext_img.setSrc(responseObject.response);
+                })
+                formpanel.getForm().setValues(data.data);
+                Ext.getCmp('user_img').setSrc(data.data.IMGPATH);
+                form_supplier.getForm().setValues(data.data);
+                form_sysconfig.getForm().setValues(data.data);
+                if (data.data.BUSITYPES) {
+                    var items = data.data.BUSITYPES.split(',');
+                    Ext.getCmp('cb_group_busitype').setValue({ BUSITYPES: items });
+                }
+            }
+        });
+    })
+    //修改密码
+    function updatePassword() {
+        opencenterwin("/AccountManagement/PasswordEdit?Password=" + field_PASSWORD.getRawValue() + "&ID=" + field_ID.getRawValue(), 800, 400);
+    }
+</script>
+
+<div class="container">
+    <div id="div_form"></div>
+    <div id="appConId"></div>
+</div>
