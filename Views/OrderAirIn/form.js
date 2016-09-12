@@ -50,7 +50,7 @@
     })
     var combo_ENTRUSTTYPENAME = Ext.create('Ext.form.field.ComboBox', {
         id: 'combo_ENTRUSTTYPENAME',
-        name: 'ENTRUSTTYPEID',
+        name: 'ENTRUSTTYPE',
         hideTrigger: true,
         store: store_ENTRUSTTYPENAME,
         fieldLabel: '委托类型',
@@ -114,7 +114,7 @@
         data: common_data_sbgq
     })
     var combo_CUSTOMDISTRICTNAME = Ext.create('Ext.form.field.ComboBox', {//申报关区 这个数据比较多需要根据输入字符到后台动态模糊匹配
-        name: 'CUSTOMDISTRICTCODE',
+        name: 'CUSTOMAREACODE',
         store: store_CUSTOMDISTRICTNAME,
         fieldLabel: '申报关区',
         displayField: 'NAME',
@@ -218,12 +218,6 @@
         fieldLabel: '委托时间',
         readOnly: true
     });
-    //委托电话
-    var field_SUBMITUSERPHONE = Ext.create('Ext.form.field.Text', {
-        name: 'SUBMITUSERPHONE',
-        fieldLabel: '委托电话',
-        readOnly: true
-    })
     //报检申报单位
     var tf_bjsbdw = Ext.create('Ext.form.field.Text', {
         id: 'tf_bjsbdw',
@@ -251,18 +245,6 @@
     var field_CREATETIME = Ext.create('Ext.form.field.Text', {
         name: 'CREATETIME1',
         fieldLabel: '维护时间',
-        readOnly: true
-    });
-    //平台客服
-    var field_CSNAME = Ext.create('Ext.form.field.Text', {
-        name: 'CSNAME',
-        fieldLabel: '平台客服',
-        readOnly: true
-    });
-    //客服电话
-    var field_CSPHONE = Ext.create('Ext.form.field.Text', {
-        name: 'CSPHONE',
-        fieldLabel: '客服电话',
         readOnly: true
     });
     //业务状态
@@ -652,19 +634,7 @@
     //隐藏的字段
     field_ID = Ext.create('Ext.form.field.Hidden', {
         name: 'ID'
-    });
-    var field_CLEARUNIT = Ext.create('Ext.form.field.Hidden', {
-        name: 'CLEARUNIT',
-    });
-    var field_CLEARUNITNAME = Ext.create('Ext.form.field.Hidden', {
-        name: 'CLEARUNITNAME',
-    });
-    var field_CUSTOMERCODE = Ext.create('Ext.form.field.Hidden', {
-        name: 'CUSTOMERCODE',
-    });
-    var field_CUSTOMERNAME = Ext.create('Ext.form.field.Hidden', {
-        name: 'CUSTOMERNAME',
-    });
+    });   
     var field_ORIGINALFILEIDS = Ext.create('Ext.form.field.Hidden', {
         id: 'field_ORIGINALFILEIDS',
         name: 'ORIGINALFILEIDS'
@@ -722,14 +692,14 @@
         },
         items: [
         { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_CODE, combo_ENTRUSTTYPENAME, combo_REPWAYNAME, combo_CUSTOMDISTRICTNAME, cont_bgsbdw] },
-        { layout: 'column', height: 42, border: 0, items: [combo_DECLWAY, field_SUBMITUSERNAME, field_SUBMITTIME, field_SUBMITUSERPHONE, cont_bjsbdw] },
-        { layout: 'column', height: 42, border: 0, items: [field_CREATEUSERNAME, field_CREATETIME, field_CSNAME, field_CSPHONE, field_STATUS] },
+        { layout: 'column', height: 42, border: 0, items: [combo_DECLWAY, field_SUBMITUSERNAME, field_SUBMITTIME, field_STATUS, cont_bjsbdw] },
+        { layout: 'column', height: 42, border: 0, items: [field_CREATEUSERNAME, field_CREATETIME] },
         { layout: 'column', border: 42, border: 0, items: [label_busiinfo, chk_container] },
         { layout: 'column', height: 42, border: 0, items: [field_CUSNO, combo_PORTCODE, field_jydw, field_TOTALNO, field_DIVIDENO] },
         { layout: 'column', height: 42, border: 0, items: [field_quanpackage, field_weight, field_contractno, field_myfs, field_TURNPRENO] },
         { layout: 'column', height: 42, border: 0, items: [combo_mzbz, field_CLEARANCENO, container_bgch, field_CLEARREMARK, chk_CHKLAWCONDITION] },
-        field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_BUSISHORTCODE, field_BUSISHORTNAME, field_CUSTOMERCODE, field_CUSTOMERNAME,
-        field_ID, field_CLEARUNIT, field_CLEARUNITNAME, field_TRADEWAYCODES, field_TRADEWAYCODES1,
+        field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_BUSISHORTCODE, field_BUSISHORTNAME,
+        field_ID, field_TRADEWAYCODES, field_TRADEWAYCODES1,
         field_CONTAINERTRUCK, field_ORIGINALFILEIDS
         ]
     });
