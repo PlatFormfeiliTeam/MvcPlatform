@@ -128,7 +128,7 @@ namespace MvcPlatform.Controllers
         public string loadform()
         {
             Object json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            string ID = Request["ID"]; string busitype = Request["busitype"];
+            string ID = Request["ID"]; //string busitype = Request["busitype"];
 
             DataTable dt;
             string data = "{}", filedata = "[]";
@@ -136,7 +136,7 @@ namespace MvcPlatform.Controllers
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             if (string.IsNullOrEmpty(ID))//如果为空、即新增的时候
             {
-                string result = "{STATUS:0,BUSITYPEID:'" + busitype + "'}";
+                string result = "{STATUS:0}";//string result = "{STATUS:0,BUSITYPEID:'" + busitype + "'}";
                 return "{data:" + result + ",filedata:" + filedata + "}";
             }
             else

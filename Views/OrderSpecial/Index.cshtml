@@ -32,9 +32,9 @@
                     data: common_data_sbfs
                 });
                 Ext.regModel('TRADE', {
-                    fields: ['ID', 'ENTRUSTTYPEID', 'STATUS', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE', 'PORTNAME', 'TURNPRENO', 'SUBMITTIME',
-                        'BUSIUNITNAME', 'BUSISHORTNAME', 'BusiUnitCode', 'CUSTOMERNAME', 'CONTRACTNO', 'TOTALNO', 'DIVIDENO', 'REPWAYID', 'GOODSNUMGOODSNW', 'GOODSWEIGHT',
-                        'GOODSGW', 'CUSTOMDISTRICTCODE', 'CUSTOMDISTRICTNAME', 'LAWCONDITION', 'ASSOCIATENO', 'ISINVALID', 'BUSITYPE']
+                    fields: ['ID', 'ENTRUSTTYPE', 'STATUS', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE', 'TURNPRENO', 'SUBMITTIME'
+                        , 'BUSIUNITNAME', 'BUSIUNITCODE', 'CUSTOMERNAME', 'CONTRACTNO', 'TOTALNO', 'GOODSNUM', 'GOODSGW', 'CUSTOMAREACODE', 'LAWFLAG'
+                        , 'ISINVALID', 'BUSITYPE']
                 })
                 store_Trade = Ext.create('Ext.data.JsonStore', {
                     model: 'TRADE',
@@ -87,14 +87,14 @@
                     { header: '报检状态', hidden: true, dataIndex: 'INSPSTATUS', width: 90, renderer: render },
                     { header: '订单编号', dataIndex: 'CODE', width: 100 },
                     { header: '客户编号', dataIndex: 'CUSNO', width: 120 },
-                    { header: '经营单位', dataIndex: 'BUSISHORTNAME', width: 100 },
-                    { header: '合同发票号', dataIndex: 'CONTRACTNO', width: 100 },
+                    { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 100 },
+                    { header: '合同号', dataIndex: 'CONTRACTNO', width: 100 },
                     { header: '申报方式', dataIndex: 'REPWAYID', width: 100, renderer: render },
-                    { header: '件数/重量', dataIndex: 'GOODSNUMGOODSNW', width: 100 },
-                    { header: '申报关区', dataIndex: 'CUSTOMDISTRICTCODE', width: 70 },
+                    { header: '件数/重量', dataIndex: 'GOODSNUM', width: 100 },
+                    { header: '申报关区', dataIndex: 'CUSTOMAREACODE', width: 70 },
                     { header: '进/出口岸', dataIndex: 'PORTCODE', width: 70 },
                     { header: '转关预录号', dataIndex: 'TURNPRENO', width: 70 },
-                    { header: '法检', dataIndex: 'LAWCONDITION', width: 60, renderer: render },
+                    { header: '法检', dataIndex: 'LAWFLAG', width: 60, renderer: render },
                     { header: '委托时间', dataIndex: 'SUBMITTIME', width: 130 }
                     ],
                     //添加双击事件
@@ -119,7 +119,7 @@
         ////大于等于20  小于40  报关状态叫【报关报检都叫预审中】   ==40  【报关报检状态都叫预审完成】  ==45  【报关报检都叫制单已受理】
         switch (dataindex) {
             case "STATUS":
-                if (record.get("ISINVALID") == "0") {
+                if (record.get("ISINVALID") == "1") {
                     rtn = "已作废";
                 }
                 else {
@@ -152,9 +152,14 @@
                     rtn = rec.get("NAME");
                 }
                 break;
-            case "LAWCONDITION":
+            case "LAWFLAG":
                 rtn = value ? "有" : "无";
-                break
+                break;
+            case "GOODSNUM":
+                if (record.get("GOODSNUM")) {
+                    rtn = record.get("GOODSNUM") + '/' + record.get("GOODSGW");
+                }
+                break;
         }
         return rtn;
     }

@@ -50,7 +50,7 @@
         data: wtlx_js_data
     })
     var combo_ENTRUSTTYPENAME = Ext.create('Ext.form.field.ComboBox', {
-        name: 'ENTRUSTTYPEID',
+        name: 'ENTRUSTTYPE',
         id: 'combo_ENTRUSTTYPENAME',
         hideTrigger: true,
         store: store_ENTRUSTTYPENAME,
@@ -120,7 +120,7 @@
         data: common_data_sbgq
     })
     var combo_CUSTOMDISTRICTNAME = Ext.create('Ext.form.field.ComboBox', {//申报关区 这个数据比较多需要根据输入字符到后台动态模糊匹配
-        name: 'CUSTOMDISTRICTCODE',
+        name: 'CUSTOMAREACODE',
         store: store_CUSTOMDISTRICTNAME,
         fieldLabel: '申报关区',
         displayField: 'NAME',
@@ -202,14 +202,6 @@
         fieldLabel: '委托时间',
         readOnly: true
     });
-    //委托电话
-    var field_SUBMITUSERPHONE = Ext.create('Ext.form.field.Text', {
-        xtype: 'textfield',
-        name: 'SUBMITUSERPHONE',
-        id: 'SUBMITUSERPHONE',
-        fieldLabel: '委托电话',
-        readOnly: true
-    })
     //报检申报单位
     var tf_bjsbdw = Ext.create('Ext.form.field.Text', {
         id: 'tf_bjsbdw',
@@ -239,18 +231,6 @@
         name: 'CREATETIME1',
         id: 'CREATETIME1',
         fieldLabel: '维护时间',
-        readOnly: true
-    });
-    //平台客服
-    var field_CSNAME = Ext.create('Ext.form.field.Text', {
-        name: 'CSNAME',
-        fieldLabel: '平台客服',
-        readOnly: true
-    });
-    //客服电话
-    var field_CSPHONE = Ext.create('Ext.form.field.Text', {
-        name: 'CSPHONE',
-        fieldLabel: '客服电话',
         readOnly: true
     });
     //业务状态
@@ -599,7 +579,7 @@
         xtype: 'checkboxfield',
         tabIndex: 18,
         fieldLabel: '法检状况',
-        name: 'LAWCONDITION',
+        name: 'LAWFLAG',
         id: 'LAWCONDITION',
         disabled: true
     }
@@ -665,22 +645,8 @@
     var field_ID = Ext.create('Ext.form.field.Hidden', {
         name: 'ID'
     });
-    var field_BUSIKIND = Ext.create('Ext.form.field.Hidden', {
-        name: 'BUSIKIND',
-        value: '002'
-    });
-    var field_ORDERWAY = Ext.create('Ext.form.field.Hidden', {
-        name: 'ORDERWAY',
-        value: '1'
-    });
-    var field_CLEARUNIT = Ext.create('Ext.form.field.Hidden', {
-        name: 'CLEARUNIT',
-        value: 'JSFLDGJWLGFYXGS'
-    });
-    var field_CLEARUNITNAME = Ext.create('Ext.form.field.Hidden', {
-        name: 'CLEARUNITNAME',
-        value: '江苏飞力达国际物流股份有限公司'
-    });
+   
+    
     var store_busitype = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
         data: [{ CODE: '51', NAME: '特殊区域进口' }, { CODE: '50', NAME: '特殊区域出口' }]
@@ -753,15 +719,14 @@
         },
         items: [
         { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_CODE, combo_ENTRUSTTYPENAME, combo_REPWAYNAME, combo_CUSTOMDISTRICTNAME, cont_bgsbdw] },
-        { layout: 'column', height: 42, border: 0, items: [combo_DECLWAY, field_SUBMITTIME, field_SUBMITUSERNAME, field_SUBMITUSERPHONE, cont_bjsbdw] },
-        { layout: 'column', height: 42, border: 0, items: [field_CREATEUSERNAME, field_CREATETIME, field_CSNAME, field_CSPHONE, field_STATUS] },
+        { layout: 'column', height: 42, border: 0, items: [combo_DECLWAY, field_SUBMITTIME, field_SUBMITUSERNAME, field_STATUS, cont_bjsbdw] },
+        { layout: 'column', height: 42, border: 0, items: [field_CREATEUSERNAME, field_CREATETIME] },
         { layout: 'column', border: 42, border: 0, items: [label_busiinfo, chk_container] },
         { layout: 'column', height: 42, border: 0, items: [field_CUSNO, combo_PORTCODE, field_jydw, field_quanpackage, field_weight] },
         { layout: 'column', height: 42, border: 0, items: [field_contractno, field_myfs, field_TURNPRENO, chk_CHKLAWCONDITION, field_CLEARANCENO] },
         { layout: 'column', height: 42, border: 0, items: [combo_GOODSTYPENAME, field_containerno, container_bgch, field_ENTRUSTREQUEST, combo_busitype] },
         field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_BUSISHORTCODE, field_BUSISHORTNAME, field_TRADEWAYCODES1,
-        field_TRADEWAYCODES, field_ID, field_BUSIKIND, field_ORDERWAY, field_CLEARUNIT,
-        field_CLEARUNITNAME, field_CONTAINERTRUCK, field_ORIGINALFILEIDS
+        field_TRADEWAYCODES, field_ID, field_CONTAINERTRUCK, field_ORIGINALFILEIDS
         ]
     });
 }

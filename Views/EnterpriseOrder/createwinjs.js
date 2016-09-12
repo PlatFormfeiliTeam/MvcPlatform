@@ -1,7 +1,8 @@
 ﻿/*****************************************************win 窗口 begin ********************************************/
 var repwayidcode;
 
-function addwin(ID, busitype) {
+//function addwin(ID, busitype) {
+function addwin(ID) {
     form_ini();
     var win = Ext.create("Ext.window.Window", {
         id: "wjcsWin",
@@ -12,7 +13,7 @@ function addwin(ID, busitype) {
         items: [Ext.getCmp('formpanel_u'), Ext.getCmp('panelfile')],
     });
     win.show();
-    loadform(ID, busitype);
+    loadform(ID);//loadform(ID, busitype);
 }
 
 function form_ini() {
@@ -312,10 +313,11 @@ function form_ini() {
     })
 }
 
-function loadform(ID, busitype) {
+//function loadform(ID, busitype) {
+function loadform(ID) {
     Ext.Ajax.request({
         url: "/EnterpriseOrder/loadform",
-        params: { ID: ID, busitype: busitype },
+        params: { ID: ID },//, busitype: busitype 
         success: function (response, opts) {
             var data = Ext.decode(response.responseText);
 
