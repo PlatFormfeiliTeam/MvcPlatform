@@ -1,18 +1,5 @@
-obj/Debug/DesignTimeResolveAssemblyReferences.cache
-obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
-obj/Debug/TempPE/Service References.FMService.Reference.cs.dll
-obj/Debug/TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
-obj/Debug/TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
-obj/Debug/TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
-obj/Debug/MvcPlatform.pdb
-obj/Debug/MvcPlatform.dll
-obj/Debug/MvcPlatform.csprojResolveAssemblyReference.cache
-obj/Debug/MvcPlatform.csproj.FileListAbsolute.txt
+obj/Debug/
 bin/MvcPlatform.dll
 bin/MvcPlatform.dll.config
 bin/MvcPlatform.pdb
-bin/System.Web.Mvc.xml
-bin/zh-Hans/System.Web.Mvc.resources.dll
-bin/System.Web.Mvc.xml
-bin/System.Web.Mvc.xml
-bin/System.Web.Mvc.xml
+FileUpload/file/
