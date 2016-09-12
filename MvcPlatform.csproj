@@ -204,6 +204,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Common\CreateOrderPre.cs" />
+    <Compile Include="Common\DBMgrBase.cs" />
     <Compile Include="Common\DBMgrERP.cs" />
     <Compile Include="Common\DBMgr.cs" />
     <Compile Include="Common\Extension.cs" />
@@ -228,9 +229,6 @@
     <Compile Include="Models\PreOrderEn.cs" />
     <Compile Include="Models\Sysmodule.cs" />
     <Compile Include="Models\User.cs" />
-    <Compile Include="obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />
-    <Compile Include="obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs" />
-    <Compile Include="obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service References\FMService\Reference.cs">
       <AutoGen>True</AutoGen>
@@ -3941,9 +3939,6 @@
     <Content Include="Lib\itextsharp.dll" />
     <Content Include="Lib\Oracle.ManagedDataAccess.dll" />
     <Content Include="Lib\StackExchange.Redis.dll" />
-    <Content Include="obj\Debug\MvcPlatform.csproj.FileListAbsolute.txt" />
-    <Content Include="obj\Debug\MvcPlatform.dll" />
-    <Content Include="obj\Debug\MvcPlatform.pdb" />
     <Content Include="Properties\DataSources\System.Data.DataSet.datasource" />
     <Content Include="bin\SceneOfCustoms.dll.config" />
     <Content Include="bin\MvcPlatform.dll.config" />
@@ -4116,11 +4111,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Shared\Empty.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="obj\Debug\DesignTimeResolveAssemblyReferences.cache" />
-    <Content Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
-    <Content Include="obj\Debug\MvcPlatform.csprojResolveAssemblyReference.cache" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
