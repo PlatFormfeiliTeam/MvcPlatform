@@ -143,11 +143,6 @@ namespace MvcPlatform.Controllers
                 //更新随附文件 
                 Extension.Update_Attachment(ordercode, filedata, json.Value<string>("ORIGINALFILEIDS"), json_user);
 
-                //如果是提交需创建订单预配信息
-                if (json.Value<string>("STATUS") == "15")
-                {
-                    Extension.add_cspond(json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSITYPE"), ordercode, "", "", json_user);
-                }
                 //插入订单状态变更日志
                 Extension.add_list_time(json.Value<Int32>("STATUS"), ordercode, json_user);
                 if (json.Value<Int32>("STATUS") > 15)

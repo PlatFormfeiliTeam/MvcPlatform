@@ -221,7 +221,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\OrderEn.cs" />
-    <Compile Include="Models\PostEnum.cs" />
     <Compile Include="Models\PreOrderEn.cs" />
     <Compile Include="Models\Sysmodule.cs" />
     <Compile Include="Models\User.cs" />

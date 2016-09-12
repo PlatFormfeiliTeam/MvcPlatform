@@ -636,10 +636,10 @@ function submit() {
     if (tabpanel.items.length == 2 && !formpanelhead2.getForm().isValid()) {
         msg = "关联订单表头数据验证未通过！";
     }
-    if (tabpanel.items.length == 2 && formpanelin2.isVisible() && !formpanelin2.getForm().isValid()) {
+    if (tabpanel.items.length == 2 && !formpanelin2.getForm().isValid()) {// && formpanelout2.isVisible()
         msg = "关联订单进口数据验证未通过！";
     }
-    if (tabpanel.items.length == 2 && formpanelout2.isVisible() && !formpanelout2.getForm().isValid()) {
+    if (tabpanel.items.length == 2 && !formpanelout2.getForm().isValid()) {// && formpanelout2.isVisible()
         msg = "关联订单出口数据验证未通过！";
     }
     if (msg) {

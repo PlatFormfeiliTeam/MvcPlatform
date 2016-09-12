@@ -102,13 +102,13 @@ namespace MvcPlatform.Controllers
             if (string.IsNullOrEmpty(ordercode))//如果订单号为空、即新增的时候
             {
                 string sql = "select * from base_company where CODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "' AND ENABLED=1 AND ROWNUM=1";//根据海关的10位编码查询申报单位
-                dt = DBMgr.GetDataTable(sql);
+                dt = DBMgrBase.GetDataTable(sql);
                 if (dt.Rows.Count > 0)
                 {
                     bgsb_unit = dt.Rows[0]["NAME"] + "";
                 }
                 sql = "select * from base_company where INSPCODE='" + json_user.Value<string>("CUSTOMERCIQCODE") + "' AND ENABLED=1 AND ROWNUM=1";//根据海关的10位编码查询申报单位
-                dt = DBMgr.GetDataTable(sql);
+                dt = DBMgrBase.GetDataTable(sql);
                 if (dt.Rows.Count > 0)
                 {
                     bjsb_unit = dt.Rows[0]["NAME"] + "";
@@ -122,21 +122,22 @@ namespace MvcPlatform.Controllers
             else
             {
                 string sql_pre = @"select ID,CODE,BUSITYPE,CUSNO,BUSIUNITCODE,CONTRACTNO,TOTALNO,DIVIDENO,TURNPRENO,CLEARANCENO,WOODPACKINGID,
-                      LAWCONDITION,GOODSNUM,GOODSWEIGHT,REGNO,REPWAYID,CUSTOMDISTRICTCODE,PORTCODE,
-                      REPUNITNAME||'('||REPUNITCODE||')' REPUNITCODE,INSPUNITNAME||'('||INSPUNITCODE||')' INSPUNITCODE,REMARK,
-                      CUSTOMERCODE,CREATEUSERID,CREATETIME,SUBMITUSERID,SUBMITTIME,CSACCEPTUSERID,STATUS,ENTRUSTREQUEST, ENTRUSTTYPEID,
-                      MANIFEST,SHIPNAME,FILGHTNO,LADINGBILLNO,PRIORITY,TRADEWAYCODES,DECLCARNO,CLEARUNIT,BUSIKIND,DECLWAY,ORDERWAY,PACKKIND,
-                      GOODSGW,GOODSNW,ARRIVEDNO,LANDREGNO,CSREQUEST,CLEARREMARK,CSID,CSACCEPTTIME,CSSUBMITTIME,MOID,MOACCEPTTIME,COID,
-                      COACCEPTTIME,ISINVALID,FIRSTLADINGBILLNO,SECONDLADINGBILLNO,GOODSTYPEID,CONTAINERNO,SECONDTRANSIT,ASSOCIATENO,CORRESPONDNO,EXTRASTATUS,INTERNALTYPE,
-                      ASSOCIATECUSTOMSNO,BUSIUNITNAME,REPUNITNAME,INSPUNITNAME,CUSTOMERNAME,CREATEUSERNAME,
-                      SUBMITUSERNAME,CSNAME,MONAME,CONAME,CLEARUNITNAME,FILINGNUMBER,ATTRIBUTION,TRADEWAYCODES1,
-                      CSSTARTTIME,CSTIME,SETNUM,PAPERNUM,MOACCEPTUSERID,COACCEPTUSERID,ASSOCIATEPEDECLNO,ISPAUSE,
-                      ASSOCIATETRADEWAY,DECLSTATUS,INSPSTATUS,DECLSETNUM,INSPSETNUM,DECLSHEETNUM,INSPSHEETNUM,PREDECLSETNUM,
-                      PREINSPSETNUM,MOSTARTTIME,MOENDTIME,MOTIME,COSTARTTIME,COENDTIME,COTIME,DECLPAUSE,INSPPAUSE,PORTNAME,
-                      CUSTOMDISTRICTNAME,SUBMITUSERPHONE,CSPHONE,YWBH,FINISHTIME,COBACK,PAUSENUM,MOACCEPTUSERNAME,COACCEPTUSERNAME,
-                      CSACCEPTUSERNAME,INVALIDREASON,CSISBACK,MOISBACK,COISBACK,INOUTTYPE,MOSUBMITTIME,
-                      BUSISHORTNAME,BUSISHORTCODE, COSUBMITTIME,IETYPE,CSSUBMITUSERID,CSSUBMITUSERNAME,SPECIALRELATIONSHIP,
-                      PRICEIMPACT,PAYPOYALTIES,PREISPAUSE from LIST_ORDER t";
+                      LAWCONDITION,GOODSNUM,GOODSWEIGHT,REPWAYID,CUSTOMDISTRICTCODE,PORTCODE,
+                      REPUNITNAME||'('||REPUNITCODE||')' REPUNITCODE,INSPUNITNAME||'('||INSPUNITCODE||')' INSPUNITCODE,
+                      CUSTOMERCODE,CREATEUSERID,CREATETIME,SUBMITUSERID,SUBMITTIME,STATUS,ENTRUSTREQUEST, ENTRUSTTYPEID,
+                      SHIPNAME,FILGHTNO,LADINGBILLNO,TRADEWAYCODES,DECLCARNO,CLEARUNIT,BUSIKIND,DECLWAY,ORDERWAY,PACKKIND,
+                      GOODSGW,GOODSNW,ARRIVEDNO,
+                      ISINVALID,FIRSTLADINGBILLNO,SECONDLADINGBILLNO,GOODSTYPEID,CONTAINERNO,ASSOCIATENO,CORRESPONDNO,
+                      BUSIUNITNAME,REPUNITNAME,INSPUNITNAME,CUSTOMERNAME,CREATEUSERNAME,
+                      SUBMITUSERNAME,CSNAME,CLEARUNITNAME,FILINGNUMBER,TRADEWAYCODES1,
+                      ASSOCIATEPEDECLNO,ISPAUSE,ASSOCIATETRADEWAY,DECLSTATUS,INSPSTATUS,PORTNAME,CUSTOMDISTRICTNAME,SUBMITUSERPHONE,CSPHONE,FINISHTIME,                                                                  
+                      BUSISHORTNAME,BUSISHORTCODE,IETYPE,CSSUBMITUSERID,CSSUBMITUSERNAME,SPECIALRELATIONSHIP,
+                      PRICEIMPACT,PAYPOYALTIES from LIST_ORDER t";
+                //,PREISPAUSE, COSUBMITTIME,MOSUBMITTIME,INOUTTYPE,COISBACK,MOISBACK,CSISBACK,INVALIDREASON, CSACCEPTUSERNAME,COACCEPTUSERNAME,MOACCEPTUSERNAME,PAUSENUM,COBACK,YWBH
+                //,DECLPAUSE,INSPPAUSE,PREINSPSETNUM,MOSTARTTIME,MOENDTIME,MOTIME,COSTARTTIME,COENDTIME,COTIME,DECLSETNUM,INSPSETNUM,DECLSHEETNUM,INSPSHEETNUM,PREDECLSETNUM,COACCEPTUSERID
+                //,CSTIME,SETNUM,PAPERNUM,MOACCEPTUSERID,CSSTARTTIME,,ATTRIBUTION,MONAME,CONAME,ASSOCIATECUSTOMSNO,INTERNALTYPE,EXTRASTATUS,SECONDTRANSIT,COACCEPTTIME,COID,MOACCEPTTIME,MOID
+                //,CSSUBMITTIME,CSACCEPTTIME,CSID,CLEARREMARK,CSREQUEST,LANDREGNO,PRIORITY,MANIFEST,CSACCEPTUSERID,REMARK,REGNO,
+
                 string sql = sql_pre + " where CODE = '" + ordercode + "'";
                 DataTable dt1 = DBMgr.GetDataTable(sql);
                 if (!string.IsNullOrEmpty(dt1.Rows[0]["CORRESPONDNO"] + ""))//如果存在多单关联号 多单关联号一定在主订单组里面
@@ -291,9 +292,6 @@ namespace MvcPlatform.Controllers
                 dt = DBMgr.GetDataTable(sql_tmp);
                 foreach (DataRow dr in dt.Rows)
                 {
-                    sql = "delete from list_cspond where ordercode='" + dr["CODE"] + "'";
-                    DBMgr.ExecuteNonQuery(sql);
-
                     sql = "delete from list_times where CODE='" + dr["CODE"] + "' AND STATUS=15";
                     DBMgr.ExecuteNonQuery(sql);
                     
@@ -518,10 +516,7 @@ namespace MvcPlatform.Controllers
                 {
                     exe_desc = "订单：" + code1 + "保存失败!<br />";
                 }
-                if (Request["action"] + "" == "submit")
-                {
-                    Extension.add_cspond(json1.Value<string>("BUSIUNITCODE"), "41", code1, AssociateNo, CorrespondNo, json_user);
-                }
+                
                 Extension.add_list_time(json1.Value<Int32>("STATUS"), code1, json_user);
             }
 
@@ -568,10 +563,7 @@ namespace MvcPlatform.Controllers
                 {
                     exe_desc = "订单：" + code2 + "保存失败!<br />";
                 }
-                if (Request["action"] + "" == "submit")
-                {
-                    Extension.add_cspond(json2.Value<string>("BUSIUNITCODE"), "40", code2, AssociateNo, CorrespondNo, json_user);
-                }
+                
                 Extension.add_list_time(json2.Value<Int32>("STATUS"), code2, json_user);
             }
             if (!string.IsNullOrEmpty(code3))
@@ -617,10 +609,7 @@ namespace MvcPlatform.Controllers
                 {
                     exe_desc = "订单：" + code3 + "保存失败!<br />";
                 }
-                if (Request["action"] + "" == "submit")
-                {
-                    Extension.add_cspond(json3.Value<string>("BUSIUNITCODE"), "41", code3, AssociateNo2, CorrespondNo, json_user);
-                }
+                
                 Extension.add_list_time(json3.Value<Int32>("STATUS"), code3, json_user);
             }
             if (!string.IsNullOrEmpty(code4))
@@ -666,10 +655,7 @@ namespace MvcPlatform.Controllers
                 {
                     exe_desc = "订单：" + code4 + "保存失败!<br />";
                 }
-                if (Request["action"] + "" == "submit")
-                {
-                    Extension.add_cspond(json4.Value<string>("BUSIUNITCODE"), "40", code4, AssociateNo2, CorrespondNo, json_user);
-                }
+                
                 Extension.add_list_time(json4.Value<Int32>("STATUS"), code4, json_user);
             }
             string file_data1 = Request["file_data1"] + "";
@@ -778,7 +764,7 @@ namespace MvcPlatform.Controllers
                     string chinname = (dt.Rows[0]["CHINNAME"] + "").Replace('（', '(').Replace('）', ')');
                     string sql_tmp = @"select a.id,a.INCODE,a.NAME,b.COMPANYCHNAME,b.COMPANYENNAME from base_company a left join user_rename_company b on b.CompanyId=a.ID
                                      where b.CUSTOMERID='" + json_user.Value<string>("CUSTOMERID") + "' and translate(name,'（）','()') = '" + chinname + "'";
-                    DataTable dt_tmp = DBMgr.GetDataTable(sql_tmp);
+                    DataTable dt_tmp = DBMgrBase.GetDataTable(sql_tmp);
                     if (dt_tmp.Rows.Count > 0)
                     {
                         dt.Rows[0]["BUSIUNITCODE"] = dt_tmp.Rows[0]["INCODE"] + "";
@@ -836,13 +822,13 @@ namespace MvcPlatform.Controllers
             string data1 = "{}"; string data2 = "{}"; string data3 = "{}"; string data4 = "{}";
             //初始化报关报检申报单位
             sql = "select * from base_company where CODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "' AND ENABLED=1 AND ROWNUM=1";//根据海关的10位编码查询申报单位
-            dt = DBMgr.GetDataTable(sql);
+            dt = DBMgrBase.GetDataTable(sql);
             if (dt.Rows.Count > 0)
             {
                 bgsb_unit = dt.Rows[0]["NAME"] + "";
             }
             sql = "select * from base_company where INSPCODE='" + json_user.Value<string>("CUSTOMERCIQCODE") + "' AND ENABLED=1 AND ROWNUM=1";//根据海关的10位编码查询申报单位
-            dt = DBMgr.GetDataTable(sql);
+            dt = DBMgrBase.GetDataTable(sql);
             if (dt.Rows.Count > 0)
             {
                 bjsb_unit = dt.Rows[0]["NAME"] + "";

@@ -66,12 +66,11 @@ namespace MvcPlatform.Controllers
             string ordercode = string.Empty;
             if (Request["action"] + "" == "submit")
             {
-                json.Remove("STATUS"); json.Remove("SUBMITTIME"); json.Remove("SUBMITUSERNAME"); json.Remove("SUBMITUSERID"); json.Remove("SUBMITUSERPHONE");
+                json.Remove("STATUS"); json.Remove("SUBMITTIME"); json.Remove("SUBMITUSERNAME"); json.Remove("SUBMITUSERID"); 
                 json.Add("STATUS", 15);
                 json.Add("SUBMITTIME", "sysdate");
                 json.Add("SUBMITUSERNAME", json_user.Value<string>("REALNAME"));
                 json.Add("SUBMITUSERID", json_user.Value<string>("ID"));
-                json.Add("SUBMITUSERPHONE", json_user.Value<string>("TELEPHONE") + "|" + json_user.Value<string>("MOBILEPHONE"));
             }
             else
             {
@@ -91,8 +90,8 @@ namespace MvcPlatform.Controllers
             {
                 ordercode = Extension.getOrderCode();
                 sql = @"INSERT INTO LIST_ORDER (
-                ID,BUSITYPE,CODE,CUSNO,BUSIUNITCODE,BUSIUNITNAME,CONTRACTNO,FIRSTLADINGBILLNO,SECONDLADINGBILLNO,TURNPRENO,
-                GOODSNUM,GOODSWEIGHT,WOODPACKINGID,CLEARANCENO,LAWCONDITION,ENTRUSTTYPEID,REPWAYID,CUSTOMDISTRICTCODE,CUSTOMDISTRICTNAME,
+                ID,BUSITYPE,CODE,CUSNO,BUSIUNITCODE,BUSIUNITNAME,CONTRACTNO,FIRSTLADINGBILLNO,SECONDLADINGBILLNO,TURNPRENO,GOODSNUM,GOODSWEIGHT,WOODPACKINGID,
+                CLEARANCENO,LAWCONDITION,ENTRUSTTYPEID,REPWAYID,CUSTOMDISTRICTCODE,CUSTOMDISTRICTNAME,
                 REPUNITCODE,REPUNITNAME,DECLWAY,PORTCODE,PORTNAME,INSPUNITCODE,INSPUNITNAME,ENTRUSTREQUEST,CREATEUSERID,CREATEUSERNAME,STATUS,
                 SUBMITUSERID,SUBMITUSERNAME,SUBMITUSERPHONE,CSPHONE,CUSTOMERCODE,CUSTOMERNAME,DECLCARNO,TRADEWAYCODES,TRADEWAYCODES1,GOODSGW,
                 GOODSNW,PACKKIND,BUSIKIND,ORDERWAY,CLEARUNIT,CLEARUNITNAME,SHIPNAME,FILGHTNO,GOODSTYPEID,CONTAINERNO,CREATETIME,
@@ -150,12 +149,7 @@ namespace MvcPlatform.Controllers
 
             //更新随附文件 
             Extension.Update_Attachment(ordercode, filedata, json.Value<string>("ORIGINALFILEIDS"), json_user);
-
-            //如果是提交需创建订单预配信息
-            if (json.Value<string>("STATUS") == "15")
-            {
-                Extension.add_cspond(json.Value<string>("BUSIUNITCODE"), "21", ordercode, "", "", json_user);
-            }
+           
             //插入订单状态变更日志
             Extension.add_list_time(json.Value<Int32>("STATUS"), ordercode, json_user);
             if (json.Value<Int32>("STATUS") > 15)
