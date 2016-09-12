@@ -45,10 +45,6 @@
     <Reference Include="itextsharp">
       <HintPath>Lib\itextsharp.dll</HintPath>
     </Reference>
-    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Oracle.ManagedDataAccess, Version=4.121.1.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -238,7 +234,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="bin\Antlr3.Runtime.dll" />
-    <Content Include="bin\Antlr3.Runtime.pdb" />
     <Content Include="bin\DotNetOpenAuth.AspNet.dll" />
     <Content Include="bin\DotNetOpenAuth.Core.dll" />
     <Content Include="bin\DotNetOpenAuth.OAuth.Consumer.dll" />
@@ -246,36 +241,9 @@
     <Content Include="bin\DotNetOpenAuth.OpenId.dll" />
     <Content Include="bin\DotNetOpenAuth.OpenId.RelyingParty.dll" />
     <Content Include="bin\EntityFramework.dll" />
-    <Content Include="bin\EntityFramework.SqlServer.dll" />
-    <Content Include="bin\EntityFramework.SqlServer.xml" />
-    <Content Include="bin\EntityFramework.xml" />
     <Content Include="bin\itextsharp.dll" />
-    <Content Include="bin\Microsoft.AspNet.Identity.Core.dll" />
-    <Content Include="bin\Microsoft.AspNet.Identity.Core.xml" />
-    <Content Include="bin\Microsoft.AspNet.Identity.EntityFramework.dll" />
-    <Content Include="bin\Microsoft.AspNet.Identity.EntityFramework.xml" />
-    <Content Include="bin\Microsoft.AspNet.Identity.Owin.dll" />
-    <Content Include="bin\Microsoft.AspNet.Identity.Owin.xml" />
     <Content Include="bin\Microsoft.Data.Edm.dll" />
     <Content Include="bin\Microsoft.Data.OData.dll" />
-    <Content Include="bin\Microsoft.Owin.dll" />
-    <Content Include="bin\Microsoft.Owin.Host.SystemWeb.dll" />
-    <Content Include="bin\Microsoft.Owin.Host.SystemWeb.xml" />
-    <Content Include="bin\Microsoft.Owin.Security.Cookies.dll" />
-    <Content Include="bin\Microsoft.Owin.Security.Cookies.xml" />
-    <Content Include="bin\Microsoft.Owin.Security.dll" />
-    <Content Include="bin\Microsoft.Owin.Security.Facebook.dll" />
-    <Content Include="bin\Microsoft.Owin.Security.Facebook.xml" />
-    <Content Include="bin\Microsoft.Owin.Security.Google.dll" />
-    <Content Include="bin\Microsoft.Owin.Security.Google.xml" />
-    <Content Include="bin\Microsoft.Owin.Security.MicrosoftAccount.dll" />
-    <Content Include="bin\Microsoft.Owin.Security.MicrosoftAccount.xml" />
-    <Content Include="bin\Microsoft.Owin.Security.OAuth.dll" />
-    <Content Include="bin\Microsoft.Owin.Security.OAuth.xml" />
-    <Content Include="bin\Microsoft.Owin.Security.Twitter.dll" />
-    <Content Include="bin\Microsoft.Owin.Security.Twitter.xml" />
-    <Content Include="bin\Microsoft.Owin.Security.xml" />
-    <Content Include="bin\Microsoft.Owin.xml" />
     <Content Include="bin\Microsoft.Web.Infrastructure.dll" />
     <Content Include="bin\Microsoft.Web.Infrastructure.xml" />
     <Content Include="bin\Microsoft.Web.Mvc.FixedDisplayModes.dll" />
@@ -286,9 +254,6 @@
     <Content Include="bin\Newtonsoft.Json.dll" />
     <Content Include="bin\Newtonsoft.Json.xml" />
     <Content Include="bin\Oracle.ManagedDataAccess.dll" />
-    <Content Include="bin\Owin.dll" />
-    <Content Include="bin\SceneOfCustoms.dll" />
-    <Content Include="bin\SceneOfCustoms.pdb" />
     <Content Include="bin\StackExchange.Redis.dll" />
     <Content Include="bin\System.Net.Http.dll" />
     <Content Include="bin\System.Net.Http.Formatting.dll" />
@@ -300,9 +265,7 @@
     <Content Include="bin\System.Web.Http.OData.dll" />
     <Content Include="bin\System.Web.Http.WebHost.dll" />
     <Content Include="bin\System.Web.Mvc.dll" />
-    <Content Include="bin\System.Web.Mvc.xml" />
     <Content Include="bin\System.Web.Optimization.dll" />
-    <Content Include="bin\System.Web.Optimization.xml" />
     <Content Include="bin\System.Web.Razor.dll" />
     <Content Include="bin\System.Web.Razor.xml" />
     <Content Include="bin\System.Web.WebPages.Deployment.dll" />
@@ -316,19 +279,14 @@
     <Content Include="bin\WebMatrix.Data.xml" />
     <Content Include="bin\WebMatrix.WebData.dll" />
     <Content Include="bin\WebMatrix.WebData.xml" />
-    <Content Include="bin\zh-Hans\EntityFramework.resources.dll" />
-    <Content Include="bin\zh-Hans\EntityFramework.SqlServer.resources.dll" />
-    <Content Include="bin\zh-Hans\Microsoft.AspNet.Identity.Core.resources.dll" />
-    <Content Include="bin\zh-Hans\Microsoft.AspNet.Identity.EntityFramework.resources.dll" />
-    <Content Include="bin\zh-Hans\Microsoft.AspNet.Identity.Owin.resources.dll" />
-    <Content Include="bin\zh-Hans\Microsoft.Owin.Host.SystemWeb.resources.dll" />
-    <Content Include="bin\zh-Hans\Microsoft.Owin.resources.dll" />
-    <Content Include="bin\zh-Hans\Microsoft.Owin.Security.Facebook.resources.dll" />
-    <Content Include="bin\zh-Hans\Microsoft.Owin.Security.Google.resources.dll" />
-    <Content Include="bin\zh-Hans\Microsoft.Owin.Security.MicrosoftAccount.resources.dll" />
-    <Content Include="bin\zh-Hans\Microsoft.Owin.Security.resources.dll" />
-    <Content Include="bin\zh-Hans\Microsoft.Owin.Security.Twitter.resources.dll" />
-    <Content Include="bin\zh-Hans\System.Web.Optimization.resources.dll" />
+    <Content Include="bin\zh-Hans\Microsoft.Web.WebPages.OAuth.resources.dll" />
+    <Content Include="bin\zh-Hans\System.Web.Helpers.resources.dll" />
+    <Content Include="bin\zh-Hans\System.Web.Razor.resources.dll" />
+    <Content Include="bin\zh-Hans\System.Web.WebPages.Deployment.resources.dll" />
+    <Content Include="bin\zh-Hans\System.Web.WebPages.Razor.resources.dll" />
+    <Content Include="bin\zh-Hans\System.Web.WebPages.resources.dll" />
+    <Content Include="bin\zh-Hans\WebMatrix.Data.resources.dll" />
+    <Content Include="bin\zh-Hans\WebMatrix.WebData.resources.dll" />
     <Content Include="Content\bootstrap32\css\bootstrap-theme.css" />
     <Content Include="Content\bootstrap32\css\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap32\css\bootstrap.css" />
@@ -3940,7 +3898,6 @@
     <Content Include="Lib\Oracle.ManagedDataAccess.dll" />
     <Content Include="Lib\StackExchange.Redis.dll" />
     <Content Include="Properties\DataSources\System.Data.DataSet.datasource" />
-    <Content Include="bin\SceneOfCustoms.dll.config" />
     <Content Include="bin\MvcPlatform.dll.config" />
     <None Include="Scripts\jquery-1.8.2-vsdoc.js" />
     <Content Include="Scripts\jquery-1.8.2.js" />
