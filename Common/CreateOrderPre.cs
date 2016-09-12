@@ -13,64 +13,6 @@ namespace MvcPlatform.Common
     public class CreateOrderPre : Controller
     {
         /// <summary>
-        /// 创建订单预配信息
-        /// </summary>
-        public int CreateOrderPreMatch(Models.OrderEn order)
-        {
-            DataTable dt = null;
-            int num = 0;
-            string str = string.Empty;
-
-            List<PreOrderEn> list = new List<PreOrderEn>();
-            if (!string.IsNullOrEmpty(order.BusiType) && !string.IsNullOrEmpty(order.BusiUnitCode) && !string.IsNullOrEmpty(order.CustomerCode))
-            {
-                string sel = @"select * from config_preorder where (instr(','||busitypes||',',','||'" + order.BusiType +
-                    "'||',')>0 or busitypes is null) and  (instr(','||customerids||',',','||'" + order.CustomerCode +
-                    "'||',')>0 or customerids is null) and (instr(','||busiunitcodes||',',','||'" + order.BusiUnitCode +
-                    "'||',')>0 or busiunitcodes is null) and enabled=1";
-                dt = DBMgr.GetDataTable(sel);
-            }
-            string cs = string.Empty, mo = string.Empty, co = string.Empty, decl = string.Empty, insp = string.Empty, regu = string.Empty;
-            if (dt == null)
-            {
-                return 0;
-            }
-            if (dt.Rows.Count > 0)
-            {
-
-                foreach (DataRow p in dt.Rows)
-                {
-                    switch (Convert.ToInt16(p["PreType"]))
-                    {
-                        case (int)PostEnum.CS:
-                            cs += p["UserId"] + ",";
-                            break;
-                        case (int)PostEnum.MO:
-                            mo += p["UserId"] + ",";
-                            break;
-                        case (int)PostEnum.CO:
-                            co += p["UserId"] + ",";
-                            break;
-                        case (int)PostEnum.DECL:
-                            decl += p["UserId"] + ",";
-                            break;
-                        case (int)PostEnum.INSP:
-                            insp += p["UserId"] + ",";
-                            break;
-                        case (int)PostEnum.REGU:
-                            regu += p["UserId"] + ",";
-                            break;
-                    }
-                }
-            }
-            string ins = @"insert into list_cspond(id,ordercode,precs,premo,preco,predecl,preinsp,preregu,priority,isback,status,correspondenceno,associateno,busitype)
-                values(list_cspond_id.nextval,'{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}')";
-            ins = string.Format(ins, order.Code, cs, mo, co, decl, insp, regu, order.Priority, 0, order.Status, order.CorrespondNo, order.AssociateNo, order.BusiType);
-            num = DBMgr.ExecuteNonQuery(ins);
-            return num;
-        }
-
-        /// <summary>
         /// 更新修改 list_times
         /// </summary>
         /// <param name="order"></param>

@@ -129,10 +129,10 @@ namespace MvcPlatform.Controllers
                 switch (Request["CONDITION1"])
                 {
                     case "BUSIUNITCODE"://经营单位
-                        where += " and BUSISHORTCODE='" + Request["VALUE1"] + "' ";
+                        where += " and BUSIUNITCODE='" + Request["VALUE1"] + "' ";
                         break;
                     case "CUSTOMDISTRICTCODE"://申报关区
-                        where += " and CUSTOMDISTRICTCODE='" + Request["VALUE1"] + "' ";
+                        where += " and CUSTOMAREACODE='" + Request["VALUE1"] + "' ";
                         break;
                     case "PORTCODE"://进口口岸
                         where += " and PORTCODE='" + Request["VALUE1"] + "' ";
@@ -194,7 +194,7 @@ namespace MvcPlatform.Controllers
                         }
                         if ((Request["VALUE3"] + "") == "订单已作废")
                         {
-                            where += " and ISINVALID='0' ";
+                            where += " and ISINVALID='1' ";
                         }
                         break;
                     case "bgzt":
@@ -233,10 +233,10 @@ namespace MvcPlatform.Controllers
                 switch (Request["CONDITION5"])
                 {
                     case "BUSIUNITCODE"://经营单位
-                        where += " and BUSISHORTCODE='" + Request["VALUE5"] + "' ";
+                        where += " and BUSIUNITCODE='" + Request["VALUE5"] + "' ";
                         break;
                     case "CUSTOMDISTRICTCODE"://申报关区
-                        where += " and CUSTOMDISTRICTCODE='" + Request["VALUE5"] + "' ";
+                        where += " and CUSTOMAREACODE='" + Request["VALUE5"] + "' ";
                         break;
                     case "PORTCODE"://进口口岸
                         where += " and PORTCODE='" + Request["VALUE5"] + "' ";
@@ -304,7 +304,7 @@ namespace MvcPlatform.Controllers
                         }
                         if ((Request["VALUE7"] + "") == "订单已作废")
                         {
-                            where += " and ISINVALID='0' ";
+                            where += " and ISINVALID='1' ";
                         }
                         break;
                     case "bgzt":
@@ -341,7 +341,7 @@ namespace MvcPlatform.Controllers
 
             if ((Request["VALUE3"] + "") != "订单已作废" && (Request["VALUE7"] + "") != "订单已作废")//在不查询已作废的订单情形下，皆显示正常的订单
             {
-                where += " and ISINVALID='1' ";
+                where += " and ISINVALID='0' ";
             }
 
             if ((Request["OnlySelf"] + "").Trim() == "fa fa-check-square-o")
@@ -351,12 +351,14 @@ namespace MvcPlatform.Controllers
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 BUSISHORTNAME,
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
-            string sql = @"select ID, CODE,ENTRUSTTYPEID,CUSNO,PORTCODE,PORTNAME,BUSIUNITNAME,FIRSTLADINGBILLNO,SECONDLADINGBILLNO,
+            /*string sql = @"select ID, CODE,ENTRUSTTYPEID,CUSNO,PORTCODE,PORTNAME,BUSIUNITNAME,FIRSTLADINGBILLNO,SECONDLADINGBILLNO,
                 BUSITYPE,CORRESPONDNO,LADINGBILLNO,ARRIVEDNO,CUSTOMERNAME,CONTRACTNO,TOTALNO,DIVIDENO,TURNPRENO,                
                 GOODSNUM || '/'|| GOODSGW  GOODSNUMGOODSNW,GOODSGW,REPWAYID, GOODSWEIGHT,CUSTOMDISTRICTCODE,
                 CUSTOMDISTRICTNAME,BUSISHORTNAME,ISINVALID,LAWCONDITION,STATUS,DECLSTATUS,INSPSTATUS,    
                 ASSOCIATENO,createtime CREATEDATE,SUBMITTIME from LIST_ORDER where instr('" + Request["busitypeid"] + "',BUSITYPE)>0 and customercode='" + json_user.Value<string>("CUSTOMERCODE") + "' " + where;
-            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATEDATE", "desc"));
+             */
+            string sql = @"select * from LIST_ORDER where instr('" + Request["busitypeid"] + "',BUSITYPE)>0 and customercode='" + json_user.Value<string>("CUSTOMERCODE") + "' " + where;
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "createtime", "desc"));
             var json = JsonConvert.SerializeObject(dt, iso);
             return "{rows:" + json + ",total:" + totalProperty + "}";
         }
@@ -372,63 +374,63 @@ namespace MvcPlatform.Controllers
             sql = "select CODE,NAME||'('||CODE||')' NAME from SYS_REPWAY where Enabled=1 and instr(busitype,'" + busitype + "')>0";
             if (busitype == "空运进口")
             {
-                //if ((Int32)redisClient.Exists("common_data_sbfs:kj") == 1)
-                //{
-                //    json_sbfs = redisClient.Get<string>("common_data_sbfs:kj");
-                //} 
-                //else
-                //{
-                json_sbfs = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
-                db.StringSet("common_data_sbfs:kj", json_sbfs);
-                //}
+                if (db.KeyExists("common_data_sbfs:kj"))
+                {
+                    json_sbfs = db.StringGet("common_data_sbfs:kj");
+                }
+                else
+                {
+                    json_sbfs = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                    db.StringSet("common_data_sbfs:kj", json_sbfs);
+                }
             }
             if (busitype == "空运出口")
             {
-                //if (db.KeyExists("common_data_sbfs:kc"))
-                //{
-                //    json_sbfs = db.StringGet("common_data_sbfs:kc");
-                //} 
-                //else
-                //{
-                json_sbfs = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
-                db.StringSet("common_data_sbfs:kc", json_sbfs);
-                // }
+                if (db.KeyExists("common_data_sbfs:kc"))
+                {
+                    json_sbfs = db.StringGet("common_data_sbfs:kc");
+                }
+                else
+                {
+                    json_sbfs = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                    db.StringSet("common_data_sbfs:kc", json_sbfs);
+                }
             }
             if (busitype == "陆运进口")
             {
-                //if (db.KeyExists("common_data_sbfs:lj"))
-                //{
-                //    json_sbfs = db.StringGet("common_data_sbfs:lj");
-                //} 
-                //else
-                //{
-                json_sbfs = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
-                db.StringSet("common_data_sbfs:lj", json_sbfs);
-                //}
+                if (db.KeyExists("common_data_sbfs:lj"))
+                {
+                    json_sbfs = db.StringGet("common_data_sbfs:lj");
+                }
+                else
+                {
+                    json_sbfs = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                    db.StringSet("common_data_sbfs:lj", json_sbfs);
+                }
             }
             if (busitype == "陆运出口")
             {
-                //if (db.KeyExists("common_data_sbfs:lc"))
-                //{
-                //    json_sbfs = db.StringGet("common_data_sbfs:lc");
-                //} 
-                //else
-                //{
-                json_sbfs = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
-                db.StringSet("common_data_sbfs:lc", json_sbfs);
-                //}
+                if (db.KeyExists("common_data_sbfs:lc"))
+                {
+                    json_sbfs = db.StringGet("common_data_sbfs:lc");
+                }
+                else
+                {
+                    json_sbfs = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                    db.StringSet("common_data_sbfs:lc", json_sbfs);
+                }
             }
             if (busitype == "海运进口")
             {
-                //if (db.KeyExists("common_data_sbfs:hj"))
-                //{
-                //    json_sbfs = db.StringGet("common_data_sbfs:hj");
-                //} 
-                //else
-                //{
-                json_sbfs = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
-                db.StringSet("common_data_sbfs:hj", json_sbfs);
-                // }
+                if (db.KeyExists("common_data_sbfs:hj"))
+                {
+                    json_sbfs = db.StringGet("common_data_sbfs:hj");
+                }
+                else
+                {
+                    json_sbfs = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                    db.StringSet("common_data_sbfs:hj", json_sbfs);
+                }
             }
             if (busitype == "海运出口")
             {
@@ -438,21 +440,21 @@ namespace MvcPlatform.Controllers
                 }
                 else
                 {
-                    json_sbfs = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
+                    json_sbfs = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
                     db.StringSet("common_data_sbfs:hc", json_sbfs);
                 }
             }
             if (busitype == "特殊区域")
             {
-                //if (db.KeyExists("common_data_sbfs:ts"))
-                //{
-                //    json_sbfs = db.StringGet("common_data_sbfs:ts").ToString();
-                //} 
-                //else
-                //{
-                json_sbfs = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
-                db.StringSet("common_data_sbfs:ts", json_sbfs);
-                //}
+                if (db.KeyExists("common_data_sbfs:ts"))
+                {
+                    json_sbfs = db.StringGet("common_data_sbfs:ts").ToString();
+                }
+                else
+                {
+                    json_sbfs = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                    db.StringSet("common_data_sbfs:ts", json_sbfs);
+                }
             }
             if (busitype == "国内")
             {
@@ -462,7 +464,7 @@ namespace MvcPlatform.Controllers
                 }
                 else
                 {
-                    json_sbfs = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
+                    json_sbfs = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
                     db.StringSet("common_data_sbfs:gn", json_sbfs);
                 }
             }
@@ -475,7 +477,7 @@ namespace MvcPlatform.Controllers
             else
             {
                 sql = "select CODE,NAME||'('||CODE||')' NAME from BASE_CUSTOMDISTRICT  where ENABLED=1 ORDER BY CODE";
-                json_sbgq = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
+                json_sbgq = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
                 db.StringSet("common_data:sbgq", json_sbgq);
             }
 
@@ -487,13 +489,15 @@ namespace MvcPlatform.Controllers
             else
             {
                 //2016-6-2 梁总提出一个改进 如果某一个经营单位 客户先 添加到自己的库了，但后来总库里面禁用了，则客户自己的库中也要禁用掉
-                sql = @"SELECT T.* FROM (
-                            SELECT a.CUSTOMERID, a.companychname||'('||a.companyenname||')' NAME ,a.companychname SHORTNAME, a.companyenname CODE,b.incode QUANCODE,b.name QUANNAME FROM USER_RENAME_COMPANY a 
-                            left join BASE_COMPANY b 
-                            on a.companyid = b.id 
-                            where b.incode is not null and a.companyenname is not null and b.enabled=1) T 
+                sql = @"SELECT T.* 
+                        FROM (
+                                SELECT a.CUSTOMERID, a.companychname||'('||a.companyenname||')' NAME ,a.companychname SHORTNAME, a.companyenname CODE,b.incode QUANCODE,b.name QUANNAME 
+                                FROM USER_RENAME_COMPANY a 
+                                    left join BASE_COMPANY b on a.companyid = b.id 
+                                where b.incode is not null and a.companyenname is not null and b.enabled=1
+                            ) T 
                             WHERE  T.CUSTOMERID = '" + json_user.Value<string>("CUSTOMERID") + "'";
-                json_jydw = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
+                json_jydw = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
                 db.StringSet("jydw:" + json_user.Value<string>("CUSTOMERID"), json_jydw);
             }
             string json_bgfs = "[]";//报关方式 
@@ -504,7 +508,7 @@ namespace MvcPlatform.Controllers
             else
             {
                 sql = "select CODE,NAME||'('||CODE||')' NAME  from SYS_DECLWAY where enabled=1 order by id asc";
-                json_bgfs = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
+                json_bgfs = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
                 db.StringSet("common_data:bgfs", json_bgfs);
             }
 
@@ -516,7 +520,7 @@ namespace MvcPlatform.Controllers
             else
             {
                 sql = "select CODE,NAME||'('||CODE||')' NAME from base_Packing";
-                json_bzzl = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
+                json_bzzl = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
                 db.StringSet("common_data:bzzl", json_bzzl);
             }
 
@@ -528,7 +532,7 @@ namespace MvcPlatform.Controllers
             else
             {
                 sql = @"select ID,CODE,NAME||'('||CODE||')' NAME from BASE_DECLTRADEWAY WHERE enabled=1";
-                json_myfs = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
+                json_myfs = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
                 db.StringSet("common_data:myfs", json_myfs);
             }
 
@@ -540,7 +544,7 @@ namespace MvcPlatform.Controllers
             else
             {
                 sql = "select CODE,NAME||'('||CONTAINERCODE||')' as MERGENAME,CONTAINERCODE from BASE_CONTAINERTYPE where enabled=1";
-                json_containertype = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
+                json_containertype = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
                 db.StringSet("common_data:containertype", json_containertype);
             }
 
@@ -552,7 +556,7 @@ namespace MvcPlatform.Controllers
             else
             {
                 sql = "select CODE,NAME as CONTAINERSIZE,NAME||'('||DECLSIZE||')' as MERGENAME,DECLSIZE from BASE_CONTAINERSIZE where enabled=1";
-                json_containersize = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
+                json_containersize = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
                 db.StringSet("common_data:containersize", json_containersize);
             }
 
@@ -565,7 +569,7 @@ namespace MvcPlatform.Controllers
             {
                 sql = @"select t.license, t.license||'('||t.whitecard||')' as MERGENAME,t.whitecard,t1.NAME||'('|| t1.CODE||')' as UNITNO from sys_declarationcar t
                 left join base_motorcade t1 on t.motorcade=t1.code where t.enabled=1";
-                json_truckno = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
+                json_truckno = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
                 db.StringSet("common_data:truckno", json_truckno);
             }
 
@@ -577,7 +581,7 @@ namespace MvcPlatform.Controllers
             else
             {
                 sql = @"select CONTAINERSIZE,CONTAINERTYPE,FORMATNAME,CONTAINERHS from rela_container t where t.enabled=1";
-                json_relacontainer = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
+                json_relacontainer = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
                 db.StringSet("common_data:relacontainer", json_relacontainer);
             }
             //木质包装
@@ -589,13 +593,9 @@ namespace MvcPlatform.Controllers
             else
             {
                 sql = @"select CODE,NAME||'('||CODE||')' NAME from SYS_WOODPACKING";
-                json_mzbz = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
+                json_mzbz = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
                 db.StringSet("common_data:mzbz", json_mzbz);
             }
-            //            string json_cur_usr = "";//当前用户信息
-            //            sql = @"SELECT a.*,b.INTERFACECODE FROM sys_user a  left join  sys_customer b on a.customerid=b.id 
-            //                  WHERE   a.ID = '" + json_user.Value<string>("ID") + "'";
-            //            json_cur_usr = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
             return "{jydw:" + json_jydw + ",sbfs:" + json_sbfs + ",sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",bzzl:" + json_bzzl + ",myfs:" + json_myfs + ",containertype:" + json_containertype + ",containersize:" + json_containersize + ",truckno:" + json_truckno + ",relacontainer:" + json_relacontainer + ",mzbz:" + json_mzbz + "}";
         }
 
@@ -629,6 +629,18 @@ namespace MvcPlatform.Controllers
             return pageSql;
         }
 
+        //为了基础数据新增的
+        private string GetPageSqlBase(string tempsql, string order, string asc)
+        {
+            int start = Convert.ToInt32(Request["start"]);
+            int limit = Convert.ToInt32(Request["limit"]);
+            string sql = "select count(1) from ( " + tempsql + " )";
+            totalProperty = Convert.ToInt32(DBMgrBase.GetDataTable(sql).Rows[0][0]);
+            string pageSql = @"SELECT * FROM ( SELECT tt.*, ROWNUM AS rowno FROM ({0} ORDER BY {1} {2}) tt WHERE ROWNUM <= {4}) table_alias WHERE table_alias.rowno >= {3}";
+            pageSql = string.Format(pageSql, tempsql, order, asc, start + 1, limit + start);
+            return pageSql;
+        }
+
         //删除报关单及其对应文件信息 by heguiqin 2016-08-26
         public string Delete()
         {
@@ -650,7 +662,7 @@ namespace MvcPlatform.Controllers
                 where += " and Code like '%" + Request["Code"] + "%'";
             }
             string sql = "SELECT * FROM BASE_COMPANY WHERE  CODE IS NOT NULL AND ENABLED=1  " + where;
-            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATEDATE", "desc"));
+            DataTable dt = DBMgrBase.GetDataTable(GetPageSqlBase(sql, "CREATEDATE", "desc"));
             string json = JsonConvert.SerializeObject(dt); ;
             return "{total:" + totalProperty + ",rows:" + json + "}";
         }
@@ -668,7 +680,7 @@ namespace MvcPlatform.Controllers
                 where += " and INSPCODE like '%" + Request["INSPCODE"] + "%'";
             }
             string sql = "SELECT * FROM BASE_COMPANY WHERE  INSPCODE IS NOT NULL AND ENABLED=1  " + where;
-            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATEDATE", "desc"));
+            DataTable dt = DBMgrBase.GetDataTable(GetPageSqlBase(sql, "CREATEDATE", "desc"));
             string json = JsonConvert.SerializeObject(dt); ;
             return "{total:" + totalProperty + ",rows:" + json + "}";
         }
@@ -680,7 +692,7 @@ namespace MvcPlatform.Controllers
             DataTable dt;
             sql = "SELECT ID,INCODE CODE,NAME FROM BASE_COMPANY WHERE ENABLED=1 AND (INCODE LIKE '%{0}%' OR NAME LIKE '%{0}%')";
             sql = string.Format(sql, (Request["NAME"] + "").ToUpper());
-            dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATEDATE", "desc"));
+            dt = DBMgrBase.GetDataTable(GetPageSqlBase(sql, "CREATEDATE", "desc"));
             var data1 = (from B in dt.AsEnumerable()
                          select new
                          {
@@ -703,22 +715,26 @@ namespace MvcPlatform.Controllers
             string CODES = Request["CODES"];
             string NAMES = Request["NAMES"];
             string sql = @"select * from user_rename_company where CUSTOMERID ='" + json_user.Value<string>("CUSTOMERID") + "' and companyid = '" + IDS + "'";
-            DataTable dt = DBMgr.GetDataTable(sql);
+            DataTable dt = DBMgrBase.GetDataTable(sql);
             string res_json = "";
             if (dt.Rows.Count == 0)
             {
                 sql = @"INSERT INTO USER_RENAME_COMPANY (ID,CUSTOMERID,COMPANYID,COMPANYCHNAME,COMPANYENNAME,CREATEDATE) 
                             VALUES (USER_RENAME_COMPANY_id.Nextval,'{0}','{1}','{2}','{3}',sysdate)";
                 sql = string.Format(sql, json_user.Value<string>("CUSTOMERID"), IDS, NAMES, CODES);
-                DBMgr.ExecuteNonQuery(sql);
+                DBMgrBase.ExecuteNonQuery(sql);
 
                 //更新redis,同步最新经营单位简称 这里记得需要和Ini_Base_Data的数据结构保持一致 update by panhuaguo 2016-07-29         
-                sql = @"SELECT T.* FROM (
-                      SELECT a.CUSTOMERID, a.companychname||'('||a.companyenname||')' NAME ,a.companychname SHORTNAME, a.companyenname CODE,b.incode QUANCODE,b.name QUANNAME FROM USER_RENAME_COMPANY a 
-                      left join BASE_COMPANY b on a.companyid = b.id  
-                      where b.incode is not null and a.companyenname is not null and b.enabled=1) T 
+                sql = @"SELECT T.* 
+                        FROM (
+                            SELECT a.CUSTOMERID, a.companychname||'('||a.companyenname||')' NAME ,a.companychname SHORTNAME, a.companyenname CODE,b.incode QUANCODE,b.name QUANNAME 
+                            FROM USER_RENAME_COMPANY a 
+                                left join BASE_COMPANY b on a.companyid = b.id  
+                            where b.incode is not null and a.companyenname is not null and b.enabled=1
+                            ) T 
                       WHERE  T.CUSTOMERID = '" + json_user.Value<string>("CUSTOMERID") + "'";
-                var json = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
+                var json = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+
                 db.StringSet("jydw:" + json_user.Value<string>("CUSTOMERID"), json);
                 res_json = "{CODE:'" + CODES + "',NAME:'" + NAMES + "',SHORTNAME:'" + NAMES + "',QUANCODE:'" + CODES + "',QUANNAME:'" + NAMES + "',data:" + json + "}";
             }
@@ -735,7 +751,7 @@ namespace MvcPlatform.Controllers
         {
             string sql = @"select ID,CODE,NAME from BASE_DECLTRADEWAY WHERE CODE LIKE '%{0}%' OR NAME LIKE '%{0}%'";
             sql = string.Format(sql, Request["NAME"] + "");
-            var json = JsonConvert.SerializeObject(DBMgr.GetDataTable(GetPageSql(sql, "CODE", "asc")));
+            var json = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(GetPageSqlBase(sql, "CODE", "asc")));
             return "{rows:" + json + ",total:" + totalProperty + "}";
         }
 
@@ -767,13 +783,13 @@ namespace MvcPlatform.Controllers
             if (string.IsNullOrEmpty(ordercode))//如果订单号为空、即新增的时候
             {
                 string sql = "select * from base_company where CODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "' AND ENABLED=1 AND ROWNUM=1";//根据海关的10位编码查询申报单位
-                dt = DBMgr.GetDataTable(sql);
+                dt = DBMgrBase.GetDataTable(sql);
                 if (dt.Rows.Count > 0)
                 {
                     bgsb_unit = dt.Rows[0]["NAME"] + "";
                 }
                 sql = "select * from base_company where INSPCODE='" + json_user.Value<string>("CUSTOMERCIQCODE") + "' AND ENABLED=1 AND ROWNUM=1";//根据海关的10位编码查询申报单位
-                dt = DBMgr.GetDataTable(sql);
+                dt = DBMgrBase.GetDataTable(sql);
                 if (dt.Rows.Count > 0)
                 {
                     bjsb_unit = dt.Rows[0]["NAME"] + "";
@@ -842,8 +858,6 @@ namespace MvcPlatform.Controllers
             }
             else
             {
-                sql = "delete from list_cspond where ordercode='" + ordercode + "'";//删除订单预配信息
-                DBMgr.ExecuteNonQuery(sql);
                 sql = "delete from list_times where code='" + ordercode + "' and status = '15'";//删除订单状态变更日志信息
                 DBMgr.ExecuteNonQuery(sql);
                 sql = "update list_order set STATUS = '10' ,SUBMITUSERNAME='',SUBMITTIME='',SUBMITUSERPHONE='' where code='" + ordercode + "'";
@@ -956,7 +970,7 @@ namespace MvcPlatform.Controllers
                          from list_declaration det 
                          left join list_predeclaration prt  on det.predeclcode = prt.predeclcode 
                          left join list_order ort on prt.ordercode = ort.code 
-                         where (ort.DECLPDF =1 or ort.PREPDF=1) and det.isinvalid=1 and instr('" + busitypeid + "',det.busitype)>0 " + where;
+                         where (ort.DECLPDF =1 or ort.PREPDF=1) and det.isinvalid=0 and instr('" + busitypeid + "',det.busitype)>0 " + where;
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATEDATE", "desc"));
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
@@ -1746,7 +1760,7 @@ namespace MvcPlatform.Controllers
             {
                 dt = ds.Tables[0];//通过ERP的经营单位中文全名到本系统数据库进行匹配,加载本地经营单位                
                 sql = "select id,INCODE,NAME from base_company where translate(name,'（）','()') = '" + dt.Rows[0]["CHINNAME"].ToString().Replace('（', '(').Replace('）', ')') + "'";
-                DataTable dtt = DBMgr.GetDataTable(sql);
+                DataTable dtt = DBMgrBase.GetDataTable(sql);
                 if (dtt.Rows.Count > 0)
                 {
                     dt.Rows[0]["BUSIUNITCODE"] = dtt.Rows[0]["INCODE"] + "";

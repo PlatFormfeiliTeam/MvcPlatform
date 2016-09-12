@@ -56,31 +56,97 @@ namespace MvcPlatform.Common
         //获取订单CODE
         public static string getOrderCode()
         {
-            string sql = "", sql1 = "";
-
-            sql = "select sys_code_id.nextval from dual";
             string code = string.Empty;
             try
             {
-                DataTable dt = DBMgr.GetDataTable(sql);
-                int CodeId = int.Parse(dt.Rows[0][0].ToString());
-                sql1 = "select YEARMONTH, code from sys_code where id=" + CodeId;
-                DataTable dt1 = DBMgr.GetDataTable(sql1);
-                while (dt1.Rows.Count <= 0)
-                {
-                    dt = DBMgr.GetDataTable(sql);
-                    CodeId = int.Parse(dt.Rows[0][0].ToString());
-                    sql1 = "select YEARMONTH, code from sys_code where id=" + CodeId;
-                    dt1 = DBMgr.GetDataTable(sql1);
-                }
-                code = dt1.Rows[0][0].ToString() + dt1.Rows[0][1].ToString();
+                string sql = "", sql1 = "";
+                sql = "update sys_code set code=code+1";
+                DBMgr.ExecuteNonQuery(sql);
+
+                sql1 = "select code,sysdate from sys_code";
+                DataTable dt = DBMgr.GetDataTable(sql1);
+
+                code = (Convert.ToDateTime(dt.Rows[0]["sysdate"].ToString()).ToString("yyyyMMdd")).Substring(2);
+                code += Convert.ToInt32(dt.Rows[0]["code"].ToString()).ToString("00000");
+
             }
             catch (Exception e)
             {
                 throw e;
             }
+
             return code;
+
         }
+
+        /*
+string sql = "", sql1 = "";
+
+sql = "select sys_code_id.nextval from dual";
+string code = string.Empty;
+try
+{
+    DataTable dt = DBMgr.GetDataTable(sql);
+    int CodeId = int.Parse(dt.Rows[0][0].ToString());
+    sql1 = "select YEARMONTH, code from sys_code where id=" + CodeId;
+    DataTable dt1 = DBMgr.GetDataTable(sql1);
+    while (dt1.Rows.Count <= 0)
+    {
+        dt = DBMgr.GetDataTable(sql);
+        CodeId = int.Parse(dt.Rows[0][0].ToString());
+        sql1 = "select YEARMONTH, code from sys_code where id=" + CodeId;
+        dt1 = DBMgr.GetDataTable(sql1);
+    }
+    code = dt1.Rows[0][0].ToString() + dt1.Rows[0][1].ToString();
+}
+catch (Exception e)
+{
+    throw e;
+}
+return code;
+ */
+
+        /*
+        private static readonly object syncRoot = new object();
+        public string GetCode1(CodeTypeEnum codeType)
+        {
+            DBSession db = new DBSession();
+            db.BeginTransaction();
+            string code = "";
+
+            lock (syncRoot)
+            {
+                try
+                {
+                    string sql = "update sys_code set code=code+1";
+                    db.Execute(sql);
+
+                    sql = "select code,sysdate from sys_code";
+                    DataTable dt = db.Query(sql);
+
+                    db.Dispose();
+                    code += createCode(Convert.ToDateTime(dt.Rows[0]["sysdate"].ToString()));
+                    code += Convert.ToInt32(dt.Rows[0]["code"].ToString()).ToString("00000");
+                    return code;
+                }
+                catch (Exception ex)
+                {
+                    db.Rollback();
+                    return ex.Message;
+                }
+            }
+
+
+        }
+        private string createCode(DateTime time)
+        {
+            string code = "";
+            code += time.Year.ToString().Substring(2);
+            code += time.Month.ToString("00");
+            code += time.Day.ToString("00");
+            return code;
+        } 
+        */
 
         //集装箱及报关车号列表更新
         public static void predeclcontainer_update(string ordercode, string containertruck)
@@ -149,29 +215,7 @@ namespace MvcPlatform.Common
                 }
             }
         }
-
-        public static void add_cspond(string busiunitcode, string busitype, string ordercode, string associateno, string correspondno, JObject json_user) //订单提交完成后需要同时新增一条预配信息
-        {
-            string sql = "select * from list_cspond where ordercode='" + ordercode + "'";
-            DataTable dt_cspond = DBMgr.GetDataTable(sql);
-            //2016-6-27 新增判断 因为发现一个漏洞，一个订单产生了两个预配信息
-            //比如订单保存后，打开两个编辑页，分别进行提交，就会产生两个预配信息 故先到数据库判断一下有没有，再进行插入操作
-            if (dt_cspond.Rows.Count == 0)
-            {
-                OrderEn entOrder = new OrderEn();
-                entOrder.BusiType = busitype;
-                entOrder.BusiUnitCode = busiunitcode;
-                entOrder.CustomerCode = json_user.Value<string>("CUSTOMERCODE");
-                entOrder.Status = 15;
-                entOrder.Priority = 0;
-                entOrder.CorrespondNo = correspondno;
-                entOrder.AssociateNo = associateno;
-                entOrder.Code = ordercode;
-                CreateOrderPre creaOrder = new CreateOrderPre();
-                creaOrder.CreateOrderPreMatch(entOrder);
-            }
-        }
-
+        
         //订单的状态在草稿、文件已上传、订单已委托 三个状态发生时记录到订单状态变更日志
         public static void add_list_time(int status, string ordercode, JObject json_user)
         {
