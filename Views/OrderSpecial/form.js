@@ -389,22 +389,6 @@
         id: 'field_BUSISHORTNAME',
         name: 'BUSISHORTNAME'
     })
-    //总单号
-    var field_TOTALNO = {
-        xtype: 'textfield',
-        name: 'TOTALNO',
-        tabIndex: 13,
-        fieldLabel: '总单号'
-    }
-    //分单号
-    var field_DIVIDENO = {
-        xtype: 'textfield',
-        name: 'DIVIDENO',
-        tabIndex: 14,
-        fieldLabel: '分单号'
-        , allowBlank: false,
-        blankText: '分单号不能为空!'
-    }
     //经营单位
     var field_jydw = {
         xtype: 'fieldcontainer',
