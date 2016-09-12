@@ -1,59 +1,49 @@
 ﻿<link href="/js/Extjs42/resources/css/ext-all-gray.css" rel="stylesheet" type="text/css" />
 <script src="/js/Extjs42/bootstrap.js" type="text/javascript"></script>
 <link href="/css/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
-
 <script src="/js/pan.js" type="text/javascript"></script>
 <script src="~/js/commondata.js"></script>
-
 <script type="text/javascript" src="/js/upload/plupload.full.min.js"></script>
 <script src="~/Views/EnterpriseOrder/createwinjs.js"></script>
-
 <script type="text/javascript">
     var gridpanel;
-    var busitype = getQueryString("busitype");
+    //   var busitype = getQueryString("busitype");
     var ID;
-
     var common_data_sbgq = [], common_data_sbfs = [];
     var store_busitype;
-
     Ext.onReady(function () {
-
         store_busitype = Ext.create('Ext.data.JsonStore', {
             fields: ['CODE', 'NAME'],
             data: common_data_busitype
         });
-
-        var busitypename = "";
-        switch (busitype) {
-            case "10":
-                busitypename = "空运出口"; break;
-            case "11":
-                busitypename = "空运进口"; break;
-            case "20":
-                busitypename = "海运出口"; break;
-            case "21":
-                busitypename = "海运进口"; break;
-            case "30":
-                busitypename = "陆运出口"; break;
-            case "31":
-                busitypename = "陆运进口"; break;
-            case "40": case "41":
-                busitypename = "国内"; break;
-            case "50": case "51":
-                busitypename = "特殊区域"; break;
-        }
-
+        //var busitypename = "";
+        //switch (busitype) {
+        //    case "10":
+        //        busitypename = "空运出口"; break;
+        //    case "11":
+        //        busitypename = "空运进口"; break;
+        //    case "20":
+        //        busitypename = "海运出口"; break;
+        //    case "21":
+        //        busitypename = "海运进口"; break;
+        //    case "30":
+        //        busitypename = "陆运出口"; break;
+        //    case "31":
+        //        busitypename = "陆运进口"; break;
+        //    case "40": case "41":
+        //        busitypename = "国内"; break;
+        //    case "50": case "51":
+        //        busitypename = "特殊区域"; break;
+        //}
         Ext.Ajax.request({
             url: "/Common/Ini_Base_Data",
-            params: { busitype: busitypename },
+            //   params: { busitype: busitypename },
             success: function (response, opts) {
                 var commondata = Ext.decode(response.responseText);
                 common_data_sbgq = commondata.sbgq;//申报关区   for win 窗口使用
                 common_data_sbfs = commondata.sbfs;//申报方式   for win 窗口使用
-
                 //查询区域
                 initSearch();
-
                 var store_Trade = Ext.create('Ext.data.JsonStore', {
                     fields: ['ID', 'FILERECEVIEUNITCODE', 'FILERECEVIEUNITNAME', 'FILEDECLAREUNITCODE', 'FILEDECLAREUNITNAME', 'BUSITYPEID', 'CUSTOMDISTRICTCODE', 'CUSTOMDISTRICTNAME', 'REPWAYID', 'STATUS',
                          'CODE', 'CREATEID', 'CREATENAME', 'CREATETIME', 'ASSOCIATENO', 'ORDERCODE', 'ENTERPRISECODE', 'ENTERPRISENAME', 'ACCEPTID', 'ACCEPTNAME',
@@ -72,9 +62,9 @@
                     listeners: {
                         beforeload: function () {
                             store_Trade.getProxy().extraParams = {
-                                busitype: busitype,
+                                //  busitype: busitype,
                                 FILERECEVIEUNIT: Ext.getCmp('FILERECEVIEUNIT_S').getValue(), FILEDECLAREUNIT: Ext.getCmp("FILEDECLAREUNIT_S").getValue(),
-                                CODE: Ext.getCmp('CODE_S').getValue(), STATUS_S: Ext.getCmp('combo_status').getValue(),
+                                CODE: Ext.getCmp('CODE_S').getValue(),
                                 STARTDATE: Ext.Date.format(Ext.getCmp("start_date").getValue(), 'Y-m-d H:i:s'),
                                 ENDDATE: Ext.Date.format(Ext.getCmp("end_date").getValue(), 'Y-m-d H:i:s')
                             }
@@ -137,11 +127,11 @@
 
         var cont_wjjsdw_S = Ext.create('Ext.form.FieldContainer', {
             fieldLabel: '文件接收单位',
-            labelWidth: 80, columnWidth: .24,
+            labelWidth: 90,
             layout: 'hbox',
             items: [field_FILERECEVIEUNIT_S, {
-                xtype: 'button', id: 'btn_filerecevieunit_S', listeners: {
-                    click: function () { bgsbdw_win(field_FILERECEVIEUNIT_S); }
+                xtype: 'button', id: 'btn_filerecevieunit_S', handler: function () {
+                    bgsbdw_win(field_FILERECEVIEUNIT_S);
                 }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
             }]
         })
@@ -156,11 +146,11 @@
 
         var cont_wjsbdw_S = Ext.create('Ext.form.FieldContainer', {
             fieldLabel: '文件申报单位',
-            labelWidth: 80, columnWidth: .24,
+            labelWidth: 90,
             layout: 'hbox',
             items: [field_FILEDECLAREUNIT_S, {
-                xtype: 'button', id: 'btn_filedeclareunit_S', listeners: {
-                    click: function () { bgsbdw_win(field_FILEDECLAREUNIT_S); }
+                xtype: 'button', id: 'btn_filedeclareunit_S', handler: function () {
+                    bgsbdw_win(field_FILEDECLAREUNIT_S);
                 }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
             }]
         })
@@ -168,40 +158,36 @@
         //企业编号
         var field_CODE_S = Ext.create('Ext.form.field.Text', {
             id: 'CODE_S',
-            fieldLabel: '企业编号',
-            labelWidth: 55, columnWidth: .16,
-            name: 'CODE_S',
-            margin: 0
+            fieldLabel: '企业编号', 
+            name: 'CODE_S'            
         });
 
-        var store_status_S = Ext.create('Ext.data.JsonStore', {
-            fields: ['CODE', 'NAME'],
-            data: [{ "CODE": 0, "NAME": "未关联" }, { "CODE": 1, "NAME": "已关联" }]
-        })
+        //var store_status_S = Ext.create('Ext.data.JsonStore', {
+        //    fields: ['CODE', 'NAME'],
+        //    data: [{ "CODE": 0, "NAME": "未关联" }, { "CODE": 1, "NAME": "已关联" }]
+        //})
 
-        var combo_status = Ext.create('Ext.form.field.ComboBox', {//业务状态
-            id: 'combo_status',
-            valueField: 'CODE',
-            displayField: 'NAME',
-            fieldLabel: '状态',
-            queryMode: 'local',
-            editable: false,
-            store: store_status_S,
-            editable: false,
-            labelWidth: 30, columnWidth: .10,
-        });
+        //var combo_status = Ext.create('Ext.form.field.ComboBox', {//业务状态
+        //    id: 'combo_status',
+        //    valueField: 'CODE',
+        //    displayField: 'NAME',
+        //    fieldLabel: '状态',
+        //    queryMode: 'local',
+        //    editable: false,
+        //    store: store_status_S,
+        //    editable: false,
+        //    labelWidth: 30, columnWidth: .10,
+        //});
 
         var start_date = Ext.create('Ext.form.field.Date', {
             id: 'start_date',
             format: 'Y-m-d',
-            fieldLabel: '创建日期从',
-            labelWidth: 65, columnWidth: .15,
+            fieldLabel: '开始时间' 
         })
         var end_date = Ext.create('Ext.form.field.Date', {
             id: 'end_date',
-            fieldLabel: '到',
-            format: 'Y-m-d',
-            labelWidth: 10, columnWidth: .11,
+            fieldLabel: '结束时间',
+            format: 'Y-m-d'
         })
 
         var formpanel = Ext.create('Ext.form.Panel', {
@@ -209,13 +195,12 @@
             renderTo: 'div_form',
             fieldDefaults: {
                 margin: '0 5 10 0',
-                //columnWidth: .33,
+                columnWidth: .2
             },
             items: [
-            { layout: 'column', border: 0, margin: '5 0 0 0', items: [cont_wjjsdw_S, cont_wjsbdw_S, field_CODE_S, combo_status, start_date, end_date] },
+            { layout: 'column', border: 0, margin: '5 0 0 0', items: [cont_wjjsdw_S, cont_wjsbdw_S, field_CODE_S, start_date, end_date] },
             ]
         });
-
     }
 
     function Open() {
