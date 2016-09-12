@@ -7,8 +7,7 @@
 <script src="~/Views/EnterpriseOrder/createwinjs.js"></script>
 <script type="text/javascript">
     var gridpanel;
-    //   var busitype = getQueryString("busitype");
-    var ID;
+    //   var busitype = getQueryString("busitype"); 
     var common_data_sbgq = [], common_data_sbfs = [];
     var store_busitype;
     Ext.onReady(function () {
@@ -100,9 +99,8 @@
                     ],
                     listeners:
                     {
-                        'itemdblclick': function (view, record, item, index, e) {
-                            ID = record.data.ID;
-                            addwin(ID, "");
+                        'itemdblclick': function (view, record, item, index, e) {                           
+                            addwin(record.data.ID);
                         }
                     },
                     viewConfig: {
@@ -203,9 +201,8 @@
         });
     }
 
-    function Open() {
-        ID = "";
-        addwin(ID, busitype);
+    function Open() {       
+        addwin("");
     }
 
     function Select() {
@@ -215,12 +212,11 @@
     function render(value, cellmeta, record, rowIndex, columnIndex, store) {
         var rtn = "";
         var dataindex = cellmeta.column.dataIndex;
-
         switch (dataindex) {
-            case "STATUS":
-                if (value == "0") { rtn = "未关联"; }
-                if (value == "1") { rtn = "已关联"; }
-                break;
+            //case "STATUS":
+            //    if (value == "0") { rtn = "未关联"; }
+            //    if (value == "1") { rtn = "已关联"; }
+            //    break;
             case "BUSITYPEID":
                 var rec = store_busitype.findRecord('CODE', value);
                 if (rec) {
