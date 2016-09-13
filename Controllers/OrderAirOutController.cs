@@ -65,12 +65,11 @@ namespace MvcPlatform.Controllers
             string ordercode = string.Empty;
             if (Request["action"] + "" == "submit")
             {
-                json.Remove("STATUS"); json.Remove("SUBMITTIME"); json.Remove("SUBMITUSERNAME"); json.Remove("SUBMITUSERID"); json.Remove("SUBMITUSERPHONE");
+                json.Remove("STATUS"); json.Remove("SUBMITTIME"); json.Remove("SUBMITUSERNAME"); json.Remove("SUBMITUSERID"); 
                 json.Add("STATUS", 15);
                 json.Add("SUBMITTIME", "sysdate");
                 json.Add("SUBMITUSERNAME", json_user.Value<string>("REALNAME"));
                 json.Add("SUBMITUSERID", json_user.Value<string>("ID"));
-                json.Add("SUBMITUSERPHONE", json_user.Value<string>("TELEPHONE") + "|" + json_user.Value<string>("MOBILEPHONE"));
             }
             else
             {
@@ -89,62 +88,64 @@ namespace MvcPlatform.Controllers
             if (string.IsNullOrEmpty(json.Value<string>("CODE")))//新增
             {
                 ordercode = Extension.getOrderCode();
-                sql = @"INSERT INTO LIST_ORDER (
-                      ID,BUSITYPE,CODE,CUSNO,BUSIUNITCODE,BUSIUNITNAME,CONTRACTNO,TOTALNO,DIVIDENO,TURNPRENO,GOODSNUM ,
-                      GOODSWEIGHT,ARRIVEDNO,CLEARANCENO,LAWCONDITION,ENTRUSTTYPEID,REPWAYID,CUSTOMDISTRICTCODE,
-                      CUSTOMDISTRICTNAME,REPUNITCODE,REPUNITNAME,DECLWAY,PORTCODE,PORTNAME,INSPUNITCODE,INSPUNITNAME,
-                      ENTRUSTREQUEST,CREATEUSERID,CREATEUSERNAME,STATUS,SUBMITUSERID,SUBMITUSERNAME,SUBMITUSERPHONE,
-                      CSPHONE,CUSTOMERCODE,CUSTOMERNAME,DECLCARNO,TRADEWAYCODES,TRADEWAYCODES1,GOODSGW,GOODSNW,PACKKIND,
-                      BUSIKIND,ORDERWAY,CLEARUNIT,CLEARUNITNAME,CREATETIME,SUBMITTIME,BUSISHORTCODE,SPECIALRELATIONSHIP,
-                      PRICEIMPACT,PAYPOYALTIES,BUSISHORTNAME,SCENEDECLAREID,SCENEINSPECTID,
-                      SELFCHECK,WEIGHTCHECK,ISWEIGHTCHECK,CHECKEDGOODSNUM,CHECKEDWEIGHT) 
-                      VALUES (LIST_ORDER_id.Nextval, '{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}', 
-                      '{12}','{13}','{14}','{15}', '{16}','{17}','{18}','{19}','{20}','{21}','{22}','{23}','{24}','{25}','{26}',
-                      '{27}','{28}',  '{29}','{30}','{31}','{32}','{33}','{34}','{35}','{36}','{37}', 
-                      '{38}','{39}','{40}','{41}','{42}','{43}','{44}', sysdate,{45},'{46}','{47}','{48}','{49}','{50}',
-                      '{51}','{52}','{53}','{54}','{55}','{56}','{57}')";
-                sql = string.Format(sql, "10", ordercode, json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME"),
-                      json.Value<string>("CONTRACTNO"), json.Value<string>("TOTALNO"), json.Value<string>("DIVIDENO"), json.Value<string>("TURNPRENO"),
-                      json.Value<string>("GOODSNUM"), json.Value<string>("GOODSWEIGHT"), json.Value<string>("ARRIVEDNO"), json.Value<string>("CLEARANCENO"),
-                      GetChk(json.Value<string>("LAWCONDITION")), json.Value<string>("ENTRUSTTYPEID"), json.Value<string>("REPWAYID"), json.Value<string>("CUSTOMDISTRICTCODE"),
-                      json.Value<string>("CUSTOMDISTRICTNAME"), GetCode(json.Value<string>("REPUNITCODE")), GetName(json.Value<string>("REPUNITCODE")),
-                      json.Value<string>("DECLWAY"), json.Value<string>("PORTCODE"), json.Value<string>("PORTNAME"), GetCode(json.Value<string>("INSPUNITCODE")),
-                      GetName(json.Value<string>("INSPUNITCODE")), json.Value<string>("ENTRUSTREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),
-                      json.Value<string>("STATUS"), json.Value<string>("SUBMITUSERID"), json.Value<string>("SUBMITUSERNAME"), json.Value<string>("SUBMITUSERPHONE"),
-                      json.Value<string>("CSPHONE"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLCARNO"),
-                      json.Value<string>("TRADEWAYCODES"), json.Value<string>("TRADEWAYCODES1"), json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW"),
-                      json.Value<string>("PACKKIND"), "001", "1", json.Value<string>("CLEARUNIT"), json.Value<string>("CLEARUNITNAME"), json.Value<string>("SUBMITTIME"),
-                      json.Value<string>("BUSISHORTCODE"), GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT")),
-                      GetChk(json.Value<string>("PAYPOYALTIES")), json.Value<string>("BUSISHORTNAME"), json_user.Value<string>("SCENEDECLAREID"),
-                      json_user.Value<string>("SCENEINSPECTID"), GetChk(json.Value<string>("SELFCHECK")), GetChk(json.Value<string>("WEIGHTCHECK")),
-                      GetChk(json.Value<string>("ISWEIGHTCHECK")), json.Value<string>("CHECKEDGOODSNUM"), json.Value<string>("CHECKEDWEIGHT"));
+                sql = @"INSERT INTO LIST_ORDER (ID
+                            ,BUSITYPE,CODE,CUSNO,BUSIUNITCODE,BUSIUNITNAME,CONTRACTNO
+                            ,TOTALNO,DIVIDENO,TURNPRENO,GOODSNUM,ARRIVEDNO
+                            ,CLEARANCENO,LAWFLAG,ENTRUSTTYPE,REPWAYID,CUSTOMAREACODE
+                            ,REPUNITCODE,REPUNITNAME,DECLWAY,PORTCODE,INSPUNITCODE
+                            ,INSPUNITNAME,ENTRUSTREQUEST,CREATEUSERID,CREATEUSERNAME,STATUS
+                            ,SUBMITUSERID,SUBMITUSERNAME,CUSTOMERCODE,CUSTOMERNAME,DECLCARNO
+                            ,TRADEWAYCODES,TRADEWAYCODES1,GOODSGW,GOODSNW,PACKKIND
+                            ,BUSIKIND,ORDERWAY,CLEARUNIT,CLEARUNITNAME,CREATETIME,SUBMITTIME
+                            ,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES,WEIGHTCHECK,ISWEIGHTCHECK
+                            ) 
+                      VALUES (LIST_ORDER_id.Nextval
+                            , '{0}','{1}','{2}','{3}','{4}','{5}'
+                            ,'{6}','{7}','{8}','{9}','{10}'
+                            ,'{11}','{12}','{13}','{14}','{15}'
+                            , '{16}','{17}','{18}','{19}','{20}'
+                            ,'{21}','{22}','{23}','{24}','{25}'
+                            ,'{26}','{27}','{28}','{29}','{30}'
+                            ,'{31}','{32}','{33}','{34}','{35}'
+                            ,'{36}','{37}','{38}','{39}', sysdate,{40}
+                            ,'{41}','{42}','{43}','{44}','{45}')";
+                sql = string.Format(sql
+                            , "10", ordercode, json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME"), json.Value<string>("CONTRACTNO")
+                            , json.Value<string>("TOTALNO"), json.Value<string>("DIVIDENO"), json.Value<string>("TURNPRENO"), json.Value<string>("GOODSNUM"), json.Value<string>("ARRIVEDNO")
+                            , json.Value<string>("CLEARANCENO"), GetChk(json.Value<string>("LAWFLAG")), json.Value<string>("ENTRUSTTYPE"), json.Value<string>("REPWAYID"), json.Value<string>("CUSTOMAREACODE")
+                            , GetCode(json.Value<string>("REPUNITCODE")), GetName(json.Value<string>("REPUNITCODE")), json.Value<string>("DECLWAY"), json.Value<string>("PORTCODE"), GetCode(json.Value<string>("INSPUNITCODE"))
+                            , GetName(json.Value<string>("INSPUNITCODE")), json.Value<string>("ENTRUSTREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"), json.Value<string>("STATUS")
+                            , json.Value<string>("SUBMITUSERID"), json.Value<string>("SUBMITUSERNAME"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLCARNO")
+                            , json.Value<string>("TRADEWAYCODES"), json.Value<string>("TRADEWAYCODES1"), json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW"), json.Value<string>("PACKKIND")
+                            , "001", "1", json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("SUBMITTIME")
+                            , GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT")), GetChk(json.Value<string>("PAYPOYALTIES")), GetChk(json.Value<string>("WEIGHTCHECK")), GetChk(json.Value<string>("ISWEIGHTCHECK"))
+                      );
             }
             else//修改
             {
                 ordercode = json.Value<string>("CODE");
-                sql = @"UPDATE LIST_ORDER SET BUSITYPE='{1}',CUSNO='{2}',BUSIUNITCODE='{3}',BUSIUNITNAME='{4}',CONTRACTNO='{5}',
-                      TOTALNO='{6}',DIVIDENO='{7}',TURNPRENO='{8}',GOODSNUM='{9}' ,GOODSWEIGHT='{10}',ARRIVEDNO='{11}',CLEARANCENO='{12}',
-                      LAWCONDITION='{13}',ENTRUSTTYPEID='{14}',REPWAYID='{15}',CUSTOMDISTRICTCODE='{16}',CUSTOMDISTRICTNAME='{17}',REPUNITCODE='{18}',
-                      REPUNITNAME='{19}',DECLWAY='{20}',PORTCODE='{21}',PORTNAME='{22}',INSPUNITCODE='{23}',INSPUNITNAME='{24}' ,ENTRUSTREQUEST='{25}',
-                      CSPHONE='{26}',SUBMITUSERPHONE='{27}',STATUS='{28}',SUBMITUSERID='{29}',SUBMITUSERNAME='{30}',CUSTOMERCODE='{31}',
-                      CUSTOMERNAME='{32}',DECLCARNO='{33}',TRADEWAYCODES='{34}',TRADEWAYCODES1='{35}',SUBMITTIME={36},GOODSGW='{37}',
-                      GOODSNW='{38}',PACKKIND='{39}',BUSIKIND='{40}',ORDERWAY='{41}' ,CLEARUNIT='{42}',CLEARUNITNAME='{43}',
-                      BUSISHORTCODE='{44}',SPECIALRELATIONSHIP='{45}',PRICEIMPACT='{46}',PAYPOYALTIES='{47}',BUSISHORTNAME='{48}' ,
-                      SELFCHECK='{49}',WEIGHTCHECK='{50}',ISWEIGHTCHECK='{51}',CHECKEDGOODSNUM='{52}',CHECKEDWEIGHT='{53}' WHERE CODE = '{0}'";
-                sql = string.Format(sql, ordercode, "10", json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME"),
-                      json.Value<string>("CONTRACTNO"), json.Value<string>("TOTALNO"), json.Value<string>("DIVIDENO"), json.Value<string>("TURNPRENO"),
-                      json.Value<string>("GOODSNUM"), json.Value<string>("GOODSWEIGHT"), json.Value<string>("ARRIVEDNO"), json.Value<string>("CLEARANCENO"),
-                      GetChk(json.Value<string>("LAWCONDITION")), json.Value<string>("ENTRUSTTYPEID"), json.Value<string>("REPWAYID"),
-                      json.Value<string>("CUSTOMDISTRICTCODE"), json.Value<string>("CUSTOMDISTRICTNAME"), GetCode(json.Value<string>("REPUNITCODE")),
-                      GetName(json.Value<string>("REPUNITCODE")), json.Value<string>("DECLWAY"), json.Value<string>("PORTCODE"), json.Value<string>("PORTNAME"),
-                      GetCode(json.Value<string>("INSPUNITCODE")), GetName(json.Value<string>("INSPUNITCODE")), json.Value<string>("ENTRUSTREQUEST"),
-                      json.Value<string>("CSPHONE"), json.Value<string>("SUBMITUSERPHONE"), json.Value<string>("STATUS"), json.Value<string>("SUBMITUSERID"),
-                      json.Value<string>("SUBMITUSERNAME"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"),
-                      json.Value<string>("DECLCARNO"), json.Value<string>("TRADEWAYCODES"), json.Value<string>("TRADEWAYCODES1"), json.Value<string>("SUBMITTIME"),
-                      json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW"), json.Value<string>("PACKKIND"), "001", "1", json.Value<string>("CLEARUNIT"),
-                      json.Value<string>("CLEARUNITNAME"), json.Value<string>("BUSISHORTCODE"), GetChk(json.Value<string>("SPECIALRELATIONSHIP")),
-                      GetChk(json.Value<string>("PRICEIMPACT")), GetChk(json.Value<string>("PAYPOYALTIES")), json.Value<string>("BUSISHORTNAME"), GetChk(json.Value<string>("SELFCHECK")),
-                      GetChk(json.Value<string>("WEIGHTCHECK")), GetChk(json.Value<string>("ISWEIGHTCHECK")), json.Value<string>("CHECKEDGOODSNUM"), json.Value<string>("CHECKEDWEIGHT"));
+                sql = @"UPDATE LIST_ORDER 
+                        SET BUSITYPE='{1}',CUSNO='{2}',BUSIUNITCODE='{3}',BUSIUNITNAME='{4}',CONTRACTNO='{5}'
+                            ,TOTALNO='{6}',DIVIDENO='{7}',TURNPRENO='{8}',GOODSNUM='{9}',ARRIVEDNO='{10}'
+                            ,CLEARANCENO='{11}',LAWFLAG='{12}',ENTRUSTTYPE='{13}',REPWAYID='{14}',CUSTOMAREACODE='{15}'
+                            ,REPUNITCODE='{16}',REPUNITNAME='{17}',DECLWAY='{18}',PORTCODE='{19}',INSPUNITCODE='{20}'
+                            ,INSPUNITNAME='{21}' ,ENTRUSTREQUEST='{22}',STATUS='{23}',SUBMITUSERID='{24}',SUBMITUSERNAME='{25}'
+                            ,CUSTOMERCODE='{26}',CUSTOMERNAME='{27}',DECLCARNO='{28}',TRADEWAYCODES='{29}',TRADEWAYCODES1='{30}'
+                            ,SUBMITTIME={31},GOODSGW='{32}',GOODSNW='{33}',PACKKIND='{34}',BUSIKIND='{35}'
+                            ,ORDERWAY='{36}' ,CLEARUNIT='{37}',CLEARUNITNAME='{38}',SPECIALRELATIONSHIP='{39}',PRICEIMPACT='{40}'
+                            ,PAYPOYALTIES='{41}',WEIGHTCHECK='{42}',ISWEIGHTCHECK='{43}' 
+                        WHERE CODE = '{0}'";
+                sql = string.Format(sql, ordercode
+                            , "10", json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME"), json.Value<string>("CONTRACTNO")
+                            , json.Value<string>("TOTALNO"), json.Value<string>("DIVIDENO"), json.Value<string>("TURNPRENO"), json.Value<string>("GOODSNUM"), json.Value<string>("ARRIVEDNO")
+                            , json.Value<string>("CLEARANCENO"), GetChk(json.Value<string>("LAWFLAG")), json.Value<string>("ENTRUSTTYPE"), json.Value<string>("REPWAYID"), json.Value<string>("CUSTOMAREACODE")
+                            , GetCode(json.Value<string>("REPUNITCODE")), GetName(json.Value<string>("REPUNITCODE")), json.Value<string>("DECLWAY"), json.Value<string>("PORTCODE"), GetCode(json.Value<string>("INSPUNITCODE"))
+                            , GetName(json.Value<string>("INSPUNITCODE")), json.Value<string>("ENTRUSTREQUEST"), json.Value<string>("STATUS"), json.Value<string>("SUBMITUSERID"), json.Value<string>("SUBMITUSERNAME")
+                            , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLCARNO"), json.Value<string>("TRADEWAYCODES"), json.Value<string>("TRADEWAYCODES1")
+                            , json.Value<string>("SUBMITTIME"), json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW"), json.Value<string>("PACKKIND"), "001"
+                            , "1", json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT"))
+                            , GetChk(json.Value<string>("PAYPOYALTIES")), GetChk(json.Value<string>("WEIGHTCHECK")), GetChk(json.Value<string>("ISWEIGHTCHECK"))
+                      );
             }
             int result = DBMgr.ExecuteNonQuery(sql);
             if (result == 1)

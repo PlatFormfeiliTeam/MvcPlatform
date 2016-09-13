@@ -809,7 +809,6 @@ namespace MvcPlatform.Controllers
                         dt.Rows[0]["CREATEUSERID"] = DBNull.Value; dt.Rows[0]["CREATEUSERNAME"] = DBNull.Value;
                         dt.Rows[0]["SUBMITTIME"] = DBNull.Value; dt.Rows[0]["CREATETIME"] = DBNull.Value;
                         dt.Rows[0]["SUBMITUSERNAME"] = DBNull.Value; dt.Rows[0]["SUBMITUSERID"] = DBNull.Value;
-                        dt.Rows[0]["SUBMITUSERPHONE"] = DBNull.Value; dt.Rows[0]["CSNAME"] = DBNull.Value;//平台客户字段需要清空
                         dt.Rows[0]["CONTAINERNO"] = DBNull.Value; dt.Rows[0]["DECLCARNO"] = DBNull.Value;
                         //报关、报检申报单位
                         dt.Rows[0]["REPUNITNAME"] = bgsb_unit; dt.Rows[0]["REPUNITCODE"] = json_user.Value<string>("CUSTOMERHSCODE");
@@ -860,7 +859,7 @@ namespace MvcPlatform.Controllers
             {
                 sql = "delete from list_times where code='" + ordercode + "' and status = '15'";//删除订单状态变更日志信息
                 DBMgr.ExecuteNonQuery(sql);
-                sql = "update list_order set STATUS = '10' ,SUBMITUSERNAME='',SUBMITTIME='',SUBMITUSERPHONE='' where code='" + ordercode + "'";
+                sql = "update list_order set STATUS = '10' ,SUBMITUSERNAME='',SUBMITTIME='' where code='" + ordercode + "'";
                 DBMgr.ExecuteNonQuery(sql);
                 result = "{success:true}";
             }
