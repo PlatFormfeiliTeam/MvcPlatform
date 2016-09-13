@@ -1059,10 +1059,41 @@ function panel_file_ini() {
 
 //非国内订单订单前端保存方法 封装 by panhuaguo 2016-08-19
 function save(action, busitype) {
+
+
     if (action == 'submit') {
+            var validate = "";
+
+            var mz = Ext.getCmp('GOODSGW');
+            var jz = Ext.getCmp('GOODSNW');
+            if (Ext.typeOf(mz) != "undefined" && Ext.typeOf(jz) != "undefined") {
+                if (!Ext.isEmpty(mz.getValue()) && !Ext.isEmpty(jz.getValue()) && Number(jz.getValue()) > Number(mz.getValue())) {
+                    validate = "净重小于应等于毛重！";
+
+                }
+            }
+
+            var mz1 = Ext.getCmp('GOODSGW1');
+            var jz1 = Ext.getCmp('GOODSNW1');
+            if (Ext.typeOf(mz1) != "undefined" && Ext.typeOf(jz1) != "undefined") {
+                if (!Ext.isEmpty(mz1.getValue()) && !Ext.isEmpty(jz1.getValue()) && Number(jz1.getValue()) > Number(mz1.getValue())) {
+                    validate = "净重小于应等于毛重！";
+
+                }
+            }
+
+        if (validate) {
+            Ext.MessageBox.alert("提示", validate);
+            return;
+
+        }
+
         if (!formpanel.getForm().isValid()) {
             return;
         }
+        
+       
+
         if (file_store.data.items.length == 0) { //如果是提交委托,必须上传文件 
             Ext.MessageBox.alert('提示', '请上传文件！');
             return;
