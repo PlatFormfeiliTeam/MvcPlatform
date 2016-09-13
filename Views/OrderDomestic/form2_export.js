@@ -56,7 +56,7 @@
     })
     var combo_ENTRUSTTYPENAME4 = Ext.create('Ext.form.field.ComboBox', {
         id: 'combo_ENTRUSTTYPENAME4',
-        name: 'ENTRUSTTYPEID',
+        name: 'ENTRUSTTYPE',
         store: store_ENTRUSTTYPENAME4,
         fieldLabel: '委托类型',
         displayField: 'NAME',
@@ -334,11 +334,11 @@
         tabIndex: 72,
         margin: 0,
         flex: .85,
-        name: 'FILINGNUMBER'
+        name: 'RECORDCODE'
     });
     var zcbah_container4 = {
         xtype: 'fieldcontainer',
-        fieldLabel: '账册备案号',
+        fieldLabel: '备案号',
         layout: 'hbox',
         items: [field_FILINGNUMBER4, {
             xtype: 'button',
@@ -355,7 +355,7 @@
     var chk_CHKLAWCONDITION4 = Ext.create('Ext.form.field.Checkbox', {
         tabIndex: 73,
         fieldLabel: '法检状况',
-        name: 'LAWCONDITION'
+        name: 'LAWFLAG'
     })
     //通关单号
     var field_CLEARANCENO4 = Ext.create('Ext.form.field.Text', {

@@ -39,9 +39,9 @@
                     data: common_data_sbfs
                 });
                 store_Trade = Ext.create('Ext.data.JsonStore', {
-                    fields: ['ID', 'STATUS', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE', 'PORTNAME', 'TURNPRENO', 'ISINVALID', 'BUSIUNITNAME',
-                    'BUSISHORTNAME', 'BUSIUNITCODE', 'CUSTOMERNAME', 'CONTRACTNO', 'TOTALNO', 'DIVIDENO', 'REPWAYID', 'GOODSNUMGOODSNW',
-                    'GOODSWEIGHT', 'GOODSGW', 'CUSTOMDISTRICTCODE', 'CUSTOMDISTRICTNAME', 'LAWCONDITION', 'ASSOCIATENO', 'BUSITYPE', 'CORRESPONDNO', 'SUBMITTIME'],
+                    fields: ['ID', 'STATUS', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE', 'ISINVALID',
+                    'BUSIUNITCODE', 'BUSIUNITNAME', 'CONTRACTNO', 'REPWAYID', 'GOODSNUM',
+                    'GOODSGW', 'CUSTOMAREACODE', 'LAWFLAG', 'ASSOCIATENO', 'BUSITYPE', 'CORRESPONDNO', 'SUBMITTIME'],
                     pageSize: 20,
                     proxy: {
                         type: 'ajax',
@@ -90,12 +90,12 @@
                     { header: '报检状态', hidden: true, dataIndex: 'INSPSTATUS', width: 90, renderer: render, locked: true },
                     { header: '订单编号', dataIndex: 'CODE', width: 100, locked: true },
                     { header: '客户编号', dataIndex: 'CUSNO', width: 120, locked: true },
-                    { header: '经营单位', dataIndex: 'BUSISHORTNAME', locked: true },
+                    { header: '经营单位', dataIndex: 'BUSIUNITNAME', locked: true },
                     { header: '合同发票号', dataIndex: 'CONTRACTNO', width: 130, locked: true },
-                    { header: '件数/重量', dataIndex: 'GOODSNUMGOODSNW', width: 80, locked: true },//该字段需要拼接
-                    { header: '申报关区', dataIndex: 'CUSTOMDISTRICTCODE', width: 70, locked: true },//需要显示编码
+                    { header: '件数/重量', dataIndex: 'GOODSNUM', width: 80, locked: true },//该字段需要拼接
+                    { header: '申报关区', dataIndex: 'CUSTOMAREACODE', width: 70, locked: true },//需要显示编码
                     { header: '申报方式', dataIndex: 'REPWAYID', width: 110, locked: true, renderer: render },
-                    { header: '法检', dataIndex: 'LAWCONDITION', width: 40, renderer: render },
+                    { header: '法检', dataIndex: 'LAWFLAG', width: 40, renderer: render },
                     { header: '业务类型', dataIndex: 'BUSITYPE', width: 70, renderer: render },
                     { header: '两单关联号', dataIndex: 'ASSOCIATENO', width: 120 },
                     { header: '委托时间', dataIndex: 'SUBMITTIME', width: 130 },
@@ -124,7 +124,7 @@
         //isinvalid等于0是作废
         switch (dataindex) {
             case "STATUS":
-                if (record.get("ISINVALID") == "0") {
+                if (record.get("ISINVALID") == "1") {
                     rtn = "已作废";
                 }
                 else {
@@ -163,9 +163,14 @@
                     rtn = rec.get("NAME");
                 }
                 break;
-            case "LAWCONDITION":
+            case "LAWFLAG":
                 rtn = value ? "有" : "无";
-                break
+                break;
+            case "GOODSNUM":
+                if (record.get("GOODSNUM")) {
+                    rtn = record.get("GOODSNUM") + '/' + record.get("GOODSGW");
+                }
+                break;
         }
         return rtn;
     }

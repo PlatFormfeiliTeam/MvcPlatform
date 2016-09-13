@@ -29,13 +29,13 @@ function loadform() {
             var data = Ext.decode(response.responseText);
             formpanelhead.getForm().setValues(data.data1.IETYPE ? data.data1 : data.data2);
             Ext.getCmp("field_ordercodes").setValue(data.ORDERCODES);//记录所有已经存在的订单号,方便改变进出口类型时进行比对         
-            repunitcode = data.data1.REPUNITCODE ? data.data1.REPUNITCODE : data.data2.REPUNITCODE;//初始化报关报检单位
-            inspunitcode = data.data1.INSPUNITCODE ? data.data1.INSPUNITCODE : data.data2.INSPUNITCODE;
-
+            repunitcode = data.data1.REPUNITCODE.length != 2 ? data.data1.REPUNITCODE : data.data2.REPUNITCODE;//初始化报关报检单位
+            inspunitcode = data.data1.INSPUNITCODE.length != 2 ? data.data1.INSPUNITCODE : data.data2.INSPUNITCODE;
+            
             formpanelin.getForm().setValues(data.data1);
             form_control(data.data1, 1);
             readonly_init(formpanelin, formpanelhead, 1);
-
+           
             formpanelout.getForm().setValues(data.data2);
             form_control(data.data2, 2);
             readonly_init(formpanelout, formpanelhead, 2);//设置控件只读
@@ -248,7 +248,6 @@ function LoadOrderErp() {
                 })
             }
             else {
-                debugger
                 importorder();
             }
         }
@@ -262,6 +261,7 @@ function importorder() {
         url: "/OrderDomestic/GetOrderCodeErp",
         params: { operateid: Ext.String.trim(Ext.getCmp('NUMBER').getValue()) },
         success: function (response, option) {
+            alert(1);
             if (Ext.decode(response.responseText)) {
                 var data = Ext.decode(response.responseText);
                 if (data.result == "true") {

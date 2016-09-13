@@ -79,7 +79,7 @@ function form_head2_ini() {
         data: common_data_sbgq
     })
     var combo_CUSTOMDISTRICTNAME2 = Ext.create('Ext.form.field.ComboBox', {//申报关区 这个数据比较多需要根据输入字符到后台动态模糊匹配
-        name: 'CUSTOMDISTRICTCODE',
+        name: 'CUSTOMAREACODE',
         store: store_CUSTOMDISTRICTNAME2,
         fieldLabel: '申报关区',
         displayField: 'NAME',
@@ -137,24 +137,6 @@ function form_head2_ini() {
         fieldLabel: '维护时间',
         readOnly: true
     });
-    //平台客服
-    var field_CSNAME2 = Ext.create('Ext.form.field.Text', {
-        name: 'CSNAME',
-        fieldLabel: '平台客服',
-        readOnly: true
-    });
-    //客服电话
-    var field_CSPHONE2 = Ext.create('Ext.form.field.Text', {
-        name: 'CSPHONE',
-        fieldLabel: '客服电话',
-        readOnly: true
-    });
-    //委托电话
-    var field_SUBMITUSERPHONE2 = Ext.create('Ext.form.field.Text', {
-        name: 'SUBMITUSERPHONE',
-        fieldLabel: '委托电话',
-        readOnly: true
-    })
     formpanelhead2 = Ext.create('Ext.form.Panel', {
         border: 0,
         fieldDefaults: {
@@ -169,7 +151,7 @@ function form_head2_ini() {
         },
         items: [
                 { layout: 'column', height: 42, border: 0, margin: '5 0 0 0', items: [combo_BUSITYPE2, combo_REPWAYNAME2, combo_CUSTOMDISTRICTNAME2, field_SUBMITTIME2, field_SUBMITUSERNAME2] },
-                { layout: 'column', height: 42, border: 0, items: [field_CREATEUSERNAME2, field_CREATETIME2, field_CSNAME2, field_CSPHONE2, field_SUBMITUSERPHONE2] },
+                { layout: 'column', height: 42, border: 0, items: [field_CREATEUSERNAME2, field_CREATETIME2] },
         field_CUSTOMDISTRICTNAME2]
     })
 }
