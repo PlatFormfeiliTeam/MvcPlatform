@@ -32,9 +32,9 @@
                     data: common_data_sbfs
                 });
                 Ext.regModel('TRADE', {
-                    fields: ['ID', 'ENTRUSTTYPEID', 'STATUS', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE', 'PORTNAME', 'TURNPRENO', 'SUBMITTIME',
-                        'BUSIUNITNAME', 'BUSISHORTNAME', 'BusiUnitCode', 'CUSTOMERNAME', 'CONTRACTNO', 'TOTALNO', 'DIVIDENO', 'REPWAYID', 'GOODSNUMGOODSNW', 'GOODSWEIGHT',
-                        'GOODSGW', 'CUSTOMDISTRICTCODE', 'CUSTOMDISTRICTNAME', 'LAWCONDITION', 'ASSOCIATENO', 'ARRIVEDNO', 'ISINVALID', 'BUSITYPE']
+                    fields: ['ID', 'ENTRUSTTYPE', 'STATUS', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE', 'TURNPRENO', 
+                        'SUBMITTIME', 'BUSIUNITNAME', 'BUSIUNITCODE', 'CONTRACTNO', 'TOTALNO', 'DIVIDENO', 'REPWAYID', 'GOODSNUM',
+                        'GOODSGW', 'CUSTOMAREACODE', 'LAWFLAG', 'ARRIVEDNO', 'ISINVALID', 'BUSITYPE']
                 })
                 store_Trade = Ext.create('Ext.data.JsonStore', {
                     model: 'TRADE',
@@ -88,16 +88,16 @@
                     { header: '报检状态', hidden: true, dataIndex: 'INSPSTATUS', width: 90, renderer: render, locked: true },
                     { header: '订单编号', dataIndex: 'CODE', width: 100, locked: true },
                     { header: '客户编号', dataIndex: 'CUSNO', width: 120, locked: true },
-                    { header: '经营单位', dataIndex: 'BUSISHORTNAME', sortable: true, locked: true },
-                    { header: '合同发票号', dataIndex: 'CONTRACTNO', width: 100, locked: true },
+                    { header: '经营单位', dataIndex: 'BUSIUNITNAME', sortable: true, locked: true },
+                    { header: '合同号', dataIndex: 'CONTRACTNO', width: 100, locked: true },
                     { header: '总单号', dataIndex: 'TOTALNO', width: 90, locked: true },//需要确定具体字段
                     { header: '分单号', dataIndex: 'DIVIDENO', width: 90 },//需要确定具体字段
-                    { header: '件数/重量', dataIndex: 'GOODSNUMGOODSNW', width: 65 },//该字段需要拼接
-                    { header: '申报关区', dataIndex: 'CUSTOMDISTRICTCODE', width: 60 },//需要显示编码
+                    { header: '件数/重量', dataIndex: 'GOODSNUM', width: 65 },//该字段需要拼接
+                    { header: '申报关区', dataIndex: 'CUSTOMAREACODE', width: 60 },//需要显示编码
                     { header: '进/出口岸', dataIndex: 'PORTCODE', width: 70 },//需要显示编码
                     { header: '申报方式', dataIndex: 'REPWAYID', width: 100, renderer: render },
                     { header: '运抵编号', dataIndex: 'ARRIVEDNO', width: 140 },//需要确定具体字段
-                    { header: '法检', dataIndex: 'LAWCONDITION', width: 60, renderer: render },
+                    { header: '法检', dataIndex: 'LAWFLAG', width: 60, renderer: render },
                     { header: '委托时间', dataIndex: 'SUBMITTIME', width: 130 }
                     ],
                     listeners:
@@ -120,7 +120,7 @@
         ////大于等于20  小于40  报关状态叫【报关报检都叫预审中】   ==40  【报关报检状态都叫预审完成】  ==45  【报关报检都叫制单已受理】
         switch (dataindex) {
             case "STATUS":
-                if (record.get("ISINVALID") == "0") {
+                if (record.get("ISINVALID") == "1") {
                     rtn = "已作废";
                 }
                 else {
@@ -153,9 +153,14 @@
                     rtn = rec.get("NAME");
                 }
                 break;
-            case "LAWCONDITION":
+            case "LAWFLAG":
                 rtn = value ? "有" : "无";
-                break
+                break;
+            case "GOODSNUM":
+                if (record.get("GOODSNUM")) {
+                    rtn = record.get("GOODSNUM") + '/' + record.get("GOODSGW");
+                }
+                break;
         }
         return rtn;
     }
