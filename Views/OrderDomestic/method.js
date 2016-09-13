@@ -261,7 +261,6 @@ function importorder() {
         url: "/OrderDomestic/GetOrderCodeErp",
         params: { operateid: Ext.String.trim(Ext.getCmp('NUMBER').getValue()) },
         success: function (response, option) {
-            alert(1);
             if (Ext.decode(response.responseText)) {
                 var data = Ext.decode(response.responseText);
                 if (data.result == "true") {
