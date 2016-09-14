@@ -1069,12 +1069,7 @@ function save(action, busitype) {
                     validate = "净重小于应等于毛重！";
                 }
             }
-            var mz1 = Ext.getCmp('GOODSGW1'); var jz1 = Ext.getCmp('GOODSNW1');
-            if (Ext.typeOf(mz1) != "undefined" && Ext.typeOf(jz1) != "undefined") {
-                if (!Ext.isEmpty(mz1.getValue()) && !Ext.isEmpty(jz1.getValue()) && Number(jz1.getValue()) > Number(mz1.getValue())) {
-                    validate = "净重小于应等于毛重！";
-                }
-            }
+
         if (validate) {
             Ext.MessageBox.alert("提示", validate);
             return;
