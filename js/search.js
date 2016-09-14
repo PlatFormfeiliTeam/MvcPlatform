@@ -2,7 +2,7 @@
 //////////////////////////combox开始//////////////////////
 function initSearch() {
     var store_1 = Ext.create("Ext.data.JsonStore", {
-        fields: ["CODE", "NAME", "QUANCODE"],
+        fields: ["CODE", "NAME"],
         data: search_js_condition1_data,
         listeners: { load: function () { store_1_1.load(); } }
     });
