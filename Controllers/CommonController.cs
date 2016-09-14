@@ -1419,7 +1419,7 @@ namespace MvcPlatform.Controllers
             }
             stamper.Close();
             reader.Close();
-            return "http://localhost:8010/Declare/" + outname + ".pdf";
+            return "http://localhost:8012/Declare/" + outname + ".pdf";
         }
 
         public void UpdatePrintInfo(string tablename, string code)

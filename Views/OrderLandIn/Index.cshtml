@@ -34,7 +34,7 @@
                 });
                 Ext.regModel('TRADE', {
                     fields: ['ID', 'ENTRUSTTYPE', 'STATUS', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE',
-                         'TURNPRENO', 'SUBMITTIME', 'BUSIUNITCODE', 'BUSIUNITNAME', 'CONTRACTNO', 'TOTALNO', 'DIVIDENO', 
+                         'TURNPRENO', 'SUBMITTIME', 'BUSIUNITCODE', 'BUSIUNITNAME', 'CONTRACTNO', 'DIVIDENO', 
                         'REPWAYID', 'GOODSNUM', 'GOODSGW', 'CUSTOMAREACODE', 'LAWFLAG', 'ISINVALID', 'BUSITYPE']
                 })
                 store_Trade = Ext.create('Ext.data.JsonStore', {
@@ -91,7 +91,6 @@
                     { header: '客户编号', dataIndex: 'CUSNO', width: 130, locked: true },
                     { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 100, sortable: true, locked: true },
                     { header: '合同号', dataIndex: 'CONTRACTNO', width: 100, locked: true },
-                    { header: '总单号', dataIndex: 'TOTALNO', width: 90, locked: true },
                     { header: '分单号', dataIndex: 'DIVIDENO', width: 110, locked: true },
                     { header: '件数/重量', dataIndex: 'GOODSNUM', width: 90 },//该字段需要拼接
                     { header: '申报关区', dataIndex: 'CUSTOMAREACODE', width: 70 },//需要显示编码
