@@ -71,7 +71,7 @@
                 });
                 var store = Ext.create('Ext.data.JsonStore', {
                     fields: ['ID', 'PREDECLCODE', 'DECLARATIONCODE', 'CUSTOMSSTATUS', 'ISPRINT', 'CODE', 'REPFINISHTIME', 'TRANSNAME', 'BUSIUNITCODE', 'CUSTOMERNAME', 'IETYPE',
-                             'BUSISHORTNAME', 'PORTCODE', 'BLNO', 'REPWAYID', 'REPWAYNAME', 'DECLWAY', 'DECLWAYNAME', 'TRADEWAYCODES', 'CONTRACTNO', 'GOODSNUM',
+                             'BUSIUNITNAME', 'PORTCODE', 'BLNO', 'REPWAYID', 'REPWAYNAME', 'DECLWAY', 'DECLWAYNAME', 'TRADEWAYCODES', 'CONTRACTNO', 'GOODSNUM',
                              'GOODSNW', 'SHEETNUM', 'ORDERCODE', 'CUSNO', 'ASSOCIATENO', 'CORRESPONDNO', 'BUSITYPE', 'DECL_TRANSNAME', 'DECLTYPE'],
                     pageSize: 22,
                     proxy: {
@@ -131,7 +131,7 @@
                     { header: '张数', dataIndex: 'SHEETNUM', width: 60 },
                     { header: '多单关联号', dataIndex: 'CORRESPONDNO', width: 100, hidden: busitypeid != '40-41' },//多单关联号
                     { header: '订单编号', dataIndex: 'ORDERCODE', width: 100 },
-                    { header: '经营单位', dataIndex: 'BUSISHORTNAME', width: 100, locked: role == 'customer' },
+                    { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 100, locked: role == 'customer' },
                     { header: '客户编号', dataIndex: 'CUSNO', width: 125, locked: role == 'enterprise' }
                     ],
                     viewConfig: {

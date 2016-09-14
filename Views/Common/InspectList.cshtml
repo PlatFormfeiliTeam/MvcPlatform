@@ -65,7 +65,7 @@
 
                 var store = Ext.create('Ext.data.JsonStore', {
                     fields: ['ID', 'PREINSPCODE', 'CODE', 'CUSTOMSSTATUS', 'ISPRINT', 'APPROVALCODE', 'INSPECTIONCODE', 'REPFINISHTIME',
-                        'UPCNNAME', 'INSPTYPE', 'ENTRYPORT', 'TRANSTOOL', 'LADINGNO', 'TOTALNO', 'TRADE', 'CONTRACTNO', 'INSPUNITNAME', 'BUSITYPE',
+                        'UPCNNAME', 'INSPTYPE', 'ENTRYPORT', 'TRANSTOOL', 'TOTALNO', 'TRADE', 'CONTRACTNO', 'INSPUNITNAME', 'BUSITYPE',
                         'ISFORCELAW', 'WOODPACKINGID', 'GOODSNUM', 'PACKAGETYPENAME', 'DECLTYPENAME', 'ORDERCODE', 'CUSNO', 'FOBPORT', 'FOBPORTNAME'],
                     pageSize: 22,
                     proxy: {
@@ -108,7 +108,6 @@
                     { header: '检验类别', dataIndex: 'INSPTYPE', width: 100, renderer: render },
                     { header: '入境口岸', dataIndex: 'ENTRYPORT', width: 80 },
                     { header: '运输工具', dataIndex: 'TRANSNAME', width: 80 },
-                    { header: '提运单号', dataIndex: 'LADINGNO', width: 130 },
                     { header: '贸易方式', dataIndex: 'TRADEWAYCODES', width: 80 },
                     { header: '合同号', dataIndex: 'CONTRACTNO', width: 100 },
                     { header: '报检单位', dataIndex: 'INSPUNITNAME', width: 200 },

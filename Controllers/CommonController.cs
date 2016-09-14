@@ -879,7 +879,7 @@ namespace MvcPlatform.Controllers
                 switch (Request["CONDITION1"])
                 {
                     case "BUSIUNITCODE"://经营单位
-                        where += " and ort.BUSISHORTCODE='" + Request["VALUE1"] + "' ";
+                        where += " and ort.BUSIUNITNAME='" + Request["VALUE1"] + "' ";
                         break;
                 }
             }
@@ -960,16 +960,25 @@ namespace MvcPlatform.Controllers
             //2016-6-24 更新报关单列表显示逻辑 根据报关单对应的订单【DECLPDF】即报关单是否已关联好PDF文件，作为显示的条件 国内业务不需要去判断关联订单，因为打这两个标志的时候已经判断了           
             //DECL_TRANSNAME 预制报关单的运输工具名称
             //运输工具名称的显示需要更改为一下逻辑：根据草单中的申报库别 如果是13或者17 运输工具名称取预制报关单里面的。否则取草单的运输工具名称
-            string sql = @"select det.ID,det.PREDECLCODE,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPFINISHTIME, det.CUSTOMSSTATUS ,   
+            /*string sql = @"select det.ID,det.PREDECLCODE,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPFINISHTIME, det.CUSTOMSSTATUS ,   
                          det.ISPRINT,det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.STARTTIME CREATEDATE,
                          det.BUSITYPE BUSITYPE,det.TRANSNAME DECL_TRANSNAME,
                          prt.TRANSNAME,prt.BUSIUNITCODE, prt.PORTCODE, prt.BLNO, prt.DECLTYPE, 
                          ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
-                         ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSISHORTNAME                                                                          
+                         ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME                                                                          
                          from list_declaration det 
                          left join list_predeclaration prt  on det.predeclcode = prt.predeclcode 
                          left join list_order ort on prt.ordercode = ort.code 
-                         where (ort.DECLPDF =1 or ort.PREPDF=1) and det.isinvalid=0 and instr('" + busitypeid + "',det.busitype)>0 " + where;
+                         where (ort.DECLPDF =1 or ort.PREPDF=1) and det.isinvalid=0 and instr('" + busitypeid + "',det.busitype)>0 " + where;*/
+            string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
+                         det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
+                         det.TRANSNAME DECL_TRANSNAME, det.ISPRINT,
+                         det.TRANSNAME,det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
+                         ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
+                         ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE                                                                           
+                         from list_declaration det 
+                              left join list_order ort on det.ordercode = ort.code 
+                         where (ort.DECLPDF =1 or ort.PREPDF=1) and sdet.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where;
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATEDATE", "desc"));
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
@@ -1304,7 +1313,10 @@ namespace MvcPlatform.Controllers
             {
                 string predeclcode = (dt.Rows[0]["DECLCODE"] + "");
                 predeclcode = predeclcode.Substring(0, predeclcode.Length - 3);
-                sql = "select t.*, t.rowid from list_predeclaration t where t.predeclcode='" + predeclcode + "'";
+
+                /*sql = "select t.*, t.rowid from list_predeclaration t where t.predeclcode='" + predeclcode + "'";*/
+                sql = "select t.*, t.rowid from list_declaration t where t.code='" + predeclcode + "'";
+
                 DataTable dt_pre = DBMgr.GetDataTable(sql);
                 //报关单标准打印的时候用户必须在前端选择多个打印模板
                 string[] tmp_array = printtmp.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
