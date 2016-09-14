@@ -891,7 +891,7 @@ namespace MvcPlatform.Controllers
                         where += " and instr(ort.CUSNO,'" + Request["VALUE2"] + "')>0 ";
                         break;
                     case "BLNO"://提运单号
-                        where += " and instr(prt.BLNO,'" + Request["VALUE2"] + "')>0 ";
+                        where += " and instr(det.BLNO,'" + Request["VALUE2"] + "')>0 ";
                         break;
                     case "ORDERCODE"://订单编号
                         where += " and instr(det.ORDERCODE,'" + Request["VALUE2"] + "')>0 ";
@@ -900,7 +900,7 @@ namespace MvcPlatform.Controllers
                         where += " and instr(ort.DECLCARNO,'" + Request["VALUE2"] + "')>0 ";
                         break;
                     case "TRANSNAME"://运输工具名称
-                        where += " and instr(prt.TRANSNAME,'" + Request["VALUE2"] + "')>0 ";
+                        where += " and instr(det.TRANSNAME,'" + Request["VALUE2"] + "')>0 ";
                         break;
                     case "DECLNO"://报关单号
                         where += " and instr(det.DECLARATIONCODE,'" + Request["VALUE2"] + "')>0 ";
@@ -934,11 +934,13 @@ namespace MvcPlatform.Controllers
                 case "REPTIME"://申报时间
                     if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
                     {
-                        where += " and det.REPTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                        where += " and det.REPSTARTTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') "; 
+                        //" and det.REPTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
                     }
                     if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
                     {
-                        where += " and det.REPTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                        where += " and det.REPSTARTTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') "; 
+                        //" and det.REPTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
                     }
                     break;
             }
