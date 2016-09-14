@@ -975,10 +975,12 @@ namespace MvcPlatform.Controllers
                          det.TRANSNAME DECL_TRANSNAME, det.ISPRINT,
                          det.TRANSNAME,det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
                          ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
-                         ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE                                                                           
+                         ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE, 
+                         cus.SCENEDECLAREID                                                                          
                          from list_declaration det 
                               left join list_order ort on det.ordercode = ort.code 
-                         where (ort.DECLPDF =1 or ort.PREPDF=1) and sdet.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where;
+                              left join sys_customer cus on ort.customercode = cus.code 
+                         where (ort.DECLPDF =1 or ort.PREPDF=1) and det.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where;
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATEDATE", "desc"));
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
@@ -1669,10 +1671,11 @@ namespace MvcPlatform.Controllers
             string sql = @"SELECT li.ID,li.CODE,li.PREINSPCODE, li.APPROVALCODE,li.INSPECTIONCODE,li.REPFINISHTIME,lp.UPCNNAME,lp.INSPTYPE,
                          lp.ENTRYPORT,lp.TRANSTOOL,lp.LADINGNO,lp.TOTALNO,lp.TRADE,lp.CONTRACTNO,lo.INSPUNITNAME,li.BUSITYPE,
                          li.ISFORCELAW,lo.WOODPACKINGID,li.GOODSNUM,bi.NAME PACKAGETYPENAME,sr.NAME DECLTYPENAME,li.ORDERCODE,lo.CUSNO,li.ISPRINT,
-                         lp.FOBPORT,lp.FOBPORTNAME,li.CUSTOMSSTATUS
+                         lp.FOBPORT,lp.FOBPORTNAME,li.CUSTOMSSTATUS,cus.SCENEINSPECTID    
                          FROM list_inspection li 
                          LEFT JOIN list_preinspection lp ON li.preinspcode = lp.preinspcode
                          LEFT JOIN list_order lo ON li.ordercode = lo.code 
+                         left join sys_customer cus on ort.customercode=cus.code 
                          left join base_insppackage bi on lp.packagetype=bi.code
                          left join sys_REPORTLIBRARY sr on sr.code=lp.DECLTYPE 
                          WHERE li.STATUS >=103 and INSTR('" + busitypeid + "',li.busitype)>0 " + where;
