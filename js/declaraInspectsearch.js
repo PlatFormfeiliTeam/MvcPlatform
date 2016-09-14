@@ -16,7 +16,7 @@
         flex: .35
     })
     var store_1_1 = Ext.create("Ext.data.JsonStore", {
-        fields: ["CODE", "NAME"],
+        fields: ["CODE", "NAME", "QUANCODE"],
         data: common_data_jydw
     });
     var combo_1_1 = Ext.create('Ext.form.field.ComboBox', {
@@ -25,7 +25,7 @@
         margin: 0,
         store: store_1_1,
         displayField: 'NAME',
-        valueField: "CODE",
+        valueField: "QUANCODE",
         hideTrigger: true,
         anyMatch: true,
         queryMode: 'local',
