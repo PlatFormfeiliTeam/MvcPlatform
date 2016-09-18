@@ -91,8 +91,8 @@ function browsefile() {
         document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="/FileUpload/file/' + records[0].get("ORIGINALNAME") + '"></embed>';
     }
     else {
-        win.show();
-        document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + AdminUrl + '\/file/' + records[0].get("FILENAME") + '"></embed>';
+        win.show(); 
+        document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + common_data_adminurl + '\/file/' + records[0].get("FILENAME") + '"></embed>';
     }
 }
 
