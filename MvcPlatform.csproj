@@ -215,6 +215,7 @@
     <Compile Include="Controllers\OrderAirOutController.cs" />
     <Compile Include="Controllers\OrderDomesticController.cs" />
     <Compile Include="Controllers\OrderLandInController.cs" />
+    <Compile Include="Controllers\OrderLandOutController.cs" />
     <Compile Include="Controllers\OrderSeaInController.cs" />
     <Compile Include="Controllers\OrderSeaOutController.cs" />
     <Compile Include="Controllers\OrderSpecialController.cs" />
@@ -3938,6 +3939,7 @@
     <Content Include="Views\OrderDomestic\panel_file.js" />
     <Content Include="Views\OrderDomestic\panel_file2.js" />
     <Content Include="Views\OrderLandIn\form.js" />
+    <Content Include="Views\OrderLandOut\form.js" />
     <Content Include="Views\OrderSeaIn\form.js" />
     <Content Include="Views\OrderSeaOut\Create.cshtml">
       <SubType>Code</SubType>
@@ -3987,6 +3989,8 @@
     <Content Include="Views\AccountManagement\Authorization.cshtml" />
     <Content Include="Views\OrderLandIn\Index.cshtml" />
     <Content Include="Views\OrderLandIn\Create.cshtml" />
+    <Content Include="Views\OrderLandOut\Index.cshtml" />
+    <Content Include="Views\OrderLandOut\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
