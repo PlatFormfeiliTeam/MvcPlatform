@@ -123,7 +123,7 @@ namespace MvcPlatform.Controllers
             else//修改
             {
                 ordercode = json.Value<string>("CODE");
-                sql = @"UPDATE LIST_ORDER SET BUSITYPE='{1}',CUSNO='{2}',BUSIUNITCODE='{4}',BUSIUNITNAME='{5}',CONTRACTNO='{6}'
+                sql = @"UPDATE LIST_ORDER SET BUSITYPE='{1}',CUSNO='{2}',BUSIUNITCODE='{3}',BUSIUNITNAME='{4}',CONTRACTNO='{5}'
                             ,TOTALNO='{6}', DIVIDENO='{7}',TURNPRENO='{8}',GOODSNUM='{9}',WOODPACKINGID='{10}'
                             ,CLEARANCENO='{11}',LAWFLAG='{12}',ENTRUSTTYPE='{13}',REPWAYID='{14}',CUSTOMAREACODE='{15}'
                             ,REPUNITCODE='{16}',REPUNITNAME='{17}',DECLWAY='{18}',PORTCODE='{19}',INSPUNITCODE='{20}'
@@ -131,7 +131,7 @@ namespace MvcPlatform.Controllers
                             ,CUSTOMERCODE='{26}',CUSTOMERNAME='{27}',DECLCARNO='{28}',TRADEWAYCODES='{29}',SUBMITTIME={30}
                             ,GOODSGW='{31}',GOODSNW='{32}',PACKKIND='{33}',GOODSTYPEID = '{34}',ARRIVEDNO = '{35}'
                             ,CONTAINERNO = '{36}',TRADEWAYCODES1 = '{37}',BUSIKIND='{38}',ORDERWAY='{39}',SPECIALRELATIONSHIP='{40}'
-                            ,PRICEIMPACT='{41}',PAYPOYALTIES='{42}',FILGHTNO='{43},CLEARUNIT='{44}',CLEARUNITNAME='{45}'
+                            ,PRICEIMPACT='{41}',PAYPOYALTIES='{42}',FILGHTNO='{43}',CLEARUNIT='{44}',CLEARUNITNAME='{45}'
                              WHERE CODE = '{0}'";
                 sql = string.Format(sql, ordercode
                         , "30", json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME"), json.Value<string>("CONTRACTNO")

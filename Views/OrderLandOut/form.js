@@ -34,6 +34,7 @@
     })
 
     var field_CODE = Ext.create('Ext.form.field.Text', {//订单编号
+        id: 'field_CODE',
         name: 'CODE',
         fieldLabel: '订单编号',
         readOnly: true,
@@ -196,7 +197,7 @@
     });
 
     var field_SUBMITTIME = Ext.create('Ext.form.field.Text', {//委托时间
-        name: 'SUBMITTIME1',
+        name: 'SUBMITTIME',
         fieldLabel: '委托时间',
         readOnly: true
     });
@@ -463,6 +464,7 @@
         data: common_data_myfs
     })
     var combo_myfs = Ext.create('Ext.form.field.ComboBox', {//贸易方式
+        id: 'combo_myfs',
         name: 'TRADEWAYCODES_ZS',
         store: store_myfs,
         displayField: 'CODE',
