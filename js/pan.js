@@ -1230,7 +1230,8 @@ function ini_container_truck() {
         maxLength: 11,
         minLength: 11,
         msgTarget: 'under',
-        tabIndex: 1
+        tabIndex: 1,
+        enforceMaxLength: true
  
 
       
