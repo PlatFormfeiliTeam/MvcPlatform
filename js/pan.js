@@ -1109,6 +1109,9 @@ function save(action, busitype) {
         case 21:
             url = "/OrderSeaIn/Save";
             break;
+        case 30:
+            url = "/OrderLandOut/Save";
+            break;
         case 31:
             url = "/OrderLandIn/Save";
             break;
@@ -1175,6 +1178,9 @@ function add_new(busitype) {
     if (busitype == 21) {
        window.location.href = "/OrderSeaIn/Create";
     }
+    if (busitype == 30) {
+        window.location.href = "/OrderLandOut/Create";
+    }
     if (busitype == 31) {
         window.location.href = "/OrderLandIn/Create";
     }
@@ -1197,6 +1203,9 @@ function copyorder(busitype) {
         }
         if (busitype == 21) {
             window.location.href = "/OrderSeaIn/Create?copyordercode=" + Ext.getCmp('field_CODE').getValue();
+        }
+        if (busitype == 30) {
+            window.location.href = "/OrderLandOut/Create?copyordercode=" + Ext.getCmp('field_CODE').getValue();
         }
         if (busitype == 31) {
             window.location.href = "/OrderLandIn/Create?copyordercode=" + Ext.getCmp('field_CODE').getValue();
