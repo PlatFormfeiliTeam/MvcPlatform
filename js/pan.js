@@ -1230,7 +1230,9 @@ function ini_container_truck() {
         maxLength: 11,
         minLength: 11,
         msgTarget: 'under',
-        tabIndex: 1,
+        tabIndex: 1
+ 
+
       
     });
     var w_eleshut = Ext.create('Ext.form.field.Text', {
@@ -1240,13 +1242,15 @@ function ini_container_truck() {
         tabIndex: 2,
         fieldLabel: '电子关锁号'
     });
-    // var w_weight = Ext.create('Ext.form.field.Number', {去除上下箭头
-     var w_weight = Ext.create('Ext.form.field.Text', {
+     var w_weight = Ext.create('Ext.form.field.Number', {
         name: 'CONTAINERWEIGHT',
         margin: '10',
         columnWidth: .34,
         fieldLabel: '自重',
-        tabIndex: 3
+        tabIndex: 3,
+        spinDownEnabled: false,
+        spinUpEnabled: false
+
     });
     var w_store_containertype = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "MERGENAME", "CONTAINERCODE"],
