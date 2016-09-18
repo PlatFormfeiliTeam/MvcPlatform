@@ -32,7 +32,7 @@
                     data: common_data_sbfs
                 });
                 Ext.regModel('TRADE', {
-                    fields: ['ID', 'ENTRUSTTYPE', 'STATUS', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE',
+                    fields: ['ID', 'ENTRUSTTYPE', 'STATUS', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE','TURNPRENO',
                         'SUBMITTIME', 'BUSIUNITCODE', 'BUSIUNITNAME', 'CONTRACTNO', 'TOTALNO', 'DIVIDENO', 'REPWAYID',
                          'GOODSNUM', 'GOODSGW', 'CUSTOMAREACODE', 'LAWFLAG', 'ARRIVEDNO', 'ISINVALID', 'BUSITYPE']
                         
@@ -97,6 +97,7 @@
                     { header: '进/出口岸', dataIndex: 'PORTCODE', width: 70 },//需要显示编码
                     { header: '申报方式', dataIndex: 'REPWAYID', width: 100, renderer: render },
                     { header: '运抵编号', dataIndex: 'ARRIVEDNO', width: 130 },//需要确定具体字段
+                    { header: '转关预录号', dataIndex: 'TURNPRENO', width: 130 },//需要确定具体字段
                     { header: '法检', dataIndex: 'LAWCONDITION', width: 60, renderer: render },
                     { header: '委托时间', dataIndex: 'SUBMITTIME', width: 130 }
                     ],
