@@ -1,4 +1,13 @@
-﻿function opencenterwin(url, width, height) {
+﻿
+//无数据则返回空字符串
+function isNull(value) {
+    if (value == null || value == "null" || value == undefined) {
+        return '';
+    } else {
+        return value;
+    }
+}
+function opencenterwin(url, width, height) {
     var iWidth = width ? width : "1000", iHeight = height ? height : "600";
     var iTop = (window.screen.availHeight - 30 - iHeight) / 2; //获得窗口的垂直位置;
     var iLeft = (window.screen.availWidth - 10 - iWidth) / 2; //获得窗口的水平位置; 
@@ -9,6 +18,8 @@ function getQueryString(name) {
     var r = window.location.search.substr(1).match(reg);
     if (r != null) return unescape(r[2]); return null;
 }
+
+
 
 //ENTER实现TAB功能
 var maximumformpaneltabIndexi = 1;
@@ -1162,7 +1173,7 @@ function add_new(busitype) {
         window.location.href = "/OrderSeaOut/Create";
     }
     if (busitype == 21) {
-        window.location.href = "/OrderSeaIn/Create";
+       window.location.href = "/OrderSeaIn/Create";
     }
     if (busitype == 31) {
         window.location.href = "/OrderLandIn/Create";
@@ -1210,7 +1221,8 @@ function ini_container_truck() {
         maxLength: 11,
         minLength: 11,
         msgTarget: 'under',
-        tabIndex: 1
+        tabIndex: 1,
+      
     });
     var w_eleshut = Ext.create('Ext.form.field.Text', {
         name: 'ELESHUT',
@@ -1219,7 +1231,8 @@ function ini_container_truck() {
         tabIndex: 2,
         fieldLabel: '电子关锁号'
     });
-    var w_weight = Ext.create('Ext.form.field.Number', {
+    // var w_weight = Ext.create('Ext.form.field.Number', {去除上下箭头
+     var w_weight = Ext.create('Ext.form.field.Text', {
         name: 'CONTAINERWEIGHT',
         margin: '10',
         columnWidth: .34,
