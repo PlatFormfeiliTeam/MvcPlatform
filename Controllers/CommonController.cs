@@ -636,8 +636,8 @@ namespace MvcPlatform.Controllers
 
             return "{jydw:" + json_jydw + ",sbfs:" + json_sbfs + ",sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",bzzl:" + json_bzzl 
                 + ",myfs:" + json_myfs + ",containertype:" + json_containertype + ",containersize:" + json_containersize + ",truckno:" + json_truckno
-                + ",relacontainer:" + json_relacontainer + ",mzbz:" + json_mzbz + ",jylb:" + json_jylb + ",json_sbkb:" + json_sbkb 
-                + ",inspbzzl:" + json_inspbzzl + "}";
+                + ",relacontainer:" + json_relacontainer + ",mzbz:" + json_mzbz + ",jylb:" + json_jylb + ",json_sbkb:" + json_sbkb
+                + ",inspbzzl:" + json_inspbzzl + ",adminurl:'" + AdminUrl + "'}";
         }
 
         //查询条件默认值 by heguiqin 2016-08-26

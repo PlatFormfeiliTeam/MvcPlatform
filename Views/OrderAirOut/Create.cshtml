@@ -18,7 +18,7 @@
 
     var common_data_jydw = [], common_data_sbfs = [], common_data_sbgq = [],
         common_data_bgfs = [], common_data_bzzl = [], common_data_myfs = [],
-        common_data_containertype = [], common_data_containersize = [], common_data_truckno = [],common_data_relacontainer = [];
+        common_data_containertype = [], common_data_containersize = [], common_data_truckno = [], common_data_relacontainer = [], common_data_adminurl = "";
     var formpanel, file_store, win_container_truck;//集装箱和报关车号选择列表页
     var repunitcode, inspunitcode;
 
@@ -40,6 +40,7 @@
                 common_data_containersize = commondata.containersize;//集装箱尺寸
                 common_data_truckno = commondata.truckno;//报关车号
                 common_data_relacontainer = commondata.relacontainer;//关联集装箱
+                common_data_adminurl = commondata.adminurl;//文件服务器URL
                
                 form_ini();//表单初始化
                 panel_file_ini();//随附文件初始化

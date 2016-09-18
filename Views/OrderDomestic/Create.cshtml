@@ -24,7 +24,7 @@
 <script type="text/javascript">
     var ordercode = getQueryString("ordercode");
     var OrderId = getQueryString("OrderId");
-    var common_data_jydw = [], common_data_sbfs = [], common_data_sbgq = [], common_data_bgfs = [], common_data_bzzl = [], common_data_myfs = [];
+    var common_data_jydw = [], common_data_sbfs = [], common_data_sbgq = [], common_data_bgfs = [], common_data_bzzl = [], common_data_myfs = [], common_data_adminurl="";
 
     var ID, CODEIN, CODEOUT, field_btn1, field_btn2, field_ID, field_TRADEWAYCODES, field_TRADEWAYCODES1;
     var tabindex = 1;
@@ -44,7 +44,8 @@
                 common_data_bgfs = commondata.bgfs;//报关方式
                 common_data_bzzl = commondata.bzzl;//包装种类
                 common_data_myfs = commondata.myfs;//贸易方式
-
+                common_data_adminurl = commondata.adminurl;//文件服务器URL
+                
                 form_head_ini();
                 form_import_ini();
                 form_export_ini();
