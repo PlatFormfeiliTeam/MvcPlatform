@@ -596,7 +596,48 @@ namespace MvcPlatform.Controllers
                 json_mzbz = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
                 db.StringSet("common_data:mzbz", json_mzbz);
             }
-            return "{jydw:" + json_jydw + ",sbfs:" + json_sbfs + ",sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",bzzl:" + json_bzzl + ",myfs:" + json_myfs + ",containertype:" + json_containertype + ",containersize:" + json_containersize + ",truckno:" + json_truckno + ",relacontainer:" + json_relacontainer + ",mzbz:" + json_mzbz + "}";
+            //20160918 add 暂时用在报检单展示    检验类别、申报库别
+            //检验类别
+            string json_jylb = "[]";
+            if (db.KeyExists("common_data:jylb"))
+            {
+                json_jylb = db.StringGet("common_data:jylb");
+            }
+            else
+            {
+                sql = @"select CODE,NAME||'('||CODE||')' NAME from SYS_INSPTYPE";
+                json_jylb = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:jylb", json_jylb);
+            }
+            //申报库别
+            string json_sbkb = "[]";
+            if (db.KeyExists("common_data:sbkb"))
+            {
+                json_sbkb = db.StringGet("common_data:sbkb");
+            }
+            else
+            {
+                sql = @"select CODE,NAME||'('||CODE||')' NAME from SYS_REPORTLIBRARY";
+                json_sbkb = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:sbkb", json_sbkb);
+            }
+            //报检包装种类 
+            string json_inspbzzl = "[]";
+            if (db.KeyExists("common_data:inspbzzl"))
+            {
+                json_inspbzzl = db.StringGet("common_data:inspbzzl");
+            }
+            else
+            {
+                sql = @"select CODE,NAME||'('||CODE||')' NAME from BASE_INSPPACKAGE";
+                json_inspbzzl = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:inspbzzl", json_inspbzzl);
+            }
+
+            return "{jydw:" + json_jydw + ",sbfs:" + json_sbfs + ",sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",bzzl:" + json_bzzl 
+                + ",myfs:" + json_myfs + ",containertype:" + json_containertype + ",containersize:" + json_containersize + ",truckno:" + json_truckno
+                + ",relacontainer:" + json_relacontainer + ",mzbz:" + json_mzbz + ",jylb:" + json_jylb + ",json_sbkb:" + json_sbkb 
+                + ",inspbzzl:" + json_inspbzzl + "}";
         }
 
         //查询条件默认值 by heguiqin 2016-08-26
@@ -946,7 +987,7 @@ namespace MvcPlatform.Controllers
             }
             if (role == "supplier") //如果是现场服务角色
             {
-                where += @" and ort.SCENEDECLAREID ='" + json_user.Value<string>("CUSTOMERID") + "' ";
+                where += @" and cus.SCENEDECLAREID ='" + json_user.Value<string>("CUSTOMERID") + "' ";
             }//如果是企业服务
             if (role == "enterprise")
             {
@@ -983,7 +1024,7 @@ namespace MvcPlatform.Controllers
                               left join list_order ort on det.ordercode = ort.code 
                               left join sys_customer cus on ort.customercode = cus.code 
                          where (ort.DECLPDF =1 or ort.PREPDF=1) and det.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where;
-            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATEDATE", "desc"));
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             var json = JsonConvert.SerializeObject(dt, iso);
@@ -1603,7 +1644,7 @@ namespace MvcPlatform.Controllers
                 switch (Request["CONDITION1"])
                 {
                     case "BUSIUNITCODE"://经营单位
-                        where += " and lp.UPCN='" + Request["VALUE1"] + "' ";
+                        where += " and lo.BUSIUNITCODE ='" + Request["VALUE1"] + "' ";
                         break;
                 }
             }
@@ -1614,9 +1655,9 @@ namespace MvcPlatform.Controllers
                     case "CUSNO"://客户编号
                         where += " and instr(lo.CUSNO,'" + Request["VALUE2"] + "')>0 ";
                         break;
-                    case "BLNO"://提运单号
-                        where += " and instr(lp.LADINGNO,'" + Request["VALUE2"] + "')>0 ";
-                        break;
+                    //case "BLNO"://提运单号
+                    //    where += " and instr(lp.LADINGNO,'" + Request["VALUE2"] + "')>0 ";
+                    //    break;
                     case "ORDERCODE"://订单编号
                         where += " and instr(li.ORDERCODE,'" + Request["VALUE2"] + "')>0 ";
                         break;
@@ -1643,20 +1684,20 @@ namespace MvcPlatform.Controllers
                         where += " and lo.SUBMITTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
                     }
                     break;
-                case "REPTIME"://申报时间
-                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
-                    {
-                        where += " and li.REPTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
-                    }
-                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
-                    {
-                        where += " and li.REPTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
-                    }
-                    break;
+                //case "REPTIME"://申报时间
+                //    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                //    {
+                //        where += " and li.REPTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                //    }
+                //    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                //    {
+                //        where += " and li.REPTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                //    }
+                //    break;
             }
             if (role == "supplier") //如果是现场服务
             {
-                where += @" and lo.SCENEINSPECTID ='" + json_user.Value<string>("CUSTOMERID") + "' ";
+                where += @" and cus.SCENEINSPECTID ='" + json_user.Value<string>("CUSTOMERID") + "' ";
             }
             if (role == "enterprise") //如果是企业服务
             {
@@ -1670,20 +1711,33 @@ namespace MvcPlatform.Controllers
                 where += @" and lo.customercode ='" + json_user.Value<string>("CUSTOMERCODE") + "' ";
             }
             //申报库别基础表sys_REPORTLIBRARY
-            string sql = @"SELECT li.ID,li.CODE,li.PREINSPCODE, li.APPROVALCODE,li.INSPECTIONCODE,li.REPFINISHTIME,lp.UPCNNAME,lp.INSPTYPE,
-                         lp.ENTRYPORT,lp.TRANSTOOL,lp.LADINGNO,lp.TOTALNO,lp.TRADE,lp.CONTRACTNO,lo.INSPUNITNAME,li.BUSITYPE,
-                         li.ISFORCELAW,lo.WOODPACKINGID,li.GOODSNUM,bi.NAME PACKAGETYPENAME,sr.NAME DECLTYPENAME,li.ORDERCODE,lo.CUSNO,li.ISPRINT,
-                         lp.FOBPORT,lp.FOBPORTNAME,li.CUSTOMSSTATUS,cus.SCENEINSPECTID    
+            /*string sql = @"SELECT li.ID,li.CODE,li.PREINSPCODE, li.APPROVALCODE,li.INSPECTIONCODE,li.REPFINISHTIME
+                            ,li.BUSITYPE,li.ORDERCODE,lo.CUSNO,li.ISPRINT,li.ISFORCELAW,li.GOODSNUM,li.CUSTOMSSTATUS
+                            ,lp.UPCNNAME,lp.INSPTYPE,lp.ENTRYPORT,lp.TRANSTOOL,lp.LADINGNO,lp.TOTALNO,lp.TRADE,lp.CONTRACTNO,lp.FOBPORT,lp.FOBPORTNAME
+                            ,lo.WOODPACKINGID,lo.INSPUNITNAME
+                            ,bi.NAME PACKAGETYPENAME,sr.NAME DECLTYPENAME,cus.SCENEINSPECTID    
                          FROM list_inspection li 
                          LEFT JOIN list_preinspection lp ON li.preinspcode = lp.preinspcode
                          LEFT JOIN list_order lo ON li.ordercode = lo.code 
                          left join sys_customer cus on ort.customercode=cus.code 
                          left join base_insppackage bi on lp.packagetype=bi.code
                          left join sys_REPORTLIBRARY sr on sr.code=lp.DECLTYPE 
-                         WHERE li.STATUS >=103 and INSTR('" + busitypeid + "',li.busitype)>0 " + where;
+                         WHERE li.STATUS >=103 and INSTR('" + busitypeid + "',li.busitype)>0 " + where;*/
+
+            /* 报检单 暂时没新增的字段
+,li.REPFINISHTIME,li.ISFORCELAW
+,lp.UPCNNAME,lp.INSPTYPE,lp.ENTRYPORT,lp.TRANSTOOL,lp.LADINGNO,lp.TOTALNO,lp.TRADE,lp.CONTRACTNO,lp.FOBPORT,lp.FOBPORTNAME,lp.PACKAGETYPE,lp.DECLTYPE 
+*/
+            string sql = @"SELECT li.ID,li.CODE,li.ORDERCODE,li.INSPSTATUS,li.ISPRINT, li.APPROVALCODE,li.INSPECTIONCODE
+                              ,lo.WOODPACKINGID,lo.INSPUNITNAME,lo.BUSITYPE,lo.GOODSNUM,lo.CUSNO
+                              ,cus.SCENEINSPECTID    
+                            FROM list_inspection li 
+                                 LEFT JOIN list_order lo ON li.ordercode = lo.code 
+                                 left join sys_customer cus on lo.customercode=cus.code 
+                            WHERE li.STATUS >=103  and INSTR('" + busitypeid + "',lo.busitype)>0 " + where;
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "REPFINISHTIME", "DESC"));
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "DESC"));//DBMgr.GetDataTable(GetPageSql(sql, "REPFINISHTIME", "DESC"));    //排序字段修改
             var json = JsonConvert.SerializeObject(dt, iso);
             return "{rows:" + json + ",total:" + totalProperty + "}";
         }

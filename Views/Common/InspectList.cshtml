@@ -11,16 +11,8 @@
 
 <script type="text/javascript">    
     var busitypeid = getQueryString("busitypeid"); var module = getQueryString("module"); var role = getQueryString("role");
-    var pgbar; var store_busitype;
-    var common_data_jydw = [];
-
-
-    var json_data_insptype = { '15': '验证', '21': '预检', '24': '出境检验检疫', '25': '核查货证', '28': '出境验证', '13': '入境检验检疫', '14': '流向' };
-    var json_data_woodpacking = {
-        '9': '无木', '1': '天然木制作的小木箱(架)', '2': '天然木制作的中木箱(架)', '3': '天然木制作的大木箱(架)', '4': '再生木制作的木箱'
-        , '5': '天然木制作的木托及板', '6': '再生木制作的木托及板', '7': '其他植物性包装及铺垫材料', '8': '动物性材料的包装及铺垫材料'
-    };
-  
+    var pgbar; var store_busitype;//var store_mzbz, store_jylb, store_sbkb, store_inspbzzl;
+    var common_data_jydw = [];//var common_data_mzbz = [], common_data_jylb = [], common_data_sbkb = [], common_data_inspbzzl = [];
     
     var busitype = "";
     switch (busitypeid) {
@@ -51,6 +43,10 @@
             success: function (response, opts) {
                 var commondata = Ext.decode(response.responseText)
                 common_data_jydw = commondata.jydw;//经营单位  查询区要用
+                //common_data_mzbz = commondata.mzbz;//木质包装
+                //common_data_jylb = commondata.jylb;//检验类别
+                //common_data_sbkb = commondata.sbkb;//申报库别
+                //common_data_inspbzzl = commondata.inspbzzl;//报检包装种类
 
                 initSearch();  //查询区域
 
@@ -61,19 +57,24 @@
                     Ext.getCmp('CONDITION2').setValue('CUSNO');
                 }
 
-                store_busitype = Ext.create('Ext.data.JsonStore', {
-                    fields: ['CODE', 'NAME'],
-                    data: common_data_busitype
-                });
+                store_busitype = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_busitype });
+                ////木质包装
+                //store_mzbz = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_mzbz });
+                ////检验类别
+                //store_jylb = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_jylb });
+                ////申报库别
+                //store_sbkb = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_sbkb });
+                ////报检包装种类
+                //store_inspbzzl = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_inspbzzl });
 
                 var store = Ext.create('Ext.data.JsonStore', {
-                    fields: ['ID', 'PREINSPCODE', 'CODE', 'CUSTOMSSTATUS', 'ISPRINT', 'APPROVALCODE', 'INSPECTIONCODE', 'REPFINISHTIME',
+                    fields: ['ID', 'CODE', 'INSPSTATUS', 'ISPRINT', 'APPROVALCODE', 'INSPECTIONCODE', 'REPFINISHTIME',
                         'UPCNNAME', 'INSPTYPE', 'ENTRYPORT', 'TRANSTOOL', 'LADINGNO', 'TOTALNO', 'TRADE', 'CONTRACTNO', 'INSPUNITNAME', 'BUSITYPE',
-                        'ISFORCELAW', 'WOODPACKINGID', 'GOODSNUM', 'PACKAGETYPENAME', 'DECLTYPENAME', 'ORDERCODE', 'CUSNO', 'FOBPORT', 'FOBPORTNAME'],
+                        'ISFORCELAW', 'WOODPACKINGID', 'GOODSNUM', 'PACKAGETYPE', 'DECLTYPE', 'ORDERCODE', 'CUSNO', 'FOBPORT', 'FOBPORTNAME'],
                     pageSize: 22,
                     proxy: {
                         type: 'ajax',
-                        url: '/Common/LoadInspectionList?role=' + role + "&busitypeid=" + busitypeid,
+                        url:  '/Common/LoadInspectionList',//'/Common/LoadInspectionList?role=' + role + "&busitypeid=" + busitypeid,
                         reader: {
                             root: 'rows',
                             type: 'json',
@@ -84,7 +85,7 @@
                     listeners: {
                         beforeload: function () {
                             store.getProxy().extraParams = {
-                                busitypeid: busitypeid,
+                                busitypeid: busitypeid, role: role,
                                 CONDITION1: Ext.getCmp('CONDITION1').getValue(), VALUE1: Ext.getCmp("CONDITION1_1").getValue(),
                                 CONDITION2: Ext.getCmp('CONDITION2').getValue(), VALUE2: Ext.getCmp("CONDITION2_1").getValue(),
                                 CONDITION3: Ext.getCmp('CONDITION3').getValue(), VALUE3: Ext.getCmp("CONDITION3_1").getValue(),
@@ -101,25 +102,25 @@
                 var col_array = [
                     { xtype: 'rownumberer', width: 35 },
                     { header: 'ID', dataIndex: 'ID', width: 110, sortable: true, hidden: true },
-                    { header: '国检状态', dataIndex: 'CUSTOMSSTATUS', width: 90, locked: true, renderer: render },
+                    { header: '国检状态', dataIndex: 'INSPSTATUS', width: 90, locked: true, renderer: render },
                     { header: '打印标志', dataIndex: 'ISPRINT', width: 70, locked: true, renderer: render },
                     { header: '核放单号', dataIndex: 'APPROVALCODE', width: 160, locked: true },
                     { header: '报检单号', dataIndex: 'INSPECTIONCODE', width: 150, locked: true, renderer: render },
-                    { header: '申报完成时间', dataIndex: 'REPFINISHTIME', width: 130 },
+                    //{ header: '申报完成时间', dataIndex: 'REPFINISHTIME', width: 130 },
                     { header: '业务类型', dataIndex: 'BUSITYPE', width: 100, renderer: render },
-                    { header: '收货单位', dataIndex: 'UPCNNAME', width: 170 },
-                    { header: '检验类别', dataIndex: 'INSPTYPE', width: 100, renderer: render },
-                    { header: '入境口岸', dataIndex: 'ENTRYPORT', width: 80 },
-                    { header: '运输工具', dataIndex: 'TRANSNAME', width: 80 },
-                    { header: '提运单号', dataIndex: 'LADINGNO', width: 130 },
-                    { header: '贸易方式', dataIndex: 'TRADEWAYCODES', width: 80 },
-                    { header: '合同号', dataIndex: 'CONTRACTNO', width: 100 },
-                    { header: '报检单位', dataIndex: 'INSPUNITNAME', width: 200 },
-                    { header: '是否法检', dataIndex: 'ISFORCELAW', width: 60, renderer: render },
-                    { header: '木质包装', dataIndex: 'WOODPACKINGID', width: 80, renderer: render },
-                    { header: '包装数量', dataIndex: 'GOODSNUM', width: 80 },
-                    { header: '包转种类', dataIndex: 'PACKAGETYPENAME', width: 80 },
-                    { header: '申报库别', dataIndex: 'DECLTYPENAME', width: 120 },
+                    //{ header: '收货单位', dataIndex: 'UPCNNAME', width: 170 },
+                    //{ header: '检验类别', dataIndex: 'INSPTYPE', width: 100, renderer: render },
+                    //{ header: '入境口岸', dataIndex: 'ENTRYPORT', width: 80 },
+                    //{ header: '运输工具', dataIndex: 'TRANSNAME', width: 80 },
+                    //{ header: '提运单号', dataIndex: 'LADINGNO', width: 130 },
+                    //{ header: '贸易方式', dataIndex: 'TRADEWAYCODES', width: 80 },
+                    //{ header: '合同号', dataIndex: 'CONTRACTNO', width: 100 },
+                    //{ header: '报检单位', dataIndex: 'INSPUNITNAME', width: 200 },
+                    //{ header: '是否法检', dataIndex: 'ISFORCELAW', width: 60, renderer: render },
+                    //{ header: '木质包装', dataIndex: 'WOODPACKINGID', width: 80, renderer: render },
+                    //{ header: '包装数量', dataIndex: 'GOODSNUM', width: 80 },
+                    //{ header: '包装种类', dataIndex: 'PACKAGETYPE', width: 80, renderer: render },
+                    //{ header: '申报库别', dataIndex: 'DECLTYPE', width: 120, renderer: render },
                     { header: '订单编号', dataIndex: 'ORDERCODE', width: 120 },
                     { header: '客户编号', dataIndex: 'CUSNO', width: 130 }
                 ]
@@ -141,7 +142,7 @@
     function render(value, cellmeta, record, rowIndex, columnIndex, store) {
         var rtn = "";
         var dataindex = cellmeta.column.dataIndex;
-        if (dataindex == "CUSTOMSSTATUS" && value) {
+        if (dataindex == "INSPSTATUS" && value) {
             rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='showinspect_receipt(\"" + record.get("CODE") + "\")'>" + value + "</div>";
         }
         if (dataindex == "ISPRINT") {
@@ -150,24 +151,39 @@
         if (dataindex == "INSPECTIONCODE" && value) {
             rtn = "<div style='cursor:pointer; text-decoration:underline;' onclick='showwinwj(\"" + record.get("ID") + "\",\"" + record.get("ORDERCODE") + "\",\"" + record.get("CODE") + "\",TYPE=61)'>" + value + "</div>";
         }
-        if (dataindex == "ASSOCIATECODE" && value) {
-            rtn = record.get("REPWAYNAME").indexOf("提前") > 0 ? "<div style='cursor:pointer; text-decoration:underline;' onclick='showwinwj(\"" + record.get("ID") + "\",\"" + record.get("ORDERCODE") + "\",\"" + record.get("CODE") + "\",TYPE=63)'>" + value + "</div>" : value;
-        }
-        if (dataindex == "INSPTYPE") {
-            rtn = json_data_insptype[value];
-        }
-        if (dataindex == "ISFORCELAW") {
-            rtn = value == "0" ? "否" : "是";
-        }
-        if (dataindex == "WOODPACKINGID") {
-            rtn = json_data_woodpacking[value];
-        }
         if (dataindex == "BUSITYPE" && value) {
             var rec = store_busitype.findRecord('CODE', value);
             if (rec) {
                 rtn = rec.get("NAME");
             }
         }
+        //if (dataindex == "WOODPACKINGID") {//木质包装
+        //    var rec = store_mzbz.findRecord('CODE', value);
+        //    if (rec) {
+        //        rtn = rec.get("NAME");
+        //    }
+        //}
+        //if (dataindex == "INSPTYPE") {//检验类别    
+        //    var rec = store_jylb.findRecord('CODE', value);
+        //    if (rec) {
+        //        rtn = rec.get("NAME");
+        //    }
+        //}
+        //if (dataindex == "PACKAGETYPE") {//包装种类
+        //    var rec = store_inspbzzl.findRecord('CODE', value);
+        //    if (rec) {
+        //        rtn = rec.get("NAME");
+        //    }
+        //}
+        //if (dataindex == "DECLTYPE") {//申报库别
+        //    var rec = store_sbkb.findRecord('CODE', value);
+        //    if (rec) {
+        //        rtn = rec.get("NAME");
+        //    }
+        //}
+        //if (dataindex == "ISFORCELAW") {
+        //    rtn = value == "0" ? "否" : "是";
+        //}      
         return rtn;
     }
 
