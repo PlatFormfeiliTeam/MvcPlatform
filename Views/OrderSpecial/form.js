@@ -441,8 +441,8 @@
         xtype: 'fieldcontainer',
         fieldLabel: '毛重/净重',
         layout: 'hbox',
-        items: [{ id: 'GOODSGW', name: 'GOODSGW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 13, margin: 0, allowBlank: false, blankText: '不能为空!', hideTrigger: true, vtype: 'gwnwrule', decimalPrecision: 4 },
-                { id: 'GOODSNW', name: 'GOODSNW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 14, margin: 0, hideTrigger: true, vtype: 'gwnwrule', decimalPrecision: 4 }]
+        items: [{ id: 'GOODSGW', name: 'GOODSGW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 13, margin: 0, allowBlank: false, blankText: '不能为空!', hideTrigger: true, decimalPrecision: 4 },
+                { id: 'GOODSNW', name: 'GOODSNW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 14, margin: 0, hideTrigger: true, decimalPrecision: 4 }]
     }
     //合同号
     var field_contractno = {
@@ -518,8 +518,7 @@
         id: 'TURNPRENO',
         name: 'TURNPRENO',
         enforceMaxLength: true,
-        maxLength: 16,
-        vtype: 'certainlength16'
+        maxLength: 16
     }
 
     //通关单号
