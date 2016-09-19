@@ -227,7 +227,7 @@
     });
     //维护时间
     var field_CREATETIME = Ext.create('Ext.form.field.Text', {
-        name: 'CREATETIME1',
+        name: 'CREATETIME',
         fieldLabel: '维护时间',
         readOnly: true
     });
@@ -709,11 +709,11 @@
         name: 'ORIGINALFILEIDS'
     });
     var bbar_r = '<div class="btn-group" role="group">'
-                        + '<button onclick="orderBack();" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤单</button>'
-                        + '<button onclick="add_new(21)" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;新增</button>'
+                        + '<button type="button" onclick="orderBack();" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤单</button>'
+                        + '<button type="button" onclick="add_new(21)" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;新增</button>'
                         + '<button type="button" onclick="copyorder(21)" class="btn btn-primary btn-sm"><i class="fa fa-files-o"></i>&nbsp;复制新增</button>'
-                        + '<button onclick="save(\'save\',21)" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
-                        + '<button onclick="save(\'submit\',21)" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交委托</button></div>'
+                        + '<button type="button" onclick="save(\'save\',21)" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
+                        + '<button type="button" onclick="save(\'submit\',21)" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交委托</button></div>'
 
     var bbar_l = '<div class="btn-group">'
                + '<button type="button" class="btn btn-primary btn-sm" id="pickfiles"><i class="fa fa-upload"></i>&nbsp;上传文件</button>'

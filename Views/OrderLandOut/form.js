@@ -18,37 +18,35 @@
         triggerAction: 'all',
         forceSelection: true,
         queryMode: 'local',
-        listeners: { focus: function () { combo_notype.expand(); } },
+        listeners: { focus: function () { combo_notype.expand(); } }
     })
-
-    //是否显示“调用ERP按钮”
-
     var tbar_r = '<div class="btn-group fl" role="group">'
-           + '<button type="button" onclick="LoadOrderFromErp(11)" class="btn btn-primary btn-sm"><i class="fa fa-exchange fa-fw"></i>&nbsp;调用ERP</button>'
-           + '<button type="button" onclick="LoadOrder()" class="btn btn-primary btn-sm"><i class="fa fa-search"></i>&nbsp;查询</button></div>';
+              + '<button type="button" onclick="LoadOrderFromErp(30)" class="btn btn-primary btn-sm"><i class="fa fa-exchange fa-fw"></i>&nbsp;调用ERP</button>'
+              + '<button type="button" onclick="LoadOrder()" class="btn btn-primary btn-sm"><i class="fa fa-search"></i>&nbsp;查询</button></div>';
 
     var field_noinput = Ext.create('Ext.form.field.Text', {
         name: 'NUMBER',
         id: 'NUMBER',
         tabIndex: 1
-    });
+    })
     var tbar = Ext.create('Ext.toolbar.Toolbar', {
         items: [label_baseinfo, '->', combo_notype, field_noinput, tbar_r]
     })
-    //订单编号
-    var field_CODE = Ext.create('Ext.form.field.Text', {
+
+    var field_CODE = Ext.create('Ext.form.field.Text', {//订单编号
         id: 'field_CODE',
         name: 'CODE',
         fieldLabel: '订单编号',
         readOnly: true,
         emptyText: '订单号自动生成'
-    });
-    //委托类型
+    })
+
     var store_ENTRUSTTYPENAME = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
         data: wtlx_js_data
     })
-    var combo_ENTRUSTTYPENAME = Ext.create('Ext.form.field.ComboBox', {
+
+    var combo_ENTRUSTTYPENAME = Ext.create('Ext.form.field.ComboBox', {//委托类型
         id: 'combo_ENTRUSTTYPENAME',
         name: 'ENTRUSTTYPE',
         hideTrigger: true,
@@ -66,7 +64,7 @@
                 if (!cb.getValue()) {
                     cb.clearInvalid();
                     cb.store.clearFilter();
-                    cb.expand();
+                    cb.expand()
                 }
             },
             select: function (field, newValue) {
@@ -76,18 +74,19 @@
         allowBlank: false,
         blankText: '委托类型不能为空!'
     })
-    //申报方式
+
     var store_REPWAYNAME = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
         data: common_data_sbfs
     })
-    var combo_REPWAYNAME = Ext.create('Ext.form.field.ComboBox', {
+    var combo_REPWAYNAME = Ext.create('Ext.form.field.ComboBox', {//申报方式
         name: 'REPWAYID',
         store: store_REPWAYNAME,
         hideTrigger: true,
         fieldLabel: '申报方式',
         displayField: 'NAME',
         valueField: 'CODE',
+        labelAlign: 'right',
         triggerAction: 'all',
         forceSelection: true,
         tabIndex: 3,
@@ -98,21 +97,23 @@
                 if (!cb.getValue()) {
                     cb.clearInvalid();
                     cb.store.clearFilter();
-                    cb.expand()
+                    cb.expand();
                 }
             }
-            //select: function (field, newValue) {
-            //    LoadButtonStyle();
-            //}
         },
         allowBlank: false,
         blankText: '申报方式不能为空!'
     })
-    //申报关区
+
     var store_CUSTOMDISTRICTNAME = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
         data: common_data_sbgq
     })
+
+    var field_CUSTOMDISTRICTNAME = Ext.create('Ext.form.field.Hidden', {
+        name: 'CUSTOMDISTRICTNAME'
+    })
+
     var combo_CUSTOMDISTRICTNAME = Ext.create('Ext.form.field.ComboBox', {//申报关区 这个数据比较多需要根据输入字符到后台动态模糊匹配
         name: 'CUSTOMAREACODE',
         store: store_CUSTOMDISTRICTNAME,
@@ -120,27 +121,27 @@
         displayField: 'NAME',
         valueField: 'CODE',
         queryMode: 'local',
-        minChars: 2,
         hideTrigger: true,
         forceSelection: true,
         anyMatch: true,
+        minChars: 2,
+        listeners: {
+            focus: function (cb) {
+                if (!cb.getValue()) {
+                    cb.clearInvalid();
+                    cb.store.clearFilter();
+                }
+            }
+        },
         tabIndex: 4,
         allowBlank: false,
         blankText: '申报关区不能为空!',
-        listeners: {
-            focus: function (cb) {
-                cb.clearInvalid();
-            }
-        },
         listConfig: {
             maxHeight: 110,
             getInnerTpl: function () {
                 return '<div>{NAME}</div>';
             }
         }
-    })
-    var field_CUSTOMDISTRICTNAME = Ext.create('Ext.form.field.Hidden', {
-        name: 'CUSTOMDISTRICTNAME'
     })
     //报关申报单位
     var tf_bgsbdw = Ext.create('Ext.form.field.Text', {
@@ -151,20 +152,20 @@
         flex: .85,
     })
     var cont_bgsbdw = Ext.create('Ext.form.FieldContainer', {
-        fieldLabel: '报关申报单位',
         id: 'cont_bgsbdw',
+        fieldLabel: '报关申报单位',
         layout: 'hbox',
         items: [tf_bgsbdw, {
             id: 'bgsbdw_btn', xtype: 'button', handler: function () { bgsbdw_win(tf_bgsbdw); },
             text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
         }]
     })
-    //报关方式
+
     var store_DECLWAY = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
         data: common_data_bgfs
     })
-    var combo_DECLWAY = Ext.create('Ext.form.field.ComboBox', {
+    var combo_DECLWAY = Ext.create('Ext.form.field.ComboBox', {//报关方式
         name: 'DECLWAY',
         hideTrigger: true,
         store: store_DECLWAY,
@@ -183,38 +184,20 @@
                     cb.store.clearFilter();
                     cb.expand()
                 }
-            },
-            beforequery: function (e) {
-                var queryItem = e.query;
-                var i;
-                var result = '';
-                for (i = 0; i < queryItem.length; i++) {
-                    code = queryItem.charCodeAt(i);
-                    if (code >= 65281 && code < 65373)
-                        result += String.fromCharCode(queryItem.charCodeAt(i) - 65248);
-                    else result += queryItem.charAt(i);
-                }
-                e.query = result;
             }
         },
         allowBlank: false,
-        blankText: '报关方式不能为空!',
-        listConfig: {
-            maxHeight: 110,
-            getInnerTpl: function () {
-                return '<div>{NAME}</div>';
-            }
-        }
+        blankText: '报关方式不能为空!'
     })
-    //委托人员
-    var field_SUBMITUSERNAME = Ext.create('Ext.form.field.Text', {
+
+    var field_SUBMITUSERNAME = Ext.create('Ext.form.field.Text', {//委托人员
         name: 'SUBMITUSERNAME',
         fieldLabel: '委托人员',
         readOnly: true
     });
-    //委托时间
-    var field_SUBMITTIME = Ext.create('Ext.form.field.Text', {
-        name: 'SUBMITTIME1',
+
+    var field_SUBMITTIME = Ext.create('Ext.form.field.Text', {//委托时间
+        name: 'SUBMITTIME',
         fieldLabel: '委托时间',
         readOnly: true
     });
@@ -227,27 +210,25 @@
         flex: .85,
     })
     var cont_bjsbdw = Ext.create('Ext.form.FieldContainer', {
-        fieldLabel: '报检申报单位',
         id: 'cont_bjsbdw',
+        fieldLabel: '报检申报单位',
         layout: 'hbox',
         items: [tf_bjsbdw, {
             id: 'bjsbdw_btn', xtype: 'button', handler: function () { bjsbdw_win(tf_bjsbdw); },
             text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
         }]
     })
-    //维护人员
-    var field_CREATEUSERNAME = Ext.create('Ext.form.field.Text', {
+
+    var field_CREATEUSERNAME = Ext.create('Ext.form.field.Text', {//维护人员
         name: 'CREATEUSERNAME',
         fieldLabel: '维护人员',
         readOnly: true
     });
-    //维护时间
-    var field_CREATETIME = Ext.create('Ext.form.field.Text', {
+    var field_CREATETIME = Ext.create('Ext.form.field.Text', {//维护时间
         name: 'CREATETIME',
         fieldLabel: '维护时间',
         readOnly: true
     });
-    //业务状态
     var store_status = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
         data: orderstatus_js_data
@@ -311,14 +292,14 @@
         layout: 'hbox',
         items: [chk_spe_relation, chk_2, chk_3]
     }
-    //客户编号
-    var field_CUSNO = Ext.create('Ext.form.field.Text', {
-        id: 'CUSNO',
+
+    var field_CUSNO = Ext.create('Ext.form.field.Text', {//客户编号
         name: 'CUSNO',
-        tabIndex: 8,
+        tabIndex: 9,
         fieldLabel: '客户编号'
     });
-    //进口口岸
+
+    //出口口岸
     var store_PORTNAME = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
         data: common_data_sbgq
@@ -326,21 +307,24 @@
     var combo_PORTCODE = Ext.create('Ext.form.field.ComboBox', {//和申报关区一样 这个数据比较多需要根据输入字符到后台动态模糊匹配
         name: 'PORTCODE',
         store: store_PORTNAME,
-        fieldLabel: '进口口岸',
+        fieldLabel: '出口口岸',
         displayField: 'NAME',
         valueField: 'CODE',
         queryMode: 'local',
         hideTrigger: true,
         anyMatch: true,
-        minChars: 2,
         forceSelection: true,
+        minChars: 2,
         listeners: {
             focus: function (cb) {
-                cb.clearInvalid();
+                if (!cb.getValue()) {
+                    cb.clearInvalid();
+                    cb.store.clearFilter();
+                }
             },
             select: function (records) { field_PORTNAME.setValue(records.rawValue.substr(0, records.rawValue.lastIndexOf('('))); }
         },
-        tabIndex: 9,
+        tabIndex: 10,
         allowBlank: false,
         blankText: '进口口岸不能为空!',
         listConfig: {
@@ -350,29 +334,41 @@
             }
         }
     })
+
     var field_PORTNAME = Ext.create('Ext.form.field.Hidden', {
         name: 'PORTNAME'
     })
-    var store_jydw = Ext.create('Ext.data.JsonStore', {  //经营单位combostore
+
+    //二转口岸
+    var flightno = Ext.create('Ext.form.field.Text', {
+        id: 'FILGHTNO',
+        name: 'FILGHTNO',
+        tabIndex: 11,
+        fieldLabel: '航次号'
+    })
+    //经营单位combostore 
+    var store_jydw = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME', 'QUANCODE', 'QUANNAME', 'SHORTNAME'],
         data: common_data_jydw
     })
     var combo_jydw = Ext.create('Ext.form.field.ComboBox', {//经营单位 这个数据比较多需要根据输入字符到后台动态模糊匹配,如果取不到点击添加按钮从总库进行选择，同时添加到自有客户库
-        id: 'combo_jydw',
         name: 'BUSIUNITCODE',
         store: store_jydw,
         displayField: 'NAME',
         valueField: 'QUANCODE',
         queryMode: 'local',
         margin: 0,
-        minChars: 2,
         forceSelection: true,
-        tabIndex: 10,
+        tabIndex: 12,
         anyMatch: true,
         hideTrigger: true,
+        minChars: 2,
         listeners: {
             focus: function (cb) {
-                cb.clearInvalid();
+                if (!cb.getValue()) {
+                    cb.clearInvalid();
+                    cb.store.clearFilter();
+                }
             },
             select: function (combo, records) {
                 field_BUSIUNITNAME.setValue(records[0].get("QUANNAME"));
@@ -394,31 +390,11 @@
         name: 'BUSIUNITNAME'
     })
     var field_BUSISHORTCODE = Ext.create('Ext.form.field.Hidden', {
-        id: 'field_BUSISHORTCODE',
         name: 'BUSISHORTCODE'
     })
     var field_BUSISHORTNAME = Ext.create('Ext.form.field.Hidden', {
-        id: 'field_BUSISHORTNAME',
         name: 'BUSISHORTNAME'
     })
-    //总单号
-    var field_TOTALNO = Ext.create('Ext.form.field.Text', {
-        name: 'TOTALNO',
-        tabIndex: 11,
-        enforceMaxLength: true,
-        maxLength: 11,
-        fieldLabel: '总单号'
-    });
-    //分单号
-    var field_DIVIDENO = Ext.create('Ext.form.field.Text', {
-        name: 'DIVIDENO',
-        tabIndex: 12,
-        enforceMaxLength: true,
-        maxLength: 18,
-        fieldLabel: '分单号',
-        allowBlank: false,
-        blankText: '分单号不能为空!'
-    });
     //经营单位
     var field_jydw = {
         xtype: 'fieldcontainer',
@@ -431,6 +407,14 @@
             text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
         }]
     }
+
+    //合同号
+    var field_contractno = Ext.create('Ext.form.field.Text', {
+        tabIndex: 13,
+        fieldLabel: '合同号',
+        name: 'CONTRACTNO'
+    });
+
     //包装combostore
     var store_PACKKINDNAME = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
@@ -444,19 +428,11 @@
         valueField: 'CODE',
         triggerAction: 'all',
         forceSelection: true,
-        tabIndex: 14,
+        tabIndex: 15,
         queryMode: 'local',
         anyMatch: true,
+        listeners: { focus: function () { if (combo_PACKKINDNAME.getValue() == null) { combo_PACKKINDNAME.expand(); } } },
         margin: 0,
-        listeners: {
-            focus: function (cb) {
-                if (!cb.getValue()) {
-                    cb.clearInvalid();
-                    cb.expand();
-                    cb.store.clearFilter();
-                }
-            }
-        },
         flex: .5,
         listConfig: {
             maxHeight: 110,
@@ -465,34 +441,31 @@
             }
         }
     })
+
     //件数/包装
     var field_quanpackage = {
         xtype: 'fieldcontainer',
         fieldLabel: '件数/包装',
         layout: 'hbox',
         items: [{
-            id: 'GOODSNUM', name: 'GOODSNUM', xtype: 'numberfield', tabIndex: 13, flex: .5, margin: 0, hideTrigger: true
+            id: 'GOODSNUM', name: 'GOODSNUM', xtype: 'numberfield', tabIndex: 14, flex: .5, margin: 0, hideTrigger: true, allowBlank: false, blankText: '不能为空!'
         }, combo_PACKKINDNAME]
     }
     var field_weight = { //毛重/净重
         xtype: 'fieldcontainer',
         fieldLabel: '毛重/净重',
         layout: 'hbox',
-        items: [{ id: 'GOODSGW', name: 'GOODSGW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 15, margin: 0, allowBlank: false, blankText: '不能为空!', hideTrigger: true, decimalPrecision: 4 },
-                { id: 'GOODSNW', name: 'GOODSNW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 16, margin: 0, hideTrigger: true, decimalPrecision: 4 }]
+        items: [{ id: 'GOODSGW', name: 'GOODSGW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 16, margin: 0, allowBlank: false, blankText: '不能为空!', hideTrigger: true, decimalPrecision: 4 },
+                { id: 'GOODSNW', name: 'GOODSNW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 17, margin: 0, hideTrigger: true, decimalPrecision: 4 }]
     }
-    //合同号
-    var field_contractno = Ext.create('Ext.form.field.Text', {
-        tabIndex: 17,
-        fieldLabel: '合同号',
-        name: 'CONTRACTNO'
-    });
+    //贸易方式 
     var store_myfs = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
         data: common_data_myfs
     })
     var combo_myfs = Ext.create('Ext.form.field.ComboBox', {//贸易方式
         id: 'combo_myfs',
+        name: 'TRADEWAYCODES_ZS',
         store: store_myfs,
         displayField: 'CODE',
         valueField: 'CODE',
@@ -506,14 +479,11 @@
             focus: function (cb) {
                 if (!cb.getValue()) {
                     cb.clearInvalid();
-                    cb.expand();
                     cb.store.clearFilter();
+                    cb.expand();
                 }
             },
-            select: function (records) {
-                field_TRADEWAYCODES1.setValue(records.rawValue);
-                field_TRADEWAYCODES.setValue(records.rawValue.substr(0, 4));
-            }
+            select: function (records) { field_TRADEWAYCODES1.setValue(records.rawValue); field_TRADEWAYCODES.setValue(records.rawValue.substr(0, 4)); }
         },
         flex: 0.85,
         margin: 0,
@@ -523,7 +493,7 @@
                 return '<div>{NAME}</div>';
             }
         }
-        , allowBlank: false,
+          , allowBlank: false,
         blankText: '贸易方式不能为空!'
     })
     var field_TRADEWAYCODES = Ext.create('Ext.form.field.Hidden', {
@@ -544,41 +514,36 @@
             text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
         }]
     }
-    //转关预录号
-    var field_TURNPRENO = Ext.create('Ext.form.field.Text', {
-        tabIndex: 19,
-        fieldLabel: '转关预录号',
-        name: 'TURNPRENO',
-        enforceMaxLength: true,
-        maxLength: 16
-    });
-    //木质包装
-    var store_mzbz = Ext.create('Ext.data.JsonStore', {
+
+    //货物类型
+    var store_GOODSTYPEID = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
-        data: common_data_mzbz
-    });
-    var combo_mzbz = Ext.create('Ext.form.field.ComboBox', {
-        name: 'WOODPACKINGID',
-        store: store_mzbz,
-        fieldLabel: '木质包装',
+        data: hwlx_js_data
+    })
+
+    var combo_GOODSTYPEID = Ext.create('Ext.form.field.ComboBox', {
+        name: 'GOODSTYPEID',
+        id: 'GOODSTYPEID',
+        store: store_GOODSTYPEID,
+        fieldLabel: '货物类型',
         displayField: 'NAME',
         valueField: 'CODE',
         queryMode: 'local',
         hideTrigger: true,
         forceSelection: true,
-        tabIndex: 20,
+        tabIndex: 19,
         anyMatch: true,
         listeners: {
             focus: function (cb) {
                 if (!cb.getValue()) {
                     cb.clearInvalid();
-                    cb.expand();
                     cb.store.clearFilter();
+                    cb.expand();
                 }
             }
         },
         allowBlank: false,
-        blankText: '木质包装不能为空!',
+        blankText: '货物类型不能为空!',
         listConfig: {
             maxHeight: 110,
             getInnerTpl: function () {
@@ -586,17 +551,54 @@
             }
         }
     })
+
+    //运抵编号
+    var field_ARRIVEDNO = Ext.create('Ext.form.field.Text', {
+        tabIndex: 20,
+        fieldLabel: '运抵编号',
+        maxLength: 18,
+        minLength: 18,
+        emptyText: '请填写18位运抵编号',
+        name: 'ARRIVEDNO'
+    });
+
+    //法检标志
+    var chk_CHKLAWCONDITION = {
+        xtype: 'checkboxfield',
+        tabIndex: 21,
+        fieldLabel: '法检标志',
+        name: 'LAWFLAG'
+    }
+
     //通关单号
     var field_CLEARANCENO = Ext.create('Ext.form.field.Text', {
         id: 'field_CLEARANCENO',
-        tabIndex: 21,
+        tabIndex: 22,
         fieldLabel: '通关单号',
         name: 'CLEARANCENO'
     });
-    //报关车号
-    var field_CONTAINERTRUCK = Ext.create('Ext.form.field.Hidden', {
-        id: 'field_CONTAINERTRUCK',
-        name: 'CONTAINERTRUCK'
+
+    //集装箱号
+    var combo_containerno = Ext.create('Ext.form.field.Text', {
+        name: 'CONTAINERNO',
+        id: 'CONTAINERNO',
+        tabIndex: 23,
+        readOnly: true,
+        margin: 0,
+        allowBlank: true,
+        flex: 0.85
+    })
+
+    var field_containerno = Ext.create('Ext.form.FieldContainer', {
+        id: 'fieldcontainer1',
+        fieldLabel: '集装箱号',
+        layout: 'hbox',
+        items: [combo_containerno, {
+            xtype: 'button', handler: function () {
+                win_container_truck.show();
+            },
+            text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
+        }]
     })
     var field_bgch = Ext.create('Ext.form.field.Text', {
         name: 'DECLCARNO',
@@ -606,52 +608,75 @@
         allowBlank: true,
         margin: 0,
         flex: 0.85
-    });
+    })
     var container_bgch = Ext.create('Ext.form.FieldContainer', {
         id: 'fieldbgch',
         fieldLabel: '报关车号',
         layout: 'hbox',
         items: [field_bgch, {
             id: 'bgch_button',
-            xtype: 'button', id: 'declcarno_btn', handler: function () {
+            xtype: 'button', handler: function () {
                 win_container_truck.show();
             }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
         }]
     })
+    var field_CONTAINERTRUCK = Ext.create('Ext.form.field.Hidden', {
+        id: 'field_CONTAINERTRUCK',
+        name: 'CONTAINERTRUCK'
+    })
+    //转关预录号
+    var field_TURNPRENO = Ext.create('Ext.form.field.Text', {
+        tabIndex: 25,
+        fieldLabel: '转关预录号',
+        readOnly: true,
+        name: 'TURNPRENO'
+    });
+
+    //总单号
+    var field_TOTALNO = Ext.create('Ext.form.field.Text', {
+        name: 'TOTALNO',
+        tabIndex: 26,
+        enforceMaxLength: true,
+        maxLength: 11,
+        fieldLabel: '总单号'
+    });
+    //分单号
+    var field_DIVIDENO = Ext.create('Ext.form.field.Text', {
+        name: 'DIVIDENO',
+        tabIndex: 27,
+        enforceMaxLength: true,
+        maxLength: 18,
+        fieldLabel: '分单号'
+    });
+
     //需求备注
-    var field_CLEARREMARK = Ext.create('Ext.form.field.Text', {
-        tabIndex: 23,
+    var field_ENTRUSTREQUEST = Ext.create('Ext.form.field.Text', {
+        tabIndex: 28,
         fieldLabel: '需求备注',
         name: 'ENTRUSTREQUEST'
     });
-    //法检状况
-    var chk_CHKLAWCONDITION = {
-        xtype: 'checkboxfield',
-        tabIndex: 24,
-        fieldLabel: '法检状况',
-        name: 'LAWCONDITION'
-    }
+
     //隐藏的字段
-    field_ID = Ext.create('Ext.form.field.Hidden', {
+    var field_ID = Ext.create('Ext.form.field.Hidden', {
         name: 'ID'
-    });   
+    });
     var field_ORIGINALFILEIDS = Ext.create('Ext.form.field.Hidden', {
         id: 'field_ORIGINALFILEIDS',
         name: 'ORIGINALFILEIDS'
     });
-    //文件列表
     var bbar_r = '<div class="btn-group" role="group">'
-                        + '<button type="button" onclick="orderBack();" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤单</button>'
-                        + '<button type="button" onclick="add_new(11)" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;新增</button>'
-                        + '<button type="button" onclick="copyorder(11)" class="btn btn-primary btn-sm"><i class="fa fa-files-o"></i>&nbsp;复制新增</button>'
-                        + '<button type="button" onclick="save(\'save\',11)" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
-                        + '<button type="button" onclick="save(\'submit\',11)" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交委托</button></div>'
-
-    var bbar_l = '<div class="btn-group">'
-               + '<button type="button" class="btn btn-primary btn-sm" id="pickfiles"><i class="fa fa-upload"></i>&nbsp;上传文件</button>'
-               + '<button type="button" onclick="browsefile()" class="btn btn-primary btn-sm"><i class="fa fa-exchange fa-fw"></i>&nbsp;浏览文件</button>'
-               + '<button type="button" onclick="removeFile()" class="btn btn-primary btn-sm" id="deletefile"><i class="fa fa-trash-o"></i>&nbsp;删除文件</button>'
-           + '</div>';
+                       + '<button type="button" onclick="orderBack();" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤单</button>'
+                       + '<button type="button" onclick="add_new(30)" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;新增</button>'
+                       + '<button type="button" onclick="copyorder(30)" class="btn btn-primary btn-sm"><i class="fa fa-files-o"></i>&nbsp;复制新增</button>'
+                       + '<button type="button" onclick="save(\'save\',30)" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
+                       + '<button type="button" onclick="save(\'submit\',30)" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交委托</button></div>'
+    var bbar_l;    
+    bbar_l = '<div class="btn-group">'
+                + '<button type="button" class="btn btn-primary btn-sm" id="pickfiles"><i class="fa fa-upload"></i>&nbsp;上传文件</button>'
+                + '<button type="button" onclick="browsefile()" class="btn btn-primary btn-sm"><i class="fa fa-exchange fa-fw"></i>&nbsp;浏览文件</button>'
+                + '<button type="button" onclick="removeFile()" class="btn btn-primary btn-sm" id="deletefile"><i class="fa fa-trash-o"></i>&nbsp;删除文件</button>'
+            + '</div>';
+    
     var store_filetype = Ext.create('Ext.data.JsonStore', {
         fields: ['FILETYPEID', 'FILETYPENAME'],
         data: [{ FILETYPEID: '44', FILETYPENAME: '订单文件' },
@@ -671,13 +696,15 @@
         width: 150,
         value: '44'
     })
+
     var bbar = Ext.create('Ext.toolbar.Toolbar', {
         items: [combo_filetype, bbar_l, '->', bbar_r]
     })
+
     formpanel = Ext.create('Ext.form.Panel', {
         renderTo: 'div_form',
-        minHeight: 350,
         border: 0,
+        minHeight: 350,
         tbar: tbar,
         bbar: bbar,
         fieldDefaults: {
@@ -687,6 +714,7 @@
             labelAlign: 'right',
             labelSeparator: '',
             msgTarget: 'under',
+            labelAlign: 'right',
             validateOnBlur: false,
             validateOnChange: false
         },
@@ -695,12 +723,12 @@
         { layout: 'column', height: 42, border: 0, items: [combo_DECLWAY, field_SUBMITUSERNAME, field_SUBMITTIME, field_STATUS, cont_bjsbdw] },
         { layout: 'column', height: 42, border: 0, items: [field_CREATEUSERNAME, field_CREATETIME] },
         { layout: 'column', border: 42, border: 0, items: [label_busiinfo, chk_container] },
-        { layout: 'column', height: 42, border: 0, items: [field_CUSNO, combo_PORTCODE, field_jydw, field_TOTALNO, field_DIVIDENO] },
-        { layout: 'column', height: 42, border: 0, items: [field_quanpackage, field_weight, field_contractno, field_myfs, field_TURNPRENO] },
-        { layout: 'column', height: 42, border: 0, items: [combo_mzbz, field_CLEARANCENO, container_bgch, field_CLEARREMARK, chk_CHKLAWCONDITION] },
-        field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_BUSISHORTCODE, field_BUSISHORTNAME,
-        field_ID, field_TRADEWAYCODES, field_TRADEWAYCODES1,
-        field_CONTAINERTRUCK, field_ORIGINALFILEIDS
+        { layout: 'column', height: 42, border: 0, items: [field_CUSNO, combo_PORTCODE, flightno, field_jydw, field_contractno] },
+        { layout: 'column', height: 42, border: 0, items: [field_quanpackage, field_weight, field_myfs, combo_GOODSTYPEID, field_ARRIVEDNO] },
+        { layout: 'column', height: 42, border: 0, items: [chk_CHKLAWCONDITION, field_CLEARANCENO, field_containerno, container_bgch, field_TURNPRENO] },
+        { layout: 'column', height: 42, border: 0, items: [field_TOTALNO, field_DIVIDENO, field_ENTRUSTREQUEST] },
+        field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_BUSISHORTCODE, field_BUSISHORTNAME, field_TRADEWAYCODES, field_TRADEWAYCODES1,
+        field_ID, field_CONTAINERTRUCK, field_ORIGINALFILEIDS
         ]
     });
 }

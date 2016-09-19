@@ -1,4 +1,13 @@
-﻿function opencenterwin(url, width, height) {
+﻿
+//无数据则返回空字符串
+function isNull(value) {
+    if (value == null || value == "null" || value == undefined) {
+        return '';
+    } else {
+        return value;
+    }
+}
+function opencenterwin(url, width, height) {
     var iWidth = width ? width : "1000", iHeight = height ? height : "600";
     var iTop = (window.screen.availHeight - 30 - iHeight) / 2; //获得窗口的垂直位置;
     var iLeft = (window.screen.availWidth - 10 - iWidth) / 2; //获得窗口的水平位置; 
@@ -9,6 +18,8 @@ function getQueryString(name) {
     var r = window.location.search.substr(1).match(reg);
     if (r != null) return unescape(r[2]); return null;
 }
+
+
 
 //ENTER实现TAB功能
 var maximumformpaneltabIndexi = 1;
@@ -91,8 +102,8 @@ function browsefile() {
         document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="/FileUpload/file/' + records[0].get("ORIGINALNAME") + '"></embed>';
     }
     else {
-        win.show();
-        document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + AdminUrl + '\/file/' + records[0].get("FILENAME") + '"></embed>';
+        win.show(); 
+        document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + common_data_adminurl + '\/file/' + records[0].get("FILENAME") + '"></embed>';
     }
 }
 
@@ -1059,10 +1070,26 @@ function panel_file_ini() {
 
 //非国内订单订单前端保存方法 封装 by panhuaguo 2016-08-19
 function save(action, busitype) {
+
     if (action == 'submit') {
-        if (!formpanel.getForm().isValid()) {
+            var validate = "";
+
+            var mz = Ext.getCmp('GOODSGW'); var jz = Ext.getCmp('GOODSNW');
+            if (Ext.typeOf(mz) != "undefined" && Ext.typeOf(jz) != "undefined") {
+                if (!Ext.isEmpty(mz.getValue()) && !Ext.isEmpty(jz.getValue()) && Number(jz.getValue()) > Number(mz.getValue())) {
+                    validate = "净重小于应等于毛重！";
+                }
+            }
+
+        if (validate) {
+            Ext.MessageBox.alert("提示", validate);
             return;
         }
+
+        if (!formpanel.getForm().isValid()) {
+            return;
+        }       
+
         if (file_store.data.items.length == 0) { //如果是提交委托,必须上传文件 
             Ext.MessageBox.alert('提示', '请上传文件！');
             return;
@@ -1081,6 +1108,12 @@ function save(action, busitype) {
             break;
         case 21:
             url = "/OrderSeaIn/Save";
+            break;
+        case 30:
+            url = "/OrderLandOut/Save";
+            break;
+        case 31:
+            url = "/OrderLandIn/Save";
             break;
         case 50:
             url = "/OrderSpecial/Save";
@@ -1143,7 +1176,13 @@ function add_new(busitype) {
         window.location.href = "/OrderSeaOut/Create";
     }
     if (busitype == 21) {
-        window.location.href = "/OrderSeaIn/Create";
+       window.location.href = "/OrderSeaIn/Create";
+    }
+    if (busitype == 30) {
+        window.location.href = "/OrderLandOut/Create";
+    }
+    if (busitype == 31) {
+        window.location.href = "/OrderLandIn/Create";
     }
     if (busitype == 50) {
         window.location.href = "/OrderSpecial/Create";
@@ -1165,6 +1204,12 @@ function copyorder(busitype) {
         if (busitype == 21) {
             window.location.href = "/OrderSeaIn/Create?copyordercode=" + Ext.getCmp('field_CODE').getValue();
         }
+        if (busitype == 30) {
+            window.location.href = "/OrderLandOut/Create?copyordercode=" + Ext.getCmp('field_CODE').getValue();
+        }
+        if (busitype == 31) {
+            window.location.href = "/OrderLandIn/Create?copyordercode=" + Ext.getCmp('field_CODE').getValue();
+        }
         if (busitype == 50) {
             window.location.href = "/OrderSpecial/Create?copyordercode=" + Ext.getCmp('field_CODE').getValue();
         }
@@ -1185,7 +1230,11 @@ function ini_container_truck() {
         maxLength: 11,
         minLength: 11,
         msgTarget: 'under',
-        tabIndex: 1
+        tabIndex: 1,
+        enforceMaxLength: true
+ 
+
+      
     });
     var w_eleshut = Ext.create('Ext.form.field.Text', {
         name: 'ELESHUT',
@@ -1194,12 +1243,14 @@ function ini_container_truck() {
         tabIndex: 2,
         fieldLabel: '电子关锁号'
     });
-    var w_weight = Ext.create('Ext.form.field.Number', {
+     var w_weight = Ext.create('Ext.form.field.Number', {
         name: 'CONTAINERWEIGHT',
         margin: '10',
         columnWidth: .34,
         fieldLabel: '自重',
-        tabIndex: 3
+        tabIndex: 3,
+        hideTrigger : true
+
     });
     var w_store_containertype = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "MERGENAME", "CONTAINERCODE"],
@@ -1425,3 +1476,35 @@ function ini_container_truck() {
         }]
     });
 }
+
+//非国内业务 列表页删除功能
+function DeleteNotGuoNei() {
+    var recs = gridpanel.getSelectionModel().getSelection();
+    if (recs.length == 0) {
+        Ext.MessageBox.alert('提示', '请选择需要删除的记录！');
+        return;
+    }
+    if (recs[0].data.STATUS != '1' && recs[0].data.STATUS != '10') {
+        Ext.MessageBox.alert('提示', '已委托的订单不能删除！');
+        return;
+    }
+    Ext.MessageBox.confirm("提示", "确定要删除所选择的记录吗？", function (btn) {
+        if (btn == 'yes') {
+            Ext.Ajax.request({
+                url: '/Common/Delete',
+                params: { ordercode: recs[0].get("CODE") },
+                success: function (response, success, option) {
+                    var res = Ext.decode(response.responseText);
+                    if (res.success) {
+                        Ext.MessageBox.alert('提示', '删除成功！');
+                        store_Trade.load();
+                    }
+                    else {
+                        Ext.MessageBox.alert('提示', '删除失败！');
+                    }
+                }
+            });
+        }
+    });
+}
+

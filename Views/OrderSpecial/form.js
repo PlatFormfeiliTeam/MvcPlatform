@@ -228,8 +228,7 @@
     });
     //维护时间
     var field_CREATETIME = Ext.create('Ext.form.field.Text', {
-        name: 'CREATETIME1',
-        id: 'CREATETIME1',
+        name: 'CREATETIME',
         fieldLabel: '维护时间',
         readOnly: true
     });
@@ -442,8 +441,8 @@
         xtype: 'fieldcontainer',
         fieldLabel: '毛重/净重',
         layout: 'hbox',
-        items: [{ id: 'GOODSGW', name: 'GOODSGW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 13, margin: 0, allowBlank: false, blankText: '不能为空!', hideTrigger: true, vtype: 'gwnwrule', decimalPrecision: 4 },
-                { id: 'GOODSNW', name: 'GOODSNW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 14, margin: 0, hideTrigger: true, vtype: 'gwnwrule', decimalPrecision: 4 }]
+        items: [{ id: 'GOODSGW', name: 'GOODSGW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 13, margin: 0, allowBlank: false, blankText: '不能为空!', hideTrigger: true, decimalPrecision: 4 },
+                { id: 'GOODSNW', name: 'GOODSNW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 14, margin: 0, hideTrigger: true, decimalPrecision: 4 }]
     }
     //合同号
     var field_contractno = {
@@ -519,8 +518,7 @@
         id: 'TURNPRENO',
         name: 'TURNPRENO',
         enforceMaxLength: true,
-        maxLength: 16,
-        vtype: 'certainlength16'
+        maxLength: 16
     }
 
     //通关单号
@@ -653,11 +651,11 @@
     //隐藏的字段
     //文件列表
     var bbar_r = '<div class="btn-group" role="group">'
-                        + '<button onclick="orderBack();" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤单</button>'
+                        + '<button type="button" onclick="orderBack();" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤单</button>'
                         + '<button type="button" onclick="add_new(50)" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;新增</button>'
                         + '<button type="button" onclick="copyorder(50)" class="btn btn-primary btn-sm"><i class="fa fa-files-o"></i>&nbsp;复制新增</button>'
-                        + '<button onclick="save(\'save\',50)" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
-                        + '<button onclick="save(\'submit\',50)" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交委托</button></div>'
+                        + '<button type="button" onclick="save(\'save\',50)" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
+                        + '<button type="button" onclick="save(\'submit\',50)" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交委托</button></div>'
     var bbar_l = '<div class="btn-group">'
                 + '<button type="button" class="btn btn-primary btn-sm" id="pickfiles"><i class="fa fa-upload"></i>&nbsp;上传文件</button>'
                 + '<button type="button" onclick="browsefile()" class="btn btn-primary btn-sm"><i class="fa fa-exchange fa-fw"></i>&nbsp;浏览文件</button>'

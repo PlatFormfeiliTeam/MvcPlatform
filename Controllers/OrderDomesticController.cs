@@ -121,23 +121,14 @@ namespace MvcPlatform.Controllers
             }
             else
             {
-                string sql_pre = @"select ID,CODE,BUSITYPE,CUSNO,BUSIUNITCODE,CONTRACTNO,TOTALNO,DIVIDENO,TURNPRENO,CLEARANCENO,WOODPACKINGID,
-                      LAWCONDITION,GOODSNUM,GOODSWEIGHT,REPWAYID,CUSTOMDISTRICTCODE,PORTCODE,
-                      REPUNITNAME||'('||REPUNITCODE||')' REPUNITCODE,INSPUNITNAME||'('||INSPUNITCODE||')' INSPUNITCODE,
-                      CUSTOMERCODE,CREATEUSERID,CREATETIME,SUBMITUSERID,SUBMITTIME,STATUS,ENTRUSTREQUEST, ENTRUSTTYPEID,
-                      SHIPNAME,FILGHTNO,LADINGBILLNO,TRADEWAYCODES,DECLCARNO,CLEARUNIT,BUSIKIND,DECLWAY,ORDERWAY,PACKKIND,
-                      GOODSGW,GOODSNW,ARRIVEDNO,
-                      ISINVALID,FIRSTLADINGBILLNO,SECONDLADINGBILLNO,GOODSTYPEID,CONTAINERNO,ASSOCIATENO,CORRESPONDNO,
-                      BUSIUNITNAME,REPUNITNAME,INSPUNITNAME,CUSTOMERNAME,CREATEUSERNAME,
-                      SUBMITUSERNAME,CSNAME,CLEARUNITNAME,FILINGNUMBER,TRADEWAYCODES1,
-                      ASSOCIATEPEDECLNO,ISPAUSE,ASSOCIATETRADEWAY,DECLSTATUS,INSPSTATUS,PORTNAME,CUSTOMDISTRICTNAME,SUBMITUSERPHONE,CSPHONE,FINISHTIME,                                                                  
-                      BUSISHORTNAME,BUSISHORTCODE,IETYPE,CSSUBMITUSERID,CSSUBMITUSERNAME,SPECIALRELATIONSHIP,
-                      PRICEIMPACT,PAYPOYALTIES from LIST_ORDER t";
-                //,PREISPAUSE, COSUBMITTIME,MOSUBMITTIME,INOUTTYPE,COISBACK,MOISBACK,CSISBACK,INVALIDREASON, CSACCEPTUSERNAME,COACCEPTUSERNAME,MOACCEPTUSERNAME,PAUSENUM,COBACK,YWBH
-                //,DECLPAUSE,INSPPAUSE,PREINSPSETNUM,MOSTARTTIME,MOENDTIME,MOTIME,COSTARTTIME,COENDTIME,COTIME,DECLSETNUM,INSPSETNUM,DECLSHEETNUM,INSPSHEETNUM,PREDECLSETNUM,COACCEPTUSERID
-                //,CSTIME,SETNUM,PAPERNUM,MOACCEPTUSERID,CSSTARTTIME,,ATTRIBUTION,MONAME,CONAME,ASSOCIATECUSTOMSNO,INTERNALTYPE,EXTRASTATUS,SECONDTRANSIT,COACCEPTTIME,COID,MOACCEPTTIME,MOID
-                //,CSSUBMITTIME,CSACCEPTTIME,CSID,CLEARREMARK,CSREQUEST,LANDREGNO,PRIORITY,MANIFEST,CSACCEPTUSERID,REMARK,REGNO,
-
+                string sql_pre = @"select ID,CODE,BUSITYPE,CUSNO,BUSIUNITCODE,BUSIUNITNAME,CONTRACTNO,CLEARANCENO,LAWFLAG,GOODSNUM,REPWAYID
+                      ,CUSTOMAREACODE,PORTCODE,REPUNITNAME||'('||REPUNITCODE||')' REPUNITCODE,INSPUNITNAME||'('||INSPUNITCODE||')' INSPUNITCODE
+                      ,CUSTOMERCODE,CREATEUSERID,CREATETIME,SUBMITUSERID,SUBMITTIME,STATUS,ENTRUSTREQUEST, ENTRUSTTYPE,SHIPNAME                      
+                      ,FILGHTNO,TRADEWAYCODES,DECLCARNO,DECLWAY,PACKKIND,GOODSGW,GOODSNW,ARRIVEDNO,ISINVALID,FIRSTLADINGBILLNO
+                      ,SECONDLADINGBILLNO,GOODSTYPEID,CONTAINERNO,ASSOCIATENO,CORRESPONDNO,REPUNITNAME,INSPUNITNAME
+                      ,CUSTOMERNAME,CREATEUSERNAME,SUBMITUSERNAME,RECORDCODE,TRADEWAYCODES1,ASSOCIATEPEDECLNO
+                      ,ASSOCIATETRADEWAY,IETYPE,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES  from LIST_ORDER t";      
+                                                                                               
                 string sql = sql_pre + " where CODE = '" + ordercode + "'";
                 DataTable dt1 = DBMgr.GetDataTable(sql);
                 if (!string.IsNullOrEmpty(dt1.Rows[0]["CORRESPONDNO"] + ""))//如果存在多单关联号 多单关联号一定在主订单组里面
@@ -276,13 +267,13 @@ namespace MvcPlatform.Controllers
                 if (!string.IsNullOrEmpty(dt.Rows[0]["CORRESPONDNO"] + ""))//如果存在多单关联号
                 {
                     sql_tmp = "select * from list_order where CORRESPONDNO='" + dt.Rows[0]["CORRESPONDNO"] + "'";
-                    sql = @"update list_order set STATUS=10,SUBMITTIME=NULL,SUBMITUSERNAME=NULL,SUBMITUSERID=NULL,SUBMITUSERPHONE=NULL 
+                    sql = @"update list_order set STATUS=10,SUBMITTIME=NULL,SUBMITUSERNAME=NULL,SUBMITUSERID=NULL
                           where CORRESPONDNO='" + dt.Rows[0]["CORRESPONDNO"] + "'";
                 }
                 else if (!string.IsNullOrEmpty(dt.Rows[0]["ASSOCIATENO"] + ""))
                 {
                     sql_tmp = "select * from list_order where ASSOCIATENO='" + dt.Rows[0]["ASSOCIATENO"] + "'";
-                    sql = @"update list_order set STATUS=10,SUBMITTIME=NULL,SUBMITUSERNAME=NULL,SUBMITUSERID=NULL,SUBMITUSERPHONE=NULL 
+                    sql = @"update list_order set STATUS=10,SUBMITTIME=NULL,SUBMITUSERNAME=NULL,SUBMITUSERID=NULL
                           where ASSOCIATENO='" + dt.Rows[0]["ASSOCIATENO"] + "'";
                 }
 
@@ -363,14 +354,12 @@ namespace MvcPlatform.Controllers
                 json1.Remove("STATUS"); json2.Remove("STATUS"); json3.Remove("STATUS"); json4.Remove("STATUS");
                 json_head1.Remove("SUBMITTIME"); json_head2.Remove("SUBMITTIME");//委托时间
                 json_head1.Remove("SUBMITUSERNAME"); json_head2.Remove("SUBMITUSERNAME"); //委托人NAME 
-                json_head1.Remove("SUBMITUSERID"); json_head2.Remove("SUBMITUSERID"); //委托人ID
-                json_head1.Remove("SUBMITUSERPHONE"); json_head2.Remove("SUBMITUSERPHONE"); //委托人电话SUBMITUSERPHONE               
+                json_head1.Remove("SUBMITUSERID"); json_head2.Remove("SUBMITUSERID"); //委托人ID             
 
                 json1.Add("STATUS", 15); json2.Add("STATUS", 15); json3.Add("STATUS", 15); json4.Add("STATUS", 15);
                 json_head1.Add("SUBMITTIME", "sysdate"); json_head2.Add("SUBMITTIME", "sysdate");
                 json_head1.Add("SUBMITUSERNAME", json_user.Value<string>("REALNAME")); json_head2.Add("SUBMITUSERNAME", json_user.Value<string>("REALNAME"));
                 json_head1.Add("SUBMITUSERID", json_user.Value<string>("ID")); json_head2.Add("SUBMITUSERID", json_user.Value<string>("ID"));
-                json_head1.Add("SUBMITUSERPHONE", json_user.Value<string>("TELEPHONE") + "|" + json_user.Value<string>("MOBILEPHONE")); json_head2.Add("SUBMITUSERPHONE", json_user.Value<string>("TELEPHONE") + "|" + json_user.Value<string>("MOBILEPHONE"));
             }
             else
             {
@@ -455,21 +444,36 @@ namespace MvcPlatform.Controllers
             //比对新的订单号和前端已经存在的订单号 删除已经废弃的订单号及其相关表记录           
             Del_Order(original_codes);
                        
-            insert_sql = @"INSERT INTO LIST_ORDER (ID,BUSITYPE,ASSOCIATEPEDECLNO,CODE,CUSNO,BUSIUNITCODE,BUSIUNITNAME,CONTRACTNO,GOODSNUM,CLEARANCENO,
-                                                LAWCONDITION,ENTRUSTTYPEID,REPWAYID,CUSTOMDISTRICTCODE,CUSTOMDISTRICTNAME,REPUNITCODE,REPUNITNAME,DECLWAY,INSPUNITCODE,
-                                                INSPUNITNAME,ENTRUSTREQUEST,CREATEUSERID,CREATEUSERNAME,STATUS,CUSTOMERCODE,CUSTOMERNAME,TRADEWAYCODES,
-                                                AssociateNo,CorrespondNo,PACKKIND,GOODSGW,GOODSNW,FILINGNUMBER,TRADEWAYCODES1,IETYPE,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES,BUSISHORTCODE,BUSISHORTNAME,
-                                                SUBMITTIME,SUBMITUSERNAME,SUBMITUSERID,SUBMITUSERPHONE,ASSOCIATETRADEWAY,BUSIKIND,ORDERWAY,SCENEDECLAREID,SCENEINSPECTID) 
-                                                VALUES (LIST_ORDER_id.Nextval,'{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}',
-                                                '{15}','{16}','{17}','{18}','{19}','{20}','{21}','{22}','{23}','{24}','{25}','{26}','{27}','{28}','{29}','{30}','{31}','{32}',
-                                                '{33}','{34}','{35}','{36}','{37}','{38}',{39},'{40}','{41}','{42}','{43}','{44}','{45}','{46}','{47}')";           
+            insert_sql = @"INSERT INTO LIST_ORDER (ID
+                                ,BUSITYPE,ASSOCIATEPEDECLNO,CODE,CUSNO,BUSIUNITCODE,BUSIUNITNAME
+                                ,CONTRACTNO,GOODSNUM,CLEARANCENO,LAWFLAG,ENTRUSTTYPE
+                                ,REPWAYID,CUSTOMAREACODE,REPUNITCODE,REPUNITNAME,DECLWAY
+                                ,INSPUNITCODE,INSPUNITNAME,ENTRUSTREQUEST,CREATEUSERID,CREATEUSERNAME
+                                ,STATUS,CUSTOMERCODE,CUSTOMERNAME,TRADEWAYCODES,ASSOCIATENO
+                                ,CORRESPONDNO,PACKKIND,GOODSGW,GOODSNW,RECORDCODE
+                                ,TRADEWAYCODES1,IETYPE,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES
+                                ,SUBMITUSERNAME,SUBMITUSERID,ASSOCIATETRADEWAY,BUSIKIND,ORDERWAY
+                                ,CLEARUNIT,CLEARUNITNAME,CREATETIME,SUBMITTIME) 
+                            VALUES (LIST_ORDER_id.Nextval
+                                ,'{0}','{1}','{2}','{3}','{4}','{5}'
+                                ,'{6}','{7}','{8}','{9}','{10}'
+                                ,'{11}','{12}','{13}','{14}','{15}'
+                                ,'{16}','{17}','{18}','{19}','{20}'
+                                ,'{21}','{22}','{23}','{24}','{25}'
+                                ,'{26}','{27}','{28}','{29}','{30}'
+                                ,'{31}','{32}','{33}','{34}','{35}'
+                                ,'{36}','{37}','{38}','{39}','{40}'
+                                ,'{41}','{42}',sysdate,{43}
+                                )";           
            
-            update_sql = @"update LIST_ORDER  set ASSOCIATEPEDECLNO='{0}',CUSNO='{1}',BUSIUNITCODE='{2}',BUSIUNITNAME='{3}',CONTRACTNO='{4}',GOODSNUM='{5}',
-                                        CLEARANCENO='{6}',LAWCONDITION='{7}',ENTRUSTTYPEID='{8}' ,REPWAYID='{9}',CUSTOMDISTRICTCODE='{10}',CUSTOMDISTRICTNAME='{11}',
-                                        REPUNITCODE='{12}',REPUNITNAME='{13}',DECLWAY='{14}',INSPUNITCODE='{15}',INSPUNITNAME='{16}',ENTRUSTREQUEST='{17}',TRADEWAYCODES='{18}',
-                                        ASSOCIATENO='{19}',CORRESPONDNO='{20}',PACKKIND='{21}',GOODSGW='{22}',GOODSNW='{23}',FILINGNUMBER='{24}',TRADEWAYCODES1='{25}',
-                                        IETYPE='{26}',SPECIALRELATIONSHIP='{27}',PRICEIMPACT='{28}',PAYPOYALTIES='{29}',BUSISHORTCODE='{30}',BUSISHORTNAME='{31}',STATUS='{32}',
-                                SUBMITTIME={33},SUBMITUSERNAME='{34}',SUBMITUSERID='{35}',SUBMITUSERPHONE='{36}',ASSOCIATETRADEWAY='{37}',BUSIKIND='{38}',ORDERWAY='{39}' where CODE='{40}'";
+            update_sql = @"update LIST_ORDER  SET ASSOCIATEPEDECLNO='{0}',CUSNO='{1}',BUSIUNITCODE='{2}',BUSIUNITNAME='{3}',CONTRACTNO='{4}',GOODSNUM='{5}'
+                                    ,CLEARANCENO='{6}',LAWFLAG='{7}',ENTRUSTTYPE='{8}' ,REPWAYID='{9}',CUSTOMAREACODE='{10}'
+                                    ,REPUNITCODE='{11}',REPUNITNAME='{12}',DECLWAY='{13}',INSPUNITCODE='{14}',INSPUNITNAME='{15}'
+                                    ,ENTRUSTREQUEST='{16}',TRADEWAYCODES='{17}',ASSOCIATENO='{18}',CORRESPONDNO='{19}',PACKKIND='{20}'
+                                    ,GOODSGW='{21}',GOODSNW='{22}',RECORDCODE='{23}',TRADEWAYCODES1='{24}',IETYPE='{25}'
+                                    ,SPECIALRELATIONSHIP='{26}',PRICEIMPACT='{27}',PAYPOYALTIES='{28}',STATUS='{29}',SUBMITTIME={30}
+                                    ,SUBMITUSERNAME='{31}',SUBMITUSERID='{32}',ASSOCIATETRADEWAY='{33}',BUSIKIND='{34}',ORDERWAY='{35}' 
+                            where CODE='{36}'";
             
             string exe_desc = "";//订单保存时记录各订单的执行情况
             int order_res = 1;
@@ -477,34 +481,32 @@ namespace MvcPlatform.Controllers
             {
                 if (string.IsNullOrEmpty(json1.Value<string>("CODE")))//新增
                 {
-                    sql = string.Format(insert_sql, "41", json1.Value<string>("ASSOCIATEPEDECLNO"), code1, json1.Value<string>("CUSNO"), json1.Value<string>("BUSIUNITCODE"),
-                         json1.Value<string>("BUSIUNITNAME"), json1.Value<string>("CONTRACTNO"), json1.Value<string>("GOODSNUM"), json1.Value<string>("CLEARANCENO"),
-                         GetChk(json1.Value<string>("LAWCONDITION")), json1.Value<string>("ENTRUSTTYPEID"), json_head1.Value<string>("REPWAYID"),
-                         json_head1.Value<string>("CUSTOMDISTRICTCODE"), json_head1.Value<string>("CUSTOMDISTRICTNAME"), GetCode(json1.Value<string>("REPUNITCODE")),
-                         GetName(json1.Value<string>("REPUNITCODE")), json1.Value<string>("DECLWAY"), GetCode(json1.Value<string>("INSPUNITCODE")),
-                         GetName(json1.Value<string>("INSPUNITCODE")), json1.Value<string>("ENTRUSTREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),
-                         json1.Value<string>("STATUS"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json1.Value<string>("TRADEWAYCODES"),
-                         AssociateNo, CorrespondNo, json1.Value<string>("PACKKIND"), json1.Value<string>("GOODSGW"), json1.Value<string>("GOODSNW"),
-                         json1.Value<string>("FILINGNUMBER"), json1.Value<string>("TRADEWAYCODES1"), json_head1.Value<string>("IETYPE"), GetChk(json1.Value<string>("SPECIALRELATIONSHIP")),
-                         GetChk(json1.Value<string>("PRICEIMPACT")), GetChk(json1.Value<string>("PAYPOYALTIES")), json1.Value<string>("BUSISHORTCODE"), json1.Value<string>("BUSISHORTNAME"),
-                         json_head1.Value<string>("SUBMITTIME"), json_head1.Value<string>("SUBMITUSERNAME"), json_head1.Value<string>("SUBMITUSERID"), json_head1.Value<string>("SUBMITUSERPHONE"), json1.Value<string>("ASSOCIATETRADEWAY"),
-                         "002", "1", json_user.Value<string>("SCENEDECLAREID"), json_user.Value<string>("SCENEINSPECTID")
+                    sql = string.Format(insert_sql
+                            , "41", json1.Value<string>("ASSOCIATEPEDECLNO"), code1, json1.Value<string>("CUSNO"), json1.Value<string>("BUSIUNITCODE"), json1.Value<string>("BUSIUNITNAME")
+                            , json1.Value<string>("CONTRACTNO"), json1.Value<string>("GOODSNUM"), json1.Value<string>("CLEARANCENO"),GetChk(json1.Value<string>("LAWFLAG")), json1.Value<string>("ENTRUSTTYPE")
+                            , json_head1.Value<string>("REPWAYID"),json_head1.Value<string>("CUSTOMAREACODE"), GetCode(json1.Value<string>("REPUNITCODE")),GetName(json1.Value<string>("REPUNITCODE")), json1.Value<string>("DECLWAY")
+                            , GetCode(json1.Value<string>("INSPUNITCODE")),GetName(json1.Value<string>("INSPUNITCODE")), json1.Value<string>("ENTRUSTREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
+                            ,json1.Value<string>("STATUS"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json1.Value<string>("TRADEWAYCODES"),AssociateNo
+                            , CorrespondNo, json1.Value<string>("PACKKIND"), json1.Value<string>("GOODSGW"), json1.Value<string>("GOODSNW"),json1.Value<string>("RECORDCODE")
+                            , json1.Value<string>("TRADEWAYCODES1"), json_head1.Value<string>("IETYPE"), GetChk(json1.Value<string>("SPECIALRELATIONSHIP")), GetChk(json1.Value<string>("PRICEIMPACT")), GetChk(json1.Value<string>("PAYPOYALTIES"))
+                            , json_head1.Value<string>("SUBMITUSERNAME"), json_head1.Value<string>("SUBMITUSERID"), json1.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
+                            , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json_head1.Value<string>("SUBMITTIME")
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code1;
                 }
                 else
                 {
-                    sql = string.Format(update_sql, json1.Value<string>("ASSOCIATEPEDECLNO"), json1.Value<string>("CUSNO"), json1.Value<string>("BUSIUNITCODE"),
-                         json1.Value<string>("BUSIUNITNAME"), json1.Value<string>("CONTRACTNO"), json1.Value<string>("GOODSNUM"), json1.Value<string>("CLEARANCENO"),
-                         GetChk(json1.Value<string>("LAWCONDITION")), json1.Value<string>("ENTRUSTTYPEID"), json_head1.Value<string>("REPWAYID"),
-                         json_head1.Value<string>("CUSTOMDISTRICTCODE"), json_head1.Value<string>("CUSTOMDISTRICTNAME"), GetCode(json1.Value<string>("REPUNITCODE")),
-                         GetName(json1.Value<string>("REPUNITCODE")), json1.Value<string>("DECLWAY"), GetCode(json1.Value<string>("INSPUNITCODE")), GetName(json1.Value<string>("INSPUNITCODE")),
-                         json1.Value<string>("ENTRUSTREQUEST"), json1.Value<string>("TRADEWAYCODES"), AssociateNo, CorrespondNo, json1.Value<string>("PACKKIND"),
-                          json1.Value<string>("GOODSGW"), json1.Value<string>("GOODSNW"), json1.Value<string>("FILINGNUMBER"), json1.Value<string>("TRADEWAYCODES1"),
-                         json_head1.Value<string>("IETYPE"), GetChk(json1.Value<string>("SPECIALRELATIONSHIP")), GetChk(json1.Value<string>("PRICEIMPACT")),
-                         GetChk(json1.Value<string>("PAYPOYALTIES")), json1.Value<string>("BUSISHORTCODE"), json1.Value<string>("BUSISHORTNAME"), json1.Value<string>("STATUS"),
-                         json_head1.Value<string>("SUBMITTIME"), json_head1.Value<string>("SUBMITUSERNAME"), json_head1.Value<string>("SUBMITUSERID"), json_head1.Value<string>("SUBMITUSERPHONE"), json1.Value<string>("ASSOCIATETRADEWAY"), "002", "1", code1);
+                    sql = string.Format(update_sql, json1.Value<string>("ASSOCIATEPEDECLNO"), json1.Value<string>("CUSNO"), json1.Value<string>("BUSIUNITCODE"), json1.Value<string>("BUSIUNITNAME"), json1.Value<string>("CONTRACTNO"), json1.Value<string>("GOODSNUM")
+                            , json1.Value<string>("CLEARANCENO"), GetChk(json1.Value<string>("LAWFLAG")), json1.Value<string>("ENTRUSTTYPE"), json_head1.Value<string>("REPWAYID"), json_head1.Value<string>("CUSTOMAREACODE")
+                            , GetCode(json1.Value<string>("REPUNITCODE")), GetName(json1.Value<string>("REPUNITCODE")), json1.Value<string>("DECLWAY"), GetCode(json1.Value<string>("INSPUNITCODE")), GetName(json1.Value<string>("INSPUNITCODE"))
+                            , json1.Value<string>("ENTRUSTREQUEST"), json1.Value<string>("TRADEWAYCODES"), AssociateNo, CorrespondNo, json1.Value<string>("PACKKIND")
+                            , json1.Value<string>("GOODSGW"), json1.Value<string>("GOODSNW"), json1.Value<string>("RECORDCODE"), json1.Value<string>("TRADEWAYCODES1"), json_head1.Value<string>("IETYPE")
+                            , GetChk(json1.Value<string>("SPECIALRELATIONSHIP")), GetChk(json1.Value<string>("PRICEIMPACT")), GetChk(json1.Value<string>("PAYPOYALTIES")), json1.Value<string>("STATUS"), json_head1.Value<string>("SUBMITTIME")
+                            , json_head1.Value<string>("SUBMITUSERNAME"), json_head1.Value<string>("SUBMITUSERID"), json1.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
+                            , code1
+                             );
+
                     if (json1.Value<Int32>("STATUS") >= 20)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
                     {
                         Extension.Insert_FieldUpdate_History(code1, json1, json_user, "41");
@@ -524,34 +526,30 @@ namespace MvcPlatform.Controllers
             {
                 if (string.IsNullOrEmpty(json2.Value<string>("CODE")))//新增
                 {
-                    sql = string.Format(insert_sql, "40", json2.Value<string>("ASSOCIATEPEDECLNO"), code2, json2.Value<string>("CUSNO"), json2.Value<string>("BUSIUNITCODE"),
-                         json2.Value<string>("BUSIUNITNAME"), json2.Value<string>("CONTRACTNO"), json2.Value<string>("GOODSNUM"), json2.Value<string>("CLEARANCENO"),
-                         GetChk(json2.Value<string>("LAWCONDITION")), json2.Value<string>("ENTRUSTTYPEID"), json_head1.Value<string>("REPWAYID"),
-                         json_head1.Value<string>("CUSTOMDISTRICTCODE"), json_head1.Value<string>("CUSTOMDISTRICTNAME"), GetCode(json2.Value<string>("REPUNITCODE")),
-                         GetName(json2.Value<string>("REPUNITCODE")), json2.Value<string>("DECLWAY"), GetCode(json2.Value<string>("INSPUNITCODE")),
-                         GetName(json2.Value<string>("INSPUNITCODE")), json2.Value<string>("ENTRUSTREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),
-                         json2.Value<string>("STATUS"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json2.Value<string>("TRADEWAYCODES"),
-                         AssociateNo, CorrespondNo, json2.Value<string>("PACKKIND"), json2.Value<string>("GOODSGW"), json2.Value<string>("GOODSNW"),
-                         json2.Value<string>("FILINGNUMBER"), json2.Value<string>("TRADEWAYCODES1"), json_head1.Value<string>("IETYPE"), GetChk(json2.Value<string>("SPECIALRELATIONSHIP")),
-                         GetChk(json2.Value<string>("PRICEIMPACT")), GetChk(json2.Value<string>("PAYPOYALTIES")), json2.Value<string>("BUSISHORTCODE"), json2.Value<string>("BUSISHORTNAME"),
-                         json_head1.Value<string>("SUBMITTIME"), json_head1.Value<string>("SUBMITUSERNAME"), json_head1.Value<string>("SUBMITUSERID"), json_head1.Value<string>("SUBMITUSERPHONE"), json2.Value<string>("ASSOCIATETRADEWAY"),
-                         "002", "1", json_user.Value<string>("SCENEDECLAREID"), json_user.Value<string>("SCENEINSPECTID")
+                    sql = string.Format(insert_sql, "40", json2.Value<string>("ASSOCIATEPEDECLNO"), code2, json2.Value<string>("CUSNO"), json2.Value<string>("BUSIUNITCODE"),json2.Value<string>("BUSIUNITNAME")
+                            , json2.Value<string>("CONTRACTNO"), json2.Value<string>("GOODSNUM"), json2.Value<string>("CLEARANCENO"), GetChk(json2.Value<string>("LAWFLAG")), json2.Value<string>("ENTRUSTTYPE")
+                            , json_head1.Value<string>("REPWAYID"), json_head1.Value<string>("CUSTOMAREACODE"), GetCode(json2.Value<string>("REPUNITCODE")), GetName(json2.Value<string>("REPUNITCODE")), json2.Value<string>("DECLWAY")
+                            , GetCode(json2.Value<string>("INSPUNITCODE")), GetName(json2.Value<string>("INSPUNITCODE")), json2.Value<string>("ENTRUSTREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
+                            , json2.Value<string>("STATUS"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json2.Value<string>("TRADEWAYCODES"), AssociateNo
+                            , CorrespondNo, json2.Value<string>("PACKKIND"), json2.Value<string>("GOODSGW"), json2.Value<string>("GOODSNW"),json2.Value<string>("RECORDCODE")
+                            , json2.Value<string>("TRADEWAYCODES1"), json_head1.Value<string>("IETYPE"), GetChk(json2.Value<string>("SPECIALRELATIONSHIP")), GetChk(json2.Value<string>("PRICEIMPACT")), GetChk(json2.Value<string>("PAYPOYALTIES"))
+                            , json_head1.Value<string>("SUBMITUSERNAME"), json_head1.Value<string>("SUBMITUSERID"), json2.Value<string>("ASSOCIATETRADEWAY"),"002", "1"
+                            , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json_head1.Value<string>("SUBMITTIME")
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code2;
                 }
                 else
                 {
-                    sql = string.Format(update_sql, json2.Value<string>("ASSOCIATEPEDECLNO"), json2.Value<string>("CUSNO"), json2.Value<string>("BUSIUNITCODE"),
-                         json2.Value<string>("BUSIUNITNAME"), json2.Value<string>("CONTRACTNO"), json2.Value<string>("GOODSNUM"), json2.Value<string>("CLEARANCENO"),
-                         GetChk(json2.Value<string>("LAWCONDITION")), json2.Value<string>("ENTRUSTTYPEID"), json_head1.Value<string>("REPWAYID"),
-                         json_head1.Value<string>("CUSTOMDISTRICTCODE"), json_head1.Value<string>("CUSTOMDISTRICTNAME"), GetCode(json2.Value<string>("REPUNITCODE")),
-                         GetName(json2.Value<string>("REPUNITCODE")), json2.Value<string>("DECLWAY"), GetCode(json2.Value<string>("INSPUNITCODE")), GetName(json2.Value<string>("INSPUNITCODE")),
-                         json2.Value<string>("ENTRUSTREQUEST"), json2.Value<string>("TRADEWAYCODES"), AssociateNo, CorrespondNo, json2.Value<string>("PACKKIND"),
-                         json2.Value<string>("GOODSGW"), json2.Value<string>("GOODSNW"), json2.Value<string>("FILINGNUMBER"), json2.Value<string>("TRADEWAYCODES1"),
-                         json_head1.Value<string>("IETYPE"), GetChk(json2.Value<string>("SPECIALRELATIONSHIP")), GetChk(json2.Value<string>("PRICEIMPACT")),
-                         GetChk(json2.Value<string>("PAYPOYALTIES")), json2.Value<string>("BUSISHORTCODE"), json2.Value<string>("BUSISHORTNAME"), json2.Value<string>("STATUS"),
-                         json_head1.Value<string>("SUBMITTIME"), json_head1.Value<string>("SUBMITUSERNAME"), json_head1.Value<string>("SUBMITUSERID"), json_head1.Value<string>("SUBMITUSERPHONE"), json2.Value<string>("ASSOCIATETRADEWAY"), "002", "1", code2);
+                    sql = string.Format(update_sql, json2.Value<string>("ASSOCIATEPEDECLNO"), json2.Value<string>("CUSNO"), json2.Value<string>("BUSIUNITCODE"), json2.Value<string>("BUSIUNITNAME"), json2.Value<string>("CONTRACTNO"), json2.Value<string>("GOODSNUM")
+                            , json2.Value<string>("CLEARANCENO"), GetChk(json2.Value<string>("LAWFLAG")), json2.Value<string>("ENTRUSTTYPE"), json_head1.Value<string>("REPWAYID"), json_head1.Value<string>("CUSTOMAREACODE")
+                            , GetCode(json2.Value<string>("REPUNITCODE")), GetName(json2.Value<string>("REPUNITCODE")), json2.Value<string>("DECLWAY"), GetCode(json2.Value<string>("INSPUNITCODE")), GetName(json2.Value<string>("INSPUNITCODE"))
+                            , json2.Value<string>("ENTRUSTREQUEST"), json2.Value<string>("TRADEWAYCODES"), AssociateNo, CorrespondNo, json2.Value<string>("PACKKIND")
+                            , json2.Value<string>("GOODSGW"), json2.Value<string>("GOODSNW"), json2.Value<string>("RECORDCODE"), json2.Value<string>("TRADEWAYCODES1"), json_head1.Value<string>("IETYPE")
+                            , GetChk(json2.Value<string>("SPECIALRELATIONSHIP")), GetChk(json2.Value<string>("PRICEIMPACT")), GetChk(json2.Value<string>("PAYPOYALTIES")), json2.Value<string>("STATUS"), json_head1.Value<string>("SUBMITTIME")
+                            , json_head1.Value<string>("SUBMITUSERNAME"), json_head1.Value<string>("SUBMITUSERID"), json2.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
+                            , code2
+                         );
                     if (json2.Value<Int32>("STATUS") >= 20)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
                     {
                         Extension.Insert_FieldUpdate_History(code2, json2, json_user, "40");
@@ -570,34 +568,33 @@ namespace MvcPlatform.Controllers
             {
                 if (string.IsNullOrEmpty(json3.Value<string>("CODE")))//新增
                 {
-                    sql = string.Format(insert_sql, "41", json3.Value<string>("ASSOCIATEPEDECLNO"), code3, json3.Value<string>("CUSNO"), json3.Value<string>("BUSIUNITCODE"),
-                         json3.Value<string>("BUSIUNITNAME"), json3.Value<string>("CONTRACTNO"), json3.Value<string>("GOODSNUM"), json3.Value<string>("CLEARANCENO"),
-                         GetChk(json3.Value<string>("LAWCONDITION")), json3.Value<string>("ENTRUSTTYPEID"), json_head1.Value<string>("REPWAYID"),
-                         json_head2.Value<string>("CUSTOMDISTRICTCODE"), json_head2.Value<string>("CUSTOMDISTRICTNAME"), GetCode(json3.Value<string>("REPUNITCODE")),
-                         GetName(json3.Value<string>("REPUNITCODE")), json3.Value<string>("DECLWAY"), GetCode(json3.Value<string>("INSPUNITCODE")),
-                         GetName(json3.Value<string>("INSPUNITCODE")), json3.Value<string>("ENTRUSTREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),
-                         json3.Value<string>("STATUS"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json3.Value<string>("TRADEWAYCODES"),
-                         AssociateNo2, CorrespondNo, json3.Value<string>("PACKKIND"), json3.Value<string>("GOODSGW"), json3.Value<string>("GOODSNW"),
-                         json3.Value<string>("FILINGNUMBER"), json3.Value<string>("TRADEWAYCODES1"), json_head2.Value<string>("IETYPE"), GetChk(json3.Value<string>("SPECIALRELATIONSHIP")),
-                         GetChk(json3.Value<string>("PRICEIMPACT")), GetChk(json3.Value<string>("PAYPOYALTIES")), json3.Value<string>("BUSISHORTCODE"), json3.Value<string>("BUSISHORTNAME"),
-                         json_head2.Value<string>("SUBMITTIME"), json_head2.Value<string>("SUBMITUSERNAME"), json_head2.Value<string>("SUBMITUSERID"), json_head2.Value<string>("SUBMITUSERPHONE"), json3.Value<string>("ASSOCIATETRADEWAY"),
-                         "002", "1", json_user.Value<string>("SCENEDECLAREID"), json_user.Value<string>("SCENEINSPECTID")
+                    sql = string.Format(insert_sql
+                            , "41", json3.Value<string>("ASSOCIATEPEDECLNO"), code3, json3.Value<string>("CUSNO"), json3.Value<string>("BUSIUNITCODE"), json3.Value<string>("BUSIUNITNAME")
+                            , json3.Value<string>("CONTRACTNO"), json3.Value<string>("GOODSNUM"), json3.Value<string>("CLEARANCENO"), GetChk(json3.Value<string>("LAWFLAG")), json3.Value<string>("ENTRUSTTYPE")
+                            , json_head1.Value<string>("REPWAYID"), json_head2.Value<string>("CUSTOMAREACODE"), GetCode(json3.Value<string>("REPUNITCODE")), GetName(json3.Value<string>("REPUNITCODE")), json3.Value<string>("DECLWAY")
+                            , GetCode(json3.Value<string>("INSPUNITCODE")), GetName(json3.Value<string>("INSPUNITCODE")), json3.Value<string>("ENTRUSTREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
+                            , json3.Value<string>("STATUS"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json3.Value<string>("TRADEWAYCODES"), AssociateNo2
+                            , CorrespondNo, json3.Value<string>("PACKKIND"), json3.Value<string>("GOODSGW"), json3.Value<string>("GOODSNW"), json3.Value<string>("RECORDCODE")
+                            , json3.Value<string>("TRADEWAYCODES1"), json_head2.Value<string>("IETYPE"), GetChk(json3.Value<string>("SPECIALRELATIONSHIP")), GetChk(json3.Value<string>("PRICEIMPACT")), GetChk(json3.Value<string>("PAYPOYALTIES"))
+                            , json_head2.Value<string>("SUBMITUSERNAME"), json_head2.Value<string>("SUBMITUSERID"), json3.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
+                             , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json_head2.Value<string>("SUBMITTIME") 
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code3;
                 }
                 else
                 {
-                    sql = string.Format(update_sql, json3.Value<string>("ASSOCIATEPEDECLNO"), json3.Value<string>("CUSNO"), json3.Value<string>("BUSIUNITCODE"),
-                         json3.Value<string>("BUSIUNITNAME"), json3.Value<string>("CONTRACTNO"), json3.Value<string>("GOODSNUM"), json3.Value<string>("CLEARANCENO"),
-                         GetChk(json3.Value<string>("LAWCONDITION")), json3.Value<string>("ENTRUSTTYPEID"), json_head2.Value<string>("REPWAYID"),
-                         json_head2.Value<string>("CUSTOMDISTRICTCODE"), json_head2.Value<string>("CUSTOMDISTRICTNAME"), GetCode(json3.Value<string>("REPUNITCODE")),
-                         GetName(json3.Value<string>("REPUNITCODE")), json3.Value<string>("DECLWAY"), GetCode(json3.Value<string>("INSPUNITCODE")), GetName(json3.Value<string>("INSPUNITCODE")),
-                         json3.Value<string>("ENTRUSTREQUEST"), json3.Value<string>("TRADEWAYCODES"), AssociateNo2, CorrespondNo, json3.Value<string>("PACKKIND"),
-                         json3.Value<string>("GOODSGW"), json3.Value<string>("GOODSNW"), json3.Value<string>("FILINGNUMBER"), json3.Value<string>("TRADEWAYCODES1"),
-                         json_head2.Value<string>("IETYPE"), GetChk(json3.Value<string>("SPECIALRELATIONSHIP")), GetChk(json3.Value<string>("PRICEIMPACT")),
-                         GetChk(json3.Value<string>("PAYPOYALTIES")), json3.Value<string>("BUSISHORTCODE"), json3.Value<string>("BUSISHORTNAME"), json3.Value<string>("STATUS"),
-                         json_head2.Value<string>("SUBMITTIME"), json_head2.Value<string>("SUBMITUSERNAME"), json_head2.Value<string>("SUBMITUSERID"), json_head2.Value<string>("SUBMITUSERPHONE"), json3.Value<string>("ASSOCIATETRADEWAY"), "002", "1", code3);
+                    sql = string.Format(update_sql, json3.Value<string>("ASSOCIATEPEDECLNO"), json3.Value<string>("CUSNO"), json3.Value<string>("BUSIUNITCODE"), json3.Value<string>("BUSIUNITNAME"), json3.Value<string>("CONTRACTNO"), json3.Value<string>("GOODSNUM")
+                            , json3.Value<string>("CLEARANCENO"), GetChk(json3.Value<string>("LAWFLAG")), json3.Value<string>("ENTRUSTTYPE"), json_head2.Value<string>("REPWAYID"), json_head2.Value<string>("CUSTOMAREACODE")
+                            , GetCode(json3.Value<string>("REPUNITCODE")), GetName(json3.Value<string>("REPUNITCODE")), json3.Value<string>("DECLWAY"), GetCode(json3.Value<string>("INSPUNITCODE")), GetName(json3.Value<string>("INSPUNITCODE"))
+                            , json3.Value<string>("ENTRUSTREQUEST"), json3.Value<string>("TRADEWAYCODES"), AssociateNo2, CorrespondNo, json3.Value<string>("PACKKIND")
+                            , json3.Value<string>("GOODSGW"), json3.Value<string>("GOODSNW"), json3.Value<string>("RECORDCODE"), json3.Value<string>("TRADEWAYCODES1"), json_head2.Value<string>("IETYPE")
+                            , GetChk(json3.Value<string>("SPECIALRELATIONSHIP")), GetChk(json3.Value<string>("PRICEIMPACT")), GetChk(json3.Value<string>("PAYPOYALTIES")), json3.Value<string>("STATUS"), json_head2.Value<string>("SUBMITTIME")
+                            , json_head2.Value<string>("SUBMITUSERNAME"), json_head2.Value<string>("SUBMITUSERID"), json3.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
+                            , code3
+                            );
+                         
+                         
                     if (json3.Value<Int32>("STATUS") >= 20)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
                     {
                         Extension.Insert_FieldUpdate_History(code3, json3, json_user, "41");
@@ -616,34 +613,31 @@ namespace MvcPlatform.Controllers
             {
                 if (string.IsNullOrEmpty(json4.Value<string>("CODE")))//新增
                 {
-                    sql = string.Format(insert_sql, "40", json4.Value<string>("ASSOCIATEPEDECLNO"), code4, json4.Value<string>("CUSNO"), json4.Value<string>("BUSIUNITCODE"),
-                         json4.Value<string>("BUSIUNITNAME"), json4.Value<string>("CONTRACTNO"), json4.Value<string>("GOODSNUM"), json4.Value<string>("CLEARANCENO"),
-                         GetChk(json4.Value<string>("LAWCONDITION")), json4.Value<string>("ENTRUSTTYPEID"), json_head2.Value<string>("REPWAYID"),
-                         json_head2.Value<string>("CUSTOMDISTRICTCODE"), json_head2.Value<string>("CUSTOMDISTRICTNAME"), GetCode(json4.Value<string>("REPUNITCODE")),
-                         GetName(json4.Value<string>("REPUNITCODE")), json4.Value<string>("DECLWAY"), GetCode(json4.Value<string>("INSPUNITCODE")),
-                         GetName(json4.Value<string>("INSPUNITCODE")), json4.Value<string>("ENTRUSTREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),
-                         json4.Value<string>("STATUS"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json4.Value<string>("TRADEWAYCODES"),
-                         AssociateNo2, CorrespondNo, json4.Value<string>("PACKKIND"), json4.Value<string>("GOODSGW"), json4.Value<string>("GOODSNW"),
-                         json4.Value<string>("FILINGNUMBER"), json4.Value<string>("TRADEWAYCODES1"), json_head2.Value<string>("IETYPE"), GetChk(json4.Value<string>("SPECIALRELATIONSHIP")),
-                         GetChk(json4.Value<string>("PRICEIMPACT")), GetChk(json4.Value<string>("PAYPOYALTIES")), json4.Value<string>("BUSISHORTCODE"), json4.Value<string>("BUSISHORTNAME"),
-                         json_head2.Value<string>("SUBMITTIME"), json_head2.Value<string>("SUBMITUSERNAME"), json_head2.Value<string>("SUBMITUSERID"), json_head2.Value<string>("SUBMITUSERPHONE"), json4.Value<string>("ASSOCIATETRADEWAY"),
-                         "002", "1", json_user.Value<string>("SCENEDECLAREID"), json_user.Value<string>("SCENEINSPECTID")
+                    sql = string.Format(insert_sql
+                            , "40", json4.Value<string>("ASSOCIATEPEDECLNO"), code4, json4.Value<string>("CUSNO"), json4.Value<string>("BUSIUNITCODE"), json4.Value<string>("BUSIUNITNAME")
+                            , json4.Value<string>("CONTRACTNO"), json4.Value<string>("GOODSNUM"), json4.Value<string>("CLEARANCENO"), GetChk(json4.Value<string>("LAWFLAG")), json4.Value<string>("ENTRUSTTYPE")
+                            , json_head2.Value<string>("REPWAYID"),json_head2.Value<string>("CUSTOMAREACODE"), GetCode(json4.Value<string>("REPUNITCODE")),GetName(json4.Value<string>("REPUNITCODE")), json4.Value<string>("DECLWAY")
+                            , GetCode(json4.Value<string>("INSPUNITCODE")), GetName(json4.Value<string>("INSPUNITCODE")), json4.Value<string>("ENTRUSTREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
+                            , json4.Value<string>("STATUS"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json4.Value<string>("TRADEWAYCODES"), AssociateNo2
+                            , CorrespondNo, json4.Value<string>("PACKKIND"), json4.Value<string>("GOODSGW"), json4.Value<string>("GOODSNW"), json4.Value<string>("RECORDCODE")
+                            , json4.Value<string>("TRADEWAYCODES1"), json_head2.Value<string>("IETYPE"), GetChk(json4.Value<string>("SPECIALRELATIONSHIP")), GetChk(json4.Value<string>("PRICEIMPACT")), GetChk(json4.Value<string>("PAYPOYALTIES"))
+                            , json_head2.Value<string>("SUBMITUSERNAME"), json_head2.Value<string>("SUBMITUSERID"), json4.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
+                            , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json_head2.Value<string>("SUBMITTIME") 
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code4;
                 }
                 else
                 {
-                    sql = string.Format(update_sql, json4.Value<string>("ASSOCIATEPEDECLNO"), json4.Value<string>("CUSNO"), json4.Value<string>("BUSIUNITCODE"),
-                         json4.Value<string>("BUSIUNITNAME"), json4.Value<string>("CONTRACTNO"), json4.Value<string>("GOODSNUM"), json4.Value<string>("CLEARANCENO"),
-                         GetChk(json4.Value<string>("LAWCONDITION")), json4.Value<string>("ENTRUSTTYPEID"), json_head2.Value<string>("REPWAYID"),
-                         json_head2.Value<string>("CUSTOMDISTRICTCODE"), json_head2.Value<string>("CUSTOMDISTRICTNAME"), GetCode(json4.Value<string>("REPUNITCODE")),
-                         GetName(json4.Value<string>("REPUNITCODE")), json4.Value<string>("DECLWAY"), GetCode(json4.Value<string>("INSPUNITCODE")), GetName(json4.Value<string>("INSPUNITCODE")),
-                         json4.Value<string>("ENTRUSTREQUEST"), json4.Value<string>("TRADEWAYCODES"), AssociateNo2, CorrespondNo, json4.Value<string>("PACKKIND"),
-                         json4.Value<string>("GOODSGW"), json4.Value<string>("GOODSNW"), json4.Value<string>("FILINGNUMBER"), json4.Value<string>("TRADEWAYCODES1"),
-                         json_head2.Value<string>("IETYPE"), GetChk(json4.Value<string>("SPECIALRELATIONSHIP")), GetChk(json4.Value<string>("PRICEIMPACT")),
-                         GetChk(json4.Value<string>("PAYPOYALTIES")), json4.Value<string>("BUSISHORTCODE"), json4.Value<string>("BUSISHORTNAME"), json4.Value<string>("STATUS"),
-                         json_head2.Value<string>("SUBMITTIME"), json_head2.Value<string>("SUBMITUSERNAME"), json_head2.Value<string>("SUBMITUSERID"), json_head2.Value<string>("SUBMITUSERPHONE"), json4.Value<string>("ASSOCIATETRADEWAY"), "002", "1", code4);
+                    sql = string.Format(update_sql, json4.Value<string>("ASSOCIATEPEDECLNO"), json4.Value<string>("CUSNO"), json4.Value<string>("BUSIUNITCODE"),json4.Value<string>("BUSIUNITNAME"), json4.Value<string>("CONTRACTNO"), json4.Value<string>("GOODSNUM")
+                            , json4.Value<string>("CLEARANCENO"), GetChk(json4.Value<string>("LAWFLAG")), json4.Value<string>("ENTRUSTTYPE"), json_head2.Value<string>("REPWAYID"), json_head2.Value<string>("CUSTOMAREACODE")
+                            , GetCode(json4.Value<string>("REPUNITCODE")), GetName(json4.Value<string>("REPUNITCODE")), json4.Value<string>("DECLWAY"), GetCode(json4.Value<string>("INSPUNITCODE")), GetName(json4.Value<string>("INSPUNITCODE"))
+                            , json4.Value<string>("ENTRUSTREQUEST"), json4.Value<string>("TRADEWAYCODES"), AssociateNo2, CorrespondNo, json4.Value<string>("PACKKIND")
+                            , json4.Value<string>("GOODSGW"), json4.Value<string>("GOODSNW"), json4.Value<string>("RECORDCODE"), json4.Value<string>("TRADEWAYCODES1"), json_head2.Value<string>("IETYPE")
+                            , GetChk(json4.Value<string>("SPECIALRELATIONSHIP")), GetChk(json4.Value<string>("PRICEIMPACT")), GetChk(json4.Value<string>("PAYPOYALTIES")), json4.Value<string>("STATUS"), json_head2.Value<string>("SUBMITTIME")
+                            , json_head2.Value<string>("SUBMITUSERNAME"), json_head2.Value<string>("SUBMITUSERID"), json4.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
+                            , code4
+                         );
                     if (json4.Value<Int32>("STATUS") >= 20)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
                     {
                         Extension.Insert_FieldUpdate_History(code4, json4, json_user, "40");
@@ -746,7 +740,7 @@ namespace MvcPlatform.Controllers
                             break;
                     }
                     break;
-                case "ENTRUSTTYPEID"://委托类型依赖28系统的报关协作体和报检协作体进行判断取值 d.CB_CODE,d.BJ_COOPER
+                case "ENTRUSTTYPE"://委托类型依赖28系统的报关协作体和报检协作体进行判断取值 d.CB_CODE,d.BJ_COOPER
                     if (!string.IsNullOrEmpty(dt.Rows[0]["CB_CODE"] + "") && !string.IsNullOrEmpty(dt.Rows[0]["BJ_COOPER"] + ""))
                     {
                         dt.Rows[0][filedname] = "03";
@@ -791,12 +785,12 @@ namespace MvcPlatform.Controllers
                         dt.Rows[0][filedname] = Convert.ToInt32(dt.Rows[0]["RELATEQUAN"]) > 0 ? "进/出口业务" : "仅进口";
                     }
                     break;
-                case "CUSTOMDISTRICTCODE"://申报关区中文匹配
-                    string sql_t = "select NAME from BASE_CUSTOMDISTRICT  where ENABLED=1 and rownum=1 and CODE='" + dt.Rows[0]["CUSTOMDISTRICTCODE"] + "'";
-                    DataTable dt_t = DBMgr.GetDataTable(sql_t);
+                case "CUSTOMAREACODE"://申报关区中文匹配
+                    string sql_t = "select NAME from BASE_CUSTOMDISTRICT  where ENABLED=1 and rownum=1 and CODE='" + dt.Rows[0]["CUSTOMAREACODE"] + "'";
+                    DataTable dt_t = DBMgrBase.GetDataTable(sql_t);
                     if (dt_t.Rows.Count >= 0)
                     {
-                        dt.Rows[0]["CUSTOMDISTRICTNAME"] = dt_t.Rows[0]["NAME"];
+                        dt.Rows[0][filedname] = dt_t.Rows[0]["NAME"];
                     }
                     break;
             }
@@ -839,8 +833,8 @@ namespace MvcPlatform.Controllers
             if (Request["operateid"].IndexOf("GJ") >= 0)//国内结转"   '{0}' REPUNITCODE,'{1}' INSPUNITCODE,TRIM(d.MANUAL_NO)因为28上有空格,需要去掉
             {
                 string subsql = "";
-                sql = @"select '{0}' as REPUNITCODE ,'{1}' as INSPUNITCODE, '1' ORDERWAY ,'' BUSIUNITCODE,'' BUSIUNITNAME,'' BUSISHORTCODE,'' BUSISHORTNAME,d.CB_CODE,d.BJ_COOPER,'' ENTRUSTTYPEID,
-                      d.DECLARE_CUSTOM CUSTOMDISTRICTCODE,(select CHINNAME from Crm_Enterprise c where c.enterpriseid=d.EP_CODE) CHINNAME,d.BG_MODE REPWAYID,TRIM(d.MANUAL_NO) FILINGNUMBER,
+                sql = @"select '{0}' as REPUNITCODE ,'{1}' as INSPUNITCODE, '1' ORDERWAY ,'' BUSIUNITCODE,'' BUSIUNITNAME,'' BUSISHORTCODE,'' BUSISHORTNAME,d.CB_CODE,d.BJ_COOPER,'' ENTRUSTTYPE,
+                      d.DECLARE_CUSTOM CUSTOMAREACODE,(select CHINNAME from Crm_Enterprise c where c.enterpriseid=d.EP_CODE) CHINNAME,d.BG_MODE REPWAYID,TRIM(d.MANUAL_NO) RECORDCODE,
                       d.PIECES GOODSNUM ,d.WEIGHT GOODSGW ,d.RELATION_NO ASSOCIATENO,d.INV_NO CONTRACTNO,d.MYFS TRADEWAYCODES1,d.MYFS TRADEWAYCODES,d.OPERATION_ID CUSNO,'' IETYPE,'M' DECLWAY,
                       '' CUSTOMDISTRICTNAME,";
                 sql = string.Format(sql, repunitcode, inspunitcode);
@@ -850,10 +844,10 @@ namespace MvcPlatform.Controllers
                 {
                     result = "true";
                     SwitchField(ds.Tables[0], "REPWAYID"); //对报关方式进行转换 集中C对应本系统的012  逐笔A对应本系统013  转厂B对应本系统015
-                    SwitchField(ds.Tables[0], "ENTRUSTTYPEID");//根据报关协作体和报检协作体确定委托类型
+                    SwitchField(ds.Tables[0], "ENTRUSTTYPE");//根据报关协作体和报检协作体确定委托类型
                     SwitchField(ds.Tables[0], "CHINNAME");
                     SwitchField(ds.Tables[0], "IETYPE");
-                    SwitchField(ds.Tables[0], "CUSTOMDISTRICTCODE");
+                    SwitchField(ds.Tables[0], "CUSTOMAREACODE");
                     data1 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
                 }
                 subsql = "(select count(1) from ops_jz_head where operation_id = 'GJIK" + operateid + "')  RELATEQUAN from ops_jz_head d where d.operation_id = 'GJEK" + operateid + "'";
@@ -862,10 +856,10 @@ namespace MvcPlatform.Controllers
                 {
                     result = "true";
                     SwitchField(ds.Tables[0], "REPWAYID"); //对报关方式进行转换 集中C对应本系统的012  逐笔A对应本系统013  转厂B对应本系统015
-                    SwitchField(ds.Tables[0], "ENTRUSTTYPEID");//根据报关协作体和报检协作体确定委托类型
+                    SwitchField(ds.Tables[0], "ENTRUSTTYPE");//根据报关协作体和报检协作体确定委托类型
                     SwitchField(ds.Tables[0], "CHINNAME");
                     SwitchField(ds.Tables[0], "IETYPE");
-                    SwitchField(ds.Tables[0], "CUSTOMDISTRICTCODE");
+                    SwitchField(ds.Tables[0], "CUSTOMAREACODE");
                     data2 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
                 }
             }
@@ -874,9 +868,9 @@ namespace MvcPlatform.Controllers
             else
             {
                 string subsql = "";
-                sql = @"select  '{0}' as REPUNITCODE ,'{1}' as INSPUNITCODE,'1' ORDERWAY ,'' BUSIUNITCODE,'' BUSIUNITNAME,'' BUSISHORTCODE,'' BUSISHORTNAME,d.CB_CODE,d.BJ_COOPER,'' ENTRUSTTYPEID,
-                      (select CHINNAME from Crm_Enterprise c where c.enterpriseid=d.EP_CODE) CHINNAME ,d.BG_MODE REPWAYID,TRIM(d.MANUAL_NO) FILINGNUMBER,                         
-                      d.DECLARE_CUSTOM CUSTOMDISTRICTCODE,d.PIECES GOODSNUM  ,d.WEIGHT GOODSGW,d.RELATION_NO ASSOCIATENO,d.INV_NO CONTRACTNO,                         
+                sql = @"select  '{0}' as REPUNITCODE ,'{1}' as INSPUNITCODE,'1' ORDERWAY ,'' BUSIUNITCODE,'' BUSIUNITNAME,'' BUSISHORTCODE,'' BUSISHORTNAME,d.CB_CODE,d.BJ_COOPER,'' ENTRUSTTYPE,
+                      (select CHINNAME from Crm_Enterprise c where c.enterpriseid=d.EP_CODE) CHINNAME ,d.BG_MODE REPWAYID,TRIM(d.MANUAL_NO) RECORDCODE,                         
+                      d.DECLARE_CUSTOM CUSTOMAREACODE,d.PIECES GOODSNUM  ,d.WEIGHT GOODSGW,d.RELATION_NO ASSOCIATENO,d.INV_NO CONTRACTNO,                         
                       d.MYFS TRADEWAYCODES1 ,d.MYFS TRADEWAYCODES ,d.OPERATION_ID CUSNO,'' IETYPE,'M' DECLWAY,'' CUSTOMDISTRICTNAME,";
                 sql = string.Format(sql, repunitcode, inspunitcode);
                 subsql = "(select count(1) from ops_dj_head where operation_id = 'DJRE" + operateid + "')  RELATEQUAN from ops_dj_head d where d.operation_id = 'DJRI" + operateid + "'";
@@ -885,10 +879,10 @@ namespace MvcPlatform.Controllers
                 if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0 && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "ZYD" && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "B")
                 {
                     SwitchField(ds.Tables[0], "REPWAYID"); //对报关方式进行转换 集中C对应本系统的012  逐笔A对应本系统013  转厂B对应本系统015 from ops_dj_head d
-                    SwitchField(ds.Tables[0], "ENTRUSTTYPEID");//根据报关协作体和报检协作体确定委托类型
+                    SwitchField(ds.Tables[0], "ENTRUSTTYPE");//根据报关协作体和报检协作体确定委托类型
                     SwitchField(ds.Tables[0], "CHINNAME");
                     SwitchField(ds.Tables[0], "IETYPE");
-                    SwitchField(ds.Tables[0], "CUSTOMDISTRICTCODE");
+                    SwitchField(ds.Tables[0], "CUSTOMAREACODE");
                     result = "true";
                     data1 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
                 }
@@ -897,10 +891,10 @@ namespace MvcPlatform.Controllers
                 if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0 && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "ZYD" && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "B")
                 {
                     SwitchField(ds.Tables[0], "REPWAYID");
-                    SwitchField(ds.Tables[0], "ENTRUSTTYPEID");
+                    SwitchField(ds.Tables[0], "ENTRUSTTYPE");
                     SwitchField(ds.Tables[0], "CHINNAME");
                     SwitchField(ds.Tables[0], "IETYPE");
-                    SwitchField(ds.Tables[0], "CUSTOMDISTRICTCODE");
+                    SwitchField(ds.Tables[0], "CUSTOMAREACODE");
                     result = "true";
                     data2 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
                 }
@@ -909,10 +903,10 @@ namespace MvcPlatform.Controllers
                 if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0 && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "ZYD" && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "B")
                 {
                     SwitchField(ds.Tables[0], "REPWAYID");
-                    SwitchField(ds.Tables[0], "ENTRUSTTYPEID");
+                    SwitchField(ds.Tables[0], "ENTRUSTTYPE");
                     SwitchField(ds.Tables[0], "CHINNAME");
                     SwitchField(ds.Tables[0], "IETYPE");
-                    SwitchField(ds.Tables[0], "CUSTOMDISTRICTCODE");
+                    SwitchField(ds.Tables[0], "CUSTOMAREACODE");
                     result = "true";
                     data3 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
                 }
@@ -921,10 +915,10 @@ namespace MvcPlatform.Controllers
                 if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0 && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "ZYD" && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "B")
                 {
                     SwitchField(ds.Tables[0], "REPWAYID");
-                    SwitchField(ds.Tables[0], "ENTRUSTTYPEID");
+                    SwitchField(ds.Tables[0], "ENTRUSTTYPE");
                     SwitchField(ds.Tables[0], "CHINNAME");
                     SwitchField(ds.Tables[0], "IETYPE");
-                    SwitchField(ds.Tables[0], "CUSTOMDISTRICTCODE");
+                    SwitchField(ds.Tables[0], "CUSTOMAREACODE");
                     result = "true";
                     data4 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
                 }

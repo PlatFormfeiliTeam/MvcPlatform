@@ -75,7 +75,7 @@
         data: common_data_sbgq
     })
     var combo_CUSTOMDISTRICTNAME = Ext.create('Ext.form.field.ComboBox', {//申报关区 这个数据比较多需要根据输入字符到后台动态模糊匹配
-        name: 'CUSTOMDISTRICTCODE',
+        name: 'CUSTOMAREACODE',
         store: store_CUSTOMDISTRICTNAME,
         fieldLabel: '申报关区',
         displayField: 'NAME',
@@ -143,24 +143,6 @@
         fieldLabel: '维护时间',
         readOnly: true
     });
-    //平台客服
-    var field_CSNAME = Ext.create('Ext.form.field.Text', {
-        name: 'CSNAME',
-        fieldLabel: '平台客服',
-        readOnly: true
-    });
-    //客服电话
-    var field_CSPHONE = Ext.create('Ext.form.field.Text', {
-        name: 'CSPHONE',
-        fieldLabel: '客服电话',
-        readOnly: true
-    });
-    //委托电话
-    var field_SUBMITUSERPHONE = Ext.create('Ext.form.field.Text', {
-        name: 'SUBMITUSERPHONE',
-        fieldLabel: '委托电话',
-        readOnly: true
-    })
     var label_baseinfo = {
         xtype: 'label',
         margin: '5',
@@ -211,7 +193,7 @@
                 },
                 {
                     layout: 'column', height: 42, border: 0, items: [
-                      field_CREATEUSERNAME, field_CREATETIME, field_CSNAME, field_CSPHONE, field_SUBMITUSERPHONE
+                      field_CREATEUSERNAME, field_CREATETIME
                     ]
                 },
         field_CUSTOMDISTRICTNAME, field_ordercodes, file_addition

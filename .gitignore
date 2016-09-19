@@ -3,3 +3,4 @@ bin/MvcPlatform.dll
 bin/MvcPlatform.dll.config
 bin/MvcPlatform.pdb
 FileUpload/file/
+MvcPlatform.csproj

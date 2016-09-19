@@ -464,10 +464,10 @@
         layout: 'hbox',
         items: [
             {
-                id: 'GOODSGW', name: 'GOODSGW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 13, margin: 0, allowBlank: false, blankText: '不能为空!', hideTrigger: true, vtype: 'gwnwrule', decimalPrecision: 4
+                id: 'GOODSGW', name: 'GOODSGW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 13, margin: 0, allowBlank: false, blankText: '不能为空!', hideTrigger: true, decimalPrecision: 4
             },
            {
-               id: 'GOODSNW', name: 'GOODSNW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 14, margin: 0, hideTrigger: true, vtype: 'gwnwrule', decimalPrecision: 4
+               id: 'GOODSNW', name: 'GOODSNW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 14, margin: 0, hideTrigger: true, decimalPrecision: 4
            }]
     }
     //合同号
@@ -691,11 +691,11 @@
         name: 'ORIGINALFILEIDS'
     });
     var bbar_r = '<div class="btn-group" role="group">'
-                        + '<button onclick="orderBack();" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤单</button>'
-                        + '<button onclick="add_new(20)" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;新增</button>'
+                        + '<button type="button" onclick="orderBack();" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤单</button>'
+                        + '<button type="button" onclick="add_new(20)" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;新增</button>'
                         + '<button type="button" onclick="copyorder(20)" class="btn btn-primary btn-sm"><i class="fa fa-files-o"></i>&nbsp;复制新增</button>'
-                        + '<button onclick="save(\'save\',20)" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
-                        + '<button onclick="save(\'submit\',20)" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交委托</button></div>'
+                        + '<button type="button" onclick="save(\'save\',20)" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
+                        + '<button type="button" onclick="save(\'submit\',20)" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交委托</button></div>'
 
     var bbar_l = '<div class="btn-group">'
                + '<button type="button" class="btn btn-primary btn-sm" id="pickfiles"><i class="fa fa-upload"></i>&nbsp;上传文件</button>'

@@ -2,7 +2,7 @@
 //////////////////////////combox开始//////////////////////
 function initSearch() {
     var store_1 = Ext.create("Ext.data.JsonStore", {
-        fields: ["CODE", "NAME", "QUANCODE"],
+        fields: ["CODE", "NAME"],
         data: search_js_condition1_data,
         listeners: { load: function () { store_1_1.load(); } }
     });
@@ -21,6 +21,8 @@ function initSearch() {
                 change: function () {
                     combo_1_1.reset();
                     if (combo_1.getValue() == "BUSIUNITCODE") {
+                        //如果是经营单位作为过滤条件，则CONDITION1_1绑定QUANCODE
+                        combo_1_1.valueField = "QUANCODE";
                         store_1_1.loadData(common_data_jydw);
                     }
                     if (combo_1.getValue() == "CUSTOMDISTRICTCODE" || combo_1.getValue() == "PORTCODE") {
@@ -33,7 +35,7 @@ function initSearch() {
             }
     })
     var store_1_1 = Ext.create("Ext.data.JsonStore", {
-        fields: ["CODE", "NAME"]
+        fields: ["CODE", "NAME", "QUANCODE"]
     });
     var combo_1_1 = Ext.create('Ext.form.field.ComboBox', {
         id: 'CONDITION1_1',
@@ -359,6 +361,7 @@ function initSearch() {
         }
     });
 }
+
 function Reset() {
     Ext.getCmp("CONDITION1_1").setValue("");
     Ext.getCmp("CONDITION2_1").setValue("");
@@ -370,4 +373,20 @@ function Reset() {
     Ext.getCmp("CONDITION7_1").setValue("");
     Ext.getCmp("CONDITION8_1").setValue("");
     Ext.getCmp("CONDITION8_2").setValue("");
+}
+
+function SaveDefault() {
+    var data = formpanel.getForm().getValues();
+    Ext.Ajax.request({
+        url: "/Common/SaveQuerySetting",
+        params: { formdata: Ext.encode(data) },
+        success: function (option, success, response) {
+            if (option.responseText == '{success:true}') {
+                Ext.MessageBox.alert('提示', '保存成功！');
+            }
+            else {
+                Ext.MessageBox.alert('提示', '保存失败！');
+            }
+        }
+    });
 }
