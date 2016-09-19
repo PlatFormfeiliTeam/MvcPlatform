@@ -86,14 +86,14 @@
                     columns: [
                     { xtype: 'rownumberer', width: 35 },
                     { header: 'ID', dataIndex: 'ID', hidden: true },
-                    { header: '统一编号', dataIndex: 'UNITCODE', width: 120 },
+                    { header: '统一编号', dataIndex: 'UNITCODE', width: 150 },
                     { header: '企业编号', dataIndex: 'CODE', width: 120 },
                     { header: '文件接收单位', dataIndex: 'FILERECEVIEUNITNAME', width: 150 },
                     { header: '文件申报单位', dataIndex: 'FILEDECLAREUNITNAME', width: 150 },
                     { header: '业务类型', dataIndex: 'BUSITYPEID', width: 100, renderer: render },
                     { header: '申报关区', dataIndex: 'CUSTOMDISTRICTCODE', width: 70 },
                     { header: '状态', dataIndex: 'STATUS', width: 70, renderer: render },
-                    { header: '创建时间', dataIndex: 'CREATETIME', width: 120 },
+                    { header: '创建时间', dataIndex: 'CREATETIME', width: 140 },
                     { header: '生成方式', dataIndex: 'CREATEMODE', width: 120 },
                     { header: '备注', dataIndex: 'REMARK', width: 200 },
                     ],
@@ -206,7 +206,7 @@
     }
 
     function Select() {
-        Ext.getCmp('pgbar').moveFirst();
+       
     }
 
     function render(value, cellmeta, record, rowIndex, columnIndex, store) {

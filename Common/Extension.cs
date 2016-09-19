@@ -28,14 +28,14 @@ namespace MvcPlatform.Common
             return result;
         }
         public static JObject Get_UserInfo(string account)
-        { 
+        {
             IDatabase db = SeRedis.redis.GetDatabase();
             string result = "";
             if (db.KeyExists(account))
             {
                 result = db.StringGet(account);
-            } 
-            else 
+            }
+            else
             {
                 //2016-08-02增加字段报关服务单位SCENEDECLAREID 报检服务单位SCENEINSPECTID 因为订单里面创建时取当前用户的默认值 故提前放到缓存
                 //CUSTOMERID 这个字段在sysuser表中有
@@ -47,7 +47,7 @@ namespace MvcPlatform.Common
                 iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 string jsonstr = JsonConvert.SerializeObject(dt, iso);
                 jsonstr = jsonstr.Replace("[", "").Replace("]", "");
-                db.StringSet(account, jsonstr); 
+                db.StringSet(account, jsonstr);
                 result = jsonstr;
             }
             return (JObject)JsonConvert.DeserializeObject(result);
@@ -215,7 +215,51 @@ return code;
                 }
             }
         }
-        
+        public static void Update_Attachment_ForEnterprise(string entorder_id, string filedata, string originalfileids, JObject json_user)
+        {
+            if (!string.IsNullOrEmpty(filedata))
+            {
+                System.Uri Uri = new Uri("ftp://" + ConfigurationManager.AppSettings["FTPServer"] + ":" + ConfigurationManager.AppSettings["FTPPortNO"]);
+                string UserName = ConfigurationManager.AppSettings["FTPUserName"];
+                string Password = ConfigurationManager.AppSettings["FTPPassword"];
+                FtpHelper ftp = new FtpHelper(Uri, UserName, Password);
+                JArray jarry = JsonConvert.DeserializeObject<JArray>(filedata);
+                string sql = "";
+                string remote = DateTime.Now.ToString("yyyy-MM-dd"); 
+                foreach (JObject json in jarry)
+                {
+                    if (string.IsNullOrEmpty(json.Value<string>("ID")))
+                    {
+                        string filename = "/" + remote + "/" + json.Value<string>("NEWNAME");
+                        string sizes = json.Value<string>("SIZES");
+                        string filetypename = json.Value<string>("FILETYPENAME");
+                        string extname = json.Value<string>("ORIGINALNAME").ToString().Substring(json.Value<string>("ORIGINALNAME").ToString().LastIndexOf('.') + 1);
+                        sql = @"insert into LIST_ATTACHMENT (id,filename,originalname,filetype,uploadtime,uploaduserid,customercode,entid,
+                        sizes,filetypename,filesuffix) values(List_Attachment_Id.Nextval,'{0}','{1}','{2}',sysdate,{3},'{4}','{5}','{6}','{7}','{8}')";
+                        sql = string.Format(sql, filename, json.Value<string>("ORIGINALNAME"), json.Value<string>("FILETYPE"), json_user.Value<string>("ID"), 
+                        json_user.Value<string>("CUSTOMERCODE"), entorder_id, sizes, filetypename, extname);
+                        DBMgr.ExecuteNonQuery(sql);
+                    }
+                    else//如果ID已经存在  说明是已经存在的记录,不需要做任何处理
+                    {
+                        originalfileids = originalfileids.Replace(json.Value<string>("ID") + ",", "");
+                    }
+                }
+                //从数据库和文档库删除在前端移除的随附文件记录  
+                string[] idarray = originalfileids.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string id in idarray)
+                {
+                    sql = @"select * from LIST_ATTACHMENT where ID='" + id + "'";
+                    DataTable dt = DBMgr.GetDataTable(sql);
+                    if (dt.Rows.Count > 0)
+                    {
+                        ftp.DeleteFile(dt.Rows[0]["FILENAME"] + "");
+                    }
+                    sql = @"delete from LIST_ATTACHMENT where ID='" + id + "'";
+                    DBMgr.ExecuteNonQuery(sql);
+                }
+            }
+        }
         //订单的状态在草稿、文件已上传、订单已委托 三个状态发生时记录到订单状态变更日志
         public static void add_list_time(int status, string ordercode, JObject json_user)
         {

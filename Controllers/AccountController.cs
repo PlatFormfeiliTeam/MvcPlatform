@@ -21,9 +21,7 @@ namespace MvcPlatform.Controllers
         }
         [HttpPost]
         public ActionResult DoLogin(Models.User u)
-        {
-            //string username = Request["username"];
-            //string password = Extension.ToSHA1(Request["password"]);
+        {            
             string sql = "select * from sys_user where name = '" + u.NAME + "' and password = '" + Extension.ToSHA1(u.PASSWORD) + "'";
             DataTable dt = DBMgr.GetDataTable(sql);
             string msg = "";
@@ -40,11 +38,7 @@ namespace MvcPlatform.Controllers
                 if (string.IsNullOrEmpty(msg))
                 {
                     FormsAuthentication.SetAuthCookie(u.NAME, false);
-                    Response.Redirect("/Home/Index");
-                    // FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(username, true, 300);
-                    //  FormsAuthentication.RedirectFromLoginPage(username, false);
-                    //Session["user"] = username;
-                    //msg = "success";
+                    Response.Redirect("/Home/Index"); 
                 }
             }
             else

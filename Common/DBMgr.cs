@@ -13,9 +13,6 @@ namespace MvcPlatform.Common
 {
     public class DBMgr
     {
-
-        //static ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         private static readonly string ConnectionString = ConfigurationManager.AppSettings["strconn"];
 
         public static DataSet GetDataSet(string sql)
@@ -84,31 +81,19 @@ namespace MvcPlatform.Common
         {
             int retcount = -1;
             OracleConnection orclCon = null;
-            try
+            using (orclCon = new OracleConnection(ConnectionString))
             {
-                using (orclCon = new OracleConnection(ConnectionString))
+                OracleCommand oc = new OracleCommand(sql, orclCon);                
+                if (orclCon.State.ToString().Equals("Open"))
                 {
-                    OracleCommand oc = new OracleCommand(sql, orclCon);
-                    //oc.Parameters.AddRange(OraPara);, OracleParameter[] OraPara
-                    if (orclCon.State.ToString().Equals("Open"))
-                    {
-                        orclCon.Close();
-                    }
-                    orclCon.Open();
-                    retcount = oc.ExecuteNonQuery();
-                    oc.Parameters.Clear();
+                    orclCon.Close();
                 }
+                orclCon.Open();
+                retcount = oc.ExecuteNonQuery();
+                oc.Parameters.Clear();
             }
-            catch (Exception e)
-            {
-                //log.Error(e.Message + e.StackTrace);
-            }
-            finally
-            {
-                orclCon.Close();
-            }
+            orclCon.Close();
             return retcount;
         }
-
     }
 }
