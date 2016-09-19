@@ -200,12 +200,12 @@ namespace MvcPlatform.Controllers
                         {
                             sql = "select ENT_ORDER_ID.Nextval from dual";
                             ent_id = DBMgr.GetDataTable(sql).Rows[0][0] + "";//获取ID
-                            sql = string.Format(insert_sql, GetCode(json_data.Value<string>("FILERECEVIEUNIT")), GetName(json_data.Value<string>("FILERECEVIEUNIT")),
+                            sql = string.Format(insert_sql, ent_id, GetCode(json_data.Value<string>("FILERECEVIEUNIT")), GetName(json_data.Value<string>("FILERECEVIEUNIT")),
                                   GetCode(json_data.Value<string>("FILEDECLAREUNIT")), GetName(json_data.Value<string>("FILEDECLAREUNIT")),
                                   json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"), json_data.Value<string>("CUSTOMDISTRICTNAME"),
-                                  json_data.Value<string>("REPWAYID"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),
+                                  json_data.Value<string>("REPWAYID"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),json_data.Value<string>("REMARK"), 
                                   json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"),
-                                  json_data.Value<string>("REMARK"), json_data.Value<string>("CODE"), json_data.Value<string>("CREATEMODE"), ent_id);
+                                  json_data.Value<string>("CODE"), json_data.Value<string>("CREATEMODE"));
                             DBMgr.ExecuteNonQuery(sql);
                             //更新随附文件
                             Extension.Update_Attachment_ForEnterprise(ent_id, "[" + JsonConvert.SerializeObject(json) + "]", json_data.Value<string>("ORIGINALFILEIDS"), json_user);
