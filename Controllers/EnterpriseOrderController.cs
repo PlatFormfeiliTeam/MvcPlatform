@@ -143,7 +143,7 @@ namespace MvcPlatform.Controllers
                 dt = DBMgr.GetDataTable(sql);
                 data = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
                 //随附文件
-                sql = "select * from list_attachment t where t.ordercode='" + ID + "'";
+                sql = "select * from list_attachment t where t.entid='" + ID + "'";
                 DataTable dt_detail = DBMgr.GetDataTable(sql);
                 return "{data:" + data + ",filedata:" + JsonConvert.SerializeObject(dt_detail, iso) + "}";
             }
