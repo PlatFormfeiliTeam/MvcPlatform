@@ -361,6 +361,7 @@ function initSearch() {
         }
     });
 }
+
 function Reset() {
     Ext.getCmp("CONDITION1_1").setValue("");
     Ext.getCmp("CONDITION2_1").setValue("");
@@ -372,4 +373,20 @@ function Reset() {
     Ext.getCmp("CONDITION7_1").setValue("");
     Ext.getCmp("CONDITION8_1").setValue("");
     Ext.getCmp("CONDITION8_2").setValue("");
+}
+
+function SaveDefault() {
+    var data = formpanel.getForm().getValues();
+    Ext.Ajax.request({
+        url: "/Common/SaveQuerySetting",
+        params: { formdata: Ext.encode(data) },
+        success: function (option, success, response) {
+            if (option.responseText == '{success:true}') {
+                Ext.MessageBox.alert('提示', '保存成功！');
+            }
+            else {
+                Ext.MessageBox.alert('提示', '保存失败！');
+            }
+        }
+    });
 }

@@ -175,22 +175,6 @@
         return rtn;
     }
 
-    function SaveDefault() {
-        var data = formpanel.getForm().getValues();
-        Ext.Ajax.request({
-            url: "/Common/SaveQuerySetting",
-            params: { formdata: Ext.encode(data) },
-            success: function (option, success, response) {
-                if (option.responseText == '{success:true}') {
-                    Ext.MessageBox.alert('提示', '保存成功！');
-                }
-                else {
-                    Ext.MessageBox.alert('提示', '保存失败！');
-                }
-            }
-        });
-    }
-
     function Delete() {
         var recs = gridpanel.getSelectionModel().getSelection();
         if (recs.length == 0) {

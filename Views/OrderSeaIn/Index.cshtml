@@ -164,61 +164,6 @@
         return rtn;
     }
 
-    function SaveDefault() {
-        var data = formpanel.getForm().getValues();
-        Ext.Ajax.request({
-            url: "/Common/SaveQuerySetting",
-            params: { formdata: Ext.encode(data) },
-            success: function (option, success, response) {
-                if (option.responseText == '{success:true}') {
-                    Ext.MessageBox.alert('提示', '保存成功！');
-                }
-                else {
-                    Ext.MessageBox.alert('提示', '保存失败！');
-                }
-            }
-        });
-    }
-    
-    function Delete() {
-        var recs = gridpanel.getSelectionModel().getSelection();
-        if (recs.length == 0) {
-            Ext.MessageBox.alert('提示', '请选择需要删除的记录！');
-            return;
-        }
-        if (recs[0].data.STATUS != '1' && recs[0].data.STATUS != '10') {
-            Ext.MessageBox.alert('提示', '已委托的订单不能删除！');
-            return;
-        }
-        Ext.MessageBox.confirm("提示", "确定要删除所选择的记录吗？", function (btn) {
-            if (btn == 'yes') {
-                Ext.Ajax.request({
-                    url: '/Common/Delete',
-                    params: { ordercode: recs[0].get("CODE") },
-                    success: function (response, success, option) {
-                        var res = Ext.decode(response.responseText);
-                        if (res.success) {
-                            Ext.MessageBox.alert('提示', '删除成功！');
-                            store_Trade.load();
-                        }
-                        else {
-                            Ext.MessageBox.alert('提示', '删除失败！');
-                        }
-                    }
-                });
-            }
-        });
-    }
-
-    function Update() {
-        var recs = gridpanel.getSelectionModel().getSelection();
-        if (recs.length == 0) {
-            Ext.MessageBox.alert('提示', '请选择需要修改的记录！');
-            return;
-        }
-        opencenterwin("/OrderSeaIn/Create?OrderId=" + recs[0].get("ID"), 1600, 900);
-    }
-
     function Select() {
         pgbar.moveFirst();
     }
@@ -290,7 +235,7 @@
         <div class="btn-group" role="group">
             <button onclick="ChangeStyle()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-exchange fa-fw"></i>&nbsp;状态切换</button>
             <button onclick="Open()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;添加</button>
-            <button onclick="Delete()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-trash-o"></i>&nbsp;删除</button>
+            <button onclick="DeleteNotGuoNei()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-trash-o"></i>&nbsp;删除</button>
             <div class="btn-group">
                 <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="openwin('HYJK')">
                     <i class="fa fa-pencil-square-o fa-fw"></i>&nbsp;批量维护

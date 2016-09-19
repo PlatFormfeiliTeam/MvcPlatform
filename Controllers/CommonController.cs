@@ -639,6 +639,35 @@ namespace MvcPlatform.Controllers
                 + ",relacontainer:" + json_relacontainer + ",mzbz:" + json_mzbz + ",jylb:" + json_jylb + ",json_sbkb:" + json_sbkb
                 + ",inspbzzl:" + json_inspbzzl + ",adminurl:'" + AdminUrl + "'}";
         }
+        
+        /*保存查询条件设置 by panhuaguo 2016-01-17*/
+        public string SaveQuerySetting()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            string formdata = Request["formdata"];
+            JObject json = (JObject)JsonConvert.DeserializeObject(formdata);
+            //首先判断该用户先前有没有设置查询条件
+            string sql = "select * from CONFIG_QUERYSETTING where UserId='" + json_user.Value<string>("ID") + "'";
+            DataTable dt = DBMgr.GetDataTable(sql);
+            if (dt.Rows.Count > 0)
+            {
+                sql = @"update CONFIG_QUERYSETTING set CONDITION1='{0}',CONDITION2='{1}',CONDITION3='{2}',CONDITION4='{3}',CONDITION5='{4}'
+                        ,CONDITION6='{5}',CONDITION7='{6}',CONDITION8='{7}',updatetime=sysdate where UserId = '{8}'";
+                sql = string.Format(sql, json.Value<string>("CONDITION1"), json.Value<string>("CONDITION2"), json.Value<string>("CONDITION3"), json.Value<string>("CONDITION4")
+                    , json.Value<string>("CONDITION5"), json.Value<string>("CONDITION6"), json.Value<string>("CONDITION7"), json.Value<string>("CONDITION8"), json_user.Value<string>("ID"));
+            }
+            else
+            {
+                sql = @"insert into CONFIG_QUERYSETTING(ID,USERNAME,USERID,CONDITION1,CONDITION2,CONDITION3,CONDITION4,CONDITION5,CONDITION6,CONDITION7,CONDITION8,updatetime)
+                        values (CONFIG_QUERYSETTING_ID.Nextval,'{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}',sysdate)";
+                sql = string.Format(sql
+                        , json_user.Value<string>("NAME"), json_user.Value<string>("ID"), json.Value<string>("CONDITION1"), json.Value<string>("CONDITION2"), json.Value<string>("CONDITION3")
+                        , json.Value<string>("CONDITION4"), json.Value<string>("CONDITION5"), json.Value<string>("CONDITION6"), json.Value<string>("CONDITION7"), json.Value<string>("CONDITION8"));
+            }
+            int i = DBMgr.ExecuteNonQuery(sql);
+            return i > 0 ? "{success:true}" : "{}";
+        }
 
         //查询条件默认值 by heguiqin 2016-08-26
         public string loadquerysetting()
