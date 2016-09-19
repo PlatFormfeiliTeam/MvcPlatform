@@ -152,11 +152,14 @@ namespace MvcPlatform.Controllers
             string sql = string.Empty;
             string formdata = Request["json"];
             JObject json = (JObject)JsonConvert.DeserializeObject(formdata);
+            DataTable dt_valid_name = new DataTable();
             if (string.IsNullOrEmpty(Request["ID"]))
             {
                 sql = @"insert into sys_user (ID,NAME,PASSWORD,REALNAME,EMAIL,TELEPHONE,MOBILEPHONE,ENABLED,SEX,PARENTID,REMARK,CREATETIME,CUSTOMERID,TYPE)
                         values(sys_user_id.nextval,'{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}',sysdate,'{10}',2)";
                 sql = string.Format(sql, json.Value<string>("NAME"), json.Value<string>("NAME").ToSHA1(), json.Value<string>("REALNAME"), json.Value<string>("EMAIL"), json.Value<string>("TELEPHONE"), json.Value<string>("MOBILEPHONE"), json.Value<string>("ENABLED"), json.Value<string>("SEX"), json_user.GetValue("ID"), json.Value<string>("REMARK"), json_user.GetValue("CustomerId"));
+
+                dt_valid_name = DBMgr.GetDataTable("select * from sys_user where  NAME='" + json.Value<string>("NAME") + "'");
             }
             else
             {
@@ -164,8 +167,7 @@ namespace MvcPlatform.Controllers
                 sql = string.Format(sql, json.Value<string>("REALNAME"), json.Value<string>("EMAIL"), json.Value<string>("TELEPHONE"), json.Value<string>("MOBILEPHONE"), json.Value<string>("ENABLED"), json.Value<string>("SEX"), json.Value<string>("REMARK"), Request["ID"]);
             }
             //验证用户是否重复
-            DataTable dt_valid_name = DBMgr.GetDataTable("select * from sys_user where  NAME='" + json.Value<string>("NAME") + "'");
-            if(dt_valid_name.Rows.Count!=0)
+            if (dt_valid_name!=null&&dt_valid_name.Rows.Count != 0)
             { return "{result:false}"; }
             else{
             DBMgr.ExecuteNonQuery(sql);
