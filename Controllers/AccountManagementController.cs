@@ -163,8 +163,14 @@ namespace MvcPlatform.Controllers
                 sql = @"update sys_user set REALNAME = '{0}',EMAIL = '{1}',TELEPHONE = '{2}',MOBILEPHONE = '{3}',ENABLED = '{4}',SEX = '{5}',REMARK = '{6}' where id = '{7}'";
                 sql = string.Format(sql, json.Value<string>("REALNAME"), json.Value<string>("EMAIL"), json.Value<string>("TELEPHONE"), json.Value<string>("MOBILEPHONE"), json.Value<string>("ENABLED"), json.Value<string>("SEX"), json.Value<string>("REMARK"), Request["ID"]);
             }
+            //验证用户是否重复
+            DataTable dt_valid_name = DBMgr.GetDataTable("select * from sys_user where  NAME='" + json.Value<string>("NAME") + "'");
+            if(dt_valid_name.Rows.Count!=0)
+            { return "{result:false}"; }
+            else{
             DBMgr.ExecuteNonQuery(sql);
             return "{result:true}";
+            }
         }
         public string Delete()
         {
