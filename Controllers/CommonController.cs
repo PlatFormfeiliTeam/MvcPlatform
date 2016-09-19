@@ -50,10 +50,10 @@ namespace MvcPlatform.Controllers
             order by sortindex";
             sql = string.Format(sql, json_user.GetValue("ID"));
             DataTable dt1 = DBMgr.GetDataTable(sql);
-            string result = "";
+            string result = "<li><a href=\"/Home/Index\">首页</a></li>";
             for (int i = 0; i < dt1.Rows.Count; i++)
             {
-                result += "<li><a href=\"#\">" + dt1.Rows[i]["NAME"] + "</a>";
+                result += "<li><a>" + dt1.Rows[i]["NAME"] + "</a>";
 
                 sql = @"select MODULEID,NAME,PARENTID,URL,SORTINDEX,IsLeaf from sysmodule t where t.parentid='{0}'
                 and t.MODULEID IN (select MODULEID FROM sys_moduleuser where userid='{1}') order by sortindex";
@@ -64,8 +64,14 @@ namespace MvcPlatform.Controllers
                     result += "<ul>";
                     for (int j = 0; j < dt2.Rows.Count; j++)
                     {
-                        result += "<li><a href=\"" + (string.IsNullOrEmpty(dt2.Rows[j]["URL"] + "") ? "#" : dt2.Rows[j]["URL"] + "") + "\">" + dt2.Rows[j]["NAME"] + "</a>";
-
+                        if (string.IsNullOrEmpty(dt2.Rows[j]["URL"] + ""))
+                        {
+                            result += "<li><a>" + dt2.Rows[j]["NAME"] + "</a>";
+                        }
+                        else
+                        {
+                            result += "<li><a href=\"" + dt2.Rows[j]["URL"] + "\">" + dt2.Rows[j]["NAME"] + "</a>";
+                        }
                         sql = @"select MODULEID,NAME,PARENTID,URL,SORTINDEX,IsLeaf from sysmodule t where t.parentid='{0}' 
                         and t.MODULEID IN (select MODULEID FROM sys_moduleuser where userid='{1}') order by sortindex";
                         sql = string.Format(sql, dt2.Rows[j]["MODULEID"], json_user.GetValue("ID"));
@@ -75,7 +81,14 @@ namespace MvcPlatform.Controllers
                             result += "<ul>";
                             for (int k = 0; k < dt3.Rows.Count; k++)
                             {
-                                result += "<li><a href=\"" + (string.IsNullOrEmpty(dt3.Rows[k]["URL"] + "") ? "#" : dt3.Rows[k]["URL"] + "") + "\">" + dt3.Rows[k]["NAME"] + "</a></li>";
+                                if (string.IsNullOrEmpty(dt3.Rows[k]["URL"] + ""))
+                                {
+                                    result += "<li><a>" + dt3.Rows[k]["NAME"] + "</a></li>";
+                                }
+                                else
+                                {
+                                    result += "<li><a href=\"" + dt3.Rows[k]["URL"] + "\">" + dt3.Rows[k]["NAME"] + "</a></li>";
+                                }
                             }
                             result += "</ul></li>";
                         }
