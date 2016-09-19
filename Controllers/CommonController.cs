@@ -53,7 +53,7 @@ namespace MvcPlatform.Controllers
             string result = "";
             for (int i = 0; i < dt1.Rows.Count; i++)
             {
-                result += "<li><a href=\"" + dt1.Rows[i]["URL"] + "\">" + dt1.Rows[i]["NAME"] + "</a>";
+                result += "<li><a href=\"#\">" + dt1.Rows[i]["NAME"] + "</a>";
 
                 sql = @"select MODULEID,NAME,PARENTID,URL,SORTINDEX,IsLeaf from sysmodule t where t.parentid='{0}'
                 and t.MODULEID IN (select MODULEID FROM sys_moduleuser where userid='{1}') order by sortindex";
@@ -64,7 +64,7 @@ namespace MvcPlatform.Controllers
                     result += "<ul>";
                     for (int j = 0; j < dt2.Rows.Count; j++)
                     {
-                        result += "<li><a href=\"" + dt2.Rows[j]["URL"] + "\">" + dt2.Rows[j]["NAME"] + "</a>";
+                        result += "<li><a href=\"" + (string.IsNullOrEmpty(dt2.Rows[j]["URL"] + "") ? "#" : dt2.Rows[j]["URL"] + "") + "\">" + dt2.Rows[j]["NAME"] + "</a>";
 
                         sql = @"select MODULEID,NAME,PARENTID,URL,SORTINDEX,IsLeaf from sysmodule t where t.parentid='{0}' 
                         and t.MODULEID IN (select MODULEID FROM sys_moduleuser where userid='{1}') order by sortindex";
@@ -75,8 +75,7 @@ namespace MvcPlatform.Controllers
                             result += "<ul>";
                             for (int k = 0; k < dt3.Rows.Count; k++)
                             {
-                                result += "<li><a href=\"" + dt3.Rows[k]["URL"] + "\">" + dt3.Rows[k]["NAME"] + "</a></li>";
-
+                                result += "<li><a href=\"" + (string.IsNullOrEmpty(dt3.Rows[k]["URL"] + "") ? "#" : dt3.Rows[k]["URL"] + "") + "\">" + dt3.Rows[k]["NAME"] + "</a></li>";
                             }
                             result += "</ul></li>";
                         }
@@ -634,12 +633,12 @@ namespace MvcPlatform.Controllers
                 db.StringSet("common_data:inspbzzl", json_inspbzzl);
             }
 
-            return "{jydw:" + json_jydw + ",sbfs:" + json_sbfs + ",sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",bzzl:" + json_bzzl 
+            return "{jydw:" + json_jydw + ",sbfs:" + json_sbfs + ",sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",bzzl:" + json_bzzl
                 + ",myfs:" + json_myfs + ",containertype:" + json_containertype + ",containersize:" + json_containersize + ",truckno:" + json_truckno
                 + ",relacontainer:" + json_relacontainer + ",mzbz:" + json_mzbz + ",jylb:" + json_jylb + ",json_sbkb:" + json_sbkb
                 + ",inspbzzl:" + json_inspbzzl + ",adminurl:'" + AdminUrl + "'}";
         }
-        
+
         /*保存查询条件设置 by panhuaguo 2016-01-17*/
         public string SaveQuerySetting()
         {
@@ -1004,12 +1003,12 @@ namespace MvcPlatform.Controllers
                 case "REPTIME"://申报时间
                     if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
                     {
-                        where += " and det.REPSTARTTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') "; 
+                        where += " and det.REPSTARTTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
                         //" and det.REPTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
                     }
                     if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
                     {
-                        where += " and det.REPSTARTTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') "; 
+                        where += " and det.REPSTARTTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
                         //" and det.REPTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
                     }
                     break;
@@ -1027,8 +1026,8 @@ namespace MvcPlatform.Controllers
             if (role == "customer")//如果角色是客户
             {
                 where += @" and ort.customercode ='" + json_user.Value<string>("CUSTOMERCODE") + "' ";
-            }           
-           
+            }
+
             //2016-6-24 更新报关单列表显示逻辑 根据报关单对应的订单【DECLPDF】即报关单是否已关联好PDF文件，作为显示的条件 国内业务不需要去判断关联订单，因为打这两个标志的时候已经判断了           
             //DECL_TRANSNAME 预制报关单的运输工具名称
             //运输工具名称的显示需要更改为一下逻辑：根据草单中的申报库别 如果是13或者17 运输工具名称取预制报关单里面的。否则取草单的运输工具名称
