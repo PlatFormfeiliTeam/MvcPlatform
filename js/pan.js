@@ -1249,8 +1249,7 @@ function ini_container_truck() {
         columnWidth: .34,
         fieldLabel: '自重',
         tabIndex: 3,
-        spinDownEnabled: false,
-        spinUpEnabled: false
+        hideTrigger : true
 
     });
     var w_store_containertype = Ext.create("Ext.data.JsonStore", {
