@@ -40,7 +40,7 @@
                     busitypes += chkitem.inputValue + ",";
                 }); 
                 Ext.Ajax.request({
-                    url: "/AccountManagement/UpdateConfig",
+                    url: "/Account/UpdateConfig",
                     params: { data: Ext.encode(form_sysconfig.getForm().getValues()), busitypes: busitypes },
                     success: function (response, opts) {
                         var data = Ext.decode(response.responseText);

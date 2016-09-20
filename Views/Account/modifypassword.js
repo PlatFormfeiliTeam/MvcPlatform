@@ -67,7 +67,7 @@
             text: '<i class="fa fa-check-square-o"></i>&nbsp;确定', handler: function () {
                 if (form_psd.getForm().isValid()) {
                     Ext.Ajax.request({//先验证原始密码
-                        url: "/AccountManagement/ValidPassword",
+                        url: "/Account/ValidPassword",
                         params: {PASSWORD: field_ori.getValue() },
                         success: function (response, option) {
                             var data = Ext.decode(response.responseText);
@@ -76,7 +76,7 @@
                             }
                             else {
                                 Ext.Ajax.request({
-                                    url: "/AccountManagement/UpdatePassword",
+                                    url: "/Account/UpdatePassword",
                                     params: {PASSWORD: field_newpsd1.getValue() },
                                     success: function (response, option) {
                                         var data = Ext.decode(response.responseText);

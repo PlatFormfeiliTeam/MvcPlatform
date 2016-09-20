@@ -3,7 +3,7 @@
         fields: ['ID', 'NAME'],
         proxy: {
             type: 'ajax',
-            url: '/AccountManagement/LoadSupplier',
+            url: '/Account/LoadSupplier',
             reader: {
                 root: 'rows',
                 type: 'json'
@@ -25,7 +25,7 @@
         fields: ['ID', 'NAME'],
         proxy: {
             type: 'ajax',
-            url: '/AccountManagement/LoadSupplier',
+            url: '/Account/LoadSupplier',
             reader: {
                 root: 'rows',
                 type: 'json'
@@ -59,7 +59,7 @@
         buttons: [{
             text: '<i class="fa fa-floppy-o"></i>&nbsp;保存', handler: function () {
                 Ext.Ajax.request({
-                    url: "/AccountManagement/UpdateSupplier",
+                    url: "/Account/UpdateSupplier",
                     params: { data: Ext.encode(form_supplier.getForm().getValues()) },
                     success: function (response, opts) {
                         var data = Ext.decode(response.responseText);

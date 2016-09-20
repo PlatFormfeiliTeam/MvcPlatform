@@ -4,7 +4,7 @@
         model: 'User',
         proxy: {
             type: 'ajax',
-            url: '/AccountManagement/loaduserInfo',
+            url: '/Account/loaduserInfo',
             reader: {
                 root: 'rows',
                 type: 'json',
@@ -16,7 +16,7 @@
     var tbar = Ext.create('Ext.toolbar.Toolbar', {
         items: [{
             text: '<i class="fa fa-plus fa-fw"></i>&nbsp;添加', handler: function () {
-                opencenterwin("/AccountManagement/ChildEdit", 800, 400);
+                opencenterwin("/Account/ChildEdit", 800, 400);
             }
         },
                 {
@@ -26,7 +26,7 @@
                             Ext.MessageBox.alert('提示', '请选择需要修改的记录！');
                             return;
                         }
-                        opencenterwin("/AccountManagement/ChildEdit?ID=" + recs[0].get("ID"), 800, 400);
+                        opencenterwin("/Account/ChildEdit?ID=" + recs[0].get("ID"), 800, 400);
                     }
                 },
                 {
@@ -37,7 +37,7 @@
                             return;
                         }
                         Ext.Ajax.request({
-                            url: '/AccountManagement/Delete',
+                            url: '/Account/Delete',
                             params: { ID: recs[0].get("ID") },
                             success: function (response, option) {
                                 var data = Ext.decode(response.responseText);
@@ -60,7 +60,7 @@
                             return;
                         }
                         Ext.Ajax.request({
-                            url: '/AccountManagement/InitialPsd',
+                            url: '/Account/InitialPsd',
                             params: { ID: recs[0].get("ID"), NAME: recs[0].get("NAME") },
                             success: function (response, option) {
                                 var data = Ext.decode(response.responseText);

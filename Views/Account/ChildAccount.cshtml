@@ -2,11 +2,11 @@
 <script src="/js/Extjs42/bootstrap.js" type="text/javascript"></script>
 <script src="/js/pan.js" type="text/javascript"></script>
 <script type="text/javascript" src="/js/upload/plupload.full.min.js"></script>
-<script src="~/Views/AccountManagement/form_user.js"></script>
-<script src="~/Views/AccountManagement/subaccount.js"></script>
-<script src="~/Views/AccountManagement/supplier.js"></script>
-<script src="~/Views/AccountManagement/modifypassword.js"></script>
-<script src="~/Views/AccountManagement/sysconfig.js"></script>
+<script src="~/Views/Account/form_user.js"></script>
+<script src="~/Views/Account/subaccount.js"></script>
+<script src="~/Views/Account/supplier.js"></script>
+<script src="~/Views/Account/modifypassword.js"></script>
+<script src="~/Views/Account/sysconfig.js"></script>
 <style type="text/css">
     .x-panel-header-default {
         background-image: none;
@@ -19,7 +19,7 @@
     var formpanel, form_supplier, gridpanel, form_sysconfig;
     Ext.onReady(function () {
         Ext.Ajax.request({
-            url: "/AccountManagement/LoadCurrentUser",
+            url: "/Account/LoadCurrentUser",
             success: function (response, option) {
                 var data = Ext.decode(response.responseText);
                 form_user_init();
@@ -42,7 +42,7 @@
                 var uploader = new plupload.Uploader({
                     runtimes: 'html5,flash,silverlight,html4',
                     browse_button: 'img_upload', // you can pass an id...
-                    url: '/AccountManagement/Upload',
+                    url: '/Account/Upload',
                     flash_swf_url: '/js/upload/Moxie.swf',
                     silverlight_xap_url: '/js/upload/Moxie.xap',
                     filters: {
@@ -74,7 +74,7 @@
     })
     //修改密码
     function updatePassword() {
-        opencenterwin("/AccountManagement/PasswordEdit?Password=" + field_PASSWORD.getRawValue() + "&ID=" + field_ID.getRawValue(), 800, 400);
+        opencenterwin("/Account/PasswordEdit?Password=" + field_PASSWORD.getRawValue() + "&ID=" + field_ID.getRawValue(), 800, 400);
     }
 </script>
 

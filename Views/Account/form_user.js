@@ -63,7 +63,7 @@
             text: '<i class="fa fa-floppy-o"></i>&nbsp;保存', handler: function () {
                 var formdata = formpanel.getForm().getValues();
                 Ext.Ajax.request({
-                    url: "/AccountManagement/Update",
+                    url: "/Account/Update",
                     params: { json: Ext.encode(formdata) },
                     success: function (option, success, response) {
                         var data = Ext.decode(option.responseText);

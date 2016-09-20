@@ -11,7 +11,7 @@
             model: 'User',
             proxy: {
                 type: 'ajax',
-                url: '/AccountManagement/loaduserInfo',
+                url: '/Account/loaduserInfo',
                 reader: {
                     root: 'rows',
                     type: 'json'
@@ -35,7 +35,7 @@
                 itemclick: function (value, record, item, index, e, eOpts) {
                     treeModelstore.setProxy({
                         type: 'ajax',
-                        url: '/AccountManagement/selectModel',
+                        url: '/Account/selectModel',
                         reader: 'json'
                     });
                     userid = record.get("ID");
@@ -55,7 +55,7 @@
             nodeParam: 'id',
             proxy: {
                 type: 'ajax',
-                url: '/AccountManagement/selectModel',
+                url: '/Account/selectModel',
                 reader: 'json'
             },
             root: {
@@ -184,7 +184,7 @@
             var mask = new Ext.LoadMask(Ext.getBody(), { msg: "数据保存中，请稍等..." });
             mask.show();
             Ext.Ajax.request({
-                url: '/AccountManagement/AuthorizationSave',
+                url: '/Account/AuthorizationSave',
                 params: { moduleids: moduleids, userid: userid },
                 success: function (option, success, response) {
                     if (option.responseText == '{success:true}') {

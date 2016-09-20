@@ -100,7 +100,7 @@
                         if (formpanel.getForm().isValid()) {
                             mask.show();
                             Ext.Ajax.request({
-                                url: '/AccountManagement/Save',
+                                url: '/Account/Save',
                                 params: { ID: ID, json: Ext.encode(formpanel.getForm().getValues()) },
                                 success: function (response, option) {
                                     var data = Ext.decode(response.responseText);
