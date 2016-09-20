@@ -1,8 +1,8 @@
 ﻿function panel_file_ini() {
     var store_filetype1 = Ext.create('Ext.data.JsonStore', {
         fields: ['FILETYPEID', 'FILETYPENAME'],
-        data: [{ FILETYPEID: '44', FILETYPENAME: '订单文件' },           
-            { FILETYPEID: '58', FILETYPENAME: '配舱单文件' }] 
+        data: [{ FILETYPEID: '44', FILETYPENAME: '订单文件' },
+            { FILETYPEID: '58', FILETYPENAME: '配舱单文件' }]
     })
     var combo_filetype1 = Ext.create('Ext.form.field.ComboBox', {//文件类型
         name: 'FILETYPEID',
@@ -34,11 +34,76 @@
         width: 170,
         value: '进/出口业务'
     })
+    var field_fileno1 = Ext.create('Ext.form.field.Text', {
+        id: 'field_fileno1',
+        labelWidth: 70,
+        fieldLabel: '文件统一编号',
+        listeners: {
+            specialkey: function (field, e) {
+                // e.HOME, e.END, e.PAGE_UP, e.PAGE_DOWN,e.TAB, e.ESC, arrow keys: e.LEFT, e.RIGHT, e.UP, e.DOWN 
+                if (e.getKey() == e.ENTER) {
+                    var fileuniteno = field.getValue();
+                    Ext.Ajax.request({
+                        url: "/Common/LoadEnterpriseFile",
+                        params: { fileuniteno: fileuniteno },
+                        success: function (response, option) {
+                            var data = Ext.decode(response.responseText);
+                            if (data.success) {
+                                Ext.MessageBox.alert("提示", "文件加载成功！", function () {
+                                    field.setValue("");
+                                    var cb_filetype = toolbar1.items.items[0];
+                                    var filetype = cb_filetype.getValue();
+                                    var filetypename = cb_filetype.getRawValue();
+                                    var ietype = toolbar1.items.items[1].getValue();
+                                    if (tabpanel.getActiveTab().title == "原始订单") {
+                                        if (ietype == "进/出口业务") {
+                                            Ext.each(data.data, function (item) {
+                                                store_file1.insert(store_file1.data.length,
+                                                { FILENAME: '/FileUpload/file/' + item.ORIGINALNAME, ORIGINALNAME: item.ORIGINALNAME, SIZES: item.SIZES, FILETYPENAME: filetypename, FILETYPE: filetype, IETYPE: '仅进口' });
+                                                store_file1.insert(store_file1.data.length,
+                                                { FILENAME: '/FileUpload/file/' + item.ORIGINALNAME, ORIGINALNAME: item.ORIGINALNAME, SIZES: item.SIZES, FILETYPENAME: filetypename, FILETYPE: filetype, IETYPE: '仅出口' });
+                                            })
+                                        }
+                                        else {
+                                            Ext.each(data.data, function (item) {
+                                                store_file1.insert(store_file1.data.length,
+                                               { FILENAME: '/FileUpload/file/' + item.ORIGINALNAME, ORIGINALNAME: item.ORIGINALNAME, SIZES: item.SIZES, FILETYPENAME: filetypename, FILETYPE: filetype, IETYPE: ietype });
+                                            })
+                                        }
+                                    }
+                                    else {
+                                        if (ietype == "进/出口业务") {
+                                            Ext.each(data.data, function (item) {
+                                                store_file2.insert(store_file2.data.length,
+                                               { FILENAME: '/FileUpload/file/' + item.ORIGINALNAME, ORIGINALNAME: item.ORIGINALNAME, SIZES: item.SIZES, FILETYPENAME: filetypename, FILETYPE: filetype, IETYPE: '仅进口' });
+                                                store_file2.insert(store_file2.data.length,
+                                               { FILENAME: '/FileUpload/file/' + item.ORIGINALNAME, ORIGINALNAME: item.ORIGINALNAME, SIZES: item.SIZES, FILETYPENAME: filetypename, FILETYPE: filetype, IETYPE: '仅出口' });
+                                            })
+                                        }
+                                        else {
+                                            Ext.each(data.data, function (item) {
+                                                store_file2.insert(store_file2.data.length,
+                                                { FILENAME: '/FileUpload/file/' + item.ORIGINALNAME, ORIGINALNAME: item.ORIGINALNAME, SIZES: item.SIZES, FILETYPENAME: filetypename, FILETYPE: filetype, IETYPE: ietype });
+                                            })
+                                        }
+                                    }
+                                });
+                            }
+                            else {
+                                Ext.MessageBox.alert("提示", "文件加载失败！");
+                            }
+                        }
+
+                    });
+
+                }
+            }
+        }
+    });
     var bbar_r = '<div class="btn-group">'
         + '<button type="button" onclick="order_cancel_submit()" class="btn btn-primary btn-sm" id="btn_cancelsubmit"><i class="fa fa-angle-double-left"></i>&nbsp;撤单</button>'
         + '<button type="button" onclick="addGlyw()" class="btn btn-primary btn-sm" id="btn_addlinkorder"><i class="fa fa-plus fa-fw"></i>&nbsp;新增关联业务</button>'
         + '<button type="button" onclick="clearWin()" class="btn btn-primary btn-sm" id="btn_createorder"><i class="fa fa-plus fa-fw"></i>&nbsp;新增</button>'
-        //+ '<button type="button" onclick="LoadOrderFzxz()" class="btn btn-primary btn-sm"><i class="fa fa-files-o"></i>&nbsp;复制新增</button>'
         + '<button type="button" onclick="save()" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
         + '<button type="button" onclick="submit()" class="btn btn-primary btn-sm" id="btn_submitorder"><i class="fa fa-hand-o-up"></i>&nbsp;提交委托</button>'
         + '</div>';
@@ -48,7 +113,7 @@
                 + '<button type="button" onclick="removeFile()" class="btn btn-primary btn-sm" id="deletefile"><i class="fa fa-trash-o"></i>&nbsp;删除文件</button>'
             + '</div>';
     toolbar1 = Ext.create('Ext.toolbar.Toolbar', {
-        items: [combo_filetype1, combo_ietype1, bbar_l, '->', bbar_r]
+        items: [combo_filetype1, combo_ietype1, field_fileno1, bbar_l, '->', bbar_r]
     })
     store_file1 = Ext.create('Ext.data.JsonStore', {
         fields: ['ID', 'FILENAME', 'ORIGINALNAME', 'FILETYPE', 'FILETYPENAME', 'UPLOADTIME', 'SIZES', 'IETYPE'],
