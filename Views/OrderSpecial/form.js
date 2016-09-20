@@ -324,7 +324,7 @@
         listeners: {
             select: function (records) {
                 field_PORTNAME.setValue(records.rawValue.substr(0, records.rawValue.lastIndexOf('(')));
-            } 
+            }
         },
         tabIndex: 9
          , allowBlank: false,
@@ -337,7 +337,7 @@
         }
     })
     var field_PORTNAME = Ext.create('Ext.form.field.Hidden', {
-        id:'field_PORTNAME',
+        id: 'field_PORTNAME',
         name: 'PORTNAME'
     })
     var store_jydw = Ext.create('Ext.data.JsonStore', {
@@ -627,8 +627,8 @@
     var field_ID = Ext.create('Ext.form.field.Hidden', {
         name: 'ID'
     });
-   
-    
+
+
     var store_busitype = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
         data: [{ CODE: '51', NAME: '特殊区域进口' }, { CODE: '50', NAME: '特殊区域出口' }]
@@ -667,7 +667,7 @@
                { FILETYPEID: '58', FILETYPENAME: '配舱单文件' }]
     })
     var combo_filetype = Ext.create('Ext.form.field.ComboBox', {//文件类型
-        id:'combo_filetype',
+        id: 'combo_filetype',
         name: 'FILETYPEID',
         store: store_filetype,
         fieldLabel: '文件类型',
@@ -679,8 +679,44 @@
         width: 150,
         value: '44'
     })
+    var field_fileno1 = Ext.create('Ext.form.field.Text', {
+        id: 'field_fileno1',
+        labelWidth: 70,
+        fieldLabel: '文件统一编号',
+        listeners: {
+            specialkey: function (field, e) {
+                // e.HOME, e.END, e.PAGE_UP, e.PAGE_DOWN,e.TAB, e.ESC, arrow keys: e.LEFT, e.RIGHT, e.UP, e.DOWN 
+                if (e.getKey() == e.ENTER) {
+                    var fileuniteno = field.getValue();
+                    Ext.Ajax.request({
+                        url: "/Common/LoadEnterpriseFile",
+                        params: { fileuniteno: fileuniteno },
+                        success: function (response, option) {
+                            var data = Ext.decode(response.responseText);
+                            if (data.success) {
+                                Ext.MessageBox.alert("提示", "文件加载成功！", function () {
+                                    field.setValue("");
+                                    var filetype = Ext.getCmp('combo_filetype').getValue();
+                                    var filetypename = Ext.getCmp('combo_filetype').getRawValue();
+                                    Ext.each(data.data, function (item) {
+                                        file_store.insert(file_store.data.length,
+                                       { FILENAME: '/FileUpload/file/' + item.ORIGINALNAME, ORIGINALNAME: item.ORIGINALNAME, SIZES: item.SIZES, FILETYPENAME: filetypename, FILETYPE: filetype });
+                                    })
+                                });
+                            }
+                            else {
+                                Ext.MessageBox.alert("提示", "文件加载失败！");
+                            }
+                        }
+
+                    });
+
+                }
+            }
+        }
+    });
     var bbar = Ext.create('Ext.toolbar.Toolbar', {
-        items: [combo_filetype, bbar_l, '->', bbar_r]
+        items: [combo_filetype, field_fileno1, bbar_l, '->', bbar_r]
     })
 
     formpanel = Ext.create('Ext.form.Panel', {

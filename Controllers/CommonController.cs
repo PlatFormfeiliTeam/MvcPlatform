@@ -1967,6 +1967,35 @@ namespace MvcPlatform.Controllers
         }
 
         #endregion
-
+        //根据文件统一编号从文件服务器获取文件信息和文件实体
+        public string LoadEnterpriseFile()
+        {
+            string fileuniteno = (Request["fileuniteno"] + "").Trim();
+            string sql = "select * from ent_order where UNITCODE='" + fileuniteno + "'";
+            DataTable dt = DBMgr.GetDataTable(sql);
+            if (dt.Rows.Count > 0)
+            {
+                sql = "select FILENAME,ORIGINALNAME,SIZES from list_attachment where entid='" + dt.Rows[0]["ID"] + "'";
+                DataTable dt_detail = DBMgr.GetDataTable(sql);
+                //FTP信息 从文件服务器DOWNLOAD到WEB虚拟目录
+                System.Uri Uri = new Uri("ftp://" + ConfigurationManager.AppSettings["FTPServer"] + ":" + ConfigurationManager.AppSettings["FTPPortNO"]);
+                string UserName = ConfigurationManager.AppSettings["FTPUserName"];
+                string Password = ConfigurationManager.AppSettings["FTPPassword"];
+                FtpHelper ftp = new FtpHelper(Uri, UserName, Password);
+                string localpath = "";
+                string remotepath = "";
+                string[] filename = null;
+                foreach (DataRow dr in dt_detail.Rows)
+                {
+                    filename = (dr["FILENAME"] + "").Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                    localpath = ConfigurationManager.AppSettings["WebFilePath"] + filename[filename.Length - 1];
+                    remotepath = dr["FILENAME"] + "";
+                    ftp.DownloadFile(remotepath, localpath);
+                    dr["ORIGINALNAME"] = filename[filename.Length - 1];
+                }
+                return "{success:true,data:" + JsonConvert.SerializeObject(dt_detail) + "}";
+            }
+            return "{success:false}";
+        }
     }
 }

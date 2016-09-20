@@ -34,7 +34,7 @@
     })
 
     var field_CODE = Ext.create('Ext.form.field.Text', {//订单编号
-        id:'field_CODE',
+        id: 'field_CODE',
         name: 'CODE',
         fieldLabel: '订单编号',
         readOnly: true,
@@ -285,7 +285,7 @@
     }
 
     var field_CUSNO = Ext.create('Ext.form.field.Text', {//客户编号
-        id:'CUSNO',
+        id: 'CUSNO',
         name: 'CUSNO',
         tabIndex: 9,
         fieldLabel: '客户编号'
@@ -580,7 +580,7 @@
     var field_CONTAINERTRUCK = Ext.create('Ext.form.field.Hidden', {
         id: 'field_CONTAINERTRUCK',
         name: 'CONTAINERTRUCK'
-    }) 
+    })
     //报关车号 
     var field_bgch = Ext.create('Ext.form.field.Text', {
         name: 'DECLCARNO',
@@ -649,7 +649,7 @@
     var field_ID = Ext.create('Ext.form.field.Hidden', {
         name: 'ID'
     });
-    
+
     var field_ORIGINALFILEIDS = Ext.create('Ext.form.field.Hidden', {
         id: 'field_ORIGINALFILEIDS',
         name: 'ORIGINALFILEIDS'
@@ -667,7 +667,7 @@
                 + '<button type="button" onclick="browsefile()" class="btn btn-primary btn-sm"><i class="fa fa-exchange fa-fw"></i>&nbsp;浏览文件</button>'
                 + '<button type="button" onclick="removeFile()" class="btn btn-primary btn-sm" id="deletefile"><i class="fa fa-trash-o"></i>&nbsp;删除文件</button>'
             + '</div>';
-  
+
     var store_filetype = Ext.create('Ext.data.JsonStore', {
         fields: ['FILETYPEID', 'FILETYPENAME'],
         data: [{ FILETYPEID: '44', FILETYPENAME: '订单文件' },
@@ -691,8 +691,44 @@
     var field_FILETYPENAME = Ext.create('Ext.form.field.Hidden', {
         name: 'FILETYPENAME'
     })
+    var field_fileno1 = Ext.create('Ext.form.field.Text', {
+        id: 'field_fileno1',
+        labelWidth: 70,
+        fieldLabel: '文件统一编号',
+        listeners: {
+            specialkey: function (field, e) {
+                // e.HOME, e.END, e.PAGE_UP, e.PAGE_DOWN,e.TAB, e.ESC, arrow keys: e.LEFT, e.RIGHT, e.UP, e.DOWN 
+                if (e.getKey() == e.ENTER) {
+                    var fileuniteno = field.getValue();
+                    Ext.Ajax.request({
+                        url: "/Common/LoadEnterpriseFile",
+                        params: { fileuniteno: fileuniteno },
+                        success: function (response, option) {
+                            var data = Ext.decode(response.responseText);
+                            if (data.success) {
+                                Ext.MessageBox.alert("提示", "文件加载成功！", function () {
+                                    field.setValue("");
+                                    var filetype = Ext.getCmp('combo_filetype').getValue();
+                                    var filetypename = Ext.getCmp('combo_filetype').getRawValue();
+                                    Ext.each(data.data, function (item) {
+                                        file_store.insert(file_store.data.length,
+                                       { FILENAME: '/FileUpload/file/' + item.ORIGINALNAME, ORIGINALNAME: item.ORIGINALNAME, SIZES: item.SIZES, FILETYPENAME: filetypename, FILETYPE: filetype });
+                                    })
+                                });
+                            }
+                            else {
+                                Ext.MessageBox.alert("提示", "文件加载失败！");
+                            }
+                        }
+
+                    });
+
+                }
+            }
+        }
+    });
     var bbar = Ext.create('Ext.toolbar.Toolbar', {
-        items: [combo_filetype, bbar_l, '->', bbar_r]
+        items: [combo_filetype, field_fileno1, bbar_l, '->', bbar_r]
     })
     formpanel = Ext.create('Ext.form.Panel', {
         renderTo: 'div_form',
@@ -720,6 +756,6 @@
     { layout: 'column', height: 42, border: 0, items: [combo_mzbz, field_CLEARANCENO, chk_CHKLAWCONDITION, field_containerno, container_bgch] },
     { layout: 'column', height: 42, border: 0, items: [field_ENTRUSTREQUEST] },
     field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_BUSISHORTCODE, field_BUSISHORTNAME,
-    field_ID,field_TRADEWAYCODES, field_TRADEWAYCODES1, field_ContainerJson, field_ORIGINALFILEIDS, field_CONTAINERTRUCK]
+    field_ID, field_TRADEWAYCODES, field_TRADEWAYCODES1, field_ContainerJson, field_ORIGINALFILEIDS, field_CONTAINERTRUCK]
     });
 }
