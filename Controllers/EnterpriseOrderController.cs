@@ -200,8 +200,8 @@ namespace MvcPlatform.Controllers
                         {
                             sql = "select ENT_ORDER_ID.Nextval from dual";
                             ent_id = DBMgr.GetDataTable(sql).Rows[0][0] + "";//获取ID
-                            sql = string.Format(insert_sql, ent_id, GetCode(json_data.Value<string>("FILERECEVIEUNIT")), GetName(json_data.Value<string>("FILERECEVIEUNIT")),
-                                  GetCode(json_data.Value<string>("FILEDECLAREUNIT")), GetName(json_data.Value<string>("FILEDECLAREUNIT")),
+                            sql = string.Format(insert_sql, ent_id, GetCode(json_data.Value<string>("FILERECEVIEUNITNAME")), GetName(json_data.Value<string>("FILERECEVIEUNITNAME")),
+                                  GetCode(json_data.Value<string>("FILEDECLAREUNITNAME")), GetName(json_data.Value<string>("FILEDECLAREUNITNAME")),
                                   json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"), json_data.Value<string>("CUSTOMDISTRICTNAME"),
                                   json_data.Value<string>("REPWAYID"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),json_data.Value<string>("REMARK"), 
                                   json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"),
@@ -216,10 +216,10 @@ namespace MvcPlatform.Controllers
                 {
                     update_sql = @"update ENT_ORDER  set filerecevieunitcode='{1}',filerecevieunitname='{2}',filedeclareunitcode='{3}',
                     filedeclareunitname='{4}',busitypeid='{5}',customdistrictcode='{6}', customdistrictname='{7}',
-                    repwayid='{8}' ,files='{9}',remark='{10}',code='{11}' where id='{0}'";
-                    sql = string.Format(update_sql, json_data.Value<string>("ID"), GetCode(json_data.Value<string>("FILERECEVIEUNIT")),
-                    GetName(json_data.Value<string>("FILERECEVIEUNIT")), GetCode(json_data.Value<string>("FILEDECLAREUNIT")),
-                    GetName(json_data.Value<string>("FILEDECLAREUNIT")), json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"),
+                    repwayid='{8}',remark='{9}',code='{10}' where id='{0}'";
+                    sql = string.Format(update_sql, json_data.Value<string>("ID"), GetCode(json_data.Value<string>("FILERECEVIEUNITNAME")),
+                    GetName(json_data.Value<string>("FILERECEVIEUNITNAME")), GetCode(json_data.Value<string>("FILEDECLAREUNITNAME")),
+                    GetName(json_data.Value<string>("FILEDECLAREUNITNAME")), json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"),
                     json_data.Value<string>("CUSTOMDISTRICTNAME"), json_data.Value<string>("REPWAYID"), json_data.Value<string>("REMARK"), json_data.Value<string>("CODE"));
                     DBMgr.ExecuteNonQuery(sql);
                     //更新随附文件

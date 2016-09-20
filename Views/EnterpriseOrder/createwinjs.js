@@ -49,22 +49,17 @@ function form_ini() {
     var field_FILERECEVIEUNIT = Ext.create('Ext.form.field.Text', {
         id: 'field_FILERECEVIEUNIT',
         readOnly: true,
-        name: 'FILERECEVIEUNIT',
+        name: 'FILERECEVIEUNITNAME',
         margin: 0,
-        flex: .90,
-        allowBlank: false,
-        blankText: '文件接收单位不能为空!'
-    })
-    var field_FILERECEVIEUNITNAME = Ext.create('Ext.form.field.Hidden', {
-        name: 'FILERECEVIEUNITNAME'
+        flex: .90
     })
     var cont_wjjsdw = Ext.create('Ext.form.FieldContainer', {
         fieldLabel: '文件接收单位',
         layout: 'hbox',
         items: [field_FILERECEVIEUNIT,
             {
-                xtype: 'button', id: 'btn_filerecevieunit', listeners: {
-                    click: function () { bgsbdw_win(field_FILERECEVIEUNIT); }
+                xtype: 'button', id: 'btn_filerecevieunit', handler: function () {
+                    bgsbdw_win(field_FILERECEVIEUNIT);
                 }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .10, margin: 0
             }
         ]
@@ -73,14 +68,11 @@ function form_ini() {
     //文件申报单位
     var field_FILEDECLAREUNIT = Ext.create('Ext.form.field.Text', {
         id: 'field_FILEDECLAREUNIT',
-        name: 'FILEDECLAREUNIT',
+        name: 'FILEDECLAREUNITNAME',
         readOnly: true,
         margin: 0,
         flex: .90,
     });
-    var field_FILEDECLAREUNITNAME = Ext.create('Ext.form.field.Hidden', {
-        name: 'FILEDECLAREUNITNAME'
-    })
     var field_ID = Ext.create('Ext.form.field.Hidden', {
         name: 'ID'
     })
@@ -93,8 +85,8 @@ function form_ini() {
         layout: 'hbox',
         items: [field_FILEDECLAREUNIT,
             {
-                xtype: 'button', id: 'btn_filedeclareunit', listeners: {
-                    click: function () { bgsbdw_win(field_FILEDECLAREUNIT); }
+                xtype: 'button', id: 'btn_filedeclareunit', handler: function () {
+                    bgsbdw_win(field_FILEDECLAREUNIT);
                 }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .10, margin: 0
             }
         ]
@@ -198,26 +190,6 @@ function form_ini() {
             }
         }
     })
-
-    //var store_status = Ext.create('Ext.data.JsonStore', {
-    //    fields: ['CODE', 'NAME'],
-    //    data: [{ "CODE": 0, "NAME": "未关联" }, { "CODE": 1, "NAME": "已关联" }]
-    //})
-    //var field_STATUS = Ext.create('Ext.form.field.ComboBox', {//业务状态
-    //    id: 'field_status1',
-    //    name: 'STATUS',
-    //    valueField: 'CODE',
-    //    displayField: 'NAME',
-    //    fieldLabel: '状态',
-    //    queryMode: 'local',
-    //    editable: false,
-    //    hiddenTrigger: true,
-    //    readOnly: true,
-    //    labelWidth: 80,
-    //    value: 0,
-    //    store: store_status
-    //});
-
     //备注
     var field_REMARK = Ext.create('Ext.form.field.Text', {
         id: 'field_REMARK1',
@@ -229,8 +201,6 @@ function form_ini() {
     var field_CODE = Ext.create('Ext.form.field.Text', {
         fieldLabel: '企业编号',
         name: 'CODE'
-        //allowBlank: false,
-        //blankText: '企业编号不能为空!'
     });
 
     var field_ISUPLOAD = Ext.create('Ext.form.field.Hidden', {
@@ -270,12 +240,12 @@ function form_ini() {
             { layout: 'column', height: 42, border: 0, items: [combo_BUSITYPE, combo_REPWAYNAME] },
             { layout: 'column', height: 42, border: 0, items: [combo_CUSTOMDISTRICTNAME, field_CODE] },
             { layout: 'column', height: 42, border: 0, items: [field_REMARK] },
-            field_FILERECEVIEUNITNAME, field_FILEDECLAREUNITNAME, field_CUSTOMDISTRICTNAME, field_ISUPLOAD, field_ID, field_ORIGINALFILEIDS
+            field_CUSTOMDISTRICTNAME, field_ISUPLOAD, field_ID, field_ORIGINALFILEIDS
         ]
     })
 
     var storefile = Ext.create('Ext.data.JsonStore', {
-        fields: ['FILENAME', 'NEWNAME', 'ORIGINALNAME', 'UPLOADTIME', 'SIZES']
+        fields: ['ID','FILENAME', 'NEWNAME', 'ORIGINALNAME', 'UPLOADTIME', 'SIZES']
     });
 
     var tmp = new Ext.XTemplate(
@@ -305,11 +275,20 @@ function form_ini() {
 function loadform(ID) {
     Ext.Ajax.request({
         url: "/EnterpriseOrder/loadform",
-        params: { ID: ID },//, busitype: busitype 
+        params: { ID: ID },
         success: function (response, opts) {
             var data = Ext.decode(response.responseText);
             repwayidcode = data.data.REPWAYID;//二次联动，前一个赋值后，调用此值 
             Ext.getCmp('formpanel_u').getForm().setValues(data.data);
+            //文件接收单位
+            if (Ext.getCmp('field_FILERECEVIEUNIT').getValue()) {
+                Ext.getCmp('field_FILERECEVIEUNIT').setValue(Ext.getCmp('field_FILERECEVIEUNIT').getValue() + '(' + data.data.FILERECEVIEUNITCODE + ')');
+            }
+            //文件申报单位
+            if (Ext.getCmp('field_FILEDECLAREUNIT').getValue()) {
+                Ext.getCmp('field_FILEDECLAREUNIT').setValue(Ext.getCmp('field_FILEDECLAREUNIT').getValue() + '(' + data.data.FILEDECLAREUNITCODE + ')');
+            }
+            //文件明细
             Ext.getCmp('fileview1').store.loadData(data.filedata);//加载附件列表数据
             //如果是修改需要将随附文件的ID拼接成字符串 赋值到
             var fileids = "";
@@ -319,17 +298,7 @@ function loadform(ID) {
             Ext.getCmp('field_ORIGINALFILEIDS').setValue(fileids);
         }
     });
-}
-
-//function button_control(status) {
-//    if (status >= 1) {
-//        document.getElementById("pickfiles").disabled = true;
-//    } else {
-//        upload_ini(); //未提交时才初始化上传控件
-//    }
-//    document.getElementById("deletefile").disabled = status >= 1; //删除按钮
-//    document.getElementById("btn_saveorder").disabled = status >= 1;//保存按钮
-//}
+} 
 
 function upload_ini() {
     var uploader = new plupload.Uploader({
@@ -351,10 +320,11 @@ function upload_ini() {
     uploader.bind('FilesAdded', function (up, files) {
         uploader.start();
     });
-    uploader.bind('FileUploaded', function (up, file) {
-        var curtime = GetCurTime();
+    uploader.bind('FileUploaded', function (up, file) { 
+        var timestamp = Ext.Date.now();  //1351666679575  这个方法只是获取的时间戳
+        var date = new Date(timestamp);
         Ext.getCmp('fileview1').store.insert(Ext.getCmp('fileview1').store.data.length
-            , { FILENAME: '/FileUpload/file/' + file.target_name, NEWNAME: file.target_name, ORIGINALNAME: file.name, SIZES: file.size, UPLOADTIME: curtime });
+            , { FILENAME: '/FileUpload/file/' + file.target_name, NEWNAME: file.target_name, ORIGINALNAME: file.name, SIZES: file.size, UPLOADTIME: Ext.Date.format(date, 'Y-m-d H:i:s') });
     });
 }
 
@@ -410,21 +380,7 @@ function save(action) {
             return;
         }
         var data = Ext.encode(Ext.getCmp('formpanel_u').getForm().getValues());
-        var filedata = Ext.encode(Ext.pluck(Ext.getCmp('fileview1').store.data.items, 'data'));
-        //var bf = true;
-        //if (Ext.getCmp('combo_BUSITYPE').getValue() == "40" || Ext.getCmp('combo_BUSITYPE').getValue() == "41") {
-        //    if (Ext.getCmp('field_FILERECEVIEUNIT').getValue() == Ext.getCmp('field_FILEDECLAREUNIT').getValue()) {
-        //        bf = false;
-        //    }
-        //}
-
-        //if (bf == false) {
-        //    Ext.MessageBox.confirm('提示', '文件接收单位、文件申报单位一致,确定要保存吗？', function (btn) {
-        //        if (btn != 'yes') {
-        //            return;
-        //        }
-        //    })
-        //} 
+        var filedata = Ext.encode(Ext.pluck(Ext.getCmp('fileview1').store.data.items, 'data')); 
         var mask = new Ext.LoadMask(Ext.getBody(), { msg: "数据保存中，请稍等..." });
         mask.show();
         Ext.Ajax.request({
@@ -436,8 +392,8 @@ function save(action) {
                 if (data.success) {
                     Ext.MessageBox.alert("提示", "保存成功！", function () {
                         Ext.getCmp('wjcsWin').close();
-                        Ext.getCmp('pgbar').moveFirst(); 
-                    });                   
+                        Ext.getCmp('pgbar').moveFirst();
+                    });
                 }
                 else {
                     Ext.MessageBox.alert("提示", "保存失败！");
@@ -446,28 +402,6 @@ function save(action) {
 
         });
     }
-}
-
-
-
-function GetCurTime() {
-    var nd = new Date();
-
-    var y = nd.getFullYear();
-    var m = nd.getMonth() + 1;
-    var d = nd.getDate();
-    var h = nd.getHours();
-    var mi = nd.getMinutes();
-    var s = nd.getSeconds();
-
-    if (m <= 9) m = "0" + m;
-    if (d <= 9) d = "0" + d;
-    if (h <= 9) h = "0" + h;
-    if (mi <= 9) mi = "0" + mi;
-    if (s <= 9) s = "0" + s;
-
-    var cdate = y + "-" + m + "-" + d + " " + h + ":" + mi + ":" + s;
-    return cdate;
-}
+} 
 
 /*****************************************************win 窗口 end ********************************************/
