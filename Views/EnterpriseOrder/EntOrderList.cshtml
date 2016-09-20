@@ -15,7 +15,7 @@
             data: common_data_busitype
         });
         Ext.Ajax.request({
-            url: "/Common/Ini_Base_Data", 
+            url: "/Common/Ini_Base_Data",
             success: function (response, opts) {
                 var commondata = Ext.decode(response.responseText);
                 common_data_sbgq = commondata.sbgq;//申报关区   for win 窗口使用
@@ -24,7 +24,8 @@
                 //查询区域
                 initSearch();
                 var store_Trade = Ext.create('Ext.data.JsonStore', {
-                    fields: ['ID', 'FILERECEVIEUNITCODE', 'FILERECEVIEUNITNAME', 'FILEDECLAREUNITCODE', 'FILEDECLAREUNITNAME', 'BUSITYPEID', 'CUSTOMDISTRICTCODE', 'CUSTOMDISTRICTNAME', 'REPWAYID', 'STATUS',
+                    fields: ['ID', 'FILERECEVIEUNITCODE', 'FILERECEVIEUNITNAME', 'FILEDECLAREUNITCODE', 'FILEDECLAREUNITNAME',
+                        'BUSITYPEID', 'CUSTOMDISTRICTCODE', 'CUSTOMDISTRICTNAME', 'REPWAYID', 'STATUS',
                          'CODE', 'CREATEID', 'CREATENAME', 'CREATETIME', 'ASSOCIATENO', 'ORDERCODE', 'ENTERPRISECODE', 'ENTERPRISENAME', 'ACCEPTID', 'ACCEPTNAME',
                          'ACCEPTTIME', 'UNITCODE', 'CREATEMODE', 'REMARK'],
                     pageSize: 20,
@@ -40,7 +41,7 @@
                     autoLoad: true,
                     listeners: {
                         beforeload: function () {
-                            store_Trade.getProxy().extraParams = { 
+                            store_Trade.getProxy().extraParams = {
                                 FILERECEVIEUNIT: Ext.getCmp('FILERECEVIEUNIT_S').getValue(), FILEDECLAREUNIT: Ext.getCmp("FILEDECLAREUNIT_S").getValue(),
                                 CODE: Ext.getCmp('CODE_S').getValue(),
                                 STARTDATE: Ext.Date.format(Ext.getCmp("start_date").getValue(), 'Y-m-d H:i:s'),
@@ -50,7 +51,6 @@
                     }
                 })
                 var pgbar = Ext.create('Ext.toolbar.Paging', {
-                    id: 'pgbar',
                     displayMsg: '显示 {0} - {1} 条,共计 {2} 条',
                     store: store_Trade,
                     displayInfo: true
@@ -74,7 +74,7 @@
                     { header: '状态', dataIndex: 'STATUS', width: 70, renderer: render },
                     { header: '创建时间', dataIndex: 'CREATETIME', width: 140 },
                     { header: '生成方式', dataIndex: 'CREATEMODE', width: 120 },
-                    { header: '备注', dataIndex: 'REMARK', width: 200 },
+                    { header: '备注', dataIndex: 'REMARK', width: 200 }
                     ],
                     listeners:
                     {
@@ -138,24 +138,6 @@
             fieldLabel: '企业编号',
             name: 'CODE_S'
         });
-
-        //var store_status_S = Ext.create('Ext.data.JsonStore', {
-        //    fields: ['CODE', 'NAME'],
-        //    data: [{ "CODE": 0, "NAME": "未关联" }, { "CODE": 1, "NAME": "已关联" }]
-        //})
-
-        //var combo_status = Ext.create('Ext.form.field.ComboBox', {//业务状态
-        //    id: 'combo_status',
-        //    valueField: 'CODE',
-        //    displayField: 'NAME',
-        //    fieldLabel: '状态',
-        //    queryMode: 'local',
-        //    editable: false,
-        //    store: store_status_S,
-        //    editable: false,
-        //    labelWidth: 30, columnWidth: .10,
-        //});
-
         var start_date = Ext.create('Ext.form.field.Date', {
             id: 'start_date',
             format: 'Y-m-d',
@@ -175,7 +157,11 @@
                 columnWidth: .2
             },
             items: [
-            { layout: 'column', border: 0, margin: '5 0 0 0', items: [cont_wjjsdw_S, cont_wjsbdw_S, field_CODE_S, start_date, end_date] },
+            {
+                layout: 'column', border: 0, margin: '5 0 0 0', items: [
+                  cont_wjjsdw_S, cont_wjsbdw_S, field_CODE_S, start_date, end_date
+                ]
+            },
             ]
         });
     }
@@ -183,19 +169,10 @@
     function Open() {
         addwin("");
     }
-
-    function Select() {
-
-    }
-
     function render(value, cellmeta, record, rowIndex, columnIndex, store) {
         var rtn = "";
         var dataindex = cellmeta.column.dataIndex;
         switch (dataindex) {
-            //case "STATUS":
-            //    if (value == "0") { rtn = "未关联"; }
-            //    if (value == "1") { rtn = "已关联"; }
-            //    break;
             case "BUSITYPEID":
                 var rec = store_busitype.findRecord('CODE', value);
                 if (rec) {
@@ -247,11 +224,6 @@
             }
         });
     }
-
-    /**************************************************** index begin ********************************************/
-
-
-
 </script>
 
 

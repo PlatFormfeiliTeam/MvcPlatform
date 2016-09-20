@@ -7,7 +7,7 @@ function addwin(ID) {
         id: "wjcsWin",
         title: '委托信息',
         width: 820,
-        height: 620,
+        height: 480,
         modal: true,
         items: [Ext.getCmp('formpanel_u'), Ext.getCmp('panelfile')],
     });
