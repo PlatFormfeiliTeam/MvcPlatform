@@ -13,25 +13,8 @@ namespace MvcPlatform.Controllers
         [Authorize]
         public ActionResult Index()
         {
-            ViewBag.Message = "Modify this template to jump-start your ASP.NET MVC application."; 
+            ViewBag.navigator = "关务云>>首页";
             return View();
-        }
-
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your app description page.";
-
-            return View();
-        }
-        public ActionResult Menu()
-        { 
-            return View();
-        }
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
-        }
+        }  
     }
 }

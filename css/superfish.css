@@ -52,10 +52,9 @@ ul.sf-menu li li li.sfHover ul {
 	top:			0;
 }
 
-/*** DEMO SKIN ***/
+/*** margin-bottom:	1em;DEMO SKIN ***/
 .sf-menu {
-	float:			left;
-	margin-bottom:	1em;
+	float:			left;	
 }
 .sf-menu a {
 	border-left:	1px solid #fff;
