@@ -7,33 +7,13 @@
 <script src="~/Views/EnterpriseOrder/createwinjs.js"></script>
 <script type="text/javascript">
     var gridpanel;
-    //   var busitype = getQueryString("busitype"); 
-    var common_data_sbgq = [], common_data_sbfs = [];
+    var common_data_sbgq = [], common_data_sbfs = [], common_data_adminurl = "";
     var store_busitype;
     Ext.onReady(function () {
         store_busitype = Ext.create('Ext.data.JsonStore', {
             fields: ['CODE', 'NAME'],
             data: common_data_busitype
         });
-        //var busitypename = "";
-        //switch (busitype) {
-        //    case "10":
-        //        busitypename = "空运出口"; break;
-        //    case "11":
-        //        busitypename = "空运进口"; break;
-        //    case "20":
-        //        busitypename = "海运出口"; break;
-        //    case "21":
-        //        busitypename = "海运进口"; break;
-        //    case "30":
-        //        busitypename = "陆运出口"; break;
-        //    case "31":
-        //        busitypename = "陆运进口"; break;
-        //    case "40": case "41":
-        //        busitypename = "国内"; break;
-        //    case "50": case "51":
-        //        busitypename = "特殊区域"; break;
-        //}
         Ext.Ajax.request({
             url: "/Common/Ini_Base_Data",
             //   params: { busitype: busitypename },
@@ -41,6 +21,7 @@
                 var commondata = Ext.decode(response.responseText);
                 common_data_sbgq = commondata.sbgq;//申报关区   for win 窗口使用
                 common_data_sbfs = commondata.sbfs;//申报方式   for win 窗口使用
+                common_data_adminurl = commondata.adminurl;//文件服务器URL
                 //查询区域
                 initSearch();
                 var store_Trade = Ext.create('Ext.data.JsonStore', {
@@ -99,7 +80,7 @@
                     ],
                     listeners:
                     {
-                        'itemdblclick': function (view, record, item, index, e) {                           
+                        'itemdblclick': function (view, record, item, index, e) {
                             addwin(record.data.ID);
                         }
                     },
@@ -156,8 +137,8 @@
         //企业编号
         var field_CODE_S = Ext.create('Ext.form.field.Text', {
             id: 'CODE_S',
-            fieldLabel: '企业编号', 
-            name: 'CODE_S'            
+            fieldLabel: '企业编号',
+            name: 'CODE_S'
         });
 
         //var store_status_S = Ext.create('Ext.data.JsonStore', {
@@ -180,7 +161,7 @@
         var start_date = Ext.create('Ext.form.field.Date', {
             id: 'start_date',
             format: 'Y-m-d',
-            fieldLabel: '开始时间' 
+            fieldLabel: '开始时间'
         })
         var end_date = Ext.create('Ext.form.field.Date', {
             id: 'end_date',
@@ -201,12 +182,12 @@
         });
     }
 
-    function Open() {       
+    function Open() {
         addwin("");
     }
 
     function Select() {
-       
+
     }
 
     function render(value, cellmeta, record, rowIndex, columnIndex, store) {

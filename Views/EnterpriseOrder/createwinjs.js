@@ -201,13 +201,7 @@ function form_ini() {
     var field_CODE = Ext.create('Ext.form.field.Text', {
         fieldLabel: '企业编号',
         name: 'CODE'
-    });
-
-    var field_ISUPLOAD = Ext.create('Ext.form.field.Hidden', {
-        id: 'field_ISUPLOAD',
-        name: 'ISUPLOAD'
-    })
-
+    }); 
     var bbar_l = '<div class="btn-group">'
            + '<button type="button" class="btn btn-primary btn-sm" id="pickfiles"><i class="fa fa-upload"></i>&nbsp;上传文件</button>'
            + '<button type="button" onclick="browsefile()" class="btn btn-primary btn-sm"><i class="fa fa-exchange fa-fw"></i>&nbsp;浏览文件</button>'
@@ -240,7 +234,7 @@ function form_ini() {
             { layout: 'column', height: 42, border: 0, items: [combo_BUSITYPE, combo_REPWAYNAME] },
             { layout: 'column', height: 42, border: 0, items: [combo_CUSTOMDISTRICTNAME, field_CODE] },
             { layout: 'column', height: 42, border: 0, items: [field_REMARK] },
-            field_CUSTOMDISTRICTNAME, field_ISUPLOAD, field_ID, field_ORIGINALFILEIDS
+            field_CUSTOMDISTRICTNAME, field_ID, field_ORIGINALFILEIDS
         ]
     })
 
@@ -365,8 +359,8 @@ function browsefile() {
     });
 
     win.show();
-    if (Ext.getCmp('field_ISUPLOAD').getValue() == "1") {//文件已经到另一台server上
-        document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + AdminUrl + '\/file' + records[0].get("FILENAME") + '"></embed>';
+    if (Ext.getCmp('ID').getValue() == "1") {//文件已经到另一台server上
+        document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + common_data_adminurl + '\/file' + records[0].get("FILENAME") + '"></embed>';
     }
     else {
         document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + records[0].get("FILENAME") + '"></embed>';
