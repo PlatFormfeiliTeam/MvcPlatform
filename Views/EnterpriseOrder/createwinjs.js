@@ -359,7 +359,7 @@ function browsefile() {
     });
 
     win.show();
-    if (Ext.getCmp('ID').getValue() == "1") {//文件已经到另一台server上
+    if (records[0].get("ID")) {//文件已经到另一台server上
         document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + common_data_adminurl + '\/file' + records[0].get("FILENAME") + '"></embed>';
     }
     else {
