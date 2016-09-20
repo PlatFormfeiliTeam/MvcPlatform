@@ -183,8 +183,8 @@ namespace MvcPlatform.Controllers
                     {
                         sql = "select ENT_ORDER_ID.Nextval from dual";
                         ent_id = DBMgr.GetDataTable(sql).Rows[0][0] + "";//获取ID
-                        sql = string.Format(insert_sql, ent_id, GetCode(json_data.Value<string>("FILERECEVIEUNIT")), GetName(json_data.Value<string>("FILERECEVIEUNIT")),
-                              GetCode(json_data.Value<string>("FILEDECLAREUNIT")), GetName(json_data.Value<string>("FILEDECLAREUNIT")),
+                        sql = string.Format(insert_sql, ent_id, GetCode(json_data.Value<string>("FILERECEVIEUNITNAME")), GetName(json_data.Value<string>("FILERECEVIEUNITNAME")),
+                              GetCode(json_data.Value<string>("FILEDECLAREUNITNAME")), GetName(json_data.Value<string>("FILEDECLAREUNITNAME")),
                               json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"), json_data.Value<string>("CUSTOMDISTRICTNAME"),
                               json_data.Value<string>("REPWAYID"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),
                               json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json_data.Value<string>("REMARK"),
