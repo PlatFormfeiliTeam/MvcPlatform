@@ -357,8 +357,7 @@ function browsefile() {
             html: "<div id='fileViewDiv' style='height: 100%;width: 100%;'></div>"
         }]
     });
-
-    win.show();
+    win.show(); 
     if (records[0].get("ID")) {//文件已经到另一台server上
         document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + common_data_adminurl + '\/file' + records[0].get("FILENAME") + '"></embed>';
     }

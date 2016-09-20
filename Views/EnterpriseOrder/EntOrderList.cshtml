@@ -15,8 +15,7 @@
             data: common_data_busitype
         });
         Ext.Ajax.request({
-            url: "/Common/Ini_Base_Data",
-            //   params: { busitype: busitypename },
+            url: "/Common/Ini_Base_Data", 
             success: function (response, opts) {
                 var commondata = Ext.decode(response.responseText);
                 common_data_sbgq = commondata.sbgq;//申报关区   for win 窗口使用
@@ -41,8 +40,7 @@
                     autoLoad: true,
                     listeners: {
                         beforeload: function () {
-                            store_Trade.getProxy().extraParams = {
-                                //  busitype: busitype,
+                            store_Trade.getProxy().extraParams = { 
                                 FILERECEVIEUNIT: Ext.getCmp('FILERECEVIEUNIT_S').getValue(), FILEDECLAREUNIT: Ext.getCmp("FILEDECLAREUNIT_S").getValue(),
                                 CODE: Ext.getCmp('CODE_S').getValue(),
                                 STARTDATE: Ext.Date.format(Ext.getCmp("start_date").getValue(), 'Y-m-d H:i:s'),
