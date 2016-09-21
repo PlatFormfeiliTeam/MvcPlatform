@@ -53,6 +53,7 @@
                 var pgbar = Ext.create('Ext.toolbar.Paging', {
                     displayMsg: '显示 {0} - {1} 条,共计 {2} 条',
                     store: store_Trade,
+                    id: 'pgbar',
                     displayInfo: true
                 })
                 gridpanel = Ext.create('Ext.grid.Panel', {
@@ -182,7 +183,9 @@
         }
         return rtn;
     }
-
+    function Select() {
+        Ext.getCmp('pgbar').moveFirst();
+    }
     function Reset() {
         Ext.Array.each(Ext.getCmp('formpanel').getForm().getFields().items, function (field) {
             field.reset();
