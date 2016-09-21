@@ -30,55 +30,26 @@
             </div>
         </div>
         <div style="border: 1px solid #363c64; float: right; width: 350px; padding: 50px 50px 42px 50px;">
-            <form action="/Account/DoLogin" method="post">
+            <form action="/Account/Login?ReturnUrl=@ViewBag.ReturnUrl" method="post" >
                 <label for="user_name">登录名</label>
                 <div class="input-group" style="margin-bottom: 20px">
                     <span class="input-group-addon icon iconfont">&#xe605;</span>
                     @Html.TextBoxFor(u => u.NAME, new { @class = "form-control" })
-                    @*<input type="text" class="form-control" id="user_name" placeholder="请输入登录账号">*@
                 </div>
                 <label for="password">登录密码</label>
                 <div class="input-group">
                     <span class="input-group-addon icon iconfont">&#xe608;</span>
-                    @Html.TextBoxFor(u => u.PASSWORD, new { @class = "form-control" })
-                    @*<input type="password" class="form-control" id="password" placeholder='请输入登录密码'>*@
+                    @Html.PasswordFor(u => u.PASSWORD, new { @class = "form-control" })
                 </div>
-                <div style="height:35px">   <label style="color:red" id="validate"></label>  </div>
+                <div style="line-height:35px">
+                    <label style="color:red" id="validate"> 
+                        @Html.ValidationMessageFor(u => u.NAME)
+                        @Html.ValidationMessageFor(u => u.PASSWORD)
+                        @Html.ValidationMessage("ERROR")
+                    </label>
+                </div>
                 <button type="submit" id='btn_login' class="btn btn-primary btn-group-justified">登录</button>
             </form>
         </div>
-    </div>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $('#btn_login').bind('click', function () {
-                //var user_name = $("#user_name").val();
-                //var password = $("#password").val();
-                //if (!user_name) {
-                //    $("#validate").text("账号不能为空!");
-                //    return;
-                //}
-                //if (!password) {
-                //    $("#validate").text("密码不能为空!");
-                //    return;
-                //}
-                //$.ajax({
-                //    url: "/Account/Login",
-                //    data: { username: user_name, password: password },
-                //    success: function (result) {
-                //        alert(result);
-                //        if (result == "success") {
-                //            window.location.href = '/Home/Index';
-                //        }
-                //        else {
-                //            $("#validate").text(result);
-                //        }
-                //    }
-                //});
-            });
-            $("input").bind('focus', function () {
-                $("#validate").text("");
-            });
-        });
-    </script>
-
+    </div> 
 </div>
