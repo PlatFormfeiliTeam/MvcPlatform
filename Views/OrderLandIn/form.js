@@ -688,9 +688,9 @@
         value: '44'
     })
 
-    var field_FILETYPENAME = Ext.create('Ext.form.field.Hidden', {
-        name: 'FILETYPENAME'
-    })
+    //var field_FILETYPENAME = Ext.create('Ext.form.field.Hidden', {
+    //    name: 'FILETYPENAME'
+    //})
     var field_fileno1 = Ext.create('Ext.form.field.Text', {
         id: 'field_fileno1',
         labelWidth: 55,
