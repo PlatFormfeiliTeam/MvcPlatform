@@ -98,18 +98,13 @@ namespace MvcPlatform.Controllers
                 where += " and instr(t.CODE,'" + CODE + "')>0 ";
             }
 
-            if (!string.IsNullOrEmpty(Request["STATUS_S"]))//判断查询条件是否有值
-            {
-                where += " and t.STATUS='" + Request["STATUS_S"].ToString().Trim() + "'";
-            }
-
             if (!string.IsNullOrEmpty(Request["STARTDATE"]))//如果开始时间有值
             {
-                where += " and t.SUBMITTIME>=to_date('" + Request["STARTDATE"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                where += " and t.CREATETIME>=to_date('" + Request["STARTDATE"] + "','yyyy-mm-dd hh24:mi:ss') ";
             }
             if (!string.IsNullOrEmpty(Request["ENDDATE"]))//如果结束时间有值
             {
-                where += " and t.SUBMITTIME<=to_date('" + Request["ENDDATE"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                where += " and t.CREATETIME<=to_date('" + Request["ENDDATE"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
             }
 
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
