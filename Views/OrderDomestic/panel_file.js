@@ -36,7 +36,7 @@
     })
     var field_fileno1 = Ext.create('Ext.form.field.Text', {
         id: 'field_fileno1',
-        labelWidth: 60,
+        labelWidth: 55,
         fieldLabel: '统一编号',
         listeners: {
             specialkey: function (field, e) {
@@ -142,8 +142,7 @@
         '<div class="panel panel-default thumb-wrap fl" style="margin-top:5px;margin-left:5px;width:240px">',
         '<div class="panel-heading" style="padding-left:5px;padding-right:5px">{[values.ORIGINALNAME.substr(0,23)]}<div class="fr"><span class="glyphicon glyphicon-paperclip"></span></div></div>',
         '<div class="panel-body" style="padding-left:5px;">{FILETYPENAME}|',
-        '<tpl>{[values.SIZES/1024 > 1024?Math.round(values.SIZES/(1024*1024))+"M":Math.round(values.SIZES/1024)+"K"]}</tpl>',
-        //'|{IETYPE}|{[values.UPLOADTIME.substr(0,values.UPLOADTIME.indexOf("T"))]}</div></div>',
+        '<tpl>{[values.SIZES/1024 > 1024?Math.round(values.SIZES/(1024*1024))+"M":Math.round(values.SIZES/1024)+"K"]}</tpl>',        
         '|{IETYPE}|{[values.UPLOADTIME]}</div></div>',
         '</tpl>'
         )
