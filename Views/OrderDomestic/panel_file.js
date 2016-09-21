@@ -55,19 +55,22 @@
                                     var filetype = cb_filetype.getValue();
                                     var filetypename = cb_filetype.getRawValue();
                                     var ietype = toolbar1.items.items[1].getValue();
+                                    var timestamp = Ext.Date.now();  //1351666679575  这个方法只是获取的时间戳
+                                    var date = new Date(timestamp);
+
                                     if (tabpanel.getActiveTab().title == "原始订单") {
                                         if (ietype == "进/出口业务") {
                                             Ext.each(data.data, function (item) {
                                                 store_file1.insert(store_file1.data.length,
-                                                { FILENAME: '/FileUpload/file/' + item.ORIGINALNAME, ORIGINALNAME: item.ORIGINALNAME, SIZES: item.SIZES, FILETYPENAME: filetypename, FILETYPE: filetype, IETYPE: '仅进口' });
+                                                { FILENAME: '/FileUpload/file/' + item.ORIGINALNAME, ORIGINALNAME: item.ORIGINALNAME, SIZES: item.SIZES, FILETYPENAME: filetypename, FILETYPE: filetype, IETYPE: '仅进口', UPLOADTIME: Ext.Date.format(date, 'Y-m-d H:i:s') });
                                                 store_file1.insert(store_file1.data.length,
-                                                { FILENAME: '/FileUpload/file/' + item.ORIGINALNAME, ORIGINALNAME: item.ORIGINALNAME, SIZES: item.SIZES, FILETYPENAME: filetypename, FILETYPE: filetype, IETYPE: '仅出口' });
+                                                { FILENAME: '/FileUpload/file/' + item.ORIGINALNAME, ORIGINALNAME: item.ORIGINALNAME, SIZES: item.SIZES, FILETYPENAME: filetypename, FILETYPE: filetype, IETYPE: '仅出口', UPLOADTIME: Ext.Date.format(date, 'Y-m-d H:i:s') });
                                             })
                                         }
                                         else {
                                             Ext.each(data.data, function (item) {
                                                 store_file1.insert(store_file1.data.length,
-                                               { FILENAME: '/FileUpload/file/' + item.ORIGINALNAME, ORIGINALNAME: item.ORIGINALNAME, SIZES: item.SIZES, FILETYPENAME: filetypename, FILETYPE: filetype, IETYPE: ietype });
+                                               { FILENAME: '/FileUpload/file/' + item.ORIGINALNAME, ORIGINALNAME: item.ORIGINALNAME, SIZES: item.SIZES, FILETYPENAME: filetypename, FILETYPE: filetype, IETYPE: ietype, UPLOADTIME: Ext.Date.format(date, 'Y-m-d H:i:s') });
                                             })
                                         }
                                     }
@@ -75,15 +78,15 @@
                                         if (ietype == "进/出口业务") {
                                             Ext.each(data.data, function (item) {
                                                 store_file2.insert(store_file2.data.length,
-                                               { FILENAME: '/FileUpload/file/' + item.ORIGINALNAME, ORIGINALNAME: item.ORIGINALNAME, SIZES: item.SIZES, FILETYPENAME: filetypename, FILETYPE: filetype, IETYPE: '仅进口' });
+                                               { FILENAME: '/FileUpload/file/' + item.ORIGINALNAME, ORIGINALNAME: item.ORIGINALNAME, SIZES: item.SIZES, FILETYPENAME: filetypename, FILETYPE: filetype, IETYPE: '仅进口', UPLOADTIME: Ext.Date.format(date, 'Y-m-d H:i:s') });
                                                 store_file2.insert(store_file2.data.length,
-                                               { FILENAME: '/FileUpload/file/' + item.ORIGINALNAME, ORIGINALNAME: item.ORIGINALNAME, SIZES: item.SIZES, FILETYPENAME: filetypename, FILETYPE: filetype, IETYPE: '仅出口' });
+                                               { FILENAME: '/FileUpload/file/' + item.ORIGINALNAME, ORIGINALNAME: item.ORIGINALNAME, SIZES: item.SIZES, FILETYPENAME: filetypename, FILETYPE: filetype, IETYPE: '仅出口', UPLOADTIME: Ext.Date.format(date, 'Y-m-d H:i:s') });
                                             })
                                         }
                                         else {
                                             Ext.each(data.data, function (item) {
                                                 store_file2.insert(store_file2.data.length,
-                                                { FILENAME: '/FileUpload/file/' + item.ORIGINALNAME, ORIGINALNAME: item.ORIGINALNAME, SIZES: item.SIZES, FILETYPENAME: filetypename, FILETYPE: filetype, IETYPE: ietype });
+                                                { FILENAME: '/FileUpload/file/' + item.ORIGINALNAME, ORIGINALNAME: item.ORIGINALNAME, SIZES: item.SIZES, FILETYPENAME: filetypename, FILETYPE: filetype, IETYPE: ietype, UPLOADTIME: Ext.Date.format(date, 'Y-m-d H:i:s') });
                                             })
                                         }
                                     }
@@ -140,7 +143,8 @@
         '<div class="panel-heading" style="padding-left:5px;padding-right:5px">{[values.ORIGINALNAME.substr(0,23)]}<div class="fr"><span class="glyphicon glyphicon-paperclip"></span></div></div>',
         '<div class="panel-body" style="padding-left:5px;">{FILETYPENAME}|',
         '<tpl>{[values.SIZES/1024 > 1024?Math.round(values.SIZES/(1024*1024))+"M":Math.round(values.SIZES/1024)+"K"]}</tpl>',
-        '|{IETYPE}|{[values.UPLOADTIME.substr(0,values.UPLOADTIME.indexOf("T"))]}</div></div>',
+        //'|{IETYPE}|{[values.UPLOADTIME.substr(0,values.UPLOADTIME.indexOf("T"))]}</div></div>',
+        '|{IETYPE}|{[values.UPLOADTIME]}</div></div>',
         '</tpl>'
         )
     var fileview1 = Ext.create('Ext.view.View', {

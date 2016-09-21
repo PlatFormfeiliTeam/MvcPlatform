@@ -715,9 +715,12 @@
                                     field.setValue("");
                                     var filetype = Ext.getCmp('combo_filetype').getValue();
                                     var filetypename = Ext.getCmp('combo_filetype').getRawValue();
+                                    var timestamp = Ext.Date.now();  //1351666679575  这个方法只是获取的时间戳
+                                    var date = new Date(timestamp);
+
                                     Ext.each(data.data, function (item) {
                                         file_store.insert(file_store.data.length,
-                                       { FILENAME: '/FileUpload/file/' + item.ORIGINALNAME, ORIGINALNAME: item.ORIGINALNAME, SIZES: item.SIZES, FILETYPENAME: filetypename, FILETYPE: filetype });
+                                       { FILENAME: '/FileUpload/file/' + item.ORIGINALNAME, ORIGINALNAME: item.ORIGINALNAME, SIZES: item.SIZES, FILETYPENAME: filetypename, FILETYPE: filetype, UPLOADTIME: Ext.Date.format(date, 'Y-m-d H:i:s') });
                                     })
                                 });
                             }

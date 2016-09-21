@@ -24,7 +24,8 @@
         '<div class="panel-heading" style="padding-left:5px;padding-right:5px">{[values.ORIGINALNAME.substr(0,23)]}<div class="fr"><span class="glyphicon glyphicon-paperclip"></span></div></div>',
         '<div class="panel-body" style="padding-left:5px;">{FILETYPENAME}|',
         '<tpl>{[values.SIZES/1024 > 1024?Math.round(values.SIZES/(1024*1024))+"M":Math.round(values.SIZES/1024)+"K"]}</tpl>',
-        '|{IETYPE}|{[values.UPLOADTIME.substr(0,values.UPLOADTIME.indexOf("T"))]}</div></div>',
+        //'|{IETYPE}|{[values.UPLOADTIME.substr(0,values.UPLOADTIME.indexOf("T"))]}</div></div>',
+        '|{IETYPE}|{[values.UPLOADTIME]}</div></div>',
         '</tpl>'
         )
     var fileview2 = Ext.create('Ext.view.View', {

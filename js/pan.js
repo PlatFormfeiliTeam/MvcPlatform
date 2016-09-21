@@ -798,8 +798,12 @@ function LoadOrderFromErp(busitype) {
                     params: { id: Ext.String.trim(Ext.getCmp('NUMBER').getValue()), busitype: busitype },
                     success: function (response, success, option) {
                         var data = Ext.decode(response.responseText);
+
+                        var timestamp = Ext.Date.now();  //1351666679575  这个方法只是获取的时间戳
+                        var date = new Date(timestamp);
+
                         Ext.each(data.rows, function (item) {
-                            file_store.insert(file_store.data.length, { FILENAME: '/FileUpload/file/' + item.MAINNAME.substr(item.MAINNAME.lastIndexOf("CustomsFile") + 11), ORIGINALNAME: item.MAINNAME.substr(item.MAINNAME.lastIndexOf("CustomsFile") + 11), SIZES: item.FILE_SIZE, FILETYPENAME: "订单文件", FILETYPE: "44" });
+                            file_store.insert(file_store.data.length, { FILENAME: '/FileUpload/file/' + item.MAINNAME.substr(item.MAINNAME.lastIndexOf("CustomsFile") + 11), ORIGINALNAME: item.MAINNAME.substr(item.MAINNAME.lastIndexOf("CustomsFile") + 11), SIZES: item.FILE_SIZE, FILETYPENAME: "订单文件", FILETYPE: "44", UPLOADTIME: Ext.Date.format(date, 'Y-m-d H:i:s') });
                         })
                     }
                 });
@@ -990,8 +994,12 @@ function upload_ini() {
     uploader.bind('FileUploaded', function (up, file) {
         var filetype = Ext.getCmp('combo_filetype').getValue();
         var filetypename = Ext.getCmp('combo_filetype').getRawValue();
+
+        var timestamp = Ext.Date.now();  //1351666679575  这个方法只是获取的时间戳
+        var date = new Date(timestamp);
+
         file_store.insert(file_store.data.length,
-       { FILENAME: '/FileUpload/file/' + file.target_name, ORIGINALNAME: file.target_name, SIZES: file.size, FILETYPENAME: filetypename, FILETYPE: filetype });
+       { FILENAME: '/FileUpload/file/' + file.target_name, ORIGINALNAME: file.target_name, SIZES: file.size, FILETYPENAME: filetypename, FILETYPE: filetype, UPLOADTIME: Ext.Date.format(date, 'Y-m-d H:i:s') });
     });
 }
 //非国内业务 委托类型对其他字段的控制逻辑 by panhuaguo  2016-08-19
@@ -1048,7 +1056,8 @@ function panel_file_ini() {
         '<div class="panel-heading" style="padding-left:5px;padding-right:5px">{[values.ORIGINALNAME.substr(0,23)]}<div class="fr"><span class="glyphicon glyphicon-paperclip"></span></div></div>',
         '<div class="panel-body" style="padding-left:5px;">{FILETYPENAME}|',
         '<tpl>{[values.SIZES/1024 > 1024?Math.round(values.SIZES/(1024*1024))+"M":Math.round(values.SIZES/1024)+"K"]}</tpl>',
-        '|{[values.UPLOADTIME.substr(0,values.UPLOADTIME.indexOf("T"))]}</div></div>',
+        //'|{[values.UPLOADTIME.substr(0,values.UPLOADTIME.indexOf("T"))]}</div></div>',
+        '|{[values.UPLOADTIME]}</div></div>',
         '</tpl>'
         )
     var fileview = Ext.create('Ext.view.View', {
