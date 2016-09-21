@@ -25,6 +25,37 @@ namespace MvcPlatform.Controllers
 
         public ActionResult DeclareList()//报关单管理
         {
+            
+            switch (Request["busitypeid"].ToString())
+            {
+                case "11":
+                    ViewBag.navigator = "空进订单>>报关单管理";
+                    break;
+                case "10":
+                    ViewBag.navigator = "空出订单>>报关单管理";
+                    break;
+                case "21":
+                    ViewBag.navigator = "海进订单>>报关单管理";
+                    break;
+                case "20":
+                    ViewBag.navigator = "海出订单>>报关单管理";
+                    break;
+                case "31":
+                    ViewBag.navigator = "陆进订单>>报关单管理";
+                    break;
+                case "30":
+                    ViewBag.navigator = "陆出订单>>报关单管理";
+                    break;
+                case "40-41":
+                    ViewBag.navigator = "国内订单>>报关单管理";
+                    break;
+                case "50-51":
+                    ViewBag.navigator = "特殊区域订单>>报关单管理";
+                    break;
+                default:
+                    break;
+            }
+
             return View();
         }
         public ActionResult FileConsult()//文件调阅
@@ -38,6 +69,35 @@ namespace MvcPlatform.Controllers
         }
         public ActionResult InspectList()//报检单管理
         {
+            switch (Request["busitypeid"].ToString())
+            {
+                case "11":
+                    ViewBag.navigator = "空进订单>>报检单管理";
+                    break;
+                case "10":
+                    ViewBag.navigator = "空出订单>>报检单管理";
+                    break;
+                case "21":
+                    ViewBag.navigator = "海进订单>>报检单管理";
+                    break;
+                case "20":
+                    ViewBag.navigator = "海出订单>>报检单管理";
+                    break;
+                case "31":
+                    ViewBag.navigator = "陆进订单>>报检单管理";
+                    break;
+                case "30":
+                    ViewBag.navigator = "陆出订单>>报检单管理";
+                    break;
+                case "40-41":
+                    ViewBag.navigator = "国内订单>>报检单管理";
+                    break;
+                case "50-51":
+                    ViewBag.navigator = "特殊区域订单>>报检单管理";
+                    break;
+                default:
+                    break;
+            }
             return View();
         }
 

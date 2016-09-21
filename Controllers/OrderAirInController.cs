@@ -16,7 +16,7 @@ namespace MvcPlatform.Controllers
 
         public ActionResult Index()
         {
-            ViewBag.navigator = "订单中心>空运进口";
+            ViewBag.navigator = "订单中心>>空运进口";
             return View();
         }
 
