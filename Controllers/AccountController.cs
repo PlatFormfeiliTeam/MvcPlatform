@@ -64,6 +64,7 @@ namespace MvcPlatform.Controllers
         int totalProperty = 0;
         public ActionResult ChildAccount()
         {
+            ViewBag.navigator = "账号管理>>账号信息";
             return View();
         }
         public ActionResult ChildEdit()
@@ -72,6 +73,7 @@ namespace MvcPlatform.Controllers
         }
         public ActionResult Authorization()
         {
+            ViewBag.navigator = "账号管理>>权限管理";
             return View();
         }
         public string LoadCurrentUser()

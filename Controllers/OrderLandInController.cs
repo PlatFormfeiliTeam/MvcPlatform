@@ -16,10 +16,12 @@ namespace MvcPlatform.Controllers
 
         public ActionResult Index()
         {
+            ViewBag.navigator = "订单中心>>陆运进口";
             return View();
         }
         public ActionResult Create()
         {
+            ViewBag.navigator = "订单中心>>陆运进口";
             return View();
         }
 

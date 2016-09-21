@@ -18,16 +18,19 @@ namespace MvcPlatform.Controllers
 
         public ActionResult EntOrderList()  //文件委托
         {
+            ViewBag.navigator = "企业服务>>委托任务";
             return View();
         }
 
         public ActionResult EnterpriseHome()//企业服务
         {
+            ViewBag.navigator = "企业服务>>委托中心";
             return View();
         }
 
         public ActionResult ProcessOrder()//订单暂存区
         {
+            ViewBag.navigator = "订单中心>>订单暂存区";
             return View();
         }
 

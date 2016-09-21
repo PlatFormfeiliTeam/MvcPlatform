@@ -21,6 +21,7 @@ namespace MvcPlatform.Controllers
         }
         public ActionResult Create()
         {
+            ViewBag.navigator = "订单中心>>海运出口";
             return View();
         }
         public string GetName(string combin)

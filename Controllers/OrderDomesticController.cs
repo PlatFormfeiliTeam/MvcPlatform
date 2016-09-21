@@ -19,10 +19,12 @@ namespace MvcPlatform.Controllers
         // GET: /OrderDomestic/
         public ActionResult Index()
         {
+            ViewBag.navigator = "订单中心>>国内结转";
             return View();
         }
         public ActionResult Create()
         {
+            ViewBag.navigator = "订单中心>>国内结转";
             return View();
         }
 

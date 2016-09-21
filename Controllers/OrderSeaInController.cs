@@ -22,6 +22,7 @@ namespace MvcPlatform.Controllers
 
         public ActionResult Create()
         {
+            ViewBag.navigator = "订单中心>>海运进口";
             return View();
         }
 
