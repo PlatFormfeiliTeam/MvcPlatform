@@ -64,18 +64,18 @@
                     bbar: pgbar,
                     enableColumnHide: false,
                     columns: [
-                    { xtype: 'rownumberer', width: 35 },
-                    { header: 'ID', dataIndex: 'ID', hidden: true },
-                    { header: '统一编号', dataIndex: 'UNITCODE', width: 150 },
-                    { header: '企业编号', dataIndex: 'CODE', width: 120 },
-                    { header: '文件接收单位', dataIndex: 'FILERECEVIEUNITNAME', width: 150 },
-                    { header: '文件申报单位', dataIndex: 'FILEDECLAREUNITNAME', width: 150 },
-                    { header: '业务类型', dataIndex: 'BUSITYPEID', width: 100, renderer: render },
+                    { xtype: 'rownumberer', width: 35 ,locked:true},
+                    { header: 'ID', dataIndex: 'ID', hidden: true, locked: true },
+                    { header: '文件统一编号', dataIndex: 'UNITCODE', width: 150, locked: true },
+                    { header: '企业|对应编号', dataIndex: 'CODE', width: 120, locked: true },
+                    { header: '文件接收单位', dataIndex: 'FILERECEVIEUNITNAME', width: 200, locked: true },
+                    { header: '文件申报单位', dataIndex: 'FILEDECLAREUNITNAME', width: 200, locked: true },
+                    { header: '业务类型', dataIndex: 'BUSITYPEID', width: 100, renderer: render, locked: true },
                     { header: '申报关区', dataIndex: 'CUSTOMDISTRICTCODE', width: 70 },
                     { header: '状态', dataIndex: 'STATUS', width: 70, renderer: render },
-                    { header: '创建时间', dataIndex: 'CREATETIME', width: 140 },
+                    { header: '创建时间', dataIndex: 'CREATETIME', width: 140, locked: true },
                     { header: '生成方式', dataIndex: 'CREATEMODE', width: 120 },
-                    { header: '备注', dataIndex: 'REMARK', width: 200 }
+                    { header: '备注', dataIndex: 'REMARK',width:150 }
                     ],
                     listeners:
                     {
@@ -85,8 +85,7 @@
                     },
                     viewConfig: {
                         enableTextSelection: true
-                    },
-                    forceFit: true
+                    }
                 })
             }
         });
