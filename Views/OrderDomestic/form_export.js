@@ -91,7 +91,7 @@
     });
     //经营单位
     var store_jydw2 = Ext.create('Ext.data.JsonStore', {
-        fields: ['CODE', 'NAME', 'QUANCODE', 'QUANNAME', 'SHORTNAME'],
+        fields: ['CODE', 'NAME'],
         data: common_data_jydw
     })
     var combo_jydw2 = Ext.create('Ext.form.field.ComboBox', {
@@ -99,7 +99,7 @@
         name: 'BUSIUNITCODE',
         store: store_jydw2,
         displayField: 'NAME',
-        valueField: 'QUANCODE',
+        valueField: 'CODE',
         queryMode: 'local',
         margin: 0,
         forceSelection: true,
@@ -108,10 +108,8 @@
         minChars: 2,
         hideTrigger: true,
         listeners: {
-            select: function (combo, records) {
-                field_BUSIUNITNAME2.setValue(records[0].get("QUANNAME"));
-                field_BUSISHORTNAME2.setValue(records[0].get("SHORTNAME"));
-                field_BUSISHORTCODE2.setValue(records[0].get("CODE"));
+            select: function (records) {
+                field_BUSIUNITNAME2.setValue(records.rawValue.substr(0, records.rawValue.lastIndexOf('(')));
             },
             focus: function (cb) {
                 if (!cb.getValue()) {
@@ -129,14 +127,6 @@
     var field_BUSIUNITNAME2 = Ext.create('Ext.form.field.Hidden', {
         name: 'BUSIUNITNAME'
     })
-    var field_BUSISHORTCODE2 = Ext.create('Ext.form.field.Hidden', {
-        id: 'BUSISHORTCODE2',
-        name: 'BUSISHORTCODE'
-    })
-    var field_BUSISHORTNAME2 = Ext.create('Ext.form.field.Hidden', {
-        id: 'BUSISHORTNAME2',
-        name: 'BUSISHORTNAME'
-    })
     //经营单位
     var field_jydw2 = {
         xtype: 'fieldcontainer',
@@ -144,7 +134,7 @@
         layout: 'hbox',
         items: [combo_jydw2, {
             xtype: 'button', id: 'jydw_btn2', handler: function () {
-                selectjydw(combo_jydw2, field_BUSIUNITNAME2, field_BUSISHORTCODE2, field_BUSISHORTNAME2);
+                selectjydw(combo_jydw2, field_BUSIUNITNAME2);
             }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
         }]
     }
@@ -444,6 +434,6 @@
         { layout: 'column', height: 42, border: 0, items: [field_quanpackage2, field_weight2, field_contractno2, field_myfs2, zcbah_container2] },
         { layout: 'column', height: 42, border: 0, items: [chk_CHKLAWCONDITION2, field_CLEARANCENO2, field_ASSOCIATEPEDECLNO2, cont_bgsbdw2, cont_bjsbdw2] },
         { layout: 'column', height: 42, border: 0, items: [field_ENTRUSTREQUEST2, field_STATUS2] },
-         field_BUSIUNITNAME2, field_BUSISHORTCODE2, field_BUSISHORTNAME2, field_TRADEWAYCODES2, field_TRADEWAYCODES2, field_TRADEWAYCODES12]
+         field_BUSIUNITNAME2, field_TRADEWAYCODES2, field_TRADEWAYCODES2, field_TRADEWAYCODES12]
     })
 }

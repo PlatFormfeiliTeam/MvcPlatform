@@ -420,15 +420,9 @@ namespace MvcPlatform.Controllers
             {
                 where += " and CREATEUSERID = " + json_user.Value<string>("ID") + " ";
             }
-            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 BUSISHORTNAME,
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
-            /*string sql = @"select ID, CODE,ENTRUSTTYPEID,CUSNO,PORTCODE,PORTNAME,BUSIUNITNAME,FIRSTLADINGBILLNO,SECONDLADINGBILLNO,
-                BUSITYPE,CORRESPONDNO,LADINGBILLNO,ARRIVEDNO,CUSTOMERNAME,CONTRACTNO,TOTALNO,DIVIDENO,TURNPRENO,                
-                GOODSNUM || '/'|| GOODSGW  GOODSNUMGOODSNW,GOODSGW,REPWAYID, GOODSWEIGHT,CUSTOMDISTRICTCODE,
-                CUSTOMDISTRICTNAME,BUSISHORTNAME,ISINVALID,LAWCONDITION,STATUS,DECLSTATUS,INSPSTATUS,    
-                ASSOCIATENO,createtime CREATEDATE,SUBMITTIME from LIST_ORDER where instr('" + Request["busitypeid"] + "',BUSITYPE)>0 and customercode='" + json_user.Value<string>("CUSTOMERCODE") + "' " + where;
-             */
             string sql = @"select * from LIST_ORDER where instr('" + Request["busitypeid"] + "',BUSITYPE)>0 and customercode='" + json_user.Value<string>("CUSTOMERCODE") + "' " + where;
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "createtime", "desc"));
             var json = JsonConvert.SerializeObject(dt, iso);
@@ -554,23 +548,15 @@ namespace MvcPlatform.Controllers
             }
 
             string json_jydw = "";//经营单位 
-            if (db.KeyExists("jydw:" + json_user.Value<string>("CUSTOMERID")))
+            if (db.KeyExists("common_data:jydw"))
             {
-                json_jydw = db.StringGet("jydw:" + json_user.Value<string>("CUSTOMERID"));
+                json_jydw = db.StringGet("common_data:jydw");
             }
             else
             {
-                //2016-6-2 梁总提出一个改进 如果某一个经营单位 客户先 添加到自己的库了，但后来总库里面禁用了，则客户自己的库中也要禁用掉
-                sql = @"SELECT T.* 
-                        FROM (
-                                SELECT a.CUSTOMERID, a.companychname||'('||a.companyenname||')' NAME ,a.companychname SHORTNAME, a.companyenname CODE,b.incode QUANCODE,b.name QUANNAME 
-                                FROM USER_RENAME_COMPANY a 
-                                    left join BASE_COMPANY b on a.companyid = b.id 
-                                where b.incode is not null and a.companyenname is not null and b.enabled=1
-                            ) T 
-                            WHERE  T.CUSTOMERID = '" + json_user.Value<string>("CUSTOMERID") + "'";
+                sql = "SELECT CODE,NAME||'('||CODE||')' NAME FROM BASE_COMPANY where CODE is not null and enabled=1";
                 json_jydw = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
-                db.StringSet("jydw:" + json_user.Value<string>("CUSTOMERID"), json_jydw);
+                db.StringSet("common_data:jydw", json_jydw);
             }
             string json_bgfs = "[]";//报关方式 
             if (db.KeyExists("common_data:bgfs"))
@@ -832,7 +818,7 @@ namespace MvcPlatform.Controllers
         {
             string sql = "";
             DataTable dt;
-            sql = "SELECT ID,INCODE CODE,NAME FROM BASE_COMPANY WHERE ENABLED=1 AND (INCODE LIKE '%{0}%' OR NAME LIKE '%{0}%')";
+            sql = "SELECT ID,CODE,NAME FROM BASE_COMPANY WHERE ENABLED=1 AND (CODE LIKE '%{0}%' OR NAME LIKE '%{0}%')";
             sql = string.Format(sql, (Request["NAME"] + "").ToUpper());
             dt = DBMgrBase.GetDataTable(GetPageSqlBase(sql, "CREATEDATE", "desc"));
             var data1 = (from B in dt.AsEnumerable()
@@ -844,48 +830,6 @@ namespace MvcPlatform.Controllers
                          }).AsQueryable();
             var json5 = new { total = totalProperty, rows = data1 };
             return Json(json5, JsonRequestBehavior.AllowGet);
-        }
-
-        //经营单位开窗后，选择资料后 更新用户库
-        public string UpdateRenameCompany()
-        {
-            //ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(AppUtil.RedisIp);
-            //IDatabase db = redis.GetDatabase();
-            IDatabase db = SeRedis.redis.GetDatabase();
-            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            string IDS = Request["IDS"]; //更新经营单位简称表 
-            string CODES = Request["CODES"];
-            string NAMES = Request["NAMES"];
-            string sql = @"select * from user_rename_company where CUSTOMERID ='" + json_user.Value<string>("CUSTOMERID") + "' and companyid = '" + IDS + "'";
-            DataTable dt = DBMgrBase.GetDataTable(sql);
-            string res_json = "";
-            if (dt.Rows.Count == 0)
-            {
-                sql = @"INSERT INTO USER_RENAME_COMPANY (ID,CUSTOMERID,COMPANYID,COMPANYCHNAME,COMPANYENNAME,CREATEDATE) 
-                            VALUES (USER_RENAME_COMPANY_id.Nextval,'{0}','{1}','{2}','{3}',sysdate)";
-                sql = string.Format(sql, json_user.Value<string>("CUSTOMERID"), IDS, NAMES, CODES);
-                DBMgrBase.ExecuteNonQuery(sql);
-
-                //更新redis,同步最新经营单位简称 这里记得需要和Ini_Base_Data的数据结构保持一致 update by panhuaguo 2016-07-29         
-                sql = @"SELECT T.* 
-                        FROM (
-                            SELECT a.CUSTOMERID, a.companychname||'('||a.companyenname||')' NAME ,a.companychname SHORTNAME, a.companyenname CODE,b.incode QUANCODE,b.name QUANNAME 
-                            FROM USER_RENAME_COMPANY a 
-                                left join BASE_COMPANY b on a.companyid = b.id  
-                            where b.incode is not null and a.companyenname is not null and b.enabled=1
-                            ) T 
-                      WHERE  T.CUSTOMERID = '" + json_user.Value<string>("CUSTOMERID") + "'";
-                var json = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
-
-                db.StringSet("jydw:" + json_user.Value<string>("CUSTOMERID"), json);
-                res_json = "{CODE:'" + CODES + "',NAME:'" + NAMES + "',SHORTNAME:'" + NAMES + "',QUANCODE:'" + CODES + "',QUANNAME:'" + NAMES + "',data:" + json + "}";
-            }
-            else//如果简称库已经存在
-            {
-                string json = db.StringGet("jydw:" + json_user.Value<string>("CUSTOMERID"));
-                res_json = "{CODE:'" + dt.Rows[0]["COMPANYENNAME"] + "',NAME:'" + dt.Rows[0]["COMPANYCHNAME"] + "',SHORTNAME:'" + dt.Rows[0]["COMPANYCHNAME"] + "',QUANCODE:'" + CODES + "',QUANNAME:'" + NAMES + "',data:" + json + "}";
-            }
-            return res_json;
         }
 
         //贸易方式开窗加载资料
@@ -1092,9 +1036,7 @@ namespace MvcPlatform.Controllers
             }//如果是企业服务
             if (role == "enterprise")
             {
-                where += @" and ort.BUSIUNITCODE IN 
-                    (SELECT b.incode QUANCODE FROM USER_RENAME_COMPANY a left join BASE_COMPANY b on a.companyid = b.id 
-                    where b.incode is not null and a.companyenname is not null and a.customerid = " + json_user.Value<string>("CUSTOMERID") + ") ";
+                where += @" and ort.BUSIUNITCODE ='" + json_user.Value<string>("CUSTOMERHSCODE") + "' ";
             }
             if (role == "customer")//如果角色是客户
             {
@@ -1802,10 +1744,7 @@ namespace MvcPlatform.Controllers
             }
             if (role == "enterprise") //如果是企业服务
             {
-                where += @" and lo.BUSIUNITCODE IN (
-                                    SELECT b.incode QUANCODE FROM USER_RENAME_COMPANY a 
-                                    left join BASE_COMPANY b on a.companyid = b.id 
-                                    where b.incode is not null and a.companyenname is not null and a.customerid = " + json_user.Value<string>("CUSTOMERID") + ") ";
+                where += @" and lo.BUSIUNITCODE ='" + json_user.Value<string>("CUSTOMERHSCODE") + "' ";
             }
             if (role == "customer")
             {
@@ -1887,14 +1826,14 @@ namespace MvcPlatform.Controllers
             {
                 case "10":
                     sql = @"select '10' BUSITYPE,d.CUSTOM_CODE CUSTOMDISTRICTCODE,'' CUSTOMDISTRICTNAME,d.SB_CUSTOM_CODE PORTCODE ,'' PORTNAME , 
-                    '' BUSIUNITCODE ,'' BUSIUNITNAME ,'' BUSISHORTCODE ,'' BUSISHORTNAME,'{0}' CUSTOMERCODE,'{1}' CUSTOMERNAME,'{0}' CLEARUNIT,                       
+                    '' BUSIUNITCODE ,'' BUSIUNITNAME ,'{0}' CUSTOMERCODE,'{1}' CUSTOMERNAME,'{0}' CLEARUNIT,                       
                     '{1}' CLEARUNITNAME,d.MBL TOTALNO ,d.HBL DIVIDENO  ,d.PIECES GOODSNUM ,d.WEIGHT GOODSGW ,d.OPERATION_ID CUSNO,  
                     (select CHINNAME from Crm_Enterprise c where c.enterpriseid=d.Customer_code) CHINNAME,
                     (select case when forekeyin_no = '0' then '' else forekeyin_no end from IFM_AIRI_PORT_CHANGE where hbl=d.hbl and mbl = d.mbl) TURNPRENO ,
                      d.customer_invoice_no CONTRACTNO from OPS_AIRE_HEAD d  where d.operation_id = '{2}'";
                     break;
                 case "11"://空进
-                    sql = @"select '11' BUSITYPE,d.Cusom_code CUSTOMDISTRICTCODE,'' BUSIUNITCODE,'' BUSIUNITNAME,'' BUSISHORTCODE,'' BUSISHORTNAME,
+                    sql = @"select '11' BUSITYPE,d.Cusom_code CUSTOMDISTRICTCODE,'' BUSIUNITCODE,'' BUSIUNITNAME,
                           '{0}' CUSTOMERCODE,'{1}' CUSTOMERNAME,'{0}' CLEARUNIT,'{1}' CLEARUNITNAME,'001' BUSIKIND,d.MBL TOTALNO,d.HBL DIVIDENO,
                           d.PIECES GOODSNUM,d.WEIGHT GOODSGW,'1' ORDERWAY,d.OPERATION_ID CUSNO,
                           (select CHINNAME from Crm_Enterprise c where c.enterpriseid=d.Customer_code) CHINNAME,                       
@@ -1903,7 +1842,7 @@ namespace MvcPlatform.Controllers
                     break;
                 case "20"://海出
                     sql = @"select  '20' BUSITYPE,d.SB_CUSTOM CUSTOMDISTRICTCODE,'' CUSTOMDISTRICTNAME,'' BUSIUNITCODE,'' BUSIUNITNAME, 
-                    '' BUSISHORTCODE,'' BUSISHORTNAME,'{0}' CUSTOMERCODE,'{1}' CUSTOMERNAME,'{0}' CLEARUNIT,'{1}' CLEARUNITNAME, 
+                    '{0}' CUSTOMERCODE,'{1}' CUSTOMERNAME,'{0}' CLEARUNIT,'{1}' CLEARUNITNAME, 
                     '001' BUSIKIND,d.FIRST_SHIP SHIPNAME  ,d.FIRST_VOYAGES FILGHTNO,d.BOOK_BILL_NUMBER SECONDLADINGBILLNO,
                     d.PIECES_TOTAL GOODSNUM,d.WEIGHT_TOTAL GOODSGW  ,d.PACK_CODE PACKKIND  ,'1' ORDERWAY ,d.OPERATION_ID CUSNO,
                     d.CUSTOMER_FP_NO CONTRACTNO ,(select CHINNAME from Crm_Enterprise c where c.enterpriseid=d.Customer_code) CHINNAME     
@@ -1911,7 +1850,7 @@ namespace MvcPlatform.Controllers
                     break;
                 case "21":
                     sql = @"select  '21' BUSITYPE,d.CUSOM_CODE CUSTOMDISTRICTCODE,'' CUSTOMDISTRICTNAME,'' BUSIUNITCODE,'' BUSIUNITNAME,
-                          '' BUSISHORTCODE,'' BUSISHORTNAME,'{0}' CUSTOMERCODE,'{1}' CUSTOMERNAME,'{0}' CLEARUNIT,'{1}' CLEARUNITNAME,                         
+                          '{0}' CUSTOMERCODE,'{1}' CUSTOMERNAME,'{0}' CLEARUNIT,'{1}' CLEARUNITNAME,                         
                           d.SECOND_SHIP SHIPNAME,d.SECOND_VOYAGES FILGHTNO,d.FIRST_BILL FIRSTLADINGBILLNO,d.main_no MAIN_NO, 
                           d.SECOND_BILL SECONDLADINGBILLNO ,d.PIECES_TOTAL GOODSNUM,d.WEIGHT_TOTAL GOODSGW,d.PACK_CODE PACKKIND,d.OPERATION_ID CUSNO,
                           (select CHINNAME from Crm_Enterprise c where c.enterpriseid=d.Customer_code) CHINNAME
@@ -1921,7 +1860,7 @@ namespace MvcPlatform.Controllers
                 case "51":
                     sql = @"select d.DECLARE_CUSTOM CUSTOMDISTRICTCODE,CUSTOM_CODE PORTCODE  ,CONSIGN_CODE BUSIUNITCODE,PIECES GOODSNUM,  
                     WEIGHT GOODSGW,PACK_TYPE  PACKKIND,'' BUSITYPE,'1' ORDERWAY ,OPERATION_ID CUSNO ,INV_NO CONTRACTNO ,'' CUSTOMDISTRICTNAME,'' BUSIUNITNAME,  
-                    '' BUSISHORTCODE ,'' BUSISHORTNAME ,'{0}' CUSTOMERCODE ,'{0}' CLEARUNIT,'003' BUSIKIND ,'{1}' CUSTOMERNAME,'{1}' CLEARUNITNAME,DECLARE_MODE,     
+                    '{0}' CUSTOMERCODE ,'{0}' CLEARUNIT,'003' BUSIKIND ,'{1}' CUSTOMERNAME,'{1}' CLEARUNITNAME,DECLARE_MODE,     
                     '' REPWAYID,(select CHINNAME from Crm_Enterprise c where c.enterpriseid=d.CONSIGN_CODE) CHINNAME  from ops_ts_head d   where d.operation_id = '{2}'";
                     break;
             }
@@ -1930,11 +1869,11 @@ namespace MvcPlatform.Controllers
             if (ds != null && ds.Tables.Count > 0)
             {
                 dt = ds.Tables[0];//通过ERP的经营单位中文全名到本系统数据库进行匹配,加载本地经营单位                
-                sql = "select id,INCODE,NAME from base_company where translate(name,'（）','()') = '" + dt.Rows[0]["CHINNAME"].ToString().Replace('（', '(').Replace('）', ')') + "'";
+                sql = "select id,CODE,NAME from base_company where translate(name,'（）','()') = '" + dt.Rows[0]["CHINNAME"].ToString().Replace('（', '(').Replace('）', ')') + "'";
                 DataTable dtt = DBMgrBase.GetDataTable(sql);
                 if (dtt.Rows.Count > 0)
                 {
-                    dt.Rows[0]["BUSIUNITCODE"] = dtt.Rows[0]["INCODE"] + "";
+                    dt.Rows[0]["BUSIUNITCODE"] = dtt.Rows[0]["CODE"] + "";
                     dt.Rows[0]["BUSIUNITNAME"] = dtt.Rows[0]["NAME"] + "";
                 }
                 if (busitype == "21") //有主拼单号，根据主拼单号（main_no）查询该主拼单的二程提单号写入到海关提单号(二程提单号)中

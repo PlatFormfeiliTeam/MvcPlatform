@@ -509,7 +509,7 @@ function bgch_win(store_bgch_com, combo_bgch_com, common) {//传入需要赋值�
     win.show();
 }
 //经营单位选择窗体
-function selectjydw(cb_jydw, field_quanname, field_shortcode, field_shortname) {//传入需要赋值的控件
+function selectjydw(cb_jydw, field_quanname) {//传入需要赋值的控件
     var tb_jydw = Ext.create('Ext.toolbar.Toolbar', {
         items: [
            { xtype: 'textfield', fieldLabel: '经营单位', labelWidth: 100, labelAlign: 'right', id: 'NAME_jydw_s' },
@@ -559,20 +559,9 @@ function selectjydw(cb_jydw, field_quanname, field_shortcode, field_shortname) {
                     { header: '经营单位名称', dataIndex: 'NAME', flex: 1 }],
         listeners: {
             itemdblclick: function (gd, record, item, index, e, eOpts) {
-                Ext.Ajax.request({  //选中加入到客户简称库,同时要区分简称库是否存在
-                    url: "/Common/UpdateRenameCompany",
-                    params: { IDS: record.get("ID"), NAMES: record.get("NAME"), CODES: record.get("CODE") },
-                    success: function (response, option) {
-                        var data = Ext.decode(response.responseText);
-                        cb_jydw.reset();
-                        cb_jydw.store.loadData(data.data);//有可能客户的经营单位简称库会有更新 所以需要重新加载一次
-                        cb_jydw.setValue(data.QUANCODE);
-                        field_shortname.setValue(data.NAME);
-                        field_shortcode.setValue(data.CODE);
-                        field_quanname.setValue(data.QUANNAME);
-                        win_jydw.close();
-                    }
-                });
+                cb_jydw.setValue(record.get("CODE"));
+                field_quanname.setValue(record.get("NAME"));
+                win_jydw.close();
             }
         }
     });
@@ -588,21 +577,9 @@ function selectjydw(cb_jydw, field_quanname, field_shortcode, field_shortname) {
             text: '<i class="fa fa-check-square-o"></i>&nbsp;确定', handler: function () {
                 var recs = grid_jydw.getSelectionModel().getSelection();
                 if (recs.length > 0) {
-                    Ext.Ajax.request({  //选中加入到客户简称库,同时要区分简称库是否存在
-                        url: "/Common/UpdateRenameCompany",
-                        params: { IDS: recs[0].get("ID"), NAMES: recs[0].get("NAME"), CODES: recs[0].get("CODE") },
-                        success: function (response, option) {
-                            var data = Ext.decode(response.responseText);
-                            //有可能客户的经营单位简称库会有更新 所以需要重新加载一次数据
-                            cb_jydw.reset();
-                            cb_jydw.store.loadData(data.data);
-                            cb_jydw.setValue(data.QUANCODE);
-                            field_shortname.setValue(data.NAME);
-                            field_shortcode.setValue(data.CODE);
-                            field_quanname.setValue(data.QUANNAME);
-                            win_jydw.close();
-                        }
-                    });
+                    cb_jydw.setValue(recs[0].get("CODE"));
+                    field_quanname.setValue(recs[0].get("NAME"));
+                    win_jydw.close();
                 }
             }
         }, {
@@ -785,9 +762,7 @@ function LoadOrderFromErp(busitype) {
                 Ext.MessageBox.alert("提示", "数据导入成功！");
                 formpanel.getForm().setValues(data.data);
                 if (Ext.getCmp('combo_jydw').getValue()) { //导入时如果经营单位有值 就给简称字段赋值
-                    var rec = Ext.getCmp('combo_jydw').store.findRecord('QUANCODE', Ext.getCmp('combo_jydw').getValue());
-                    Ext.getCmp('field_BUSISHORTCODE').setValue(rec.get("CODE"));
-                    Ext.getCmp('field_BUSISHORTNAME').setValue(rec.get("SHORTNAME"));
+                    var rec = Ext.getCmp('combo_jydw').store.findRecord('CODE', Ext.getCmp('combo_jydw').getValue());
                 }
                 if (Ext.getCmp('combo_PORTCODE') && Ext.getCmp('combo_PORTCODE').getValue()) {//如果进出口岸有值就给portname赋值
                     var rec = Ext.getCmp('combo_PORTCODE').store.findRecord('CODE', Ext.getCmp('combo_PORTCODE').getValue());

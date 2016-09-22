@@ -758,15 +758,13 @@ namespace MvcPlatform.Controllers
                     break;
                 case "CHINNAME"://江苏飞力达过来的订单需要将经营单位的全称，对应到关务系统库的经营单位名称、编码、简称、简称的编码
                     string chinname = (dt.Rows[0]["CHINNAME"] + "").Replace('（', '(').Replace('）', ')');
-                    string sql_tmp = @"select a.id,a.INCODE,a.NAME,b.COMPANYCHNAME,b.COMPANYENNAME from base_company a left join user_rename_company b on b.CompanyId=a.ID
-                                     where b.CUSTOMERID='" + json_user.Value<string>("CUSTOMERID") + "' and translate(name,'（）','()') = '" + chinname + "'";
+                    string sql_tmp = @"select a.CODE,a.NAME from base_company a where translate(name,'（）','()') = '" + chinname + "'";
+
                     DataTable dt_tmp = DBMgrBase.GetDataTable(sql_tmp);
                     if (dt_tmp.Rows.Count > 0)
                     {
-                        dt.Rows[0]["BUSIUNITCODE"] = dt_tmp.Rows[0]["INCODE"] + "";
+                        dt.Rows[0]["BUSIUNITCODE"] = dt_tmp.Rows[0]["CODE"] + "";
                         dt.Rows[0]["BUSIUNITNAME"] = dt_tmp.Rows[0]["NAME"] + "";
-                        dt.Rows[0]["BUSISHORTNAME"] = dt_tmp.Rows[0]["COMPANYCHNAME"];
-                        dt.Rows[0]["BUSISHORTCODE"] = dt_tmp.Rows[0]["COMPANYENNAME"];
                     }
                     break;
                 case "IETYPE"://进出口类型 : '仅进口', NAME: '仅进口' }, { CODE: '仅出口', NAME: '仅出口' }, { CODE: '进/出口业务
@@ -835,7 +833,7 @@ namespace MvcPlatform.Controllers
             if (Request["operateid"].IndexOf("GJ") >= 0)//国内结转"   '{0}' REPUNITCODE,'{1}' INSPUNITCODE,TRIM(d.MANUAL_NO)因为28上有空格,需要去掉
             {
                 string subsql = "";
-                sql = @"select '{0}' as REPUNITCODE ,'{1}' as INSPUNITCODE, '1' ORDERWAY ,'' BUSIUNITCODE,'' BUSIUNITNAME,'' BUSISHORTCODE,'' BUSISHORTNAME,d.CB_CODE,d.BJ_COOPER,'' ENTRUSTTYPE,
+                sql = @"select '{0}' as REPUNITCODE ,'{1}' as INSPUNITCODE, '1' ORDERWAY ,'' BUSIUNITCODE,'' BUSIUNITNAME,d.CB_CODE,d.BJ_COOPER,'' ENTRUSTTYPE,
                       d.DECLARE_CUSTOM CUSTOMAREACODE,(select CHINNAME from Crm_Enterprise c where c.enterpriseid=d.EP_CODE) CHINNAME,d.BG_MODE REPWAYID,TRIM(d.MANUAL_NO) RECORDCODE,
                       d.PIECES GOODSNUM ,d.WEIGHT GOODSGW ,d.RELATION_NO ASSOCIATENO,d.INV_NO CONTRACTNO,d.MYFS TRADEWAYCODES1,d.MYFS TRADEWAYCODES,d.OPERATION_ID CUSNO,'' IETYPE,'M' DECLWAY,
                       '' CUSTOMDISTRICTNAME,";
@@ -865,12 +863,12 @@ namespace MvcPlatform.Controllers
                     data2 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
                 }
             }
-            //叠加保税  28报关方式 d.BG_MODE 对应本系统申报方式REPWAYID   ORDERWAY接单方式  1  线上   BUSISHORTNAME 
+            //叠加保税  28报关方式 d.BG_MODE 对应本系统申报方式REPWAYID   ORDERWAY接单方式  1  线上    
             //2016-4-26 客户提出一个问题 ERP里面存在0+2模式 建议采取的方案是 3-》1  4--》2 '{0}' REPUNITCODE ,'{1}' INSPUNITCODE ,
             else
             {
                 string subsql = "";
-                sql = @"select  '{0}' as REPUNITCODE ,'{1}' as INSPUNITCODE,'1' ORDERWAY ,'' BUSIUNITCODE,'' BUSIUNITNAME,'' BUSISHORTCODE,'' BUSISHORTNAME,d.CB_CODE,d.BJ_COOPER,'' ENTRUSTTYPE,
+                sql = @"select  '{0}' as REPUNITCODE ,'{1}' as INSPUNITCODE,'1' ORDERWAY ,'' BUSIUNITCODE,'' BUSIUNITNAME,d.CB_CODE,d.BJ_COOPER,'' ENTRUSTTYPE,
                       (select CHINNAME from Crm_Enterprise c where c.enterpriseid=d.EP_CODE) CHINNAME ,d.BG_MODE REPWAYID,TRIM(d.MANUAL_NO) RECORDCODE,                         
                       d.DECLARE_CUSTOM CUSTOMAREACODE,d.PIECES GOODSNUM  ,d.WEIGHT GOODSGW,d.RELATION_NO ASSOCIATENO,d.INV_NO CONTRACTNO,                         
                       d.MYFS TRADEWAYCODES1 ,d.MYFS TRADEWAYCODES ,d.OPERATION_ID CUSNO,'' IETYPE,'M' DECLWAY,'' CUSTOMDISTRICTNAME,";

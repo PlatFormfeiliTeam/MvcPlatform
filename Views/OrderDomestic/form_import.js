@@ -92,7 +92,7 @@
     });
     //经营单位
     var store_jydw = Ext.create('Ext.data.JsonStore', {
-        fields: ['CODE', 'NAME', 'QUANCODE', 'QUANNAME', 'SHORTNAME'],
+        fields: ['CODE', 'NAME'],
         data: common_data_jydw
     })
     var combo_jydw = Ext.create('Ext.form.field.ComboBox', {
@@ -100,7 +100,7 @@
         name: 'BUSIUNITCODE',
         store: store_jydw,
         displayField: 'NAME',
-        valueField: 'QUANCODE',
+        valueField: 'CODE',
         queryMode: 'local',
         margin: 0,
         forceSelection: true,
@@ -108,11 +108,9 @@
         anyMatch: true,
         minChars: 2,
         hideTrigger: true,
-        listeners: {//示例数据{ "CUSTOMERID": 41.0, "NAME": "仁宝电子(RBDZK01)", "CODE": "RBDZK01", "QUANCODE": "RBDZKJKSYXGS", "QUANNAME": "仁宝电子科技（昆山）有限公司" }
-            select: function (combo, records) {
-                field_BUSIUNITNAME.setValue(records[0].get("QUANNAME"));
-                field_BUSISHORTNAME.setValue(records[0].get("SHORTNAME"));
-                field_BUSISHORTCODE.setValue(records[0].get("CODE"));
+        listeners: {
+            select: function (records) {
+                field_BUSIUNITNAME.setValue(records.rawValue.substr(0, records.rawValue.lastIndexOf('(')));
             },
             focus: function (cb) {
                 if (!cb.getValue()) {
@@ -130,21 +128,13 @@
     var field_BUSIUNITNAME = Ext.create('Ext.form.field.Hidden', {
         name: 'BUSIUNITNAME'
     })
-    var field_BUSISHORTCODE = Ext.create('Ext.form.field.Hidden', {
-        id: 'BUSISHORTCODE1',
-        name: 'BUSISHORTCODE'
-    })
-    var field_BUSISHORTNAME = Ext.create('Ext.form.field.Hidden', {
-        id: 'BUSISHORTNAME1',
-        name: 'BUSISHORTNAME'
-    })
     var field_jydw = { //经营单位
         xtype: 'fieldcontainer',
         fieldLabel: '经营单位',
         layout: 'hbox',
         items: [combo_jydw, {
             xtype: 'button', id: 'jydw_btn1', handler: function () {
-                selectjydw(combo_jydw, field_BUSIUNITNAME, field_BUSISHORTCODE, field_BUSISHORTNAME);
+                selectjydw(combo_jydw, field_BUSIUNITNAME);
             }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
         }]
     }
@@ -441,7 +431,7 @@
                 { layout: 'column', height: 42, border: 0, items: [field_quanpackage, field_weight, field_contractno, field_myfs, zcbah_container] },
                 { layout: 'column', height: 42, border: 0, items: [chk_CHKLAWCONDITION, field_CLEARANCENO, field_ASSOCIATEPEDECLNO, cont_bgsbdw, cont_bjsbdw] },
                 { layout: 'column', height: 42, border: 0, items: [field_ENTRUSTREQUEST, field_STATUS] },
-                field_BUSIUNITNAME, field_BUSISHORTCODE, field_BUSISHORTNAME, field_TRADEWAYCODES, field_TRADEWAYCODES1
+                field_BUSIUNITNAME, field_TRADEWAYCODES, field_TRADEWAYCODES1
         ]
     })
 }

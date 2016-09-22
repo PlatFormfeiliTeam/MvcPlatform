@@ -21,8 +21,6 @@ function initSearch() {
                 change: function () {
                     combo_1_1.reset();
                     if (combo_1.getValue() == "BUSIUNITCODE") {
-                        //如果是经营单位作为过滤条件，则CONDITION1_1绑定QUANCODE
-                        combo_1_1.valueField = "QUANCODE";
                         store_1_1.loadData(common_data_jydw);
                     }
                     if (combo_1.getValue() == "CUSTOMDISTRICTCODE" || combo_1.getValue() == "PORTCODE") {
@@ -35,7 +33,7 @@ function initSearch() {
             }
     })
     var store_1_1 = Ext.create("Ext.data.JsonStore", {
-        fields: ["CODE", "NAME", "QUANCODE"]
+        fields: ["CODE", "NAME"]
     });
     var combo_1_1 = Ext.create('Ext.form.field.ComboBox', {
         id: 'CONDITION1_1',
