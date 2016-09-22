@@ -21,12 +21,15 @@ function initSearch() {
                 change: function () {
                     combo_1_1.reset();
                     if (combo_1.getValue() == "BUSIUNITCODE") {
+                        combo_1_1.minChars = "4";
                         store_1_1.loadData(common_data_jydw);
                     }
                     if (combo_1.getValue() == "CUSTOMDISTRICTCODE" || combo_1.getValue() == "PORTCODE") {
+                        combo_1_1.minChars = "1";
                         store_1_1.loadData(common_data_sbgq);
                     }
                     if (combo_1.getValue() == "REPWAYID") {
+                        combo_1_1.minChars = "1";
                         store_1_1.loadData(common_data_sbfs);
                     }
                 }
@@ -192,12 +195,15 @@ function initSearch() {
                 change: function () {
                     combo_5_1.reset();
                     if (combo_5.getValue() == "BUSIUNITCODE") {
+                        combo_5_1.minChars = "4";
                         store_5_1.loadData(common_data_jydw);
                     }
                     if (combo_5.getValue() == "CUSTOMDISTRICTCODE" || combo_5.getValue() == "PORTCODE") {
+                        combo_5_1.minChars = "1";
                         store_5_1.loadData(common_data_sbgq);
                     }
                     if (combo_5.getValue() == "REPWAYID") {
+                        combo_5_1.minChars = "1";
                         store_5_1.loadData(common_data_sbfs);
                     }
                 }

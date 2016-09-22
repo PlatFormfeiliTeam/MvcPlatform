@@ -1104,7 +1104,7 @@ namespace MvcPlatform.Controllers
                 dt = DBMgr.GetDataTable(sql);
                 if (dt.Rows.Count > 0)
                 {
-                    string entrusttypeid = dt.Rows[0]["ENTRUSTTYPEID"] + "";
+                    string entrusttypeid = dt.Rows[0]["ENTRUSTTYPE"] + "";
                     switch (entrusttypeid)
                     {
                         case "01":

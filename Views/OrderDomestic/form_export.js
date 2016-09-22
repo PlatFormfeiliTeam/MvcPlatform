@@ -105,7 +105,7 @@
         forceSelection: true,
         tabIndex: 23,
         anyMatch: true,
-        minChars: 2,
+        minChars: 4,
         hideTrigger: true,
         listeners: {
             select: function (records) {

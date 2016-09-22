@@ -30,7 +30,7 @@
         anyMatch: true,
         queryMode: 'local',
         forceSelection: true,
-        minChars: 2,
+        minChars: 4,
         flex: .65
     })
     var condition1 = {

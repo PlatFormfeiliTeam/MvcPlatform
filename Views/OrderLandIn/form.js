@@ -362,7 +362,7 @@
         tabIndex: 11,
         anyMatch: true,
         hideTrigger: true,
-        minChars: 2,
+        minChars: 4,
         listeners: {
             focus: function (cb) {
                 if (!cb.getValue()) {

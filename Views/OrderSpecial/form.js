@@ -352,7 +352,7 @@
         valueField: 'CODE',
         queryMode: 'local',
         margin: 0,
-        minChars: 2,
+        minChars: 4,
         forceSelection: true,
         tabIndex: 10,
         anyMatch: true,

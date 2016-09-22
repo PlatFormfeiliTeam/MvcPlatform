@@ -362,7 +362,7 @@
         displayField: 'NAME',
         valueField: 'CODE',
         queryMode: 'local',
-        minChars: 2,
+        minChars: 4,
         margin: 0,
         forceSelection: true,
         tabIndex: 10,
