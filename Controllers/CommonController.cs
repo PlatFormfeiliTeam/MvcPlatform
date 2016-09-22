@@ -1212,7 +1212,7 @@ namespace MvcPlatform.Controllers
             if (id == "61")//报关单下面显示所有的报关单号 每个报关单号下可能会有一个或者多个报关单文件 236920161696176849
             {
                 int i = 0;
-                sql = @"select CODE,DECLARATIONCODE from list_declaration t where t.ordercode='" + ordercode + "' order by starttime";
+                sql = @"select CODE,DECLARATIONCODE from list_declaration t where t.ordercode='" + ordercode + "' order by COSTARTTIME";
                 dt = DBMgr.GetDataTable(sql);
                 result += "[";
                 foreach (DataRow dr in dt.Rows)
