@@ -233,10 +233,10 @@ namespace MvcPlatform.Controllers
 
         public string Delete()
         {
-            string ids = Request["id"].ToString().TrimEnd(',');
+            string id = Request["id"].ToString();
             string json = "{success:false}";
 
-            string sql = "delete from ENT_ORDER where id in (" + ids + ")";
+            string sql = "delete from ENT_ORDER where id = '" + id + "'";
             int i = DBMgr.ExecuteNonQuery(sql);
             if (i > 0)
             {
