@@ -53,7 +53,6 @@ namespace MvcPlatform.Controllers
                     {
                         Response.Redirect("/Home/Index");
                     }
-
                 }
                 else
                 {

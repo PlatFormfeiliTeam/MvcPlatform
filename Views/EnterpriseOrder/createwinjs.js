@@ -201,7 +201,7 @@ function form_ini() {
     var field_CODE = Ext.create('Ext.form.field.Text', {
         fieldLabel: '企业编号',
         name: 'CODE'
-    }); 
+    });
     var bbar_l = '<div class="btn-group">'
            + '<button type="button" class="btn btn-primary btn-sm" id="pickfiles"><i class="fa fa-upload"></i>&nbsp;上传文件</button>'
            + '<button type="button" onclick="browsefile()" class="btn btn-primary btn-sm"><i class="fa fa-exchange fa-fw"></i>&nbsp;浏览文件</button>'
@@ -239,7 +239,7 @@ function form_ini() {
     })
 
     var storefile = Ext.create('Ext.data.JsonStore', {
-        fields: ['ID','FILENAME', 'NEWNAME', 'ORIGINALNAME', 'UPLOADTIME', 'SIZES']
+        fields: ['ID', 'FILENAME', 'NEWNAME', 'ORIGINALNAME', 'UPLOADTIME', 'SIZES']
     });
 
     var tmp = new Ext.XTemplate(
@@ -292,7 +292,7 @@ function loadform(ID) {
             Ext.getCmp('field_ORIGINALFILEIDS').setValue(fileids);
         }
     });
-} 
+}
 
 function upload_ini() {
     var uploader = new plupload.Uploader({
@@ -314,7 +314,7 @@ function upload_ini() {
     uploader.bind('FilesAdded', function (up, files) {
         uploader.start();
     });
-    uploader.bind('FileUploaded', function (up, file) { 
+    uploader.bind('FileUploaded', function (up, file) {
         var timestamp = Ext.Date.now();  //1351666679575  这个方法只是获取的时间戳
         var date = new Date(timestamp);
         Ext.getCmp('fileview1').store.insert(Ext.getCmp('fileview1').store.data.length
@@ -357,9 +357,19 @@ function browsefile() {
             html: "<div id='fileViewDiv' style='height: 100%;width: 100%;'></div>"
         }]
     });
-    win.show(); 
+    win.show();
     if (records[0].get("ID")) {//文件已经到另一台server上
-        document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + common_data_adminurl + '\/file' + records[0].get("FILENAME") + '"></embed>';
+        // 2016-09-23/E1C1637027_sheet.txt  records[0].get("FILENAME")
+        //找到最后一个圆点的位置        
+        var position = records[0].get("FILENAME").lastIndexOf(".");
+        var suffix = records[0].get("FILENAME").substr(position + 1);
+        if (suffix == 'pdf' || suffix == 'PDF') {
+            document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + common_data_adminurl + '\/file' + records[0].get("FILENAME") + '"></embed>';
+        }
+        else {
+            var newpath = records[0].get("FILENAME").substr(0, position + 1) + 'pdf';
+            document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + common_data_adminurl + '\/file' + newpath + '"></embed>';
+        }
     }
     else {
         document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + records[0].get("FILENAME") + '"></embed>';
@@ -373,7 +383,7 @@ function save(action) {
             return;
         }
         var data = Ext.encode(Ext.getCmp('formpanel_u').getForm().getValues());
-        var filedata = Ext.encode(Ext.pluck(Ext.getCmp('fileview1').store.data.items, 'data')); 
+        var filedata = Ext.encode(Ext.pluck(Ext.getCmp('fileview1').store.data.items, 'data'));
         var mask = new Ext.LoadMask(Ext.getBody(), { msg: "数据保存中，请稍等..." });
         mask.show();
         Ext.Ajax.request({
@@ -395,6 +405,6 @@ function save(action) {
 
         });
     }
-} 
+}
 
 /*****************************************************win 窗口 end ********************************************/
