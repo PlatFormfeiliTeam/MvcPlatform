@@ -260,23 +260,35 @@ return code;
                 }
             }
         }
+        
         //订单的状态在草稿、文件已上传、订单已委托 三个状态发生时记录到订单状态变更日志
         public static void add_list_time(int status, string ordercode, JObject json_user)
         {
-            int[] status_array = new int[] { 1, 10, 15 };
-            foreach (int status_tmp in status_array)
+            if (status != 1 && status != 10 && status != 15)
             {
-                if (status >= status_tmp)
-                {
-                    OrderEn entTimes = new OrderEn();
-                    entTimes.Status = status_tmp;
-                    entTimes.Code = ordercode;
-                    entTimes.CreateUserId = json_user.Value<Int32>("ID");
-                    entTimes.CreateUserName = json_user.Value<string>("REALNAME");
-                    CreateOrderPre creaTimes = new CreateOrderPre();
-                    creaTimes.CreateOrdertimes(entTimes);
-                }
+                return;
             }
+
+            string sql = ""; int i = 0;
+            int CreateUserId = json_user.Value<Int32>("ID"); string CreateUserName = json_user.Value<string>("REALNAME");
+
+             int[] status_array = new int[] { 1, 10, 15 };
+             foreach (int status_tmp in status_array)
+             {
+                 if (status >= status_tmp)
+                 {
+                     sql = @"select count(*) from list_times where code = '{0}' and status = '{1}'";
+                     sql = string.Format(sql, ordercode, status);
+                     i = Convert.ToInt32(DBMgr.GetDataTable(sql).Rows[0][0]);
+                     if (i == 0)
+                     {
+                         sql = "insert into list_times(id,code,userid,realname,status,times,type,ispause) values(list_times_id.nextval,'{0}','{1}','{2}','{3}',sysdate,'1','0')";
+                         sql = string.Format(sql, ordercode, CreateUserId, CreateUserName, status_tmp);
+                         DBMgr.ExecuteNonQuery(sql);
+                     }
+                 }
+             }       
+                       
         }
 
         //提交后订单修改时记录字段信息变更情况
