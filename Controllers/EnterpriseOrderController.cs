@@ -4,6 +4,7 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -234,15 +235,27 @@ namespace MvcPlatform.Controllers
         public string Delete()
         {
             string id = Request["id"].ToString();
-            string json = "{success:false}";
+            string json = "{success:false}"; string sql = "";
 
-            string sql = "delete from ENT_ORDER where id = '" + id + "'";
-            int i = DBMgr.ExecuteNonQuery(sql);
-            if (i > 0)
+            //删除订单随附文件
+            System.Uri Uri = new Uri("ftp://" + ConfigurationManager.AppSettings["FTPServer"] + ":" + ConfigurationManager.AppSettings["FTPPortNO"]);
+            string UserName = ConfigurationManager.AppSettings["FTPUserName"];
+            string Password = ConfigurationManager.AppSettings["FTPPassword"];
+            FtpHelper ftp = new FtpHelper(Uri, UserName, Password);
+            sql = "select * from list_attachment where entid='" + id + "'";
+            DataTable dt = DBMgr.GetDataTable(sql);
+            foreach (DataRow dr in dt.Rows)
             {
-                json = "{success:true}";
+                ftp.DeleteFile(dr["FILENAME"] + "");
             }
 
+            sql = "delete from list_attachment where entid='" + id + "'";
+            DBMgr.ExecuteNonQuery(sql);
+
+            sql = "delete from ENT_ORDER where id = '" + id + "'";
+            DBMgr.ExecuteNonQuery(sql);
+
+            json = "{success:true}";
             return json;
         }
 
