@@ -127,9 +127,9 @@ namespace MvcPlatform.Controllers
                 sql = @"UPDATE LIST_ORDER 
                         SET BUSITYPE='{1}',CUSNO='{2}',BUSIUNITCODE='{3}',BUSIUNITNAME='{4}',CONTRACTNO='{5}'
                             ,TOTALNO='{6}',DIVIDENO='{7}',TURNPRENO='{8}',GOODSNUM='{9}',WOODPACKINGID='{10}'
-                            ,CLEARANCENO='{11}',LAWFLAG='{12}',ENTRUSTTYPE='{13}',REPWAYID='{4}',CUSTOMAREACODE='{15}
+                            ,CLEARANCENO='{11}',LAWFLAG='{12}',ENTRUSTTYPE='{13}',REPWAYID='{14}',CUSTOMAREACODE='{15}'
                             ,REPUNITCODE='{16}',REPUNITNAME='{17}',DECLWAY='{18}',PORTCODE='{19}',INSPUNITCODE='{20}'
-                            ,INSPUNITNAME='{21}',ENTRUSTREQUEST='{22}',STATUS='{23},SUBMITUSERID='{24}',SUBMITUSERNAME'='{25}'
+                            ,INSPUNITNAME='{21}',ENTRUSTREQUEST='{22}',STATUS='{23}',SUBMITUSERID='{24}',SUBMITUSERNAME='{25}'
                             ,CUSTOMERCODE='{26}',CUSTOMERNAME='{27}',DECLCARNO='{28}',TRADEWAYCODES='{29}',TRADEWAYCODES1='{30}'
                             ,GOODSGW='{31}',GOODSNW='{32}',PACKKIND='{33}',BUSIKIND='{34}',ORDERWAY='{35}'
                             ,CLEARUNIT='{36}',CLEARUNITNAME='{37}',SPECIALRELATIONSHIP='{38}', PRICEIMPACT='{39}',PAYPOYALTIES='{40}'

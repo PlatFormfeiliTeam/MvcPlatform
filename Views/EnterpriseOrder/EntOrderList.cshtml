@@ -197,21 +197,17 @@
             Ext.MessageBox.alert('提示', '请选择需要删除的记录！');
             return;
         }
-        for (var i = 0; i < recs.length; i++) {
-            if (recs[i].data.STATUS != '0') {
-                Ext.MessageBox.alert('提示', '已关联的订单不能删除！');
-                return;
-            }
-        }
+        
+        //if (recs[0].data.STATUS != '0') {
+        //    Ext.MessageBox.alert('提示', '已关联的订单不能删除！');
+        //    return;
+        //}
+       
         Ext.MessageBox.confirm("提示", "确定要删除所选择的记录吗？", function (btn) {
             if (btn == 'yes') {
-                var ids = "";
-                for (var i = 0; i < recs.length; i++) {
-                    ids += recs[i].data.ID + ',';
-                }
                 Ext.Ajax.request({
                     url: '/EnterpriseOrder/Delete',
-                    params: { id: ids },
+                    params: { id: recs[0].get("ID") },
                     success: function (response, success, option) {
                         var res = Ext.decode(response.responseText);
                         if (res.success) {

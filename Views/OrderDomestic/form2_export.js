@@ -90,7 +90,7 @@
     });
     //经营单位
     var store_jydw4 = Ext.create('Ext.data.JsonStore', {
-        fields: ['CODE', 'NAME', 'QUANCODE', 'QUANNAME', 'SHORTNAME'],
+        fields: ['CODE', 'NAME'],
         data: common_data_jydw
     })
     var combo_jydw4 = Ext.create('Ext.form.field.ComboBox', {
@@ -98,19 +98,17 @@
         name: 'BUSIUNITCODE',
         store: store_jydw4,
         displayField: 'NAME',
-        valueField: 'QUANCODE',
+        valueField: 'CODE',
         queryMode: 'local',
         margin: 0,
         forceSelection: true,
         tabIndex: 63,
         anyMatch: true,
-        minChars: 2,
+        minChars: 4,
         hideTrigger: true,
         listeners: {
-            select: function (combo, records) {
-                field_BUSIUNITNAME4.setValue(records[0].get("QUANNAME"));
-                field_BUSISHORTNAME4.setValue(records[0].get("NAME"));
-                field_BUSISHORTCODE4.setValue(records[0].get("CODE"));
+            select: function (records) {
+                field_BUSIUNITNAME4.setValue(records.rawValue.substr(0, records.rawValue.lastIndexOf('(')));
             },
             focus: function (cb) {
                 if (!cb.getValue()) {
@@ -128,14 +126,6 @@
     var field_BUSIUNITNAME4 = Ext.create('Ext.form.field.Hidden', {
         name: 'BUSIUNITNAME'
     })
-    var field_BUSISHORTCODE4 = Ext.create('Ext.form.field.Hidden', {
-        id: 'BUSISHORTCODE4',
-        name: 'BUSISHORTCODE'
-    })
-    var field_BUSISHORTNAME4 = Ext.create('Ext.form.field.Hidden', {
-        id: 'BUSISHORTNAME4',
-        name: 'BUSISHORTNAME'
-    })
     //经营单位
     var field_jydw4 = {
         xtype: 'fieldcontainer',
@@ -143,7 +133,7 @@
         layout: 'hbox',
         items: [combo_jydw4, {
             xtype: 'button', id: 'jydw_btn4', handler: function () {
-                selectjydw(combo_jydw4, field_BUSIUNITNAME4, field_BUSISHORTCODE4, field_BUSISHORTNAME4);
+                selectjydw(combo_jydw4, field_BUSIUNITNAME4);
             }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
         }]
     }
@@ -443,6 +433,6 @@
         { layout: 'column', height: 42, border: 0, items: [field_quanpackage4, field_weight4, field_contractno4, field_myfs4, zcbah_container4] },
         { layout: 'column', height: 42, border: 0, items: [chk_CHKLAWCONDITION4, field_CLEARANCENO4, field_ASSOCIATEPEDECLNO4, cont_bgsbdw4, cont_bjsbdw4] },
         { layout: 'column', height: 42, border: 0, items: [field_ENTRUSTREQUEST4, field_STATUS4] },
-         field_BUSIUNITNAME4, field_BUSISHORTCODE4, field_BUSISHORTNAME4, field_TRADEWAYCODES4, field_TRADEWAYCODES14]
+         field_BUSIUNITNAME4, field_TRADEWAYCODES4, field_TRADEWAYCODES14]
     })
 }

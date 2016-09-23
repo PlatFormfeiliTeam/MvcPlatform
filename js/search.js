@@ -21,21 +21,22 @@ function initSearch() {
                 change: function () {
                     combo_1_1.reset();
                     if (combo_1.getValue() == "BUSIUNITCODE") {
-                        //如果是经营单位作为过滤条件，则CONDITION1_1绑定QUANCODE
-                        combo_1_1.valueField = "QUANCODE";
+                        combo_1_1.minChars = "4";
                         store_1_1.loadData(common_data_jydw);
                     }
                     if (combo_1.getValue() == "CUSTOMDISTRICTCODE" || combo_1.getValue() == "PORTCODE") {
+                        combo_1_1.minChars = "1";
                         store_1_1.loadData(common_data_sbgq);
                     }
                     if (combo_1.getValue() == "REPWAYID") {
+                        combo_1_1.minChars = "1";
                         store_1_1.loadData(common_data_sbfs);
                     }
                 }
             }
     })
     var store_1_1 = Ext.create("Ext.data.JsonStore", {
-        fields: ["CODE", "NAME", "QUANCODE"]
+        fields: ["CODE", "NAME"]
     });
     var combo_1_1 = Ext.create('Ext.form.field.ComboBox', {
         id: 'CONDITION1_1',
@@ -194,12 +195,15 @@ function initSearch() {
                 change: function () {
                     combo_5_1.reset();
                     if (combo_5.getValue() == "BUSIUNITCODE") {
+                        combo_5_1.minChars = "4";
                         store_5_1.loadData(common_data_jydw);
                     }
                     if (combo_5.getValue() == "CUSTOMDISTRICTCODE" || combo_5.getValue() == "PORTCODE") {
+                        combo_5_1.minChars = "1";
                         store_5_1.loadData(common_data_sbgq);
                     }
                     if (combo_5.getValue() == "REPWAYID") {
+                        combo_5_1.minChars = "1";
                         store_5_1.loadData(common_data_sbfs);
                     }
                 }

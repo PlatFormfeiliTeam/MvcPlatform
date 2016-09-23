@@ -346,7 +346,7 @@
     })
     //经营单位combostore
     var store_jydw = Ext.create('Ext.data.JsonStore', {
-        fields: ['CODE', 'NAME', 'QUANCODE', 'QUANNAME', 'SHORTNAME'],
+        fields: ['CODE', 'NAME'],
         data: common_data_jydw
     })
     var combo_jydw = Ext.create('Ext.form.field.ComboBox', {//经营单位 这个数据比较多需要根据输入字符到后台动态模糊匹配,如果取不到点击添加按钮从总库进行选择，同时添加到自有客户库
@@ -354,19 +354,17 @@
         name: 'BUSIUNITCODE',
         store: store_jydw,
         displayField: 'NAME',
-        valueField: 'QUANCODE',
+        valueField: 'CODE',
         queryMode: 'local',
-        minChars: 2,
+        minChars: 4,
         margin: 0,
         forceSelection: true,
         tabIndex: 10,
         anyMatch: true,
         hideTrigger: true,
         listeners: {
-            select: function (combo, records) {
-                field_BUSIUNITNAME.setValue(records[0].get("QUANNAME"));
-                field_BUSISHORTCODE.setValue(records[0].get("CODE"));
-                field_BUSISHORTNAME.setValue(records[0].get("SHORTNAME"));
+            select: function (records) {
+                field_BUSIUNITNAME.setValue(records.rawValue.substr(0, records.rawValue.lastIndexOf('(')));
             },
             focus: function (cb) {
                 if (!cb.getValue()) {
@@ -388,14 +386,6 @@
     var field_BUSIUNITNAME = Ext.create('Ext.form.field.Hidden', {
         name: 'BUSIUNITNAME'
     })
-    var field_BUSISHORTCODE = Ext.create('Ext.form.field.Hidden', {
-        id: 'field_BUSISHORTCODE',
-        name: 'BUSISHORTCODE'
-    })
-    var field_BUSISHORTNAME = Ext.create('Ext.form.field.Hidden', {
-        id: 'field_BUSISHORTNAME',
-        name: 'BUSISHORTNAME'
-    })
     //经营单位
     var field_jydw = {
         xtype: 'fieldcontainer',
@@ -403,7 +393,7 @@
         layout: 'hbox',
         items: [combo_jydw, {
             id: 'jydw_btn', xtype: 'button', handler: function () {
-                selectjydw(combo_jydw, field_BUSIUNITNAME, field_BUSISHORTCODE, field_BUSISHORTNAME);
+                selectjydw(combo_jydw, field_BUSIUNITNAME);
             },
             text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
         }]
@@ -761,7 +751,7 @@
         { layout: 'column', height: 42, border: 0, items: [field_quanpackage, field_weight, field_contractno, field_myfs, field_ARRIVEDNO] },
         { layout: 'column', height: 42, border: 0, items: [field_TURNPRENO, field_CLEARANCENO, field_bgch, field_CLEARREMARK, chk_CHKLAWCONDITION] },
         { layout: 'column', height: 42, border: 0, items: [label_busiinfo_w, chk_container2] },
-        field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_BUSISHORTCODE, field_BUSISHORTNAME,
+        field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME,
         field_ID, field_TRADEWAYCODES, field_TRADEWAYCODES1, field_CONTAINERTRUCK, field_ORIGINALFILEIDS
         ]
     });
