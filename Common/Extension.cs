@@ -282,7 +282,7 @@ return code;
                      i = Convert.ToInt32(DBMgr.GetDataTable(sql).Rows[0][0]);
                      if (i == 0)
                      {
-                         sql = "insert into list_times(id,code,userid,realname,status,times,type,ispause) values(list_times_id.nextval,'{0}','{1}','{2}','{3}',sysdate,'1','0')";
+                         sql = "insert into list_times(id,code,userid,realname,status,times,type,ispause) values(list_times_id.nextval,'{0}','{1}','{2}','{3}',sysdate,'0','0')";
                          sql = string.Format(sql, ordercode, CreateUserId, CreateUserName, status_tmp);
                          DBMgr.ExecuteNonQuery(sql);
                      }
