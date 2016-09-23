@@ -278,7 +278,7 @@ return code;
                  if (status >= status_tmp)
                  {
                      sql = @"select count(*) from list_times where code = '{0}' and status = '{1}'";
-                     sql = string.Format(sql, ordercode, status);
+                     sql = string.Format(sql, ordercode, status_tmp);
                      i = Convert.ToInt32(DBMgr.GetDataTable(sql).Rows[0][0]);
                      if (i == 0)
                      {
