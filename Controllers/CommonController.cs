@@ -1400,7 +1400,7 @@ namespace MvcPlatform.Controllers
             if (printtype == "standardprint")//如果是标准打印
             {
                 string predeclcode = (dt.Rows[0]["DECLCODE"] + "");
-                predeclcode = predeclcode.Substring(0, predeclcode.Length - 3);
+                //predeclcode = predeclcode.Substring(0, predeclcode.Length - 3);
 
                 /*sql = "select t.*, t.rowid from list_predeclaration t where t.predeclcode='" + predeclcode + "'";*/
                 sql = "select t.*, t.rowid from list_declaration t where t.code='" + predeclcode + "'";
