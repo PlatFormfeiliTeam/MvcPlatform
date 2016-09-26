@@ -751,6 +751,29 @@ function LoadOrderFromErp(busitype) {
         Ext.MessageBox.alert("提示", "请输入相同的客户编号！");
         return;
     }
+
+    //2016/9/26 add heguiqin：如果订单中存在重复的客户编号需要进行确认
+    Ext.Ajax.request({
+        url: "/Common/OperateIdRepeate",
+        params: { operateid: Ext.String.trim(Ext.getCmp('NUMBER').getValue()) },
+        success: function (response, option) {
+            var json = Ext.decode(response.responseText);
+            if (parseInt(json.result) > 0) {
+                Ext.MessageBox.confirm('提示', '该订单编号已经存在，确定要继续导入吗？', function (btn) {
+                    if (btn == "yes") {
+                        importorderFromErp();
+                    }
+                })
+            }
+            else {
+                importorderFromErp();
+            }
+        }
+    });   
+}
+
+function importorderFromErp()
+{
     var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "数据查询中,请稍候..." });
     myMask.show();
     Ext.Ajax.request({
@@ -784,7 +807,7 @@ function LoadOrderFromErp(busitype) {
                 });
             }
             else {
-                Ext.MessageBox.alert("提示", "数据导入失败,该业务编号对应的记录不存在！");
+                Ext.MessageBox.alert("提示", "对应的订单号在ERP上无记录！");
             }
             myMask.hide();
         }

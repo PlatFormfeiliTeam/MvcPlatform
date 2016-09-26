@@ -806,129 +806,139 @@ namespace MvcPlatform.Controllers
         }
         public string GetOrderCodeErp()
         {
+            string result = "";
+            string data1 = "{}"; string data2 = "{}"; string data3 = "{}"; string data4 = "{}";
+
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string operateid = Request["operateid"];
-            operateid = operateid.Substring(4, operateid.Length - 4);
-            //订单号示例  国内结转 GJIKS140705078 GJEKS160303451  叠加保税DJRIKS130300420     DJCEKS160300772  DJRIKS130300420            
 
-            DataTable dt; DataSet ds;
-            string bgsb_unit = ""; string bjsb_unit = "";
-            string sql = ""; string result = "";
-            string data1 = "{}"; string data2 = "{}"; string data3 = "{}"; string data4 = "{}";
-            //初始化报关报检申报单位
-            sql = "select * from base_company where CODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "' AND ENABLED=1 AND ROWNUM=1";//根据海关的10位编码查询申报单位
-            dt = DBMgrBase.GetDataTable(sql);
-            if (dt.Rows.Count > 0)
+            try
             {
-                bgsb_unit = dt.Rows[0]["NAME"] + "";
-            }
-            sql = "select * from base_company where INSPCODE='" + json_user.Value<string>("CUSTOMERCIQCODE") + "' AND ENABLED=1 AND ROWNUM=1";//根据海关的10位编码查询申报单位
-            dt = DBMgrBase.GetDataTable(sql);
-            if (dt.Rows.Count > 0)
-            {
-                bjsb_unit = dt.Rows[0]["NAME"] + "";
-            }
-            string repunitcode = bgsb_unit + "(" + json_user.Value<string>("CUSTOMERHSCODE") + ")";
-            string inspunitcode = bjsb_unit + "(" + json_user.Value<string>("CUSTOMERCIQCODE") + ")";
-            //2016-5-14更新梁总要求到ERP导入时默认的报关方式是无纸报关W  CUSTOMDISTRICTNAME ()
-            if (Request["operateid"].IndexOf("GJ") >= 0)//国内结转"   '{0}' REPUNITCODE,'{1}' INSPUNITCODE,TRIM(d.MANUAL_NO)因为28上有空格,需要去掉
-            {
-                string subsql = "";
-                sql = @"select '{0}' as REPUNITCODE ,'{1}' as INSPUNITCODE, '1' ORDERWAY ,'' BUSIUNITCODE,'' BUSIUNITNAME,d.CB_CODE,d.BJ_COOPER,'' ENTRUSTTYPE,
+                operateid = operateid.Substring(4, operateid.Length - 4);
+                //订单号示例  国内结转 GJIKS140705078 GJEKS160303451  叠加保税DJRIKS130300420     DJCEKS160300772  DJRIKS130300420            
+
+                DataTable dt; DataSet ds;
+                string bgsb_unit = ""; string bjsb_unit = ""; string sql = "";
+                //初始化报关报检申报单位
+                sql = "select * from base_company where CODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "' AND ENABLED=1 AND ROWNUM=1";//根据海关的10位编码查询申报单位
+                dt = DBMgrBase.GetDataTable(sql);
+                if (dt.Rows.Count > 0)
+                {
+                    bgsb_unit = dt.Rows[0]["NAME"] + "";
+                }
+                sql = "select * from base_company where INSPCODE='" + json_user.Value<string>("CUSTOMERCIQCODE") + "' AND ENABLED=1 AND ROWNUM=1";//根据海关的10位编码查询申报单位
+                dt = DBMgrBase.GetDataTable(sql);
+                if (dt.Rows.Count > 0)
+                {
+                    bjsb_unit = dt.Rows[0]["NAME"] + "";
+                }
+                string repunitcode = bgsb_unit + "(" + json_user.Value<string>("CUSTOMERHSCODE") + ")";
+                string inspunitcode = bjsb_unit + "(" + json_user.Value<string>("CUSTOMERCIQCODE") + ")";
+                //2016-5-14更新梁总要求到ERP导入时默认的报关方式是无纸报关W  CUSTOMDISTRICTNAME ()
+                if (Request["operateid"].IndexOf("GJ") >= 0)//国内结转"   '{0}' REPUNITCODE,'{1}' INSPUNITCODE,TRIM(d.MANUAL_NO)因为28上有空格,需要去掉
+                {
+                    string subsql = "";
+                    sql = @"select '{0}' as REPUNITCODE ,'{1}' as INSPUNITCODE, '1' ORDERWAY ,'' BUSIUNITCODE,'' BUSIUNITNAME,d.CB_CODE,d.BJ_COOPER,'' ENTRUSTTYPE,
                       d.DECLARE_CUSTOM CUSTOMAREACODE,(select CHINNAME from Crm_Enterprise c where c.enterpriseid=d.EP_CODE) CHINNAME,d.BG_MODE REPWAYID,TRIM(d.MANUAL_NO) RECORDCODE,
                       d.PIECES GOODSNUM ,d.WEIGHT GOODSGW ,d.RELATION_NO ASSOCIATENO,d.INV_NO CONTRACTNO,d.MYFS TRADEWAYCODES1,d.MYFS TRADEWAYCODES,d.OPERATION_ID CUSNO,'' IETYPE,'M' DECLWAY,
                       '' CUSTOMDISTRICTNAME,";
-                sql = string.Format(sql, repunitcode, inspunitcode);
-                subsql = "(select count(1) from ops_jz_head where operation_id = 'GJEK" + operateid + "')  RELATEQUAN from ops_jz_head d where d.operation_id = 'GJIK" + operateid + "'";
-                ds = DBMgrERP.GetDataSet(sql + subsql);
-                if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-                {
-                    result = "true";
-                    SwitchField(ds.Tables[0], "REPWAYID"); //对报关方式进行转换 集中C对应本系统的012  逐笔A对应本系统013  转厂B对应本系统015
-                    SwitchField(ds.Tables[0], "ENTRUSTTYPE");//根据报关协作体和报检协作体确定委托类型
-                    SwitchField(ds.Tables[0], "CHINNAME");
-                    SwitchField(ds.Tables[0], "IETYPE");
-                    SwitchField(ds.Tables[0], "CUSTOMAREACODE");
-                    data1 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
+                    sql = string.Format(sql, repunitcode, inspunitcode);
+                    subsql = "(select count(1) from ops_jz_head where operation_id = 'GJEK" + operateid + "')  RELATEQUAN from ops_jz_head d where d.operation_id = 'GJIK" + operateid + "'";
+                    ds = DBMgrERP.GetDataSet(sql + subsql);
+                    if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                    {
+                        result = "true";
+                        SwitchField(ds.Tables[0], "REPWAYID"); //对报关方式进行转换 集中C对应本系统的012  逐笔A对应本系统013  转厂B对应本系统015
+                        SwitchField(ds.Tables[0], "ENTRUSTTYPE");//根据报关协作体和报检协作体确定委托类型
+                        SwitchField(ds.Tables[0], "CHINNAME");
+                        SwitchField(ds.Tables[0], "IETYPE");
+                        SwitchField(ds.Tables[0], "CUSTOMAREACODE");
+                        data1 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
+                    }
+                    subsql = "(select count(1) from ops_jz_head where operation_id = 'GJIK" + operateid + "')  RELATEQUAN from ops_jz_head d where d.operation_id = 'GJEK" + operateid + "'";
+                    ds = DBMgrERP.GetDataSet(sql + subsql);
+                    if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                    {
+                        result = "true";
+                        SwitchField(ds.Tables[0], "REPWAYID"); //对报关方式进行转换 集中C对应本系统的012  逐笔A对应本系统013  转厂B对应本系统015
+                        SwitchField(ds.Tables[0], "ENTRUSTTYPE");//根据报关协作体和报检协作体确定委托类型
+                        SwitchField(ds.Tables[0], "CHINNAME");
+                        SwitchField(ds.Tables[0], "IETYPE");
+                        SwitchField(ds.Tables[0], "CUSTOMAREACODE");
+                        data2 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
+                    }
                 }
-                subsql = "(select count(1) from ops_jz_head where operation_id = 'GJIK" + operateid + "')  RELATEQUAN from ops_jz_head d where d.operation_id = 'GJEK" + operateid + "'";
-                ds = DBMgrERP.GetDataSet(sql + subsql);
-                if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                //叠加保税  28报关方式 d.BG_MODE 对应本系统申报方式REPWAYID   ORDERWAY接单方式  1  线上    
+                //2016-4-26 客户提出一个问题 ERP里面存在0+2模式 建议采取的方案是 3-》1  4--》2 '{0}' REPUNITCODE ,'{1}' INSPUNITCODE ,
+                else
                 {
-                    result = "true";
-                    SwitchField(ds.Tables[0], "REPWAYID"); //对报关方式进行转换 集中C对应本系统的012  逐笔A对应本系统013  转厂B对应本系统015
-                    SwitchField(ds.Tables[0], "ENTRUSTTYPE");//根据报关协作体和报检协作体确定委托类型
-                    SwitchField(ds.Tables[0], "CHINNAME");
-                    SwitchField(ds.Tables[0], "IETYPE");
-                    SwitchField(ds.Tables[0], "CUSTOMAREACODE");
-                    data2 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
-                }
-            }
-            //叠加保税  28报关方式 d.BG_MODE 对应本系统申报方式REPWAYID   ORDERWAY接单方式  1  线上    
-            //2016-4-26 客户提出一个问题 ERP里面存在0+2模式 建议采取的方案是 3-》1  4--》2 '{0}' REPUNITCODE ,'{1}' INSPUNITCODE ,
-            else
-            {
-                string subsql = "";
-                sql = @"select  '{0}' as REPUNITCODE ,'{1}' as INSPUNITCODE,'1' ORDERWAY ,'' BUSIUNITCODE,'' BUSIUNITNAME,d.CB_CODE,d.BJ_COOPER,'' ENTRUSTTYPE,
+                    string subsql = "";
+                    sql = @"select  '{0}' as REPUNITCODE ,'{1}' as INSPUNITCODE,'1' ORDERWAY ,'' BUSIUNITCODE,'' BUSIUNITNAME,d.CB_CODE,d.BJ_COOPER,'' ENTRUSTTYPE,
                       (select CHINNAME from Crm_Enterprise c where c.enterpriseid=d.EP_CODE) CHINNAME ,d.BG_MODE REPWAYID,TRIM(d.MANUAL_NO) RECORDCODE,                         
                       d.DECLARE_CUSTOM CUSTOMAREACODE,d.PIECES GOODSNUM  ,d.WEIGHT GOODSGW,d.RELATION_NO ASSOCIATENO,d.INV_NO CONTRACTNO,                         
                       d.MYFS TRADEWAYCODES1 ,d.MYFS TRADEWAYCODES ,d.OPERATION_ID CUSNO,'' IETYPE,'M' DECLWAY,'' CUSTOMDISTRICTNAME,";
-                sql = string.Format(sql, repunitcode, inspunitcode);
-                subsql = "(select count(1) from ops_dj_head where operation_id = 'DJRE" + operateid + "')  RELATEQUAN from ops_dj_head d where d.operation_id = 'DJRI" + operateid + "'";
-                ds = DBMgrERP.GetDataSet(sql + subsql);
-                //对于叠加保税业务类型报关方式如果在28那边是作业单的情形,不予写入 2016-6-7又添加过滤条件转厂 值为B的也不需要同步过来
-                if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0 && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "ZYD" && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "B")
-                {
-                    SwitchField(ds.Tables[0], "REPWAYID"); //对报关方式进行转换 集中C对应本系统的012  逐笔A对应本系统013  转厂B对应本系统015 from ops_dj_head d
-                    SwitchField(ds.Tables[0], "ENTRUSTTYPE");//根据报关协作体和报检协作体确定委托类型
-                    SwitchField(ds.Tables[0], "CHINNAME");
-                    SwitchField(ds.Tables[0], "IETYPE");
-                    SwitchField(ds.Tables[0], "CUSTOMAREACODE");
-                    result = "true";
-                    data1 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
+                    sql = string.Format(sql, repunitcode, inspunitcode);
+                    subsql = "(select count(1) from ops_dj_head where operation_id = 'DJRE" + operateid + "')  RELATEQUAN from ops_dj_head d where d.operation_id = 'DJRI" + operateid + "'";
+                    ds = DBMgrERP.GetDataSet(sql + subsql);
+                    //对于叠加保税业务类型报关方式如果在28那边是作业单的情形,不予写入 2016-6-7又添加过滤条件转厂 值为B的也不需要同步过来
+                    if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0 && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "ZYD" && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "B")
+                    {
+                        SwitchField(ds.Tables[0], "REPWAYID"); //对报关方式进行转换 集中C对应本系统的012  逐笔A对应本系统013  转厂B对应本系统015 from ops_dj_head d
+                        SwitchField(ds.Tables[0], "ENTRUSTTYPE");//根据报关协作体和报检协作体确定委托类型
+                        SwitchField(ds.Tables[0], "CHINNAME");
+                        SwitchField(ds.Tables[0], "IETYPE");
+                        SwitchField(ds.Tables[0], "CUSTOMAREACODE");
+                        result = "true";
+                        data1 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
+                    }
+                    subsql = "(select count(1) from ops_dj_head where operation_id = 'DJRI" + operateid + "')  RELATEQUAN from ops_dj_head d where d.operation_id = 'DJRE" + operateid + "'";
+                    ds = DBMgrERP.GetDataSet(sql + subsql);
+                    if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0 && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "ZYD" && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "B")
+                    {
+                        SwitchField(ds.Tables[0], "REPWAYID");
+                        SwitchField(ds.Tables[0], "ENTRUSTTYPE");
+                        SwitchField(ds.Tables[0], "CHINNAME");
+                        SwitchField(ds.Tables[0], "IETYPE");
+                        SwitchField(ds.Tables[0], "CUSTOMAREACODE");
+                        result = "true";
+                        data2 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
+                    }
+                    subsql = "(select count(1) from ops_dj_head where operation_id = 'DJCE" + operateid + "')  RELATEQUAN from ops_dj_head d where d.operation_id = 'DJCI" + operateid + "'";
+                    ds = DBMgrERP.GetDataSet(sql + subsql);
+                    if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0 && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "ZYD" && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "B")
+                    {
+                        SwitchField(ds.Tables[0], "REPWAYID");
+                        SwitchField(ds.Tables[0], "ENTRUSTTYPE");
+                        SwitchField(ds.Tables[0], "CHINNAME");
+                        SwitchField(ds.Tables[0], "IETYPE");
+                        SwitchField(ds.Tables[0], "CUSTOMAREACODE");
+                        result = "true";
+                        data3 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
+                    }
+                    subsql = "(select count(1) from ops_dj_head where operation_id = 'DJCI" + operateid + "')  RELATEQUAN from ops_dj_head d where d.operation_id = 'DJCE" + operateid + "'";
+                    ds = DBMgrERP.GetDataSet(sql + subsql);
+                    if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0 && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "ZYD" && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "B")
+                    {
+                        SwitchField(ds.Tables[0], "REPWAYID");
+                        SwitchField(ds.Tables[0], "ENTRUSTTYPE");
+                        SwitchField(ds.Tables[0], "CHINNAME");
+                        SwitchField(ds.Tables[0], "IETYPE");
+                        SwitchField(ds.Tables[0], "CUSTOMAREACODE");
+                        result = "true";
+                        data4 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
+                    }
                 }
-                subsql = "(select count(1) from ops_dj_head where operation_id = 'DJRI" + operateid + "')  RELATEQUAN from ops_dj_head d where d.operation_id = 'DJRE" + operateid + "'";
-                ds = DBMgrERP.GetDataSet(sql + subsql);
-                if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0 && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "ZYD" && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "B")
+                //2016-4-26 客户提出一个问题 ERP里面存在0+2模式 建议采取的方案是 3-》1  4--》2 '{0}' 
+                if (data1 == "{}" && data2 == "{}" && (data3 != "{}" || data4 != "{}"))
                 {
-                    SwitchField(ds.Tables[0], "REPWAYID");
-                    SwitchField(ds.Tables[0], "ENTRUSTTYPE");
-                    SwitchField(ds.Tables[0], "CHINNAME");
-                    SwitchField(ds.Tables[0], "IETYPE");
-                    SwitchField(ds.Tables[0], "CUSTOMAREACODE");
-                    result = "true";
-                    data2 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
-                }
-                subsql = "(select count(1) from ops_dj_head where operation_id = 'DJCE" + operateid + "')  RELATEQUAN from ops_dj_head d where d.operation_id = 'DJCI" + operateid + "'";
-                ds = DBMgrERP.GetDataSet(sql + subsql);
-                if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0 && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "ZYD" && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "B")
-                {
-                    SwitchField(ds.Tables[0], "REPWAYID");
-                    SwitchField(ds.Tables[0], "ENTRUSTTYPE");
-                    SwitchField(ds.Tables[0], "CHINNAME");
-                    SwitchField(ds.Tables[0], "IETYPE");
-                    SwitchField(ds.Tables[0], "CUSTOMAREACODE");
-                    result = "true";
-                    data3 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
-                }
-                subsql = "(select count(1) from ops_dj_head where operation_id = 'DJCI" + operateid + "')  RELATEQUAN from ops_dj_head d where d.operation_id = 'DJCE" + operateid + "'";
-                ds = DBMgrERP.GetDataSet(sql + subsql);
-                if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0 && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "ZYD" && ds.Tables[0].Rows[0]["REPWAYID"] + "" != "B")
-                {
-                    SwitchField(ds.Tables[0], "REPWAYID");
-                    SwitchField(ds.Tables[0], "ENTRUSTTYPE");
-                    SwitchField(ds.Tables[0], "CHINNAME");
-                    SwitchField(ds.Tables[0], "IETYPE");
-                    SwitchField(ds.Tables[0], "CUSTOMAREACODE");
-                    result = "true";
-                    data4 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
+                    data1 = data3; data2 = data4; data3 = "{}"; data4 = "{}";
                 }
             }
-            //2016-4-26 客户提出一个问题 ERP里面存在0+2模式 建议采取的方案是 3-》1  4--》2 '{0}' 
-            if (data1 == "{}" && data2 == "{}" && (data3 != "{}" || data4 != "{}"))
+            catch (Exception ex)
             {
-                data1 = data3; data2 = data4; data3 = "{}"; data4 = "{}";
-            }
+                result = "";//2016/9/26 add heguiqin:有可能输入的客户编号长度不对，导致operateid截取异常
+            }              
+                        
             return "{result:'" + result + "',data1:" + data1 + ",data2:" + data2 + ",data3:" + data3 + ",data4:" + data4 + "}";
         }
 

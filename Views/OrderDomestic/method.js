@@ -307,6 +307,7 @@ function importorder() {
                 }
                 else {
                     Ext.MessageBox.alert("提示", "对应的订单号在ERP上无记录！");
+                    mask.hide();//2016/9/26 add heguiqin
                 }
             }
         }

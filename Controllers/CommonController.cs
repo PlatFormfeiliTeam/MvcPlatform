@@ -1813,6 +1813,14 @@ namespace MvcPlatform.Controllers
             }
             return erpCode;
         }
+        //客户通过客户订单编号从ERP导入数据时需要进行判断有无重复,如果有需要确认是否继续导入  梁 2016-5-14
+        public string OperateIdRepeate()
+        {
+            DataTable dt;
+            string sql = "select * from list_order where cusno='" + Request["operateid"] + "'";
+            dt = DBMgr.GetDataTable(sql);
+            return "{result:'" + dt.Rows.Count + "'}";
+        }
 
         //非国内业务根据业务编号(客户自己的编号)从客户ERP获取订单信息  by panhuaguo 2016-08-19  封装出来 不用到每个业务的控制器里面去调取
         public string GetOrderFromErp()
@@ -1865,10 +1873,11 @@ namespace MvcPlatform.Controllers
                     break;
             }
             sql = string.Format(sql, json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), operationid);
-            DataSet ds = DBMgrERP.GetDataSet(sql);
-            if (ds != null && ds.Tables.Count > 0)
+            //DataSet ds = DBMgrERP.GetDataSet(sql);
+            dt = DBMgrERP.GetDataTable(sql);
+            if (dt.Rows.Count > 0)//(ds != null && ds.Tables.Count > 0)
             {
-                dt = ds.Tables[0];//通过ERP的经营单位中文全名到本系统数据库进行匹配,加载本地经营单位                
+                //dt = ds.Tables[0];//通过ERP的经营单位中文全名到本系统数据库进行匹配,加载本地经营单位                
                 sql = "select id,CODE,NAME from base_company where translate(name,'（）','()') = '" + dt.Rows[0]["CHINNAME"].ToString().Replace('（', '(').Replace('）', ')') + "'";
                 DataTable dtt = DBMgrBase.GetDataTable(sql);
                 if (dtt.Rows.Count > 0)
