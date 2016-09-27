@@ -359,8 +359,7 @@ function browsefile() {
     });
     win.show();
     if (records[0].get("ID")) {//文件已经到另一台server上
-        // 2016-09-23/E1C1637027_sheet.txt  records[0].get("FILENAME")
-        //找到最后一个圆点的位置        
+        // 2016-09-23/E1C1637027_sheet.txt  records[0].get("FILENAME")             
         var position = records[0].get("FILENAME").lastIndexOf(".");
         var suffix = records[0].get("FILENAME").substr(position + 1);
         if (suffix == 'pdf' || suffix == 'PDF') {
