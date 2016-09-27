@@ -23,7 +23,7 @@
         var store = Ext.create('Ext.data.JsonStore', {
             fields: ['ID', 'FILERECEVIEUNITCODE', 'FILERECEVIEUNITNAME', 'FILEDECLAREUNITCODE', 'FILEDECLAREUNITNAME', 'BUSITYPEID',
                 'CUSTOMDISTRICTCODE', 'CUSTOMDISTRICTNAME', 'REPWAYID', 'STATUS', 'CODE', 'CREATEID', 'CREATENAME', 'CREATETIME', 'ASSOCIATENO',
-                'ORDERCODE', 'ENTERPRISECODE', 'ENTERPRISENAME', 'ACCEPTID', 'ACCEPTNAME', 'SUBMITTIME', 'ACCEPTTIME', 'REMARK'],
+                'ORDERCODE', 'ENTERPRISECODE', 'ENTERPRISENAME', 'ACCEPTID', 'ACCEPTNAME', 'ACCEPTTIME', 'REMARK'],
             pageSize: 20,
             proxy: {
                 type: 'ajax',
@@ -70,7 +70,7 @@
             { header: '文件接收单位', dataIndex: 'FILERECEVIEUNITNAME', width: 200 },
             { header: '文件申报单位', dataIndex: 'FILEDECLAREUNITNAME', width: 180, locked: true },
             { header: '状态', dataIndex: 'STATUS', width: 70, renderer: render, locked: true },
-            { header: '提交时间', dataIndex: 'SUBMITTIME', width: 130 },
+            //{ header: '提交时间', dataIndex: 'SUBMITTIME', width: 130 },
             { header: '受理时间', dataIndex: 'ACCEPTTIME', width: 130 },
             { header: '受理人', dataIndex: 'ACCEPTNAME', width: 100 },
             { header: '备注', dataIndex: 'REMARK', width: 150 }

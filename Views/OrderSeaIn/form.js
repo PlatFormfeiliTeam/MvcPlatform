@@ -523,7 +523,10 @@
             getInnerTpl: function () {
                 return '<div>{NAME}</div>';
             }
-        }
+        },
+        allowBlank: false,
+        blankText: '贸易方式不能为空!'
+
     })
     var field_TRADEWAYCODES = Ext.create('Ext.form.field.Hidden', {
         name: 'TRADEWAYCODES'
