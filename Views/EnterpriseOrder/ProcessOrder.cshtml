@@ -22,7 +22,7 @@
         });
         var store = Ext.create('Ext.data.JsonStore', {
             fields: ['ID', 'FILERECEVIEUNITCODE', 'FILERECEVIEUNITNAME', 'FILEDECLAREUNITCODE', 'FILEDECLAREUNITNAME', 'BUSITYPEID',
-                'CUSTOMDISTRICTCODE', 'CUSTOMDISTRICTNAME', 'REPWAYID', 'STATUS', 'CODE', 'CREATEID', 'CREATENAME', 'CREATETIME', 'ASSOCIATENO',
+                'CUSTOMDISTRICTCODE','CUSTOMDISTRICTNAME', 'REPWAYID', 'STATUS', 'CODE', 'CREATEID', 'CREATENAME','CREATETIME', 'ASSOCIATENO',
                 'ORDERCODE', 'ENTERPRISECODE', 'ENTERPRISENAME', 'ACCEPTID', 'ACCEPTNAME', 'ACCEPTTIME', 'REMARK'],
             pageSize: 20,
             proxy: {
@@ -106,7 +106,7 @@
                             var commondata = Ext.decode(response.responseText);
                             common_data_sbgq = commondata.sbgq;//申报关区   for win 窗口使用
                             common_data_sbfs = commondata.sbfs;//申报方式
-                            addwin(record.get("ID"), record.get("BUSITYPEID"));
+                            addwin(record.get("ID"));//, record.get("BUSITYPEID")
                         }
                     })
                 }
@@ -195,7 +195,8 @@
                 break;
             case "BUSITYPEID":
                 var rec = store_busitype.findRecord('CODE', value);
-                rtn = rec.get("NAME");
+                if (rec)
+                { rtn = rec.get("NAME"); }
                 break;
         }
         return rtn;

@@ -461,7 +461,7 @@
         fieldLabel: '件数/包装',
         layout: 'hbox',
         items: [{
-            id: 'GOODSNUM', name: 'GOODSNUM', xtype: 'numberfield', tabIndex: 13, flex: .5, margin: 0, hideTrigger: true
+            id: 'GOODSNUM', name: 'GOODSNUM', xtype: 'numberfield', tabIndex: 13, flex: .5, margin: 0, hideTrigger: true, allowBlank: false, blankText: '不能为空!'
         }, combo_PACKKINDNAME]
     }
     var field_weight = { //毛重/净重
