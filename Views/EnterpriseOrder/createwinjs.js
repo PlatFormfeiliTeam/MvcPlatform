@@ -362,13 +362,13 @@ function browsefile() {
         // 2016-09-23/E1C1637027_sheet.txt  records[0].get("FILENAME")             
         var position = records[0].get("FILENAME").lastIndexOf(".");
         var suffix = records[0].get("FILENAME").substr(position + 1);
-        if (suffix == 'pdf' || suffix == 'PDF') {
-            document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + common_data_adminurl + '\/file' + records[0].get("FILENAME") + '"></embed>';
-        }
-        else {
-            var newpath = records[0].get("FILENAME").substr(0, position + 1) + 'pdf';
-            document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + common_data_adminurl + '\/file' + newpath + '"></embed>';
-        }
+        // if (suffix == 'pdf' || suffix == 'PDF') {
+        document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + common_data_adminurl + '\/file' + records[0].get("FILENAME") + '"></embed>';
+        //}
+        //else {
+        //    var newpath = records[0].get("FILENAME").substr(0, position + 1) + 'pdf';
+        //    document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + common_data_adminurl + '\/file' + newpath + '"></embed>';
+        //}
     }
     else {
         document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + records[0].get("FILENAME") + '"></embed>';
