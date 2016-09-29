@@ -34,8 +34,6 @@ namespace MvcPlatform.Controllers
             ViewBag.navigator = "客户服务>>委托任务";
             return View();
         }
-
-        #region 文件委托
         public string GetCode(string combin)
         {
             if (string.IsNullOrEmpty(combin))
@@ -111,12 +109,8 @@ namespace MvcPlatform.Controllers
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
-            string sql = @"select t.ID, t.FILERECEVIEUNITCODE, t.FILERECEVIEUNITNAME, t.FILEDECLAREUNITCODE, t.FILEDECLAREUNITNAME, t.BUSITYPEID
-                            , t.CUSTOMDISTRICTCODE, t.CUSTOMDISTRICTNAME, t.REPWAYID, t.STATUS
-                            ,t.CODE, t.CREATEID, t.CREATENAME, t.CREATETIME, t.ASSOCIATENO, t.ORDERCODE, t.ENTERPRISECODE, t.ENTERPRISENAME, t.ACCEPTID, t.ACCEPTNAME
-                            ,t.ACCEPTTIME, t.UNITCODE, t.CREATEMODE, t.REMARK 
-                        from ENT_ORDER t                
-                        where ENTERPRISECODE='" + json_user.Value<string>("CUSTOMERCODE") + "' " + where;
+            string sql = @"select t.*  from ENT_ORDER t                
+                         where t.ENTERPRISECODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "' " + where;
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
             var json = JsonConvert.SerializeObject(dt, iso);
             return "{rows:" + json + ",total:" + totalProperty + "}";
@@ -186,7 +180,7 @@ namespace MvcPlatform.Controllers
                               GetCode(json_data.Value<string>("FILEDECLAREUNITNAME")), GetName(json_data.Value<string>("FILEDECLAREUNITNAME")),
                               json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"), json_data.Value<string>("CUSTOMDISTRICTNAME"),
                               json_data.Value<string>("REPWAYID"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),
-                              json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json_data.Value<string>("REMARK"),
+                              json_user.Value<string>("CUSTOMERHSCODE"), json_user.Value<string>("CUSTOMERNAME"), json_data.Value<string>("REMARK"),
                               json_data.Value<string>("CODE"), json_data.Value<string>("CREATEMODE"));
                         DBMgr.ExecuteNonQuery(sql);
                         //更新随附文件
@@ -203,7 +197,7 @@ namespace MvcPlatform.Controllers
                                   GetCode(json_data.Value<string>("FILEDECLAREUNITNAME")), GetName(json_data.Value<string>("FILEDECLAREUNITNAME")),
                                   json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"), json_data.Value<string>("CUSTOMDISTRICTNAME"),
                                   json_data.Value<string>("REPWAYID"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"), json_data.Value<string>("REMARK"),
-                                  json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"),
+                                  json_user.Value<string>("CUSTOMERHSCODE"), json_user.Value<string>("CUSTOMERNAME"),
                                   json_data.Value<string>("CODE"), json_data.Value<string>("CREATEMODE"));
                             DBMgr.ExecuteNonQuery(sql);
                             //更新随附文件
@@ -269,8 +263,6 @@ namespace MvcPlatform.Controllers
             pageSql = string.Format(pageSql, tempsql, order, asc, start + 1, limit + start);
             return pageSql;
         }
-
-        #endregion
 
         public string IniChart()
         {
@@ -359,7 +351,7 @@ namespace MvcPlatform.Controllers
                 {
                     filelist.Add(ConfigurationManager.AppSettings["AdminUrl"] + "/file/" + dr["FILENAME"]);
                 }
-                sql="update ent_order set printstatus=1 where id='"+entid+"'";
+                sql = "update ent_order set printstatus=1 where id='" + entid + "'";
                 DBMgr.ExecuteNonQuery(sql);
             }
             Extension.MergePDFFiles(filelist, Server.MapPath("~/Declare/") + output + ".pdf");
