@@ -345,7 +345,7 @@ namespace MvcPlatform.Controllers
         //文件申报单位维度委托任务的批量打印功能 by panhuaguo 20160929
         public string BatchPrint()
         {
-            string entids = Request["endids"];
+            string entids = Request["entids"];
             string[] id_array = entids.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
             string output = Guid.NewGuid() + "";
             string sql = "";
@@ -357,11 +357,13 @@ namespace MvcPlatform.Controllers
                 dt = DBMgr.GetDataTable(sql);
                 foreach (DataRow dr in dt.Rows)
                 {
-                    filelist.Add(ConfigurationManager.AppSettings["AdminUrl"] + "/file/" + dt.Rows[0]["FILENAME"]);
+                    filelist.Add(ConfigurationManager.AppSettings["AdminUrl"] + "/file/" + dr["FILENAME"]);
                 }
+                sql="update ent_order set printstatus=1 where id='"+entid+"'";
+                DBMgr.ExecuteNonQuery(sql);
             }
             Extension.MergePDFFiles(filelist, Server.MapPath("~/Declare/") + output + ".pdf");
-            return "";
+            return "/Declare/" + output + ".pdf";
         }
 
     }

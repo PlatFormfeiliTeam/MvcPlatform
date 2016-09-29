@@ -348,7 +348,7 @@ function browsefile() {
     }
     var win = Ext.create("Ext.window.Window", {
         title: "文件预览",
-        width: 800,
+        width: 1000,
         height: 600,
         layout: "fit",
         modal: true,
