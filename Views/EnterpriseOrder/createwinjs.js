@@ -7,7 +7,7 @@ function addwin(ID) {
         id: "wjcsWin",
         title: '委托信息',
         width: 820,
-        height: 480,
+        height: 550,
         modal: true,
         items: [Ext.getCmp('formpanel_u'), Ext.getCmp('panelfile')],
     });
@@ -202,6 +202,17 @@ function form_ini() {
         fieldLabel: '企业编号',
         name: 'CODE'
     });
+    //
+    var field_TEMPLATENAME = Ext.create('Ext.form.field.Text', {
+        fieldLabel: '模板名称',
+        readOnly: true,
+        name: 'TEMPLATENAME'
+    });
+    var field_ISREADPDF = Ext.create('Ext.form.field.Text', {
+        fieldLabel: '解析标志',
+        readOnly: true,
+        name: 'ISREADPDF'
+    });
     var bbar_l = '<div class="btn-group">'
            + '<button type="button" class="btn btn-primary btn-sm" id="pickfiles"><i class="fa fa-upload"></i>&nbsp;上传文件</button>'
            + '<button type="button" onclick="browsefile()" class="btn btn-primary btn-sm"><i class="fa fa-exchange fa-fw"></i>&nbsp;浏览文件</button>'
@@ -233,6 +244,7 @@ function form_ini() {
             { layout: 'column', height: 42, border: 0, items: [cont_wjjsdw, cont_wjsbdw] },
             { layout: 'column', height: 42, border: 0, items: [combo_BUSITYPE, combo_REPWAYNAME] },
             { layout: 'column', height: 42, border: 0, items: [combo_CUSTOMDISTRICTNAME, field_CODE] },
+            { layout: 'column', height: 42, border: 0, items: [field_TEMPLATENAME, field_ISREADPDF] },
             { layout: 'column', height: 42, border: 0, items: [field_REMARK] },
             field_CUSTOMDISTRICTNAME, field_ID, field_ORIGINALFILEIDS
         ]
