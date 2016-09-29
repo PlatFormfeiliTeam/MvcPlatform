@@ -202,7 +202,7 @@ namespace MvcPlatform.Controllers
                             sql = string.Format(insert_sql, ent_id, GetCode(json_data.Value<string>("FILERECEVIEUNITNAME")), GetName(json_data.Value<string>("FILERECEVIEUNITNAME")),
                                   GetCode(json_data.Value<string>("FILEDECLAREUNITNAME")), GetName(json_data.Value<string>("FILEDECLAREUNITNAME")),
                                   json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"), json_data.Value<string>("CUSTOMDISTRICTNAME"),
-                                  json_data.Value<string>("REPWAYID"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),json_data.Value<string>("REMARK"), 
+                                  json_data.Value<string>("REPWAYID"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"), json_data.Value<string>("REMARK"),
                                   json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"),
                                   json_data.Value<string>("CODE"), json_data.Value<string>("CREATEMODE"));
                             DBMgr.ExecuteNonQuery(sql);
@@ -341,6 +341,27 @@ namespace MvcPlatform.Controllers
             string sql = "update ent_order set acceptid='" + json_user.Value<string>("ID") + "',acceptname='" + json_user.Value<string>("REALNAME") + "',accepttime=sysdate,status=15 where instr('" + Request["ids"] + "',ID)>0";
             int result = DBMgr.ExecuteNonQuery(sql);
             return result == 1 ? "{success:true}" : "{success:false}";
+        }
+        //文件申报单位维度委托任务的批量打印功能 by panhuaguo 20160929
+        public string BatchPrint()
+        {
+            string entids = Request["endids"];
+            string[] id_array = entids.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            string output = Guid.NewGuid() + "";
+            string sql = "";
+            DataTable dt = null;
+            IList<string> filelist = new List<string>();
+            foreach (string entid in id_array)
+            {
+                sql = "select * from list_attachment where entid='" + entid + "' order by ID ASC";
+                dt = DBMgr.GetDataTable(sql);
+                foreach (DataRow dr in dt.Rows)
+                {
+                    filelist.Add(ConfigurationManager.AppSettings["AdminUrl"] + "/file/" + dt.Rows[0]["FILENAME"]);
+                }
+            }
+            Extension.MergePDFFiles(filelist, Server.MapPath("~/Declare/") + output + ".pdf");
+            return "";
         }
 
     }

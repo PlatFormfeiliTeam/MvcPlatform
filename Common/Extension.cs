@@ -1,4 +1,6 @@
-﻿using MvcPlatform.Models;
+﻿using iTextSharp.text;
+using iTextSharp.text.pdf;
+using MvcPlatform.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
@@ -7,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -405,5 +408,28 @@ return code;
             return json;
         }
 
+        public static void MergePDFFiles(IList<string> fileList, string outMergeFile)
+        {
+            PdfReader reader;
+            Document document = new Document();  // Define the output place, and add the document to the stream          
+            PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(outMergeFile, FileMode.Create));
+            document.Open();// Open document         
+            // writer.AddJavaScript("this.print(true);", true);
+            PdfContentByte cb = writer.DirectContent; // PDF ContentByte         
+            PdfImportedPage newPage;   // PDF import page  
+            for (int i = 0; i < fileList.Count; i++)
+            {
+                Uri url = new Uri(fileList[i]);
+                reader = new PdfReader(url);
+                int iPageNum = reader.NumberOfPages;
+                for (int j = 1; j <= iPageNum; j++)
+                {
+                    document.NewPage();
+                    newPage = writer.GetImportedPage(reader, j);
+                    cb.AddTemplate(newPage, 0, 0);
+                }
+            }
+            document.Close();
+        }
     }
 }

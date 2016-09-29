@@ -22,8 +22,9 @@
         });
         var store = Ext.create('Ext.data.JsonStore', {
             fields: ['ID', 'FILERECEVIEUNITCODE', 'FILERECEVIEUNITNAME', 'FILEDECLAREUNITCODE', 'FILEDECLAREUNITNAME', 'BUSITYPEID',
-                'CUSTOMDISTRICTCODE', 'CUSTOMDISTRICTNAME', 'REPWAYID', 'STATUS', 'CODE', 'CREATEID', 'CREATENAME', 'CREATETIME', 'ASSOCIATENO',
-                'ORDERCODE', 'ENTERPRISECODE', 'ENTERPRISENAME', 'ACCEPTID', 'ACCEPTNAME', 'SUBMITTIME', 'ACCEPTTIME', 'REMARK'],
+                'CUSTOMDISTRICTCODE', 'CUSTOMDISTRICTNAME', 'REPWAYID', 'STATUS', 'CODE', 'CREATEID', 'CREATENAME', 'CREATETIME',
+                'ASSOCIATENO', 'ORDERCODE', 'ENTERPRISECODE', 'ENTERPRISENAME', 'ACCEPTID', 'ACCEPTNAME', 'SUBMITTIME', 'ACCEPTTIME',
+                 'REMARK', 'PRINTSTATUS'],
             pageSize: 20,
             proxy: {
                 type: 'ajax',
@@ -68,11 +69,11 @@
             { header: '申报关区', dataIndex: 'CUSTOMDISTRICTNAME', width: 100, locked: true },
             { header: '业务类型', dataIndex: 'BUSITYPEID', width: 100, locked: true, renderer: render },
             { header: '文件接收单位', dataIndex: 'FILERECEVIEUNITNAME', width: 200 },
+            { header: '委托时间', dataIndex: 'SUBMITTIME', width: 130 },
             { header: '文件申报单位', dataIndex: 'FILEDECLAREUNITNAME', width: 180, locked: true },
-            { header: '状态', dataIndex: 'STATUS', width: 70, renderer: render, locked: true },
-            { header: '提交时间', dataIndex: 'SUBMITTIME', width: 130 },
-            { header: '受理时间', dataIndex: 'ACCEPTTIME', width: 130 },
-            { header: '受理人', dataIndex: 'ACCEPTNAME', width: 100 },
+            //{ header: '状态', dataIndex: 'STATUS', width: 70, renderer: render, locked: true },           
+            { header: '打印状态', dataIndex: 'PRINTSTATUS', width: 70, renderer: render, locked: true },
+          // { header: '受理人', dataIndex: 'ACCEPTNAME', width: 100 },
             { header: '备注', dataIndex: 'REMARK', width: 150 }
             ],
             listeners:
@@ -128,7 +129,7 @@
         })
 
         var cont_wjjsdw = Ext.create('Ext.form.FieldContainer', {
-            fieldLabel: '接收单位',
+            fieldLabel: '委托单位',
             layout: 'hbox',
             items: [s_field_FILERECEVIEUNIT, {
                 xtype: 'button', id: 's_btn_filerecevieunit', handler: function () { bgsbdw_win(s_field_FILERECEVIEUNIT); },
@@ -197,6 +198,9 @@
                 var rec = store_busitype.findRecord('CODE', value);
                 rtn = rec.get("NAME");
                 break;
+            case "PRINTSTATUS":
+                rtn = value == "1" ? '<i class="fa fa-check" style="color:blue" aria-hidden="true"></i>' : '<i class="fa fa-times" style="color:red" aria-hidden="true"></i>';
+                break;
         }
         return rtn;
     }
@@ -206,7 +210,36 @@
             field.reset();
         });
     }
-
+    function BatchPrint() {
+        Ext.Ajax.request({
+            url: "/EnterpriseOrder/BatchPrint",
+            params: { ids: ids },
+            success: function (response, option) {
+                var data = Ext.decode(response.responseText);
+                var win = Ext.create("Ext.window.Window", {
+                    title: "文件预览",
+                    width: 1200,
+                    height: 700,
+                    layout: "fit",
+                    modal: true,
+                    closeAction: "destroy",
+                    items: [{
+                        html: "<div id='pdfPrintDiv' style='height: 100%;width: 100%;'></div>"
+                    }]
+                });
+                win.show();
+                document.getElementById('pdfPrintDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="/FileUpload/file/' + response.responseText + '"></embed>';
+                //if (data.success) {
+                //    Ext.MessageBox.alert("提示", "受理成功!", function () {
+                //        gridpanel.store.load();
+                //    });
+                //}
+                //else {
+                //    Ext.MessageBox.alert("提示", "受理失败!");
+                //}
+            }
+        });
+    }
     function SignProcess() {
         var recs = gridpanel.getSelectionModel().getSelection();
         if (recs.length == 0) {
@@ -238,14 +271,15 @@
 
 <div class="container">
     <div id="div_form" style="width:100%;"></div>
-    <div>
+    <div style="text-align:right">
+        @*<div class="btn-group" role="group">
+    <button onclick="SignProcess()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-check-square"></i>&nbsp;直接受理</button>
+         <button type="button" class="btn btn-primary btn-sm"><i class="fa fa-sign-in"></i>&nbsp;转订单受理</button>
+        </div>*@
         <div class="btn-group" role="group">
-            <button onclick="SignProcess()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-check-square"></i>&nbsp;直接受理</button>
-            <button type="button" class="btn btn-primary btn-sm"><i class="fa fa-sign-in"></i>&nbsp;转订单受理</button>
-        </div>
-        <div class="btn-group fr" role="group">
-            <button onclick="Select()" class="btn btn-primary btn-sm"><i class="fa fa-search"></i>&nbsp;查询</button>
-            <button onclick="Reset()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-refresh"></i>&nbsp;重置</button>
+            <button type="button" onclick="Select()" class="btn btn-primary btn-sm"><i class="fa fa-search"></i>&nbsp;查询</button>
+            <button type="button" onclick="Reset()"  class="btn btn-primary btn-sm"><i class="fa fa-refresh"></i>&nbsp;重置</button>
+            <button type="button" onclick="BatchPrint()"  class="btn btn-primary btn-sm"><i class="fa fa-print"></i>&nbsp;批量打印</button>
         </div>
     </div>
     <div id="appConId" style="width:100%"></div>
