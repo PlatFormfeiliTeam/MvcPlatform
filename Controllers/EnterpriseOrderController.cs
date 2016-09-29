@@ -313,17 +313,17 @@ namespace MvcPlatform.Controllers
             {
                 where += " and instr(t.CODE,'" + Request["CODE"].ToString().Trim() + "')>0 ";
             }
-            if (!string.IsNullOrEmpty(Request["STATUS"]))//判断查询条件是否有值
-            {
-                where += " and  t.STATUS= " + Request["STATUS"];
-            }
+            //if (!string.IsNullOrEmpty(Request["STATUS"]))//判断查询条件是否有值
+            //{
+            //    where += " and  t.STATUS= " + Request["STATUS"];
+            //}
             if (!string.IsNullOrEmpty(Request["STARTDATE"]))//如果开始时间有值
             {
-                where += " and t.SUBMITTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                where += " and t.CREATETIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
             }
             if (!string.IsNullOrEmpty(Request["ENDDATE"]))//如果结束时间有值
             {
-                where += " and t.SUBMITTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                where += " and t.CREATETIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
             }
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
