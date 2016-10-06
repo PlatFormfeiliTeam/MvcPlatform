@@ -82,9 +82,9 @@
                     columns: [
                     { xtype: 'rownumberer', width: 35 },
                     { header: 'ID', dataIndex: 'ID', hidden: true, locked: true },
-                    { header: '订单状态', dataIndex: 'STATUS', width: 95, renderer: render, locked: true },
-                    { header: '报关状态', hidden: true, dataIndex: 'DECLSTATUS', width: 90, renderer: render, locked: true },
-                    { header: '报检状态', hidden: true, dataIndex: 'INSPSTATUS', width: 90, renderer: render, locked: true },
+                    { header: '订单状态', dataIndex: 'STATUS', width: 95, renderer: renderOrder, locked: true },
+                    { header: '报关状态', hidden: true, dataIndex: 'DECLSTATUS', width: 90, renderer: renderOrder, locked: true },
+                    { header: '报检状态', hidden: true, dataIndex: 'INSPSTATUS', width: 90, renderer: renderOrder, locked: true },
                     { header: '订单编号', dataIndex: 'CODE', width: 100, locked: true },
                     { header: '客户编号', dataIndex: 'CUSNO', width: 130, locked: true },
                     { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 100, sortable: true, locked: true },
@@ -94,9 +94,9 @@
                     { header: '件数/重量', dataIndex: 'GOODSNUM', width: 65 },//该字段需要拼接
                     { header: '申报关区', dataIndex: 'CUSTOMAREACODE', width: 60 },//需要显示编码
                     { header: '进/出口岸', dataIndex: 'PORTCODE', width: 70 },//需要显示编码
-                    { header: '申报方式', dataIndex: 'REPWAYID', width: 110, renderer: render },
+                    { header: '申报方式', dataIndex: 'REPWAYID', width: 110, renderer: renderOrder },
                     { header: '转关预录号', dataIndex: 'TURNPRENO', width: 130 },//需要确定具体字段
-                    { header: '法检', dataIndex: 'LAWFLAG', width: 60, renderer: render },
+                    { header: '法检', dataIndex: 'LAWFLAG', width: 60, renderer: renderOrder },
                     { header: '委托时间', dataIndex: 'SUBMITTIME', width: 130 }
                     ],
                     listeners:
@@ -112,57 +112,6 @@
             }
         })
     })
-
-    function render(value, cellmeta, record, rowIndex, columnIndex, store) {
-        var rtn = "";
-        var dataindex = cellmeta.column.dataIndex;
-        ////大于等于20  小于40  报关状态叫【报关报检都叫预审中】   ==40  【报关报检状态都叫预审完成】  ==45  【报关报检都叫制单已受理】
-        switch (dataindex) {
-            case "STATUS":
-                if (record.get("ISINVALID") == "1") {
-                    rtn = "已作废";
-                }
-                else {
-                    rtn = orders_tatus[value];
-                }
-                break;
-            case "DECLSTATUS":
-            case "INSPSTATUS":
-                if (record.get("ISINVALID") == "0") {
-                    rtn = "已作废";
-                }
-                else {
-                    if (value >= 20 && value < 40) {
-                        rtn = "预审中";
-                    }
-                    if (value == 40) {
-                        rtn = "预审完成";
-                    }
-                    if (value == 45) {
-                        rtn = "制单已受理";
-                    }
-                    if (value > 45) {
-                        rtn = orders_tatus[value];
-                    }
-                }
-                break;
-            case "REPWAYID":
-                var rec = store_sbfs.findRecord('CODE', value);
-                if (rec) {
-                    rtn = rec.get("NAME");
-                }
-                break;
-            case "LAWFLAG":
-                rtn = value ? "有" : "无";
-                break
-            case "GOODSNUM":
-                if (record.get("GOODSNUM")) {
-                    rtn = record.get("GOODSNUM") + '/' + record.get("GOODSGW");
-                }
-                break;
-        }
-        return rtn;
-    }
 
     function Select() {
         pgbar.moveFirst();

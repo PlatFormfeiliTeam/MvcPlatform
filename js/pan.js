@@ -1515,3 +1515,61 @@ function DeleteNotGuoNei() {
     });
 }
 
+
+//查询界面 grid的列方法
+function renderOrder(value, cellmeta, record, rowIndex, columnIndex, store) {
+    var rtn = "";
+    var dataindex = cellmeta.column.dataIndex;
+    ////大于等于20  小于40  报关状态叫【报关报检都叫预审中】   ==40  【报关报检状态都叫预审完成】  ==45  【报关报检都叫制单已受理】
+    switch (dataindex) {
+        case "STATUS":
+            if (record.get("ISINVALID") == "1") {
+                rtn = "已作废";
+            }
+            else {
+                rtn = orders_tatus[value];
+            }
+            break;
+        case "DECLSTATUS":
+        case "INSPSTATUS":
+            if (record.get("ISINVALID") == "1") {
+                rtn = "已作废";
+            }
+            else {
+                if (value >= 20 && value < 40) {
+                    rtn = "预审中";
+                }
+                if (value == 40) {
+                    rtn = "预审完成";
+                }
+                if (value == 45) {
+                    rtn = "制单已受理";
+                }
+                if (value > 45) {
+                    rtn = orders_tatus[value];
+                }
+            }
+            break;
+        case "BUSITYPE":
+            var rec = store_busitype.findRecord('CODE', value);
+            if (rec) {
+                rtn = rec.get("NAME");
+            }
+            break;
+        case "REPWAYID":
+            var rec = store_sbfs.findRecord('CODE', value);
+            if (rec) {
+                rtn = rec.get("NAME");
+            }
+            break;
+        case "LAWFLAG":
+            rtn = value ? "有" : "无";
+            break;
+        case "GOODSNUM":
+            if (record.get("GOODSNUM")) {
+                rtn = record.get("GOODSNUM") + '/' + record.get("GOODSGW");
+            }
+            break;
+    }
+    return rtn;
+}

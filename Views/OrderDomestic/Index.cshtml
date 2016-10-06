@@ -85,18 +85,18 @@
                     columns: [
                     { xtype: 'rownumberer', width: 35 },
                     { header: 'ID', dataIndex: 'ID', hidden: true, locked: true },
-                    { header: '订单状态', dataIndex: 'STATUS', width: 85, renderer: render, locked: true },
-                    { header: '报关状态', hidden: true, dataIndex: 'DECLSTATUS', width: 90, renderer: render, locked: true },
-                    { header: '报检状态', hidden: true, dataIndex: 'INSPSTATUS', width: 90, renderer: render, locked: true },
+                    { header: '订单状态', dataIndex: 'STATUS', width: 85, renderer: renderOrder, locked: true },
+                    { header: '报关状态', hidden: true, dataIndex: 'DECLSTATUS', width: 90, renderer: renderOrder, locked: true },
+                    { header: '报检状态', hidden: true, dataIndex: 'INSPSTATUS', width: 90, renderer: renderOrder, locked: true },
                     { header: '订单编号', dataIndex: 'CODE', width: 100, locked: true },
                     { header: '客户编号', dataIndex: 'CUSNO', width: 120, locked: true },
                     { header: '经营单位', dataIndex: 'BUSIUNITNAME', locked: true },
                     { header: '合同发票号', dataIndex: 'CONTRACTNO', width: 130, locked: true },
                     { header: '件数/重量', dataIndex: 'GOODSNUM', width: 80, locked: true },//该字段需要拼接
                     { header: '申报关区', dataIndex: 'CUSTOMAREACODE', width: 70, locked: true },//需要显示编码
-                    { header: '申报方式', dataIndex: 'REPWAYID', width: 110, locked: true, renderer: render },
-                    { header: '法检', dataIndex: 'LAWFLAG', width: 40, renderer: render },
-                    { header: '业务类型', dataIndex: 'BUSITYPE', width: 70, renderer: render },
+                    { header: '申报方式', dataIndex: 'REPWAYID', width: 110, locked: true, renderer: renderOrder },
+                    { header: '法检', dataIndex: 'LAWFLAG', width: 40, renderer: renderOrder },
+                    { header: '业务类型', dataIndex: 'BUSITYPE', width: 70, renderer: renderOrder },
                     { header: '两单关联号', dataIndex: 'ASSOCIATENO', width: 120 },
                     { header: '委托时间', dataIndex: 'SUBMITTIME', width: 130 },
                     { header: '多单关联号', dataIndex: 'CORRESPONDNO', width: 110 }
@@ -115,65 +115,6 @@
             }
         });
     })
-
-    function render(value, cellmeta, record, rowIndex, columnIndex, store) {
-        var rtn = "";
-        var dataindex = cellmeta.column.dataIndex;
-        //大于等于20  小于40  报关状态叫【报关报检都叫预审中】   ==40  【报关报检状态都叫预审完成】  ==45
-        //【报关报检都叫制单已受理】
-        //isinvalid等于0是作废
-        switch (dataindex) {
-            case "STATUS":
-                if (record.get("ISINVALID") == "1") {
-                    rtn = "已作废";
-                }
-                else {
-                    rtn = orders_tatus[value];
-                }
-                break;
-            case "DECLSTATUS":
-            case "INSPSTATUS":
-                if (record.get("ISINVALID") == "0") {
-                    rtn = "已作废";
-                }
-                else {
-                    if (value >= 20 && value < 40) {
-                        rtn = "预审中";
-                    }
-                    if (value == 40) {
-                        rtn = "预审完成";
-                    }
-                    if (value == 45) {
-                        rtn = "制单已受理";
-                    }
-                    if (value > 45) {
-                        rtn = orders_tatus[value];
-                    }
-                }
-                break;
-            case "BUSITYPE":
-                var rec = store_busitype.findRecord('CODE', value);
-                if (rec) {
-                    rtn = rec.get("NAME");
-                }
-                break;
-            case "REPWAYID":
-                var rec = store_sbfs.findRecord('CODE', value);
-                if (rec) {
-                    rtn = rec.get("NAME");
-                }
-                break;
-            case "LAWFLAG":
-                rtn = value ? "有" : "无";
-                break;
-            case "GOODSNUM":
-                if (record.get("GOODSNUM")) {
-                    rtn = record.get("GOODSNUM") + '/' + record.get("GOODSGW");
-                }
-                break;
-        }
-        return rtn;
-    }
 
     function Delete() {
         var recs = gridpanel.getSelectionModel().getSelection();
