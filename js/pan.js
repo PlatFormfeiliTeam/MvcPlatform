@@ -910,8 +910,10 @@ function loadform() {
                 Ext.getCmp('combo_myfs').setValue(data.formdata.TRADEWAYCODES1.split(','));
             }
             repunitcode = data.formdata.REPUNITNAME + '(' + data.formdata.REPUNITCODE + ')';
+            if (repunitcode != "null(null)")
             Ext.getCmp('tf_bgsbdw').setValue(repunitcode);
             inspunitcode = data.formdata.INSPUNITNAME + '(' + data.formdata.INSPUNITCODE + ')';
+            if (inspunitcode != "null(null)")
             Ext.getCmp('tf_bjsbdw').setValue(inspunitcode);
             //如果是修改需要将随附文件的ID拼接成字符串 赋值到
             var fileids = "";
@@ -940,7 +942,7 @@ function formcontrol() {
     //以前是要加状态判断,考虑到撤单后页面字段状态需要重新控制 故去掉status>=15条件 by panhuaguo 2016-08-29
     //2016-08-30测试发现field_STATUS这个控件在默认只读的情况,循环表单控件的时候会将其只读属性去掉，所以要过滤掉这个控件 自始至终这个控件应该是只读的
     Ext.Array.each(formpanel.getForm().getFields().items, function (item) {
-        if (item.value != "" && item.value != null && item.value != undefined && item.id != 'field_ENTRUSTREQUEST' && item.id != "field_STATUS") {
+        if (item.value != "" && item.value != null && item.value != undefined && item.id != 'field_ENTRUSTREQUEST' && item.id != "field_STATUS" && item.id != "tf_bjsbdw" && item.id != "tf_bgsbdw") {
             item.setReadOnly(status >= 15);
         }
     });
@@ -1005,6 +1007,7 @@ function wtlx_control() {
     if (Ext.getCmp('combo_ENTRUSTTYPENAME').getValue() == '01')//仅报关
     {
         Ext.getCmp('tf_bgsbdw').enable();
+        if (repunitcode!="null(null)")
         Ext.getCmp('tf_bgsbdw').setValue(repunitcode);
         Ext.getCmp('cont_bgsbdw').enable();
         Ext.getCmp('tf_bjsbdw').setValue('');
@@ -1013,6 +1016,7 @@ function wtlx_control() {
     }
     if (Ext.getCmp('combo_ENTRUSTTYPENAME').getValue() == '02') {
         Ext.getCmp('tf_bjsbdw').enable();
+        if (inspunitcode != "null(null)")
         Ext.getCmp('tf_bjsbdw').setValue(inspunitcode);
         Ext.getCmp('cont_bjsbdw').enable();
         Ext.getCmp('tf_bgsbdw').setValue('');
@@ -1023,9 +1027,11 @@ function wtlx_control() {
     }
     if (Ext.getCmp('combo_ENTRUSTTYPENAME').getValue() == '03') {
         Ext.getCmp('tf_bgsbdw').enable();
+        if (repunitcode != "null(null)")
         Ext.getCmp('tf_bgsbdw').setValue(repunitcode);
         Ext.getCmp('cont_bgsbdw').enable();
         Ext.getCmp('tf_bjsbdw').enable();
+        if (inspunitcode != "null(null)")
         Ext.getCmp('tf_bjsbdw').setValue(inspunitcode);
         Ext.getCmp('cont_bjsbdw').enable();
         //委托类型是报关报检时、屏蔽通关单号字段
