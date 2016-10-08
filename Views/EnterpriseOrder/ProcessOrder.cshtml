@@ -39,7 +39,7 @@
             listeners: {
                 beforeload: function () {
                     store.getProxy().extraParams = {
-                        FILERECEVIEUNIT: Ext.getCmp('s_field_FILERECEVIEUNIT').getValue(), STATUS: Ext.getCmp("s_combo_status").getValue(),
+                        ENTERPRISENAME: Ext.getCmp('s_field_ENTERPRISENAME').getValue(), PRINTSTATUS: Ext.getCmp("s_combo_status").getValue(),
                         CODE: Ext.getCmp('field_CODE').getValue(),
                         STARTDATE: Ext.Date.format(Ext.getCmp("start_date").getValue(), 'Y-m-d H:i:s'),
                         ENDDATE: Ext.Date.format(Ext.getCmp("end_date").getValue(), 'Y-m-d H:i:s')
@@ -63,7 +63,7 @@
             columns: [
             { xtype: 'rownumberer', width: 35 },
             { header: 'ID', dataIndex: 'ID', hidden: true },
-            { header: '委托编号', dataIndex: 'UNITCODE', width: 120, locked: true },
+            { header: '委托编号', dataIndex: 'UNITCODE', width: 130, locked: true },
             { header: '企业编号', dataIndex: 'CODE', width: 110, locked: true },
             { header: '委托企业', dataIndex: 'ENTERPRISENAME', width: 180, locked: true },
             { header: '委托时间', dataIndex: 'SUBMITTIME', width: 130, locked: true },
@@ -127,9 +127,9 @@
     });
 
     function initSearch() {
-        var s_field_FILERECEVIEUNIT = Ext.create('Ext.form.field.Text', {  //文件接收单位
-            id: 's_field_FILERECEVIEUNIT',
-            name: 'FILERECEVIEUNIT',
+        var s_field_ENTERPRISENAME = Ext.create('Ext.form.field.Text', {
+            id: 's_field_ENTERPRISENAME',
+            name: 'ENTERPRISENAME',
             margin: 0,
             flex: .85
         })
@@ -137,23 +137,22 @@
         var cont_wjjsdw = Ext.create('Ext.form.FieldContainer', {
             fieldLabel: '委托单位',
             layout: 'hbox',
-            items: [s_field_FILERECEVIEUNIT, {
-                xtype: 'button', id: 's_btn_filerecevieunit', handler: function () { bgsbdw_win(s_field_FILERECEVIEUNIT); },
+            items: [s_field_ENTERPRISENAME, {
+                xtype: 'button', handler: function () { bgsbdw_win(s_field_ENTERPRISENAME); },
                 text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
             }]
         })
         var store_status = Ext.create('Ext.data.JsonStore', {
             fields: ['CODE', 'NAME'],
-            data: [{ CODE: '10', NAME: '未受理' }, { CODE: '15', NAME: '已受理' }]
+            data: [{ CODE: '0', NAME: '未打印' }, { CODE: '1', NAME: '已打印' }]
         });
         var s_combo_status = Ext.create('Ext.form.field.ComboBox', {
             id: 's_combo_status',
             editable: false,
             store: store_status,
-            fieldLabel: '委托状态',
-            value: '10',
+            fieldLabel: '打印状态', 
             displayField: 'NAME',
-            name: 'STATUS',
+            name: 'PRINTSTATUS',
             valueField: 'CODE',
             triggerAction: 'all',
             queryMode: 'local'
@@ -167,7 +166,7 @@
         var start_date = Ext.create('Ext.form.field.Date', {
             id: 'start_date',
             format: 'Y-m-d',
-            fieldLabel: '提交日期从'
+            fieldLabel: '委托日期从'
         })
         var end_date = Ext.create('Ext.form.field.Date', {
             id: 'end_date',
