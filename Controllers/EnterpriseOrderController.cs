@@ -345,7 +345,7 @@ namespace MvcPlatform.Controllers
             IList<string> filelist = new List<string>();
             foreach (string entid in id_array)
             {
-                sql = "select * from list_attachment where entid='" + entid + "' order by ID ASC";
+                sql = @"select t.*,instr('44515250',t.filetype) as typeindex from list_attachment t  where t.entid='" + entid + "' order by typeindex ASC";
                 dt = DBMgr.GetDataTable(sql);
                 foreach (DataRow dr in dt.Rows)
                 {
@@ -353,7 +353,7 @@ namespace MvcPlatform.Controllers
                 }
                 sql = "update ent_order set printstatus=1 where id='" + entid + "'";
                 DBMgr.ExecuteNonQuery(sql);
-            }
+            }            
             Extension.MergePDFFiles(filelist, Server.MapPath("~/Declare/") + output + ".pdf");
             return "/Declare/" + output + ".pdf";
         }
