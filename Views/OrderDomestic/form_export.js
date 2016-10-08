@@ -212,7 +212,7 @@
         layout: 'hbox',
         items: [{
             id: 'GOODSNUM2', name: 'GOODSNUM', xtype: 'numberfield', flex: .5, margin: 0, hideTrigger: true, anyMatch: true, tabIndex: 26,
-            spinUpEnabled: false, spinDownEnabled: false,
+            spinUpEnabled: false, spinDownEnabled: false, allowBlank: false, blankText: '不能为空!',
             listeners: {
                 change: function (nf, newValue, oldValue, eOpts) {
                     if (Ext.getCmp("GOODSNUM1")) {
