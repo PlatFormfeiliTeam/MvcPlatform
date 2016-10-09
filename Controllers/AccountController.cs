@@ -90,7 +90,7 @@ namespace MvcPlatform.Controllers
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string sql = @"select t.CUSTOMERID,t.NAME,t.EMAIL,t.TELEPHONE,t.MOBILEPHONE,t.IMGPATH,t.COMPANYNAMES,t.TYPE,t.REALNAME,
-                         b.SCENEDECLAREID,b.SCENEINSPECTID,b.Name COMPANYNAME,b.ISCUSTOMER,b.SELFCHECK,b.WEIGHTCHECK,b.BUSITYPES
+                         b.SCENEDECLAREID,b.SCENEINSPECTID,b.Name COMPANYNAME,b.ISCUSTOMER,b.WEIGHTCHECK,b.BUSITYPES
                          from Sys_User t left join Sys_Customer b on t.CustomerId=b.Id
                          where t.id='" + json_user.GetValue("ID") + "'";
             DataTable dt = DBMgr.GetDataTable(sql);
@@ -134,8 +134,8 @@ namespace MvcPlatform.Controllers
             try
             {
                 JObject json = (JObject)JsonConvert.DeserializeObject(data);
-                string sql = @"update sys_customer set SELFCHECK='{0}',WEIGHTCHECK='{1}',BUSITYPES='{2}' where id='{3}'";
-                sql = string.Format(sql, json.Value<string>("SELFCHECK") == "on" ? 1 : 0, json.Value<string>("WEIGHTCHECK") == "on" ? 1 : 0, Request["busitypes"], json.Value<string>("CUSTOMERID"));
+                string sql = @"update sys_customer set WEIGHTCHECK='{0}',BUSITYPES='{1}' where id='{2}'";
+                sql = string.Format(sql,json.Value<string>("WEIGHTCHECK") == "on" ? 1 : 0, Request["busitypes"], json.Value<string>("CUSTOMERID"));
                 int result = DBMgr.ExecuteNonQuery(sql);
                 return "{result:'" + result + "'}";
             }

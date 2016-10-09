@@ -20,18 +20,18 @@
         columns: 4,
         items: items
     })
-    var cbg_selfcheck = Ext.create('Ext.form.field.Checkbox', {
-        margin: '10 0 10 10',
-        fieldLabel: '需自审',
-        name: 'SELFCHECK'
-    })
+    //var cbg_selfcheck = Ext.create('Ext.form.field.Checkbox', {
+    //    margin: '10 0 10 10',
+    //    fieldLabel: '需自审',
+    //    name: 'SELFCHECK'
+    //})
     var cbg_needweightconfirm = Ext.create('Ext.form.field.Checkbox', {
         margin: '10 0 10 10',
         fieldLabel: '需重量确认',
         name: 'WEIGHTCHECK'
     })
     form_sysconfig = Ext.create('Ext.form.Panel', {
-        items: [cbg_busitype, cbg_selfcheck, cbg_needweightconfirm, field_id, field_customerid],
+        items: [cbg_busitype, cbg_needweightconfirm, field_id, field_customerid],
         buttonAlign: 'center',
         buttons: [{
             text: '<i class="fa fa-floppy-o"></i>&nbsp;保存', handler: function () {
