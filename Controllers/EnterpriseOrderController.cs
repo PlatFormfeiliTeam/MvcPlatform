@@ -8,6 +8,7 @@ using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 
@@ -356,6 +357,28 @@ namespace MvcPlatform.Controllers
             }            
             Extension.MergePDFFiles(filelist, Server.MapPath("~/Declare/") + output + ".pdf");
             return "/Declare/" + output + ".pdf";
+        }
+
+        public FileResult DownFile(string filename, string ID)//ActionResult
+        {
+            string url = ""; byte[] bytes;
+            if (ID != "")//文件在文件服务器上
+            {
+                url = ConfigurationManager.AppSettings["AdminUrl"] + "/file" + filename;
+                WebClient wc = new WebClient();
+                bytes = wc.DownloadData(url);
+                wc.Dispose();
+            }
+            else//企业端上传的文件，未保存前还在当前服务器上
+            {
+                url = Server.MapPath(filename);
+                FileStream fs = new FileStream(url, FileMode.Open);
+                bytes = new byte[(int)fs.Length];
+                fs.Read(bytes, 0, bytes.Length);
+                fs.Close();
+            }
+            MemoryStream ms = new MemoryStream(bytes);
+            return File(ms, "application/octet-stream", Path.GetFileName(filename));
         }
 
     }
