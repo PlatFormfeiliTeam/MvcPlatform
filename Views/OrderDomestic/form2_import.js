@@ -365,6 +365,8 @@
         name: 'REPUNITCODE',
         margin: 0,
         flex: .85,
+        allowBlank: false,
+        blankText: '报关单位不能为空!'
     })
     var cont_bgsbdw3 = Ext.create('Ext.form.FieldContainer', {
         id: 'cont_bgsbdw3',
@@ -383,6 +385,8 @@
         name: 'INSPUNITCODE',
         margin: 0,
         flex: .85,
+        allowBlank: false,
+        blankText: '报检单位不能为空!'
     })
     var cont_bjsbdw3 = Ext.create('Ext.form.FieldContainer', {
         id: 'cont_bjsbdw3',
