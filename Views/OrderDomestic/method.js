@@ -28,10 +28,14 @@ function loadform() {
         success: function (response, opts) {
             var data = Ext.decode(response.responseText);
             formpanelhead.getForm().setValues(data.data1.IETYPE ? data.data1 : data.data2);
-            Ext.getCmp("field_ordercodes").setValue(data.ORDERCODES);//记录所有已经存在的订单号,方便改变进出口类型时进行比对         
+            Ext.getCmp("field_ordercodes").setValue(data.ORDERCODES);//记录所有已经存在的订单号,方便改变进出口类型时进行比对    
             repunitcode = data.data1.REPUNITCODE.length != 2 ? data.data1.REPUNITCODE : data.data2.REPUNITCODE;//初始化报关报检单位
             inspunitcode = data.data1.INSPUNITCODE.length != 2 ? data.data1.INSPUNITCODE : data.data2.INSPUNITCODE;
-            
+            if (repunitcode.length == 2)
+                repunitcode = "";
+            if (inspunitcode.length == 2)
+                inspunitcode = "";
+                
             formpanelin.getForm().setValues(data.data1);
             form_control(data.data1, 1);
             readonly_init(formpanelin, formpanelhead, 1);
@@ -120,7 +124,7 @@ function readonly_init(formpanel_tmp, formhead_tmp, index) {
         var status = Ext.getCmp('field_status' + index).getValue();
 
         Ext.Array.each(formpanel_tmp.getForm().getFields().items, function (item) {
-            if (item.value != "" && item.value != null && item.value != undefined && item.id != 'field_ENTRUSTREQUEST' + index && item.id != "field_status" + index) {
+            if (item.value != "" && item.value != null && item.value != undefined && item.id != 'field_ENTRUSTREQUEST' + index && item.id != "field_status" + index&&item.id != "tf_bgsbdw" + index&&item.id != "tf_bjsbdw" + index) {
                 item.setReadOnly(status >= 15);
             }
         });

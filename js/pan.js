@@ -909,11 +909,9 @@ function loadform() {
             if (data.formdata.TRADEWAYCODES1) {
                 Ext.getCmp('combo_myfs').setValue(data.formdata.TRADEWAYCODES1.split(','));
             }
-            repunitcode = data.formdata.REPUNITNAME + '(' + data.formdata.REPUNITCODE + ')';
-            if (repunitcode != "null(null)")
+            repunitcode = data.formdata.REPUNITNAME != null ? (data.formdata.REPUNITNAME + '(' + data.formdata.REPUNITCODE + ')') : "";
             Ext.getCmp('tf_bgsbdw').setValue(repunitcode);
-            inspunitcode = data.formdata.INSPUNITNAME + '(' + data.formdata.INSPUNITCODE + ')';
-            if (inspunitcode != "null(null)")
+            inspunitcode = data.formdata.INSPUNITNAME != null ? (data.formdata.INSPUNITNAME + '(' + data.formdata.INSPUNITCODE + ')') : "";
             Ext.getCmp('tf_bjsbdw').setValue(inspunitcode);
             //如果是修改需要将随附文件的ID拼接成字符串 赋值到
             var fileids = "";
@@ -1007,7 +1005,6 @@ function wtlx_control() {
     if (Ext.getCmp('combo_ENTRUSTTYPENAME').getValue() == '01')//仅报关
     {
         Ext.getCmp('tf_bgsbdw').enable();
-        if (repunitcode!="null(null)")
         Ext.getCmp('tf_bgsbdw').setValue(repunitcode);
         Ext.getCmp('cont_bgsbdw').enable();
         Ext.getCmp('tf_bjsbdw').setValue('');
@@ -1016,7 +1013,6 @@ function wtlx_control() {
     }
     if (Ext.getCmp('combo_ENTRUSTTYPENAME').getValue() == '02') {
         Ext.getCmp('tf_bjsbdw').enable();
-        if (inspunitcode != "null(null)")
         Ext.getCmp('tf_bjsbdw').setValue(inspunitcode);
         Ext.getCmp('cont_bjsbdw').enable();
         Ext.getCmp('tf_bgsbdw').setValue('');
@@ -1027,11 +1023,9 @@ function wtlx_control() {
     }
     if (Ext.getCmp('combo_ENTRUSTTYPENAME').getValue() == '03') {
         Ext.getCmp('tf_bgsbdw').enable();
-        if (repunitcode != "null(null)")
         Ext.getCmp('tf_bgsbdw').setValue(repunitcode);
         Ext.getCmp('cont_bgsbdw').enable();
         Ext.getCmp('tf_bjsbdw').enable();
-        if (inspunitcode != "null(null)")
         Ext.getCmp('tf_bjsbdw').setValue(inspunitcode);
         Ext.getCmp('cont_bjsbdw').enable();
         //委托类型是报关报检时、屏蔽通关单号字段
