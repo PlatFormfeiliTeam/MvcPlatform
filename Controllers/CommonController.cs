@@ -882,7 +882,16 @@ namespace MvcPlatform.Controllers
                 }
                 if (string.IsNullOrEmpty(copyordercode))//如果不是复制新增
                 {
-                    string formdata = "{STATUS:1,REPUNITNAME:'" + bgsb_unit + "',REPUNITCODE:'" + json_user.Value<string>("CUSTOMERHSCODE") + "',INSPUNITNAME:'" + bjsb_unit + "',INSPUNITCODE:'" + json_user.Value<string>("CUSTOMERCIQCODE") + "'}";
+                    //add 2016/10/9 by heguiqin
+                    string WEIGHTCHECK = "";
+                    sql = "select * from Sys_Customer where ID='" + json_user.Value<string>("CUSTOMERID") + "' AND instr(BUSITYPES,'" + Request["busitype"] + "')>0 AND ENABLED=1 AND ROWNUM=1";//根据客户ID，查询需自审，需重量确认
+                    dt = DBMgr.GetDataTable(sql);
+                    if (dt.Rows.Count > 0)
+                    {
+                       WEIGHTCHECK = dt.Rows[0]["WEIGHTCHECK"].ToString();
+                    }
+                    //end
+                    string formdata = "{STATUS:1,REPUNITNAME:'" + bgsb_unit + "',REPUNITCODE:'" + json_user.Value<string>("CUSTOMERHSCODE") + "',INSPUNITNAME:'" + bjsb_unit + "',INSPUNITCODE:'" + json_user.Value<string>("CUSTOMERCIQCODE") + "',WEIGHTCHECK:'" + WEIGHTCHECK + "'}";
                     result = "{formdata:" + formdata + ",filedata:[]}";
                 }
                 else//如果是复制新增

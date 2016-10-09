@@ -901,7 +901,7 @@ function seniorsearch(pagebar_p) {
 function loadform() {
     Ext.Ajax.request({
         url: "/Common/loadorder",
-        params: { ordercode: ordercode, copyordercode: copyordercode },
+        params: { ordercode: ordercode, copyordercode: copyordercode, busitype: busitype },
         success: function (response, opts) {
             var data = Ext.decode(response.responseText);
             formpanel.getForm().setValues(data.formdata);
@@ -926,6 +926,20 @@ function loadform() {
                 Ext.getCmp('w_grid').store.loadData(Ext.decode(Ext.getCmp('field_CONTAINERTRUCK').getValue()));
             }
             formcontrol();//表单字段控制
+            //add 2016/10/9 add
+            if (ordercode == "" && copyordercode == "") {//编辑或复制新增时，直接以上面的formdata赋值为准，新增则需要抓取值
+                if (Ext.getCmp('WEIGHTCHECK')) {
+                    if (data.WEIGHTCHECK == "1") {
+                        Ext.getCmp('WEIGHTCHECK').setValue(true);
+                        Ext.getCmp('ISWEIGHTCHECK').setReadOnly(false);
+                    } else {
+                        Ext.getCmp('WEIGHTCHECK').setValue(false);
+
+                        Ext.getCmp('ISWEIGHTCHECK').setValue(false);
+                        Ext.getCmp('ISWEIGHTCHECK').setReadOnly(true);
+                    }
+                }
+            }            
         }
     });
 }
