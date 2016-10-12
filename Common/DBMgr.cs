@@ -95,5 +95,32 @@ namespace MvcPlatform.Common
             orclCon.Close();
             return retcount;
         }
+
+        public static int ExecuteNonQueryParm(string sql, OracleParameter[] parms)
+        {
+            int retcount = -1;
+            OracleConnection orclCon = null;
+            using (orclCon = new OracleConnection(ConnectionString))
+            {
+                OracleCommand oc = new OracleCommand();
+                oc.Connection = orclCon;
+                if (orclCon.State.ToString().Equals("Open"))
+                {
+                    orclCon.Close();
+                }
+                orclCon.Open();
+
+                oc.CommandType = CommandType.StoredProcedure;
+                oc.CommandText = sql;
+                oc.Parameters.AddRange(parms);
+
+                retcount = oc.ExecuteNonQuery();
+                oc.Parameters.Clear();
+                oc.Dispose();
+            }
+            orclCon.Close();
+            return retcount;
+        }
+
     }
 }

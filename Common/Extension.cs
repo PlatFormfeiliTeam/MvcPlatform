@@ -62,36 +62,18 @@ namespace MvcPlatform.Common
         {
             string code = string.Empty;
             try
-            {
-                OracleConnection orclCon = new OracleConnection(ConfigurationManager.AppSettings["strconn"]);
-                OracleCommand cmd = new OracleCommand();
-                cmd.Connection = orclCon;
-                if (orclCon.State.ToString().Equals("Open"))
-                {
-                    orclCon.Close();
-                }
-                orclCon.Open();
+            {;
+                OracleParameter[] parms = new OracleParameter[3];
+                parms[0] = new OracleParameter("p_prefix", OracleDbType.NVarchar2, 20, ParameterDirection.Input);
+                parms[1] = new OracleParameter("p_type", OracleDbType.NVarchar2, 10, ParameterDirection.Input);
+                parms[2] = new OracleParameter("p_increase", OracleDbType.Int32, ParameterDirection.Output);
 
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.CommandText = "p_sequencegenerator";
-                OracleParameter[] parm = new OracleParameter[3];
-                parm[0] = new OracleParameter("p_prefix", OracleDbType.NVarchar2, 20);
-                parm[0].Direction = ParameterDirection.Input;
-                parm[1] = new OracleParameter("p_type", OracleDbType.NVarchar2, 10);
-                parm[1].Direction = ParameterDirection.Input;
-                parm[2] = new OracleParameter("p_increase", OracleDbType.Int32);
-                parm[2].Direction = ParameterDirection.Output;
                 string prefix = getPrefix();
-                parm[0].Value = prefix;
-                parm[1].Value = "order";//O是订单 
-                cmd.Parameters.AddRange(parm);
+                parms[0].Value = prefix;
+                parms[1].Value = "order";//O是订单 
 
-                int i = cmd.ExecuteNonQuery();
-                code = prefix + Convert.ToInt32(parm[2].Value).ToString("00000");
-                cmd.Parameters.Clear();
-                
-                cmd.Dispose();
-                orclCon.Close();
+                DBMgr.ExecuteNonQueryParm("p_sequencegenerator", parms);
+                code = prefix + Convert.ToInt32(parms[2].Value.ToString()).ToString("00000"); 
             }
             catch (Exception ex)
             {
@@ -102,6 +84,7 @@ namespace MvcPlatform.Common
 
         }
 
+        /*
         /// <summary> 
         /// 获取订单编号 
         /// </summary> 
@@ -127,7 +110,7 @@ namespace MvcPlatform.Common
                 cmd.Parameters.AddRange(parm);
 
                 int i = cmd.ExecuteNonQuery();
-                code = prefix + Convert.ToInt32(parm[2].Value).ToString("00000");
+                code = prefix + parm[2].Value.ToInt().ToString("00000"); 
                 cmd.Parameters.Clear();
             }
             catch (Exception ex)
@@ -136,7 +119,7 @@ namespace MvcPlatform.Common
             }
 
             return code;
-        }
+        }*/
         /// <summary> 
         /// 获取前缀 
         /// </summary> 
@@ -150,27 +133,6 @@ namespace MvcPlatform.Common
             code += time.Day.ToString("00");
             return code;
         }
-
-        /*string code = string.Empty;
-            try
-            {
-                string sql = "", sql1 = "";
-                sql = "update sys_code set code=code+1";
-                DBMgr.ExecuteNonQuery(sql);
-
-                sql1 = "select code,sysdate from sys_code";
-                DataTable dt = DBMgr.GetDataTable(sql1);
-
-                code = (Convert.ToDateTime(dt.Rows[0]["sysdate"].ToString()).ToString("yyyyMMdd")).Substring(2);
-                code += Convert.ToInt32(dt.Rows[0]["code"].ToString()).ToString("00000");
-
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-
-            return code;*/
 
 
         //集装箱及报关车号列表更新
