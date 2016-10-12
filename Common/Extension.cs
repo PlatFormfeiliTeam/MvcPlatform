@@ -61,9 +61,43 @@ namespace MvcPlatform.Common
         public static string getOrderCode()
         {
             string code = string.Empty;
-            OracleConnection orclCon = new OracleConnection(ConfigurationManager.AppSettings["strconn"]);
-            OracleCommand cmd = orclCon.CreateCommand();
-            code = getCode(cmd);
+            try
+            {
+                OracleConnection orclCon = new OracleConnection(ConfigurationManager.AppSettings["strconn"]);
+                OracleCommand cmd = new OracleCommand();
+                cmd.Connection = orclCon;
+                if (orclCon.State.ToString().Equals("Open"))
+                {
+                    orclCon.Close();
+                }
+                orclCon.Open();
+
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "p_sequencegenerator";
+                OracleParameter[] parm = new OracleParameter[3];
+                parm[0] = new OracleParameter("p_prefix", OracleDbType.NVarchar2, 20);
+                parm[0].Direction = ParameterDirection.Input;
+                parm[1] = new OracleParameter("p_type", OracleDbType.NVarchar2, 10);
+                parm[1].Direction = ParameterDirection.Input;
+                parm[2] = new OracleParameter("p_increase", OracleDbType.Int32);
+                parm[2].Direction = ParameterDirection.Output;
+                string prefix = getPrefix();
+                parm[0].Value = prefix;
+                parm[1].Value = "order";//O是订单 
+                cmd.Parameters.AddRange(parm);
+
+                int i = cmd.ExecuteNonQuery();
+                code = prefix + Convert.ToInt32(parm[2].Value).ToString("00000");
+                cmd.Parameters.Clear();
+                
+                cmd.Dispose();
+                orclCon.Close();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
             return code;
 
         }
