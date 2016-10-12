@@ -4,6 +4,7 @@ using MvcPlatform.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
+using Oracle.ManagedDataAccess.Client;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -60,6 +61,63 @@ namespace MvcPlatform.Common
         public static string getOrderCode()
         {
             string code = string.Empty;
+            OracleConnection orclCon = new OracleConnection(ConfigurationManager.AppSettings["strconn"]);
+            OracleCommand cmd = orclCon.CreateCommand();
+            code = getCode(cmd);
+            return code;
+
+        }
+
+        /// <summary> 
+        /// 获取订单编号 
+        /// </summary> 
+        /// <param name="cmd"></param> 
+        /// <returns></returns> 
+        private static string getCode(OracleCommand cmd)
+        {
+            string code = "";
+            try
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "p_sequencegenerator";
+                OracleParameter[] parm = new OracleParameter[3];
+                parm[0] = new OracleParameter("p_prefix", OracleDbType.NVarchar2, 20);
+                parm[0].Direction = ParameterDirection.Input;
+                parm[1] = new OracleParameter("p_type", OracleDbType.NVarchar2, 10);
+                parm[1].Direction = ParameterDirection.Input;
+                parm[2] = new OracleParameter("p_increase", OracleDbType.Int32);
+                parm[2].Direction = ParameterDirection.Output;
+                string prefix = getPrefix();
+                parm[0].Value = prefix;
+                parm[1].Value = "order";//O是订单 
+                cmd.Parameters.AddRange(parm);
+
+                int i = cmd.ExecuteNonQuery();
+                code = prefix + Convert.ToInt32(parm[2].Value).ToString("00000");
+                cmd.Parameters.Clear();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return code;
+        }
+        /// <summary> 
+        /// 获取前缀 
+        /// </summary> 
+        /// <returns></returns> 
+        private static string getPrefix()
+        {
+            DateTime time = DateTime.Now;
+            string code = "";
+            code += time.Year.ToString().Substring(2);
+            code += time.Month.ToString("00");
+            code += time.Day.ToString("00");
+            return code;
+        }
+
+        /*string code = string.Empty;
             try
             {
                 string sql = "", sql1 = "";
@@ -78,78 +136,8 @@ namespace MvcPlatform.Common
                 throw e;
             }
 
-            return code;
+            return code;*/
 
-        }
-
-        /*
-string sql = "", sql1 = "";
-
-sql = "select sys_code_id.nextval from dual";
-string code = string.Empty;
-try
-{
-    DataTable dt = DBMgr.GetDataTable(sql);
-    int CodeId = int.Parse(dt.Rows[0][0].ToString());
-    sql1 = "select YEARMONTH, code from sys_code where id=" + CodeId;
-    DataTable dt1 = DBMgr.GetDataTable(sql1);
-    while (dt1.Rows.Count <= 0)
-    {
-        dt = DBMgr.GetDataTable(sql);
-        CodeId = int.Parse(dt.Rows[0][0].ToString());
-        sql1 = "select YEARMONTH, code from sys_code where id=" + CodeId;
-        dt1 = DBMgr.GetDataTable(sql1);
-    }
-    code = dt1.Rows[0][0].ToString() + dt1.Rows[0][1].ToString();
-}
-catch (Exception e)
-{
-    throw e;
-}
-return code;
- */
-
-        /*
-        private static readonly object syncRoot = new object();
-        public string GetCode1(CodeTypeEnum codeType)
-        {
-            DBSession db = new DBSession();
-            db.BeginTransaction();
-            string code = "";
-
-            lock (syncRoot)
-            {
-                try
-                {
-                    string sql = "update sys_code set code=code+1";
-                    db.Execute(sql);
-
-                    sql = "select code,sysdate from sys_code";
-                    DataTable dt = db.Query(sql);
-
-                    db.Dispose();
-                    code += createCode(Convert.ToDateTime(dt.Rows[0]["sysdate"].ToString()));
-                    code += Convert.ToInt32(dt.Rows[0]["code"].ToString()).ToString("00000");
-                    return code;
-                }
-                catch (Exception ex)
-                {
-                    db.Rollback();
-                    return ex.Message;
-                }
-            }
-
-
-        }
-        private string createCode(DateTime time)
-        {
-            string code = "";
-            code += time.Year.ToString().Substring(2);
-            code += time.Month.ToString("00");
-            code += time.Day.ToString("00");
-            return code;
-        } 
-        */
 
         //集装箱及报关车号列表更新
         public static void predeclcontainer_update(string ordercode, string containertruck)
