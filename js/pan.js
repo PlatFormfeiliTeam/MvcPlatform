@@ -264,7 +264,7 @@ function bjsbdw_win(component) {//传入需要赋值的控件
             text: '<i class="fa fa-check-square-o"></i>&nbsp;确定', handler: function () {
                 var recs = grid_bjsbdw.getSelectionModel().getSelection();
                 if (recs.length > 0) {
-                    component.setValue(recs[0].get("NAME") + "(" + recs[0].get("CODE") + ")");
+                    component.setValue(recs[0].get("NAME") + "(" + recs[0].get("INSPCODE") + ")");
                     win.close();
                 }
             }
