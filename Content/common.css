@@ -21,7 +21,7 @@ body {
     font-family: 'Microsoft YaHei' !important;
 }
 .footer{  
-    color:black;
+    color:#fbfbfb;
     margin:0 10px;
 }
 /*权限管理模块*/
@@ -29,3 +29,6 @@ body {
 /*上传文件的选中的线框*/
 .x-item-selected {border:1px solid;}
 .thumb-wrap {color:#57638b;}
+
+/** 修改button boostrap primary 样式**/
+.btn-primary {color: #fff;background-color: #57638b;border-color: #57638b;}
