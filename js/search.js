@@ -382,15 +382,3 @@ function SaveDefault() {
         }
     });
 }
-
-function ChangeStyle() {
-    if (showIndex == 2) {
-        gridpanel.columns[2].show();
-        gridpanel.columns[3].hide();
-        showIndex++;
-    } else if (showIndex == 3) {
-        gridpanel.columns[2].hide();
-        gridpanel.columns[3].show();
-        showIndex = 2;
-    }
-}

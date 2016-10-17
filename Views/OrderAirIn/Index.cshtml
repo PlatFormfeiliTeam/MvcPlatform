@@ -8,7 +8,6 @@
 
 <script type="text/javascript">
     var store_Trade; var store_sbfs;
-    var showIndex = 2;
     var formpanel, gridpanel;
     var common_data_jydw = [], common_data_sbfs = [], common_data_sbgq = [], common_data_bgfs = [], common_data_bzzl = [], common_data_myfs = [];
     var seniorcondition = "";//高级查询参数
@@ -84,8 +83,8 @@
                     columns: [
                     { xtype: 'rownumberer', width: 35 },
                     { header: 'ID', dataIndex: 'ID', hidden: true, locked: true },
-                    { header: '报关状态', hidden: true, dataIndex: 'DECLSTATUS', width: 90, renderer: renderOrder, locked: true },
-                    { header: '报检状态', hidden: true, dataIndex: 'INSPSTATUS', width: 90, renderer: renderOrder, locked: true },
+                    { header: '报关状态', dataIndex: 'DECLSTATUS', width: 90, renderer: renderOrder, locked: true },
+                    { header: '报检状态', dataIndex: 'INSPSTATUS', width: 90, renderer: renderOrder, locked: true },
                     { header: '订单编号', dataIndex: 'CODE', width: 100, locked: true },
                     { header: '客户编号', dataIndex: 'CUSNO', width: 120, locked: true },
                     { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 100, locked: true },

@@ -1531,18 +1531,7 @@ function renderOrder(value, cellmeta, record, rowIndex, columnIndex, store) {
                 rtn = "已作废";
             }
             else {
-                if (value >= 20 && value < 40) {
-                    rtn = "预审中";
-                }
-                if (value == 40) {
-                    rtn = "预审完成";
-                }
-                if (value == 45) {
-                    rtn = "制单已受理";
-                }
-                if (value > 45) {
-                    rtn = orders_tatus[value];
-                }
+                rtn = orders_tatus[value];
             }
             break;
         case "BUSITYPE":

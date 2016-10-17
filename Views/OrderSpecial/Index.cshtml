@@ -8,7 +8,6 @@
 
 <script type="text/javascript">
     var store_Trade; var store_sbfs;
-    var showIndex = 2;
     var formpanel, gridpanel;    
     var common_data_jydw = [], common_data_sbfs = [], common_data_sbgq = [], common_data_bgfs = [], common_data_bzzl = [], common_data_myfs = [];
 
@@ -82,8 +81,8 @@
                     columns: [
                     { xtype: 'rownumberer', width: 35 },
                     { header: 'ID', dataIndex: 'ID', width: 110, sortable: true, hidden: true },
-                    { header: '报关状态', hidden: true, dataIndex: 'DECLSTATUS', width: 90, renderer: renderOrder },
-                    { header: '报检状态', hidden: true, dataIndex: 'INSPSTATUS', width: 90, renderer: renderOrder },
+                    { header: '报关状态', dataIndex: 'DECLSTATUS', width: 90, renderer: renderOrder },
+                    { header: '报检状态', dataIndex: 'INSPSTATUS', width: 90, renderer: renderOrder },
                     { header: '订单编号', dataIndex: 'CODE', width: 100 },
                     { header: '客户编号', dataIndex: 'CUSNO', width: 120 },
                     { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 100 },
@@ -160,7 +159,6 @@
     <div id="div_form" style="width:100%;"></div>
     <div>
         <div class="btn-group" role="group">
-            <button onclick="ChangeStyle()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-exchange fa-fw"></i>&nbsp;状态切换</button>
             <button onclick="Open()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;添加</button>
             <button onclick="DeleteNotGuoNei()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-trash-o"></i>&nbsp;删除</button>
             <div class="btn-group">

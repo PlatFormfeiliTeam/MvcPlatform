@@ -57,29 +57,44 @@ namespace MvcPlatform.Controllers
             JObject json = (JObject)JsonConvert.DeserializeObject(Request["formdata"]);
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string sql = "";
-            string ordercode = string.Empty;
+            string ordercode = string.Empty; bool IsSubmitAfterSave = false;
             if (Request["action"] + "" == "submit")
             {
                 json.Remove("STATUS"); json.Remove("SUBMITTIME"); json.Remove("SUBMITUSERNAME"); json.Remove("SUBMITUSERID"); 
-                json.Add("STATUS", 15);
+                json.Add("STATUS", 10);
                 json.Add("SUBMITTIME", "sysdate");
                 json.Add("SUBMITUSERNAME", json_user.Value<string>("REALNAME"));
                 json.Add("SUBMITUSERID", json_user.Value<string>("ID"));
             }
             else
             {
-                if (string.IsNullOrEmpty(json.Value<string>("SUBMITTIME")))//有可能提交以后再对部分字段进行修改后保存
+                if (string.IsNullOrEmpty(json.Value<string>("SUBMITTIME")))
                 {
                     json.Remove("SUBMITTIME"); //委托时间  因为该字段需要取ORACLE的时间，而非系统时间 所以需要特殊处理,格式化时并没有加引号
                     json.Add("SUBMITTIME", "null");
                 }
-                else
+                else//有可能提交以后再对部分字段进行修改后保存
                 {
                     string submittime = json.Value<string>("SUBMITTIME");
                     json.Remove("SUBMITTIME");//委托时间  因为该字段需要取ORACLE的时间，而非系统时间 所以需要特殊处理
                     json.Add("SUBMITTIME", "to_date('" + submittime + "','yyyy-MM-dd HH24:mi:ss')");
+                    IsSubmitAfterSave = true;
                 }
             }
+
+            if (json.Value<string>("ENTRUSTTYPE") == "01")
+            {
+                json.Add("DECLSTATUS", json.Value<string>("STATUS")); json.Add("INSPSTATUS", null);
+            }
+            if (json.Value<string>("ENTRUSTTYPE") == "02")
+            {
+                json.Add("DECLSTATUS", null); json.Add("INSPSTATUS", json.Value<string>("STATUS"));
+            }
+            if (json.Value<string>("ENTRUSTTYPE") == "03")
+            {
+                json.Add("DECLSTATUS", json.Value<string>("STATUS")); json.Add("INSPSTATUS", json.Value<string>("STATUS"));
+            }
+
             if (string.IsNullOrEmpty(json.Value<string>("CODE")))//新增
             {
                 ordercode = Extension.getOrderCode();
@@ -92,6 +107,7 @@ namespace MvcPlatform.Controllers
                             ,CUSTOMERNAME,DECLCARNO,TRADEWAYCODES,GOODSGW,GOODSNW
                             ,PACKKIND,CREATETIME,SUBMITTIME,TRADEWAYCODES1,GOODSTYPEID,CONTAINERNO
                             ,ORDERWAY,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES,BUSIKIND
+                            ,CLEARUNIT,CLEARUNITNAME,DECLSTATUS,INSPSTATUS
                             )
                       VALUES ( LIST_ORDER_id.Nextval,
                             '{0}','{1}','{2}','{3}','{4}','{5}'
@@ -102,6 +118,7 @@ namespace MvcPlatform.Controllers
                             ,'{26}','{27}','{28}','{29}','{30}'
                             ,'{31}',sysdate,{32},'{33}','{34}','{35}'
                             ,'{36}','{37}','{38}','{39}','{40}'
+                            ,'{41}','{42}','{43}','{44}'
                             )";
                 sql = string.Format(sql
                         , json.Value<string>("BUSITYPE"), ordercode, json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME"), json.Value<string>("CONTRACTNO")
@@ -111,7 +128,8 @@ namespace MvcPlatform.Controllers
                         , json_user.Value<string>("REALNAME"), json.Value<string>("STATUS"), json.Value<string>("SUBMITUSERID"), json.Value<string>("SUBMITUSERNAME"), json_user.Value<string>("CUSTOMERCODE")
                         , json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLCARNO"), json.Value<string>("TRADEWAYCODES"), json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW")
                         , json.Value<string>("PACKKIND"), json.Value<string>("SUBMITTIME"), json.Value<string>("TRADEWAYCODES1"), json.Value<string>("GOODSTYPEID"), json.Value<string>("CONTAINERNO")
-                        , "1", GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT")), GetChk(json.Value<string>("PAYPOYALTIES")), "002" 
+                        , "1", GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT")), GetChk(json.Value<string>("PAYPOYALTIES")), "002"
+                        , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS")
                        );
             }
             else//修改
@@ -125,17 +143,25 @@ namespace MvcPlatform.Controllers
                             ,STATUS='{21}',SUBMITUSERID='{22}',SUBMITUSERNAME='{23}',CUSTOMERCODE='{24}',CUSTOMERNAME='{25}'
                             ,DECLCARNO='{26}',TRADEWAYCODES='{27}',SUBMITTIME={28},GOODSGW='{29}',GOODSNW='{30}'
                             ,PACKKIND='{31}',TRADEWAYCODES1='{32}',GOODSTYPEID='{33}',CONTAINERNO='{34}',ORDERWAY='{35}'
-                            ,SPECIALRELATIONSHIP='{36}',PRICEIMPACT='{37}',PAYPOYALTIES='{38}' 
-                        WHERE CODE = '{0}'";
+                            ,SPECIALRELATIONSHIP='{36}',PRICEIMPACT='{37}',PAYPOYALTIES='{38}',CLEARUNIT='{39}',CLEARUNITNAME='{40}' 
+                            ";
+
+                if (IsSubmitAfterSave == false)//提交之后保存，就不更新报关报检状态；
+                {
+                    sql += @",DECLSTATUS='{41}',INSPSTATUS='{42}'";
+                }
+                sql += @" WHERE CODE = '{0}'";
+
                 sql = string.Format(sql
                         , ordercode, json.Value<string>("BUSITYPE"), "002", json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME")
                         , json.Value<string>("CONTRACTNO"), json.Value<string>("TURNPRENO"), json.Value<string>("GOODSNUM"), json.Value<string>("CLEARANCENO"), GetChk(json.Value<string>("LAWFLAG"))
                         , json.Value<string>("ENTRUSTTYPE"), json.Value<string>("REPWAYID"), json.Value<string>("CUSTOMAREACODE"),GetCode(json.Value<string>("REPUNITCODE")), GetName(json.Value<string>("REPUNITCODE"))
                         , json.Value<string>("DECLWAY"), json.Value<string>("PORTCODE"), GetCode(json.Value<string>("INSPUNITCODE")), GetName(json.Value<string>("INSPUNITCODE")), json.Value<string>("ENTRUSTREQUEST")
-                        , json.Value<string>("STATUS"), json.Value<string>("SUBMITUSERID"), json.Value<string>("SUBMITUSERNAME"), json_user.Value<string>("CUSTOMERHSCODE"), json_user.Value<string>("CUSTOMERNAME")
+                        , json.Value<string>("STATUS"), json.Value<string>("SUBMITUSERID"), json.Value<string>("SUBMITUSERNAME"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
                         , json.Value<string>("DECLCARNO"), json.Value<string>("TRADEWAYCODES"), json.Value<string>("SUBMITTIME"), json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW")
                         , json.Value<string>("PACKKIND"), json.Value<string>("TRADEWAYCODES1"), json.Value<string>("GOODSTYPEID"), json.Value<string>("CONTAINERNO"), "1"
-                        , GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT")), GetChk(json.Value<string>("PAYPOYALTIES"))
+                        , GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT")), GetChk(json.Value<string>("PAYPOYALTIES")), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
+                        , json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS")
                      );
             }
             int result = DBMgr.ExecuteNonQuery(sql);

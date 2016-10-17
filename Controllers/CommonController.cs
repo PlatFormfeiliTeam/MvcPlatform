@@ -431,7 +431,7 @@ namespace MvcPlatform.Controllers
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
-            string sql = @"select * from LIST_ORDER where instr('" + Request["busitypeid"] + "',BUSITYPE)>0 and customercode='" + json_user.Value<string>("CUSTOMERHSCODE") + "' " + where;
+            string sql = @"select * from LIST_ORDER where instr('" + Request["busitypeid"] + "',BUSITYPE)>0 and customercode='" + json_user.Value<string>("CUSTOMERCODE") + "' " + where;
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "createtime", "desc"));
             var json = JsonConvert.SerializeObject(dt, iso);
             return "{rows:" + json + ",total:" + totalProperty + "}";
@@ -1057,7 +1057,7 @@ namespace MvcPlatform.Controllers
             }
             if (role == "customer")//如果角色是客户
             {
-                where += @" and ort.customercode ='" + json_user.Value<string>("CUSTOMERHSCODE") + "' ";
+                where += @" and ort.customercode ='" + json_user.Value<string>("CUSTOMERCODE") + "' ";
             }
 
             //2016-6-24 更新报关单列表显示逻辑 根据报关单对应的订单【DECLPDF】即报关单是否已关联好PDF文件，作为显示的条件 国内业务不需要去判断关联订单，因为打这两个标志的时候已经判断了           
@@ -1082,7 +1082,7 @@ namespace MvcPlatform.Controllers
                          cus.SCENEDECLAREID                                                                          
                          from list_declaration det 
                               left join list_order ort on det.ordercode = ort.code 
-                              left join sys_customer cus on ort.customercode = cus.hscode 
+                              left join sys_customer cus on ort.customercode = cus.code 
                          where DECLSTATUS=130 and det.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where;//(ort.DECLPDF =1 or ort.PREPDF=1) 
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
@@ -1765,7 +1765,7 @@ namespace MvcPlatform.Controllers
             }
             if (role == "customer")
             {
-                where += @" and lo.customercode ='" + json_user.Value<string>("CUSTOMERHSCODE") + "' ";
+                where += @" and lo.customercode ='" + json_user.Value<string>("CUSTOMERCODE") + "' ";
             }
             //申报库别基础表sys_REPORTLIBRARY
             /*string sql = @"SELECT li.ID,li.CODE,li.PREINSPCODE, li.APPROVALCODE,li.INSPECTIONCODE,li.REPFINISHTIME
@@ -1790,7 +1790,7 @@ namespace MvcPlatform.Controllers
                               ,cus.SCENEINSPECTID    
                             FROM list_inspection li 
                                  LEFT JOIN list_order lo ON li.ordercode = lo.code 
-                                 left join sys_customer cus on lo.customercode=cus.hscode 
+                                 left join sys_customer cus on lo.customercode=cus.code 
                             WHERE li.STATUS >=103  and INSTR('" + busitypeid + "',lo.busitype)>0 " + where;
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
