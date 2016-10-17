@@ -158,7 +158,7 @@ namespace MvcPlatform.Controllers
 
                 if (IsSubmitAfterSave == false)//提交之后保存，就不更新报关报检状态；
                 {
-                    sql += @",DECLSTATUS='{45}',INSPSTATUS='{46}'";
+                    sql += @",DECLSTATUS='{44}',INSPSTATUS='{45}'";
                 }
                 sql += @" WHERE CODE = '{0}'";
 
