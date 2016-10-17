@@ -1504,7 +1504,7 @@ function DeleteNotGuoNei() {
         if (recs[0].data.INSPSTATUS != '0') { bf = true; }
     }
     if (recs[0].data.ENTRUSTTYPE == "03") {
-        if (recs[0].data.DECLSTATUS != '0' || recs[0].data.DECLSTATUS != '0') { bf = true; }
+        if (recs[0].data.DECLSTATUS != '0' || recs[0].data.INSPSTATUS != '0') { bf = true; }
     }
 
     if (bf) {
