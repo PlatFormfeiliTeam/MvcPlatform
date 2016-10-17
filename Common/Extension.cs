@@ -251,7 +251,7 @@ namespace MvcPlatform.Common
         //订单的状态在草稿、文件已上传、订单已委托 三个状态发生时记录到订单状态变更日志
         public static void add_list_time(int status, string ordercode, JObject json_user)
         {
-            if (status != 1 && status != 10 && status != 15)
+            if (status != 0 && status != 10)
             {
                 return;
             }
@@ -261,7 +261,7 @@ namespace MvcPlatform.Common
 
             string sql = ""; int i = 0; int CreateUserId = json_user.Value<Int32>("ID"); string CreateUserName = json_user.Value<string>("REALNAME");
 
-             int[] status_array = new int[] { 1, 10, 15 };
+             int[] status_array = new int[] { 0, 10 };
              foreach (int status_tmp in status_array)
              {
                  if (status >= status_tmp)

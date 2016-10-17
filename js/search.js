@@ -104,14 +104,8 @@ function initSearch() {
         listeners: {
             change: function () {
                 combo_3_1.reset();
-                if (combo_3.getValue() == "ddzt") {
-                    store_3_1.loadData(search_js_condition3_orderstatus_data);
-                }
                 if (combo_3.getValue() == "bgzt" || combo_3.getValue() == "bjzt") {
                     store_3_1.loadData(search_js_condition3_bgbjstatus_data);
-                }
-                if (combo_3.getValue() == "yjzt") {
-                    store_3_1.loadData(search_js_condition3_yjstatus_data);
                 }
             }
         }
@@ -273,14 +267,8 @@ function initSearch() {
         listeners: {
             change: function () {
                 combo_7_1.reset();
-                if (combo_7.getValue() == "ddzt") {
-                    store_7_1.loadData(search_js_condition3_orderstatus_data);
-                }
                 if (combo_7.getValue() == "bgzt" || combo_7.getValue() == "bjzt") {
                     store_7_1.loadData(search_js_condition3_bgbjstatus_data);
-                }
-                if (combo_7.getValue() == "yjzt") {
-                    store_7_1.loadData(search_js_condition3_yjstatus_data);
                 }
             }
         }
@@ -393,4 +381,16 @@ function SaveDefault() {
             }
         }
     });
+}
+
+function ChangeStyle() {
+    if (showIndex == 2) {
+        gridpanel.columns[2].show();
+        gridpanel.columns[3].hide();
+        showIndex++;
+    } else if (showIndex == 3) {
+        gridpanel.columns[2].hide();
+        gridpanel.columns[3].show();
+        showIndex = 2;
+    }
 }

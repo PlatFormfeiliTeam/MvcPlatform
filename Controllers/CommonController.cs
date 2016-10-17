@@ -239,41 +239,49 @@ namespace MvcPlatform.Controllers
             {
                 switch (Request["CONDITION3"])
                 {
-                    case "ddzt"://订单状态                      
+                    case "bgzt":
                         if ((Request["VALUE3"] + "") == "草稿")  //草稿=草稿
                         {
-                            where += " and STATUS='1' ";
+                            where += " and DECLSTATUS=0 ";
                         }
-                        if ((Request["VALUE3"] + "") == "订单待委托")   //订单待委托 < 已委托
+                        if ((Request["VALUE3"] + "") == "已委托")  //已委托=已委托
                         {
-                            where += " and STATUS < 15 ";
+                            where += " and DECLSTATUS=10 ";
                         }
-                        if ((Request["VALUE3"] + "") == "订单待受理") //已委托 <= 订单待受理 < 已受理
+                        if ((Request["VALUE3"] + "") == "申报中")  //申报中=申报中
                         {
-                            where += " and STATUS >= 15 and STATUS < 20 ";
+                            where += " and DECLSTATUS=100 ";
                         }
-                        if ((Request["VALUE3"] + "") == "订单受理中")  //已受理 <= 订单受理中 < 已交付
+                        if ((Request["VALUE3"] + "") == "申报完结")  //申报完结=申报完结
                         {
-                            where += " and STATUS >= 20 and STATUS < 110 ";
+                            where += " and DECLSTATUS=130 ";
                         }
-                        if ((Request["VALUE3"] + "") == "订单待交付")  //已委托 <= 订单待交付 < 已交付
+                        if ((Request["VALUE3"] + "") == "未完结")  //未完结
                         {
-                            where += " and STATUS >= 15 and STATUS < 110 ";
+                            where += " and DECLSTATUS<130 ";
                         }
-                        if ((Request["VALUE3"] + "") == "订单已交付")  //订单已交付 = 已交付
-                        {
-                            where += " and STATUS='110' ";
-                        }
-                        if ((Request["VALUE3"] + "") == "订单已作废")
-                        {
-                            where += " and ISINVALID='1' ";
-                        }
-                        break;
-                    case "bgzt":
-                        where += " and DECLSTATUS='" + Request["VALUE3"] + "' ";
                         break;
                     case "bjzt":
-                        where += " and INSPSTATUS='" + Request["VALUE3"] + "' ";
+                        if ((Request["VALUE3"] + "") == "草稿")  //草稿=草稿
+                        {
+                            where += " and INSPSTATUS=0 ";
+                        }
+                        if ((Request["VALUE3"] + "") == "已委托")  //已委托=已委托
+                        {
+                            where += " and INSPSTATUS=10 ";
+                        }
+                        if ((Request["VALUE3"] + "") == "申报中")  //申报中=申报中
+                        {
+                            where += " and INSPSTATUS=100 ";
+                        }
+                        if ((Request["VALUE3"] + "") == "申报完结")  //申报完结=申报完结
+                        {
+                            where += " and INSPSTATUS=130 ";
+                        }
+                        if ((Request["VALUE3"] + "") == "未完结")  //未完结
+                        {
+                            where += " and INSPSTATUS<130 ";
+                        }
                         break;
                 }
             }
@@ -343,47 +351,49 @@ namespace MvcPlatform.Controllers
             {
                 switch (Request["CONDITION7"])
                 {
-                    case "ddzt"://订单状态
-                        //草稿=草稿
-                        if ((Request["VALUE7"] + "") == "草稿")
-                        {
-                            where += " and STATUS='1' ";
-                        }
-                        //订单待委托 < 已委托
-                        if ((Request["VALUE7"] + "") == "订单待委托")
-                        {
-                            where += " and STATUS < 15 ";
-                        }
-                        //已委托 <= 订单待受理 < 已受理
-                        if ((Request["VALUE7"] + "") == "订单待受理")
-                        {
-                            where += " and STATUS >= 15 and STATUS < 20 ";
-                        }
-                        //已受理 <= 订单受理中 < 已交付
-                        if ((Request["VALUE7"] + "") == "订单受理中")
-                        {
-                            where += " and STATUS >= 20 and STATUS < 110 ";
-                        }
-                        //已委托 <= 订单待交付 < 已交付
-                        if ((Request["VALUE7"] + "") == "订单待交付")
-                        {
-                            where += " and STATUS >= 15 and STATUS < 110 ";
-                        }
-                        //订单已交付 = 已交付
-                        if ((Request["VALUE7"] + "") == "订单已交付")
-                        {
-                            where += " and STATUS='110' ";
-                        }
-                        if ((Request["VALUE7"] + "") == "订单已作废")
-                        {
-                            where += " and ISINVALID='1' ";
-                        }
-                        break;
                     case "bgzt":
-                        where += " and DECLSTATUS='" + Request["VALUE7"] + "' ";
+                        if ((Request["VALUE7"] + "") == "草稿")  //草稿=草稿
+                        {
+                            where += " and DECLSTATUS=0 ";
+                        }
+                        if ((Request["VALUE7"] + "") == "已委托")  //已委托=已委托
+                        {
+                            where += " and DECLSTATUS=10 ";
+                        }
+                        if ((Request["VALUE7"] + "") == "申报中")  //申报中=申报中
+                        {
+                            where += " and DECLSTATUS=100 ";
+                        }
+                        if ((Request["VALUE7"] + "") == "申报完结")  //申报完结=申报完结
+                        {
+                            where += " and DECLSTATUS=130 ";
+                        }
+                        if ((Request["VALUE7"] + "") == "未完结")  //未完结
+                        {
+                            where += " and DECLSTATUS<130 ";
+                        }
                         break;
                     case "bjzt":
-                        where += " and INSPSTATUS='" + Request["VALUE7"] + "' ";
+                        if ((Request["VALUE7"] + "") == "草稿")  //草稿=草稿
+                        {
+                            where += " and INSPSTATUS=0 ";
+                        }
+                        if ((Request["VALUE7"] + "") == "已委托")  //已委托=已委托
+                        {
+                            where += " and INSPSTATUS=10 ";
+                        }
+                        if ((Request["VALUE7"] + "") == "申报中")  //申报中=申报中
+                        {
+                            where += " and INSPSTATUS=100 ";
+                        }
+                        if ((Request["VALUE7"] + "") == "申报完结")  //申报完结=申报完结
+                        {
+                            where += " and INSPSTATUS=130 ";
+                        }
+                        if ((Request["VALUE7"] + "") == "未完结")  //未完结
+                        {
+                            where += " and INSPSTATUS<130 ";
+                        }
                         break;
                 }
             }
@@ -411,15 +421,13 @@ namespace MvcPlatform.Controllers
                     break;
             }
 
-            if ((Request["VALUE3"] + "") != "订单已作废" && (Request["VALUE7"] + "") != "订单已作废")//在不查询已作废的订单情形下，皆显示正常的订单
-            {
-                where += " and ISINVALID='0' ";
-            }
-
             if ((Request["OnlySelf"] + "").Trim() == "fa fa-check-square-o")
             {
                 where += " and CREATEUSERID = " + json_user.Value<string>("ID") + " ";
             }
+            
+            where += " and ISINVALID=0 ";            
+
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
@@ -891,7 +899,7 @@ namespace MvcPlatform.Controllers
                        WEIGHTCHECK = dt.Rows[0]["WEIGHTCHECK"].ToString();
                     }
                     //end
-                    string formdata = "{STATUS:1,REPUNITNAME:'" + bgsb_unit + "',REPUNITCODE:'" + json_user.Value<string>("CUSTOMERHSCODE") + "',INSPUNITNAME:'" + bjsb_unit + "',INSPUNITCODE:'" + json_user.Value<string>("CUSTOMERCIQCODE") + "',WEIGHTCHECK:'" + WEIGHTCHECK + "'}";
+                    string formdata = "{STATUS:0,REPUNITNAME:'" + bgsb_unit + "',REPUNITCODE:'" + json_user.Value<string>("CUSTOMERHSCODE") + "',INSPUNITNAME:'" + bjsb_unit + "',INSPUNITCODE:'" + json_user.Value<string>("CUSTOMERCIQCODE") + "',WEIGHTCHECK:'" + WEIGHTCHECK + "'}";
                     result = "{formdata:" + formdata + ",filedata:[]}";
                 }
                 else//如果是复制新增
@@ -900,7 +908,7 @@ namespace MvcPlatform.Controllers
                     dt = DBMgr.GetDataTable(sql);
                     if (dt.Rows.Count > 0)
                     {
-                        dt.Rows[0]["CODE"] = DBNull.Value; dt.Rows[0]["STATUS"] = "1";
+                        dt.Rows[0]["CODE"] = DBNull.Value; dt.Rows[0]["STATUS"] = "0";
                         dt.Rows[0]["CREATEUSERID"] = DBNull.Value; dt.Rows[0]["CREATEUSERNAME"] = DBNull.Value;
                         dt.Rows[0]["SUBMITTIME"] = DBNull.Value; dt.Rows[0]["CREATETIME"] = DBNull.Value;
                         dt.Rows[0]["SUBMITUSERNAME"] = DBNull.Value; dt.Rows[0]["SUBMITUSERID"] = DBNull.Value;
@@ -946,15 +954,15 @@ namespace MvcPlatform.Controllers
             string sql = "select * from list_order where code='" + ordercode + "'";
             DataTable dt = DBMgr.GetDataTable(sql);
             string result = "";
-            if (dt.Rows[0]["STATUS"] + "" != "15")
+            if (dt.Rows[0]["STATUS"] + "" != "10")
             {
                 result = "{success:false}";
             }
             else
             {
-                sql = "delete from list_times where code='" + ordercode + "' and status = '15'";//删除订单状态变更日志信息
+                sql = "delete from list_times where code='" + ordercode + "' and status = '10'";//删除订单状态变更日志信息
                 DBMgr.ExecuteNonQuery(sql);
-                sql = "update list_order set STATUS = '10' ,SUBMITUSERNAME='',SUBMITTIME='' where code='" + ordercode + "'";
+                sql = "update list_order set STATUS = '0' ,SUBMITUSERNAME='',SUBMITTIME='' where code='" + ordercode + "'";
                 DBMgr.ExecuteNonQuery(sql);
                 result = "{success:true}";
             }
@@ -1075,7 +1083,7 @@ namespace MvcPlatform.Controllers
                          from list_declaration det 
                               left join list_order ort on det.ordercode = ort.code 
                               left join sys_customer cus on ort.customercode = cus.hscode 
-                         where (ort.DECLPDF =1 or ort.PREPDF=1) and det.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where;
+                         where DECLSTATUS=130 and det.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where;//(ort.DECLPDF =1 or ort.PREPDF=1) 
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";

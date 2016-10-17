@@ -946,38 +946,38 @@ function loadform() {
 //非国内业务表单控制逻辑  by panhuaguo 2016-08-19 封装至此 
 function formcontrol() {
     var status = Ext.getCmp('field_STATUS').getValue();
-    document.getElementById("pickfiles").disabled = status >= 15;
-    document.getElementById("deletefile").disabled = status >= 15; //删除按钮  --提交后不允许删除setVisibilityMode
-    document.getElementById("btn_cancelsubmit").disabled = status != 15;//撤单按钮  只有在提交后受理前才可以撤单
-    document.getElementById("btn_submitorder").disabled = status >= 15;//提交按钮
+    document.getElementById("pickfiles").disabled = status >= 10;
+    document.getElementById("deletefile").disabled = status >= 10; //删除按钮  --提交后不允许删除setVisibilityMode
+    document.getElementById("btn_cancelsubmit").disabled = status != 10;//撤单按钮  只有在提交后受理前才可以撤单
+    document.getElementById("btn_submitorder").disabled = status >= 10;//提交按钮
 
     //以前是要加状态判断,考虑到撤单后页面字段状态需要重新控制 故去掉status>=15条件 by panhuaguo 2016-08-29
     //2016-08-30测试发现field_STATUS这个控件在默认只读的情况,循环表单控件的时候会将其只读属性去掉，所以要过滤掉这个控件 自始至终这个控件应该是只读的
     Ext.Array.each(formpanel.getForm().getFields().items, function (item) {
         if (item.value != "" && item.value != null && item.value != undefined && item.id != 'field_ENTRUSTREQUEST' && item.id != "field_STATUS" && item.id != "tf_bjsbdw" && item.id != "tf_bgsbdw") {
-            item.setReadOnly(status >= 15);
+            item.setReadOnly(status >= 10);
         }
     });
 
     //下面是表单控件涉及的弹窗选择按钮
-    Ext.getCmp('jydw_btn').setDisabled(status >= 15); //经营单位        
-    Ext.getCmp("myfs_btn").setDisabled(status >= 15);//贸易方式 
-    Ext.getCmp('bgsbdw_btn').setDisabled(status >= 15);//报关申报单位 
-    Ext.getCmp('bjsbdw_btn').setDisabled(status >= 15); //报检申报单位 
+    Ext.getCmp('jydw_btn').setDisabled(status >= 10); //经营单位        
+    Ext.getCmp("myfs_btn").setDisabled(status >= 10);//贸易方式 
+    Ext.getCmp('bgsbdw_btn').setDisabled(status >= 10);//报关申报单位 
+    Ext.getCmp('bjsbdw_btn').setDisabled(status >= 10); //报检申报单位 
 
     //集装箱号和报关车号不是所有的业务下都有这些控件，所以需要判断一下
     if (Ext.getCmp('container_btn')) {
         if (Ext.getCmp("CONTAINERNO").getValue()) {
-            Ext.getCmp('container_btn').setDisabled(status >= 15);//集装箱号 
+            Ext.getCmp('container_btn').setDisabled(status >= 10);//集装箱号 
         }
     }
     if (Ext.getCmp('declcarno_btn')) {
         if (Ext.getCmp("DECLCARNO").getValue()) {
-            Ext.getCmp('declcarno_btn').setDisabled(status >= 15);//报关车号  
+            Ext.getCmp('declcarno_btn').setDisabled(status >= 10);//报关车号  
         }
     }
 
-    if (status < 15) {
+    if (status < 10) {
         upload_ini();
     }
     wtlx_control();//委托类型对其他字段的控制
@@ -1050,17 +1050,7 @@ function wtlx_control() {
 //非国内业务 随附文件展示控件 by panhuaguo 2016-08-19  1  调用此方法时注意将file_store声明为全局  2 父页面渲染的html  ID  div_panel
 function panel_file_ini() {
     file_store = Ext.create('Ext.data.JsonStore', {
-        fields: ['ID', 'FILENAME', 'ORIGINALNAME', 'FILETYPE', 'FILETYPENAME', 'UPLOADTIME', 'SIZES', 'IETYPE'],
-        listeners: {
-            datachanged: function (sf_1, eOpts) {
-                if (file_store.data.length > 0 && Ext.getCmp('field_STATUS').getValue() == 1) {
-                    Ext.getCmp('field_STATUS').setValue(10);
-                }
-                if (file_store.data.length == 0 && Ext.getCmp('field_STATUS').getValue() == 10) {
-                    Ext.getCmp('field_STATUS').setValue(1);
-                }
-            }
-        }
+        fields: ['ID', 'FILENAME', 'ORIGINALNAME', 'FILETYPE', 'FILETYPENAME', 'UPLOADTIME', 'SIZES', 'IETYPE']        
     })
     var tmp = new Ext.XTemplate(
          '<tpl for=".">',
@@ -1505,7 +1495,7 @@ function DeleteNotGuoNei() {
         Ext.MessageBox.alert('提示', '请选择需要删除的记录！');
         return;
     }
-    if (recs[0].data.STATUS != '1' && recs[0].data.STATUS != '10') {
+    if (recs[0].data.STATUS != '0') {
         Ext.MessageBox.alert('提示', '已委托的订单不能删除！');
         return;
     }
@@ -1534,16 +1524,7 @@ function DeleteNotGuoNei() {
 function renderOrder(value, cellmeta, record, rowIndex, columnIndex, store) {
     var rtn = "";
     var dataindex = cellmeta.column.dataIndex;
-    ////大于等于20  小于40  报关状态叫【报关报检都叫预审中】   ==40  【报关报检状态都叫预审完成】  ==45  【报关报检都叫制单已受理】
     switch (dataindex) {
-        case "STATUS":
-            if (record.get("ISINVALID") == "1") {
-                rtn = "已作废";
-            }
-            else {
-                rtn = orders_tatus[value];
-            }
-            break;
         case "DECLSTATUS":
         case "INSPSTATUS":
             if (record.get("ISINVALID") == "1") {

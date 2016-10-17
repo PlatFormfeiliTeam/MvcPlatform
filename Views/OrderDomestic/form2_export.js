@@ -417,7 +417,7 @@
         hiddenTrigger: true,
         readOnly: true,
         labelWidth: 80,
-        value: 1,
+        value: 0,
         store: store_status4
     });
     formpanelout2 = Ext.create('Ext.form.Panel', {

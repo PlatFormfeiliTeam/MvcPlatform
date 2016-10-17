@@ -117,7 +117,7 @@ namespace MvcPlatform.Controllers
                 }
                 string repunitcode = bgsb_unit + "(" + json_user.Value<string>("CUSTOMERHSCODE") + ")";
                 string inspunitcode = bjsb_unit + "(" + json_user.Value<string>("CUSTOMERCIQCODE") + ")";
-                string result = "{STATUS:1,REPUNITCODE:'" + repunitcode + "' ,INSPUNITCODE:'" + inspunitcode + "'}";
+                string result = "{STATUS:0,REPUNITCODE:'" + repunitcode + "' ,INSPUNITCODE:'" + inspunitcode + "'}";
                 return "{data1:" + result + ",data2:" + result + ",data3:" + result + ",data4:" + result + ",filedata1:" + filedata1 + ",filedata2:" + filedata2 + "}";
 
             }

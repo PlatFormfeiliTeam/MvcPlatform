@@ -414,7 +414,7 @@
         hiddenTrigger: true,
         readOnly: true,
         labelWidth: 80,
-        value: 1,
+        value: 0,
         store: store_status
     });
     formpanelin = Ext.create('Ext.form.Panel', {

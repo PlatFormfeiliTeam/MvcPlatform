@@ -39,7 +39,7 @@
                     data: common_data_sbfs
                 });
                 store_Trade = Ext.create('Ext.data.JsonStore', {
-                    fields: ['ID', 'STATUS', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE', 'ISINVALID',
+                    fields: ['ID', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE', 'ISINVALID',
                     'BUSIUNITCODE', 'BUSIUNITNAME', 'CONTRACTNO', 'REPWAYID', 'GOODSNUM',
                     'GOODSGW', 'CUSTOMAREACODE', 'LAWFLAG', 'ASSOCIATENO', 'BUSITYPE', 'CORRESPONDNO', 'SUBMITTIME'],
                     pageSize: 20,
@@ -85,7 +85,6 @@
                     columns: [
                     { xtype: 'rownumberer', width: 35 },
                     { header: 'ID', dataIndex: 'ID', hidden: true, locked: true },
-                    { header: '订单状态', dataIndex: 'STATUS', width: 85, renderer: renderOrder, locked: true },
                     { header: '报关状态', hidden: true, dataIndex: 'DECLSTATUS', width: 90, renderer: renderOrder, locked: true },
                     { header: '报检状态', hidden: true, dataIndex: 'INSPSTATUS', width: 90, renderer: renderOrder, locked: true },
                     { header: '订单编号', dataIndex: 'CODE', width: 100, locked: true },
@@ -161,25 +160,6 @@
 
     function Open() {
         opencenterwin("/OrderDomestic/Create", 1600, 900);
-    }
-
-    function ChangeStyle() {
-        if (showIndex == 2) {
-            gridpanel.columns[2].hide();
-            gridpanel.columns[3].show();
-            gridpanel.columns[4].hide();
-            showIndex++;
-        } else if (showIndex == 3) {
-            gridpanel.columns[2].hide();
-            gridpanel.columns[3].hide();
-            gridpanel.columns[4].show();
-            showIndex++;
-        } else if (showIndex == 4) {
-            gridpanel.columns[2].show();
-            gridpanel.columns[3].hide();
-            gridpanel.columns[4].hide();
-            showIndex = 2;
-        }
     }
 
     function openwin(type) {
