@@ -962,7 +962,10 @@ namespace MvcPlatform.Controllers
             {
                 sql = "delete from list_times where code='" + ordercode + "' and status = '10'";//删除订单状态变更日志信息
                 DBMgr.ExecuteNonQuery(sql);
-                sql = "update list_order set STATUS = '0' ,SUBMITUSERNAME='',SUBMITTIME='' where code='" + ordercode + "'";
+                sql = @"update list_order set STATUS = '0'
+                        ,DECLSTATUS=case when DECLSTATUS is null then null else '0' end
+                        ,INSPSTATUS=case when INSPSTATUS is null then null else '0' end
+                        ,SUBMITUSERNAME='',SUBMITTIME='' where code='" + ordercode + "'";
                 DBMgr.ExecuteNonQuery(sql);
                 result = "{success:true}";
             }

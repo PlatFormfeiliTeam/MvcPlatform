@@ -1495,10 +1495,23 @@ function DeleteNotGuoNei() {
         Ext.MessageBox.alert('提示', '请选择需要删除的记录！');
         return;
     }
-    if (recs[0].data.STATUS != '0') {
+
+    var bf = false;
+    if (recs[0].data.ENTRUSTTYPE == "01") {
+        if (recs[0].data.DECLSTATUS != '0') { bf = true; }
+    }
+    if (recs[0].data.ENTRUSTTYPE == "02") {
+        if (recs[0].data.INSPSTATUS != '0') { bf = true; }
+    }
+    if (recs[0].data.ENTRUSTTYPE == "03") {
+        if (recs[0].data.DECLSTATUS != '0' || recs[0].data.DECLSTATUS != '0') { bf = true; }
+    }
+
+    if (bf) {
         Ext.MessageBox.alert('提示', '已委托的订单不能删除！');
         return;
     }
+
     Ext.MessageBox.confirm("提示", "确定要删除所选择的记录吗？", function (btn) {
         if (btn == 'yes') {
             Ext.Ajax.request({
