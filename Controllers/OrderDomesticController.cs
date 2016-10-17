@@ -269,13 +269,19 @@ namespace MvcPlatform.Controllers
                 if (!string.IsNullOrEmpty(dt.Rows[0]["CORRESPONDNO"] + ""))//如果存在多单关联号
                 {
                     sql_tmp = "select * from list_order where CORRESPONDNO='" + dt.Rows[0]["CORRESPONDNO"] + "'";
-                    sql = @"update list_order set STATUS=10,SUBMITTIME=NULL,SUBMITUSERNAME=NULL,SUBMITUSERID=NULL
+                    sql = @"update list_order set STATUS=0
+                            ,DECLSTATUS=case when DECLSTATUS is null then null else '0' end
+                            ,INSPSTATUS=case when INSPSTATUS is null then null else '0' end
+                            ,SUBMITTIME=NULL,SUBMITUSERNAME=NULL,SUBMITUSERID=NULL
                           where CORRESPONDNO='" + dt.Rows[0]["CORRESPONDNO"] + "'";
                 }
                 else if (!string.IsNullOrEmpty(dt.Rows[0]["ASSOCIATENO"] + ""))
                 {
                     sql_tmp = "select * from list_order where ASSOCIATENO='" + dt.Rows[0]["ASSOCIATENO"] + "'";
-                    sql = @"update list_order set STATUS=10,SUBMITTIME=NULL,SUBMITUSERNAME=NULL,SUBMITUSERID=NULL
+                    sql = @"update list_order set STATUS=0
+                            ,DECLSTATUS=case when DECLSTATUS is null then null else '0' end
+                            ,INSPSTATUS=case when INSPSTATUS is null then null else '0' end
+                            ,SUBMITTIME=NULL,SUBMITUSERNAME=NULL,SUBMITUSERID=NULL
                           where ASSOCIATENO='" + dt.Rows[0]["ASSOCIATENO"] + "'";
                 }
 
@@ -285,7 +291,7 @@ namespace MvcPlatform.Controllers
                 dt = DBMgr.GetDataTable(sql_tmp);
                 foreach (DataRow dr in dt.Rows)
                 {
-                    sql = "delete from list_times where CODE='" + dr["CODE"] + "' AND STATUS=15";
+                    sql = "delete from list_times where CODE='" + dr["CODE"] + "' AND STATUS=10";
                     DBMgr.ExecuteNonQuery(sql);
                     
                 }
@@ -351,6 +357,7 @@ namespace MvcPlatform.Controllers
             //关联订单贸易方式 在前端没有
             json1.Add("ASSOCIATETRADEWAY", ""); json2.Add("ASSOCIATETRADEWAY", ""); json3.Add("ASSOCIATETRADEWAY", ""); json4.Add("ASSOCIATETRADEWAY", "");
 
+            bool IsSubmitAfterSave = false;
             if (Request["action"] + "" == "submit")
             {
                 json1.Remove("STATUS"); json2.Remove("STATUS"); json3.Remove("STATUS"); json4.Remove("STATUS");
@@ -377,6 +384,7 @@ namespace MvcPlatform.Controllers
                     json_head1.Remove("SUBMITTIME"); json_head2.Remove("SUBMITTIME");
                     json_head1.Add("SUBMITTIME", "to_date('" + submittime1 + "','yyyy-MM-dd HH24:mi:ss')");
                     json_head2.Add("SUBMITTIME", "to_date('" + submittime2 + "','yyyy-MM-dd HH24:mi:ss')");
+                    IsSubmitAfterSave = true;
                 }
             }
 
@@ -455,7 +463,8 @@ namespace MvcPlatform.Controllers
                                 ,CORRESPONDNO,PACKKIND,GOODSGW,GOODSNW,RECORDCODE
                                 ,TRADEWAYCODES1,IETYPE,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES
                                 ,SUBMITUSERNAME,SUBMITUSERID,ASSOCIATETRADEWAY,BUSIKIND,ORDERWAY
-                                ,CLEARUNIT,CLEARUNITNAME,CREATETIME,SUBMITTIME,PORTCODE) 
+                                ,CLEARUNIT,CLEARUNITNAME,CREATETIME,SUBMITTIME,PORTCODE
+                                ,DECLSTATUS,INSPSTATUS) 
                             VALUES (LIST_ORDER_id.Nextval
                                 ,'{0}','{1}','{2}','{3}','{4}','{5}'
                                 ,'{6}','{7}','{8}','{9}','{10}'
@@ -466,6 +475,7 @@ namespace MvcPlatform.Controllers
                                 ,'{31}','{32}','{33}','{34}','{35}'
                                 ,'{36}','{37}','{38}','{39}','{40}'
                                 ,'{41}','{42}',sysdate,{43},'{44}'
+                                ,'{45}','{46}'
                                 )";           
            
             update_sql = @"update LIST_ORDER  SET ASSOCIATEPEDECLNO='{0}',CUSNO='{1}',BUSIUNITCODE='{2}',BUSIUNITNAME='{3}',CONTRACTNO='{4}',GOODSNUM='{5}'
@@ -476,12 +486,32 @@ namespace MvcPlatform.Controllers
                                     ,SPECIALRELATIONSHIP='{26}',PRICEIMPACT='{27}',PAYPOYALTIES='{28}',STATUS='{29}',SUBMITTIME={30}
                                     ,SUBMITUSERNAME='{31}',SUBMITUSERID='{32}',ASSOCIATETRADEWAY='{33}',BUSIKIND='{34}',ORDERWAY='{35}' 
                                     ,PORTCODE='{36}'
-                            where CODE='{37}'";
+                            ";
+
+            if (IsSubmitAfterSave == false)//提交之后保存，就不更新报关报检状态；
+            {
+                update_sql += @",DECLSTATUS='{38}',INSPSTATUS='{39}'";
+            }
+            update_sql += @" WHERE CODE = '{37}'";
+
             
             string exe_desc = "";//订单保存时记录各订单的执行情况
             int order_res = 1;
             if (!string.IsNullOrEmpty(code1))//如果code1不为空 
             {
+                if (json1.Value<string>("ENTRUSTTYPE") == "01")
+                {
+                    json1.Add("DECLSTATUS", json1.Value<string>("STATUS")); json1.Add("INSPSTATUS", null);
+                }
+                if (json1.Value<string>("ENTRUSTTYPE") == "02")
+                {
+                    json1.Add("DECLSTATUS", null); json1.Add("INSPSTATUS", json1.Value<string>("STATUS"));
+                }
+                if (json1.Value<string>("ENTRUSTTYPE") == "03")
+                {
+                    json1.Add("DECLSTATUS", json1.Value<string>("STATUS")); json1.Add("INSPSTATUS", json1.Value<string>("STATUS"));
+                }
+
                 if (string.IsNullOrEmpty(json1.Value<string>("CODE")))//新增
                 {
                     sql = string.Format(insert_sql
@@ -494,6 +524,7 @@ namespace MvcPlatform.Controllers
                             , json1.Value<string>("TRADEWAYCODES1"), json_head1.Value<string>("IETYPE"), GetChk(json1.Value<string>("SPECIALRELATIONSHIP")), GetChk(json1.Value<string>("PRICEIMPACT")), GetChk(json1.Value<string>("PAYPOYALTIES"))
                             , json_head1.Value<string>("SUBMITUSERNAME"), json_head1.Value<string>("SUBMITUSERID"), json1.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
                             , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json_head1.Value<string>("SUBMITTIME"), json_head1.Value<string>("CUSTOMAREACODE")
+                            , json1.Value<string>("DECLSTATUS"), json1.Value<string>("INSPSTATUS")
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code1;
@@ -507,10 +538,10 @@ namespace MvcPlatform.Controllers
                             , json1.Value<string>("GOODSGW"), json1.Value<string>("GOODSNW"), json1.Value<string>("RECORDCODE"), json1.Value<string>("TRADEWAYCODES1"), json_head1.Value<string>("IETYPE")
                             , GetChk(json1.Value<string>("SPECIALRELATIONSHIP")), GetChk(json1.Value<string>("PRICEIMPACT")), GetChk(json1.Value<string>("PAYPOYALTIES")), json1.Value<string>("STATUS"), json_head1.Value<string>("SUBMITTIME")
                             , json_head1.Value<string>("SUBMITUSERNAME"), json_head1.Value<string>("SUBMITUSERID"), json1.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
-                            , json_head1.Value<string>("CUSTOMAREACODE"), code1
+                            , json_head1.Value<string>("CUSTOMAREACODE"), code1, json1.Value<string>("DECLSTATUS"), json1.Value<string>("INSPSTATUS")
                              );
 
-                    if (json1.Value<Int32>("STATUS") >= 20)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
+                    if (json1.Value<Int32>("STATUS") > 10)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
                     {
                         Extension.Insert_FieldUpdate_History(code1, json1, json_user, "41");
                     }
@@ -527,6 +558,19 @@ namespace MvcPlatform.Controllers
 
             if (!string.IsNullOrEmpty(code2))
             {
+                if (json2.Value<string>("ENTRUSTTYPE") == "01")
+                {
+                    json2.Add("DECLSTATUS", json2.Value<string>("STATUS")); json2.Add("INSPSTATUS", null);
+                }
+                if (json2.Value<string>("ENTRUSTTYPE") == "02")
+                {
+                    json2.Add("DECLSTATUS", null); json2.Add("INSPSTATUS", json2.Value<string>("STATUS"));
+                }
+                if (json2.Value<string>("ENTRUSTTYPE") == "03")
+                {
+                    json2.Add("DECLSTATUS", json2.Value<string>("STATUS")); json2.Add("INSPSTATUS", json2.Value<string>("STATUS"));
+                }
+
                 if (string.IsNullOrEmpty(json2.Value<string>("CODE")))//新增
                 {
                     sql = string.Format(insert_sql, "40", json2.Value<string>("ASSOCIATEPEDECLNO"), code2, json2.Value<string>("CUSNO"), json2.Value<string>("BUSIUNITCODE"),json2.Value<string>("BUSIUNITNAME")
@@ -538,6 +582,7 @@ namespace MvcPlatform.Controllers
                             , json2.Value<string>("TRADEWAYCODES1"), json_head1.Value<string>("IETYPE"), GetChk(json2.Value<string>("SPECIALRELATIONSHIP")), GetChk(json2.Value<string>("PRICEIMPACT")), GetChk(json2.Value<string>("PAYPOYALTIES"))
                             , json_head1.Value<string>("SUBMITUSERNAME"), json_head1.Value<string>("SUBMITUSERID"), json2.Value<string>("ASSOCIATETRADEWAY"),"002", "1"
                             , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json_head1.Value<string>("SUBMITTIME"), json_head1.Value<string>("CUSTOMAREACODE")
+                            , json2.Value<string>("DECLSTATUS"), json2.Value<string>("INSPSTATUS")
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code2;
@@ -551,7 +596,7 @@ namespace MvcPlatform.Controllers
                             , json2.Value<string>("GOODSGW"), json2.Value<string>("GOODSNW"), json2.Value<string>("RECORDCODE"), json2.Value<string>("TRADEWAYCODES1"), json_head1.Value<string>("IETYPE")
                             , GetChk(json2.Value<string>("SPECIALRELATIONSHIP")), GetChk(json2.Value<string>("PRICEIMPACT")), GetChk(json2.Value<string>("PAYPOYALTIES")), json2.Value<string>("STATUS"), json_head1.Value<string>("SUBMITTIME")
                             , json_head1.Value<string>("SUBMITUSERNAME"), json_head1.Value<string>("SUBMITUSERID"), json2.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
-                            , json_head1.Value<string>("CUSTOMAREACODE"), code2
+                            , json_head1.Value<string>("CUSTOMAREACODE"), code2, json2.Value<string>("DECLSTATUS"), json2.Value<string>("INSPSTATUS")
                          );
                     if (json2.Value<Int32>("STATUS") >= 20)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
                     {
@@ -569,6 +614,19 @@ namespace MvcPlatform.Controllers
             }
             if (!string.IsNullOrEmpty(code3))
             {
+                if (json3.Value<string>("ENTRUSTTYPE") == "01")
+                {
+                    json3.Add("DECLSTATUS", json3.Value<string>("STATUS")); json3.Add("INSPSTATUS", null);
+                }
+                if (json3.Value<string>("ENTRUSTTYPE") == "02")
+                {
+                    json3.Add("DECLSTATUS", null); json3.Add("INSPSTATUS", json3.Value<string>("STATUS"));
+                }
+                if (json3.Value<string>("ENTRUSTTYPE") == "03")
+                {
+                    json3.Add("DECLSTATUS", json3.Value<string>("STATUS")); json3.Add("INSPSTATUS", json3.Value<string>("STATUS"));
+                }
+
                 if (string.IsNullOrEmpty(json3.Value<string>("CODE")))//新增
                 {
                     sql = string.Format(insert_sql
@@ -580,7 +638,8 @@ namespace MvcPlatform.Controllers
                             , CorrespondNo, json3.Value<string>("PACKKIND"), json3.Value<string>("GOODSGW"), json3.Value<string>("GOODSNW"), json3.Value<string>("RECORDCODE")
                             , json3.Value<string>("TRADEWAYCODES1"), json_head2.Value<string>("IETYPE"), GetChk(json3.Value<string>("SPECIALRELATIONSHIP")), GetChk(json3.Value<string>("PRICEIMPACT")), GetChk(json3.Value<string>("PAYPOYALTIES"))
                             , json_head2.Value<string>("SUBMITUSERNAME"), json_head2.Value<string>("SUBMITUSERID"), json3.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
-                             , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json_head2.Value<string>("SUBMITTIME"), json_head2.Value<string>("CUSTOMAREACODE")
+                            , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json_head2.Value<string>("SUBMITTIME"), json_head2.Value<string>("CUSTOMAREACODE")
+                            , json3.Value<string>("DECLSTATUS"), json3.Value<string>("INSPSTATUS")
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code3;
@@ -594,7 +653,7 @@ namespace MvcPlatform.Controllers
                             , json3.Value<string>("GOODSGW"), json3.Value<string>("GOODSNW"), json3.Value<string>("RECORDCODE"), json3.Value<string>("TRADEWAYCODES1"), json_head2.Value<string>("IETYPE")
                             , GetChk(json3.Value<string>("SPECIALRELATIONSHIP")), GetChk(json3.Value<string>("PRICEIMPACT")), GetChk(json3.Value<string>("PAYPOYALTIES")), json3.Value<string>("STATUS"), json_head2.Value<string>("SUBMITTIME")
                             , json_head2.Value<string>("SUBMITUSERNAME"), json_head2.Value<string>("SUBMITUSERID"), json3.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
-                            , json_head2.Value<string>("CUSTOMAREACODE"), code3
+                            , json_head2.Value<string>("CUSTOMAREACODE"), code3, json3.Value<string>("DECLSTATUS"), json3.Value<string>("INSPSTATUS")
                             );
                          
                          
@@ -614,6 +673,19 @@ namespace MvcPlatform.Controllers
             }
             if (!string.IsNullOrEmpty(code4))
             {
+                if (json4.Value<string>("ENTRUSTTYPE") == "01")
+                {
+                    json4.Add("DECLSTATUS", json4.Value<string>("STATUS")); json4.Add("INSPSTATUS", null);
+                }
+                if (json4.Value<string>("ENTRUSTTYPE") == "02")
+                {
+                    json4.Add("DECLSTATUS", null); json4.Add("INSPSTATUS", json4.Value<string>("STATUS"));
+                }
+                if (json4.Value<string>("ENTRUSTTYPE") == "03")
+                {
+                    json4.Add("DECLSTATUS", json4.Value<string>("STATUS")); json4.Add("INSPSTATUS", json4.Value<string>("STATUS"));
+                }
+
                 if (string.IsNullOrEmpty(json4.Value<string>("CODE")))//新增
                 {
                     sql = string.Format(insert_sql
@@ -626,6 +698,7 @@ namespace MvcPlatform.Controllers
                             , json4.Value<string>("TRADEWAYCODES1"), json_head2.Value<string>("IETYPE"), GetChk(json4.Value<string>("SPECIALRELATIONSHIP")), GetChk(json4.Value<string>("PRICEIMPACT")), GetChk(json4.Value<string>("PAYPOYALTIES"))
                             , json_head2.Value<string>("SUBMITUSERNAME"), json_head2.Value<string>("SUBMITUSERID"), json4.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
                             , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json_head2.Value<string>("SUBMITTIME"), json_head2.Value<string>("CUSTOMAREACODE")
+                            , json4.Value<string>("DECLSTATUS"), json4.Value<string>("INSPSTATUS")
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code4;
@@ -639,7 +712,7 @@ namespace MvcPlatform.Controllers
                             , json4.Value<string>("GOODSGW"), json4.Value<string>("GOODSNW"), json4.Value<string>("RECORDCODE"), json4.Value<string>("TRADEWAYCODES1"), json_head2.Value<string>("IETYPE")
                             , GetChk(json4.Value<string>("SPECIALRELATIONSHIP")), GetChk(json4.Value<string>("PRICEIMPACT")), GetChk(json4.Value<string>("PAYPOYALTIES")), json4.Value<string>("STATUS"), json_head2.Value<string>("SUBMITTIME")
                             , json_head2.Value<string>("SUBMITUSERNAME"), json_head2.Value<string>("SUBMITUSERID"), json4.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
-                            , json_head2.Value<string>("CUSTOMAREACODE"), code4
+                            , json_head2.Value<string>("CUSTOMAREACODE"), code4, json4.Value<string>("DECLSTATUS"), json4.Value<string>("INSPSTATUS")
                          );
                     if (json4.Value<Int32>("STATUS") >= 20)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
                     {

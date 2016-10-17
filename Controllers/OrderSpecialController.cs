@@ -176,7 +176,7 @@ namespace MvcPlatform.Controllers
 
                 //插入订单状态变更日志
                 Extension.add_list_time(json.Value<Int32>("STATUS"), ordercode, json_user);
-                if (json.Value<Int32>("STATUS") > 15)
+                if (json.Value<Int32>("STATUS") > 10)
                 {
                     Extension.Insert_FieldUpdate_History(ordercode, json, json_user, json.Value<string>("BUSITYPE"));
                 }

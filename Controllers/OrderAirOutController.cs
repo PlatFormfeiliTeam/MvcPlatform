@@ -64,7 +64,7 @@ namespace MvcPlatform.Controllers
             JObject json = (JObject)JsonConvert.DeserializeObject(Request["formdata"]);
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string sql = "";
-            string ordercode = string.Empty;
+            string ordercode = string.Empty; bool IsSubmitAfterSave = false;
             if (Request["action"] + "" == "submit")
             {
                 json.Remove("STATUS"); json.Remove("SUBMITTIME"); json.Remove("SUBMITUSERNAME"); json.Remove("SUBMITUSERID"); 
@@ -85,8 +85,23 @@ namespace MvcPlatform.Controllers
                     string submittime = json.Value<string>("SUBMITTIME");
                     json.Remove("SUBMITTIME");//委托时间  因为该字段需要取ORACLE的时间，而非系统时间 所以需要特殊处理
                     json.Add("SUBMITTIME", "to_date('" + submittime + "','yyyy-MM-dd HH24:mi:ss')");
+                    IsSubmitAfterSave = true;
                 }
             }
+
+            if (json.Value<string>("ENTRUSTTYPE") == "01")
+            {
+                json.Add("DECLSTATUS", json.Value<string>("STATUS")); json.Add("INSPSTATUS", null);
+            }
+            if (json.Value<string>("ENTRUSTTYPE") == "02")
+            {
+                json.Add("DECLSTATUS", null); json.Add("INSPSTATUS", json.Value<string>("STATUS"));
+            }
+            if (json.Value<string>("ENTRUSTTYPE") == "03")
+            {
+                json.Add("DECLSTATUS", json.Value<string>("STATUS")); json.Add("INSPSTATUS", json.Value<string>("STATUS"));
+            }
+
             if (string.IsNullOrEmpty(json.Value<string>("CODE")))//新增
             {
                 ordercode = Extension.getOrderCode();
@@ -100,6 +115,7 @@ namespace MvcPlatform.Controllers
                             ,TRADEWAYCODES,TRADEWAYCODES1,GOODSGW,GOODSNW,PACKKIND
                             ,BUSIKIND,ORDERWAY,CLEARUNIT,CLEARUNITNAME,CREATETIME,SUBMITTIME
                             ,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES,WEIGHTCHECK,ISWEIGHTCHECK
+                            ,DECLSTATUS,INSPSTATUS
                             ) 
                       VALUES (LIST_ORDER_id.Nextval
                             , '{0}','{1}','{2}','{3}','{4}','{5}'
@@ -110,7 +126,8 @@ namespace MvcPlatform.Controllers
                             ,'{26}','{27}','{28}','{29}','{30}'
                             ,'{31}','{32}','{33}','{34}','{35}'
                             ,'{36}','{37}','{38}','{39}', sysdate,{40}
-                            ,'{41}','{42}','{43}','{44}','{45}')";
+                            ,'{41}','{42}','{43}','{44}','{45}'
+                            ,'{46}','{47}')";
                 sql = string.Format(sql
                             , "10", ordercode, json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME"), json.Value<string>("CONTRACTNO")
                             , json.Value<string>("TOTALNO"), json.Value<string>("DIVIDENO"), json.Value<string>("TURNPRENO"), json.Value<string>("GOODSNUM"), json.Value<string>("ARRIVEDNO")
@@ -121,7 +138,8 @@ namespace MvcPlatform.Controllers
                             , json.Value<string>("TRADEWAYCODES"), json.Value<string>("TRADEWAYCODES1"), json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW"), json.Value<string>("PACKKIND")
                             , "001", "1", json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("SUBMITTIME")
                             , GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT")), GetChk(json.Value<string>("PAYPOYALTIES")), GetChk(json.Value<string>("WEIGHTCHECK")), GetChk(json.Value<string>("ISWEIGHTCHECK"))
-                      );
+                            , json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS")
+                        );
             }
             else//修改
             {
@@ -136,7 +154,14 @@ namespace MvcPlatform.Controllers
                             ,SUBMITTIME={31},GOODSGW='{32}',GOODSNW='{33}',PACKKIND='{34}',BUSIKIND='{35}'
                             ,ORDERWAY='{36}' ,CLEARUNIT='{37}',CLEARUNITNAME='{38}',SPECIALRELATIONSHIP='{39}',PRICEIMPACT='{40}'
                             ,PAYPOYALTIES='{41}',WEIGHTCHECK='{42}',ISWEIGHTCHECK='{43}' 
-                        WHERE CODE = '{0}'";
+                        ";
+
+                if (IsSubmitAfterSave == false)//提交之后保存，就不更新报关报检状态；
+                {
+                    sql += @",DECLSTATUS='{45}',INSPSTATUS='{46}'";
+                }
+                sql += @" WHERE CODE = '{0}'";
+
                 sql = string.Format(sql, ordercode
                             , "10", json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME"), json.Value<string>("CONTRACTNO")
                             , json.Value<string>("TOTALNO"), json.Value<string>("DIVIDENO"), json.Value<string>("TURNPRENO"), json.Value<string>("GOODSNUM"), json.Value<string>("ARRIVEDNO")
@@ -147,6 +172,7 @@ namespace MvcPlatform.Controllers
                             , json.Value<string>("SUBMITTIME"), json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW"), json.Value<string>("PACKKIND"), "001"
                             , "1", json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT"))
                             , GetChk(json.Value<string>("PAYPOYALTIES")), GetChk(json.Value<string>("WEIGHTCHECK")), GetChk(json.Value<string>("ISWEIGHTCHECK"))
+                            , json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS")
                       );
             }
             int result = DBMgr.ExecuteNonQuery(sql);
@@ -160,7 +186,7 @@ namespace MvcPlatform.Controllers
 
                 //插入订单状态变更日志
                 Extension.add_list_time(json.Value<Int32>("STATUS"), ordercode, json_user);
-                if (json.Value<Int32>("STATUS") > 15)
+                if (json.Value<Int32>("STATUS") > 10)
                 {
                     Extension.Insert_FieldUpdate_History(ordercode, json, json_user, "10");
                 }
