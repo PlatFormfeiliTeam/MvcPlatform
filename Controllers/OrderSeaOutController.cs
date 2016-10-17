@@ -67,7 +67,7 @@ namespace MvcPlatform.Controllers
             if (Request["action"] + "" == "submit")
             {
                 json.Remove("STATUS"); json.Remove("SUBMITTIME"); json.Remove("SUBMITUSERNAME"); json.Remove("SUBMITUSERID"); 
-                json.Add("STATUS", 15);
+                json.Add("STATUS", 10);
                 json.Add("SUBMITTIME", "sysdate");
                 json.Add("SUBMITUSERNAME", json_user.Value<string>("REALNAME"));
                 json.Add("SUBMITUSERID", json_user.Value<string>("ID"));

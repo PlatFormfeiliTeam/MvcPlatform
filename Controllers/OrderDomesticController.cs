@@ -365,7 +365,7 @@ namespace MvcPlatform.Controllers
                 json_head1.Remove("SUBMITUSERNAME"); json_head2.Remove("SUBMITUSERNAME"); //委托人NAME 
                 json_head1.Remove("SUBMITUSERID"); json_head2.Remove("SUBMITUSERID"); //委托人ID             
 
-                json1.Add("STATUS", 15); json2.Add("STATUS", 15); json3.Add("STATUS", 15); json4.Add("STATUS", 15);
+                json1.Add("STATUS", 10); json2.Add("STATUS", 10); json3.Add("STATUS", 10); json4.Add("STATUS", 10);
                 json_head1.Add("SUBMITTIME", "sysdate"); json_head2.Add("SUBMITTIME", "sysdate");
                 json_head1.Add("SUBMITUSERNAME", json_user.Value<string>("REALNAME")); json_head2.Add("SUBMITUSERNAME", json_user.Value<string>("REALNAME"));
                 json_head1.Add("SUBMITUSERID", json_user.Value<string>("ID")); json_head2.Add("SUBMITUSERID", json_user.Value<string>("ID"));
