@@ -82,8 +82,8 @@
                     columns: [
                     { xtype: 'rownumberer', width: 35 },
                     { header: 'ID', dataIndex: 'ID', hidden: true, locked: true },
-                    { header: '报关状态', dataIndex: 'DECLSTATUS', width: 90, locked: true },
-                    { header: '报检状态', dataIndex: 'INSPSTATUS', width: 90, locked: true },
+                    { header: '报关状态', dataIndex: 'DECLSTATUS', width: 90, locked: true, renderer: renderOrder },
+                    { header: '报检状态', dataIndex: 'INSPSTATUS', width: 90, locked: true, renderer: renderOrder },
                     { header: '订单编号', dataIndex: 'CODE', width: 100, locked: true },
                     { header: '客户编号', dataIndex: 'CUSNO', width: 130, locked: true },
                     { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 100, sortable: true, locked: true },
