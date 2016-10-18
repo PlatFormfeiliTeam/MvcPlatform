@@ -101,6 +101,11 @@ namespace MvcPlatform.Controllers
             return View();
         }
 
+        public ActionResult BatchMaintain()
+        {
+            return View();
+        }
+
         //登录后显示菜单栏 by heguiqin 2016-08-25
         public string Header()
         {
