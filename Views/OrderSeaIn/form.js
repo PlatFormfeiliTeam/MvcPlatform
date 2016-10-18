@@ -497,9 +497,10 @@
         data: common_data_myfs
     })
     var combo_myfs = Ext.create('Ext.form.field.ComboBox', {//贸易方式
-        id:'combo_myfs', 
+        id: 'combo_myfs',
+        name:'TRADEWAYCODES',
         store: store_myfs,
-        displayField: 'CODE',
+        displayField: 'NAME',
         valueField: 'CODE',
         queryMode: 'local',
         anyMatch: true,
@@ -514,10 +515,6 @@
                     cb.store.clearFilter();
                     cb.expand();
                 }
-            },
-            select: function (records) {
-                field_TRADEWAYCODES1.setValue(records.rawValue);
-                field_TRADEWAYCODES.setValue(records.rawValue.substr(0, 4));
             }
         },
         flex: 0.85,
@@ -532,12 +529,6 @@
         blankText: '贸易方式不能为空!'
 
     })
-    var field_TRADEWAYCODES = Ext.create('Ext.form.field.Hidden', {
-        name: 'TRADEWAYCODES'
-    });
-    var field_TRADEWAYCODES1 = Ext.create('Ext.form.field.Hidden', {
-        name: 'TRADEWAYCODES1'
-    });
     //贸易方式
     var field_myfs = {
         xtype: 'fieldcontainer',
@@ -803,8 +794,7 @@
         { layout: 'column', height: 42, border: 0, items: [field_ship, field_contractno, field_FIRSTLADINGBILLNO, , field_SECONDLADINGBILLNO, field_myfs] },
         { layout: 'column', height: 42, border: 0, items: [field_TURNPRENO, combo_mzbz, field_CLEARANCENO, combo_GOODSTYPEID, chk_CHKLAWCONDITION] },
         { layout: 'column', height: 42, border: 0, items: [field_CONTAINERNO, container_bgch, field_CLEARREMARK] },
-        field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME,
-        field_ID, field_TRADEWAYCODES, field_TRADEWAYCODES1, field_CONTAINERTRUCK, field_ORIGINALFILEIDS
+        field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_ID, field_CONTAINERTRUCK, field_ORIGINALFILEIDS
         ]
     });
 }
