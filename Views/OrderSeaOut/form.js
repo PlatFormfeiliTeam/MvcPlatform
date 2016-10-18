@@ -506,8 +506,9 @@
     })
     var combo_myfs = Ext.create('Ext.form.field.ComboBox', {//贸易方式
         id: 'combo_myfs',
+        name: 'TRADEWAYCODES',
         store: store_myfs,
-        displayField: 'CODE',
+        displayField: 'NAME',
         valueField: 'CODE',
         queryMode: 'local',
         anyMatch: true,
@@ -523,10 +524,6 @@
                     cb.store.clearFilter();
                     cb.expand();
                 }
-            },
-            select: function (combo, records, eOpts) {
-                field_TRADEWAYCODES.setValue(combo.rawValue.substr(0, 4));
-                field_TRADEWAYCODES1.setValue(combo.rawValue.substr(0, 4));
             }
         },
         allowBlank: false,
@@ -540,12 +537,6 @@
             }
         }
     })
-    var field_TRADEWAYCODES = Ext.create('Ext.form.field.Hidden', {
-        name: 'TRADEWAYCODES'
-    });
-    var field_TRADEWAYCODES1 = Ext.create('Ext.form.field.Hidden', {
-        name: 'TRADEWAYCODES1'
-    });
     //贸易方式
     var field_myfs = {
         xtype: 'fieldcontainer',
@@ -553,7 +544,7 @@
         layout: 'hbox',
         items: [combo_myfs, {
             xtype: 'button', id: 'myfs_btn', handler: function () {
-                selectmyfs(combo_myfs, field_TRADEWAYCODES, field_TRADEWAYCODES1);
+                selectmyfs(combo_myfs, field_CLEARREMARK);
             },
             text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
         }]
@@ -755,7 +746,7 @@
         }
     });
     var bbar = Ext.create('Ext.toolbar.Toolbar', {
-        items: [combo_filetype,field_fileno1, bbar_l, '->', bbar_r]
+        items: [combo_filetype, field_fileno1, bbar_l, '->', bbar_r]
     })
     formpanel = Ext.create('Ext.form.Panel', {
         renderTo: 'div_form',
@@ -782,8 +773,7 @@
         { layout: 'column', height: 42, border: 0, items: [field_contractno, field_ship, field_LADINGBILLNO, field_myfs, field_ARRIVEDNO] },
         { layout: 'column', height: 42, border: 0, items: [combo_GOODSTYPEID, chk_CHKLAWCONDITION, field_CLEARANCENO, container_box, container_bgch] },
         { layout: 'column', height: 42, border: 0, items: [field_TURNPRENO, field_CLEARREMARK] },
-        field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME,
-        field_ID, field_TRADEWAYCODES, field_TRADEWAYCODES1,field_CONTAINERTRUCK, field_ORIGINALFILEIDS
+        field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_ID, field_CONTAINERTRUCK, field_ORIGINALFILEIDS
         ]
     });
 }
