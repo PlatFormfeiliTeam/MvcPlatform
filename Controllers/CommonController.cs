@@ -25,7 +25,7 @@ namespace MvcPlatform.Controllers
 
         public ActionResult DeclareList()//报关单管理
         {
-            
+
             switch (Request["busitypeid"].ToString())
             {
                 case "11":
@@ -430,8 +430,8 @@ namespace MvcPlatform.Controllers
             {
                 where += " and CREATEUSERID = " + json_user.Value<string>("ID") + " ";
             }
-            
-            where += " and ISINVALID=0 ";            
+
+            where += " and ISINVALID=0 ";
 
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
@@ -901,7 +901,7 @@ namespace MvcPlatform.Controllers
                     dt = DBMgr.GetDataTable(sql);
                     if (dt.Rows.Count > 0)
                     {
-                       WEIGHTCHECK = dt.Rows[0]["WEIGHTCHECK"].ToString();
+                        WEIGHTCHECK = dt.Rows[0]["WEIGHTCHECK"].ToString();
                     }
                     //end
                     string formdata = "{STATUS:0,REPUNITNAME:'" + bgsb_unit + "',REPUNITCODE:'" + json_user.Value<string>("CUSTOMERHSCODE") + "',INSPUNITNAME:'" + bjsb_unit + "',INSPUNITCODE:'" + json_user.Value<string>("CUSTOMERCIQCODE") + "',WEIGHTCHECK:'" + WEIGHTCHECK + "'}";
@@ -909,21 +909,21 @@ namespace MvcPlatform.Controllers
                 }
                 else//如果是复制新增
                 {
-                    sql = @"select t.*,'' CONTAINERTRUCK from LIST_ORDER t where t.CODE = '" + copyordercode + "' and rownum=1";
+                    sql = @"select t.ENTRUSTTYPE,t.REPWAYID,t.CUSTOMAREACODE,t.DECLWAY,t.PORTCODE,'' CONTAINERTRUCK from LIST_ORDER t where t.CODE = '" + copyordercode + "' and rownum=1";
                     dt = DBMgr.GetDataTable(sql);
                     if (dt.Rows.Count > 0)
                     {
-                        dt.Rows[0]["CODE"] = DBNull.Value; dt.Rows[0]["STATUS"] = "0";
-                        dt.Rows[0]["CREATEUSERID"] = DBNull.Value; dt.Rows[0]["CREATEUSERNAME"] = DBNull.Value;
-                        dt.Rows[0]["SUBMITTIME"] = DBNull.Value; dt.Rows[0]["CREATETIME"] = DBNull.Value;
-                        dt.Rows[0]["SUBMITUSERNAME"] = DBNull.Value; dt.Rows[0]["SUBMITUSERID"] = DBNull.Value;
-                        dt.Rows[0]["CONTAINERNO"] = DBNull.Value; dt.Rows[0]["DECLCARNO"] = DBNull.Value;
-                        //报关、报检申报单位
-                        dt.Rows[0]["REPUNITNAME"] = bgsb_unit; dt.Rows[0]["REPUNITCODE"] = json_user.Value<string>("CUSTOMERHSCODE");
-                        dt.Rows[0]["INSPUNITNAME"] = bjsb_unit; dt.Rows[0]["INSPUNITCODE"] = json_user.Value<string>("CUSTOMERCIQCODE");
-                        //件数和重量也要清空
-                        dt.Rows[0]["GOODSNUM"] = DBNull.Value; dt.Rows[0]["PACKKIND"] = DBNull.Value;
-                        dt.Rows[0]["GOODSGW"] = DBNull.Value; dt.Rows[0]["GOODSNW"] = DBNull.Value;
+                        //    dt.Rows[0]["CODE"] = DBNull.Value; dt.Rows[0]["STATUS"] = "0";
+                        //    dt.Rows[0]["CREATEUSERID"] = DBNull.Value; dt.Rows[0]["CREATEUSERNAME"] = DBNull.Value;
+                        //    dt.Rows[0]["SUBMITTIME"] = DBNull.Value; dt.Rows[0]["CREATETIME"] = DBNull.Value;
+                        //    dt.Rows[0]["SUBMITUSERNAME"] = DBNull.Value; dt.Rows[0]["SUBMITUSERID"] = DBNull.Value;
+                        //    dt.Rows[0]["CONTAINERNO"] = DBNull.Value; dt.Rows[0]["DECLCARNO"] = DBNull.Value;
+                        //    //报关、报检申报单位
+                        //    dt.Rows[0]["REPUNITNAME"] = bgsb_unit; dt.Rows[0]["REPUNITCODE"] = json_user.Value<string>("CUSTOMERHSCODE");
+                        //    dt.Rows[0]["INSPUNITNAME"] = bjsb_unit; dt.Rows[0]["INSPUNITCODE"] = json_user.Value<string>("CUSTOMERCIQCODE");
+                        //    //件数和重量也要清空
+                        //    dt.Rows[0]["GOODSNUM"] = DBNull.Value; dt.Rows[0]["PACKKIND"] = DBNull.Value;
+                        //    dt.Rows[0]["GOODSGW"] = DBNull.Value; dt.Rows[0]["GOODSNW"] = DBNull.Value;
                         string formdata = JsonConvert.SerializeObject(dt).TrimStart('[').TrimEnd(']');
                         result = "{formdata:" + formdata + ",filedata:[]}";
                     }
