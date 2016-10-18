@@ -485,9 +485,10 @@
     //贸易方式
     var combo_myfs = Ext.create('Ext.form.field.ComboBox', {
         id: 'combo_myfs',
-        name: 'TRADEWAYCODES_ZS',
+        //name: 'TRADEWAYCODES_ZS',
+        name: 'TRADEWAYCODES',
         store: store_myfs,
-        displayField: 'CODE',
+        displayField: 'NAME',
         valueField: 'CODE',
         queryMode: 'local',
         anyMatch: true,
@@ -501,10 +502,11 @@
                 if (combo_myfs.getValue() == null) {
                     combo_myfs.expand();
                 }
-            },
-            select: function (records) {
-                field_TRADEWAYCODES1.setValue(records.rawValue); field_TRADEWAYCODES.setValue(records.rawValue.substr(0, 4));
             }
+            //,
+            //select: function (records) {
+            //    field_TRADEWAYCODES.setValue(records.rawValue.substr(0, 4));
+            //}
         },
         flex: 0.85,
         margin: 0,
@@ -513,16 +515,13 @@
             getInnerTpl: function () {
                 return '<div>{NAME}</div>';
             }
-        }
-          , allowBlank: false,
+        },
+        allowBlank: false,
         blankText: '贸易方式不能为空!'
     })
-    var field_TRADEWAYCODES = Ext.create('Ext.form.field.Hidden', {
-        name: 'TRADEWAYCODES'
-    });
-    var field_TRADEWAYCODES1 = Ext.create('Ext.form.field.Hidden', {
-        name: 'TRADEWAYCODES1'
-    });
+    //var field_TRADEWAYCODES = Ext.create('Ext.form.field.Hidden', {
+    //    name: 'TRADEWAYCODES'
+    //});
     //贸易方式
     var field_myfs = {
         xtype: 'fieldcontainer',
@@ -530,7 +529,7 @@
         layout: 'hbox',
         items: [combo_myfs, {
             xtype: 'button', id: 'myfs_btn', handler: function () {
-                selectmyfs(combo_myfs, field_TRADEWAYCODES, field_TRADEWAYCODES1);
+                selectmyfs(combo_myfs, field_ENTRUSTREQUEST);
             },
             text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
         }]
@@ -771,8 +770,7 @@
         { layout: 'column', height: 42, border: 0, items: [field_CUSNO, combo_PORTCODE, field_jydw, field_quanpackage, field_weight] },
         { layout: 'column', height: 42, border: 0, items: [field_contractno, field_myfs, field_TURNPRENO, chk_CHKLAWCONDITION, field_CLEARANCENO] },
         { layout: 'column', height: 42, border: 0, items: [combo_GOODSTYPENAME, field_containerno, container_bgch, field_ENTRUSTREQUEST, combo_busitype] },
-        field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_TRADEWAYCODES1,
-        field_TRADEWAYCODES, field_ID, field_CONTAINERTRUCK, field_ORIGINALFILEIDS
+        field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_ID, field_CONTAINERTRUCK, field_ORIGINALFILEIDS
         ]
     });
 }

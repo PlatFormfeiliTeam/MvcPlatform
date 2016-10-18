@@ -102,7 +102,7 @@ function browsefile() {
         document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="/FileUpload/file/' + records[0].get("ORIGINALNAME") + '"></embed>';
     }
     else {
-        win.show(); 
+        win.show();
         document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + common_data_adminurl + '\/file/' + records[0].get("FILENAME") + '"></embed>';
     }
 }
@@ -591,7 +591,7 @@ function selectjydw(cb_jydw, field_quanname) {//传入需要赋值的控件
     win_jydw.show();
 }
 //贸易方式选择窗体
-function selectmyfs(cb_myfs, tradeway_s, tradeway_m) {//传入需要赋值的控件
+function selectmyfs(cb_myfs, tradeway_m) {//传入需要赋值的控件tradeway_m 表示备注信息
     var tb_myfs = Ext.create('Ext.toolbar.Toolbar', {
         items: [
            { xtype: 'textfield', fieldLabel: '贸易方式', labelWidth: 100, labelAlign: 'right', id: 'NAME_myfs_s' },
@@ -650,17 +650,16 @@ function selectmyfs(cb_myfs, tradeway_s, tradeway_m) {//传入需要赋值的控
         listeners: {
             itemdblclick: function (gd, record, item, index, e, eOpts) {
                 cb_myfs.setValue(record.get("CODE"));
-                tradeway_s.setValue(record.get("CODE"));
-                tradeway_m.setValue(record.get("CODE"));
+                //  tradeway_s.setValue(record.get("CODE")); 
                 win_myfs.close();
             },
             select: function (gd, record, index, eOpts) {
                 if (Ext.Array.indexOf(sm_selrecs, record.get('CODE')) < 0) {
-                    sm_selrecs.push(record.get('CODE'));
+                    sm_selrecs.push(record);
                 }
             },
             deselect: function (gd, record, index, eOpts) {
-                Ext.Array.remove(sm_selrecs, record.get('CODE'));
+                Ext.Array.remove(sm_selrecs, record);
             }
         }
     });
@@ -675,15 +674,17 @@ function selectmyfs(cb_myfs, tradeway_s, tradeway_m) {//传入需要赋值的控
         buttonAlign: 'center',
         buttons: [{
             text: '<i class="fa fa-check-square-o"></i>&nbsp;确定', handler: function () {
-                //var recs = grid_myfs.getSelectionModel().getSelection();
                 if (sm_selrecs.length > 0) {
                     var codes = "";
-                    Ext.each(sm_selrecs, function (str) {
-                        codes += codes ? "," + str : str;
+                    Ext.each(sm_selrecs, function (rec) {
+                        codes += codes ? "|" + rec.get("NAME") : rec.get("NAME");
                     })
-                    cb_myfs.setValue(sm_selrecs);
-                    tradeway_s.setValue(sm_selrecs[0]);
-                    tradeway_m.setValue(codes);
+                    cb_myfs.setValue(sm_selrecs[0].get("CODE"));
+                    //tradeway_s.setValue(sm_selrecs[0]);
+                    //如果贸易方式超过一个,需要将贸易方式写入备注信息  2016-10-18 by panhuaguo
+                    if (sm_selrecs.length > 1) {
+                        tradeway_m.setValue(tradeway_m.getValue() + ' 贸易方式:' + codes);
+                    }
                     win_myfs.close();
                 }
                 else {
@@ -769,11 +770,10 @@ function LoadOrderFromErp(busitype) {
                 importorderFromErp();
             }
         }
-    });   
+    });
 }
 
-function importorderFromErp()
-{
+function importorderFromErp() {
     var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "数据查询中,请稍候..." });
     myMask.show();
     Ext.Ajax.request({
@@ -939,7 +939,7 @@ function loadform() {
                         Ext.getCmp('ISWEIGHTCHECK').setReadOnly(true);
                     }
                 }
-            }            
+            }
         }
     });
 }
@@ -979,6 +979,10 @@ function formcontrol() {
 
     if (status < 10) {
         upload_ini();
+    }
+    //2016-10-18增加判断,因为提交表单后页面并没有刷新,虽然上传按钮禁用了,但uploader对象并没有销毁,还是能上传 10表示已委托 
+    if (status >= 10 && uploader) {
+        uploader.destroy();
     }
     wtlx_control();//委托类型对其他字段的控制
 }
@@ -1050,7 +1054,7 @@ function wtlx_control() {
 //非国内业务 随附文件展示控件 by panhuaguo 2016-08-19  1  调用此方法时注意将file_store声明为全局  2 父页面渲染的html  ID  div_panel
 function panel_file_ini() {
     file_store = Ext.create('Ext.data.JsonStore', {
-        fields: ['ID', 'FILENAME', 'ORIGINALNAME', 'FILETYPE', 'FILETYPENAME', 'UPLOADTIME', 'SIZES', 'IETYPE']        
+        fields: ['ID', 'FILENAME', 'ORIGINALNAME', 'FILETYPE', 'FILETYPENAME', 'UPLOADTIME', 'SIZES', 'IETYPE']
     })
     var tmp = new Ext.XTemplate(
          '<tpl for=".">',
@@ -1083,14 +1087,14 @@ function panel_file_ini() {
 function save(action, busitype) {
 
     if (action == 'submit') {
-            var validate = "";
+        var validate = "";
 
-            var mz = Ext.getCmp('GOODSGW'); var jz = Ext.getCmp('GOODSNW');
-            if (Ext.typeOf(mz) != "undefined" && Ext.typeOf(jz) != "undefined") {
-                if (!Ext.isEmpty(mz.getValue()) && !Ext.isEmpty(jz.getValue()) && Number(jz.getValue()) > Number(mz.getValue())) {
-                    validate = "净重小于应等于毛重！";
-                }
+        var mz = Ext.getCmp('GOODSGW'); var jz = Ext.getCmp('GOODSNW');
+        if (Ext.typeOf(mz) != "undefined" && Ext.typeOf(jz) != "undefined") {
+            if (!Ext.isEmpty(mz.getValue()) && !Ext.isEmpty(jz.getValue()) && Number(jz.getValue()) > Number(mz.getValue())) {
+                validate = "净重小于应等于毛重！";
             }
+        }
 
         if (validate) {
             Ext.MessageBox.alert("提示", validate);
@@ -1099,7 +1103,7 @@ function save(action, busitype) {
 
         if (!formpanel.getForm().isValid()) {
             return;
-        }       
+        }
 
         if (file_store.data.items.length == 0) { //如果是提交委托,必须上传文件 
             Ext.MessageBox.alert('提示', '请上传文件！');
@@ -1176,7 +1180,7 @@ function orderBack() {
     });
 }
 //非国内业务 订单编辑页 点新增按钮时 统一调用此方法
-function add_new(busitype) {    
+function add_new(busitype) {
     if (busitype == 10) {
         window.location.href = "/OrderAirOut/Create";
     }
@@ -1187,7 +1191,7 @@ function add_new(busitype) {
         window.location.href = "/OrderSeaOut/Create";
     }
     if (busitype == 21) {
-       window.location.href = "/OrderSeaIn/Create";
+        window.location.href = "/OrderSeaIn/Create";
     }
     if (busitype == 30) {
         window.location.href = "/OrderLandOut/Create";
@@ -1243,9 +1247,9 @@ function ini_container_truck() {
         msgTarget: 'under',
         tabIndex: 1,
         enforceMaxLength: true
- 
 
-      
+
+
     });
     var w_eleshut = Ext.create('Ext.form.field.Text', {
         name: 'ELESHUT',
@@ -1254,13 +1258,13 @@ function ini_container_truck() {
         tabIndex: 2,
         fieldLabel: '电子关锁号'
     });
-     var w_weight = Ext.create('Ext.form.field.Number', {
+    var w_weight = Ext.create('Ext.form.field.Number', {
         name: 'CONTAINERWEIGHT',
         margin: '10',
         columnWidth: .34,
         fieldLabel: '自重',
         tabIndex: 3,
-        hideTrigger : true
+        hideTrigger: true
 
     });
     var w_store_containertype = Ext.create("Ext.data.JsonStore", {
