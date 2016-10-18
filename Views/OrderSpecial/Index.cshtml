@@ -8,7 +8,7 @@
 
 <script type="text/javascript">
     var store_Trade; var store_sbfs;
-    var formpanel, gridpanel;    
+    var formpanel, gridpanel;
     var common_data_jydw = [], common_data_sbfs = [], common_data_sbgq = [], common_data_bgfs = [], common_data_bzzl = [], common_data_myfs = [];
 
     Ext.onReady(function () {
@@ -33,7 +33,7 @@
                 Ext.regModel('TRADE', {
                     fields: ['ID', 'ENTRUSTTYPE', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE', 'TURNPRENO', 'SUBMITTIME'
                         , 'BUSIUNITNAME', 'BUSIUNITCODE', 'CUSTOMERNAME', 'CONTRACTNO', 'GOODSNUM', 'GOODSGW', 'CUSTOMAREACODE', 'LAWFLAG'
-                        , 'ISINVALID', 'BUSITYPE','REPWAYID']
+                        , 'ISINVALID', 'BUSITYPE', 'REPWAYID']
                 })
                 store_Trade = Ext.create('Ext.data.JsonStore', {
                     model: 'TRADE',
@@ -79,19 +79,19 @@
                     bbar: pgbar,
                     enableColumnHide: false,
                     columns: [
-                    { xtype: 'rownumberer', width: 35 },
-                    { header: 'ID', dataIndex: 'ID', width: 110, sortable: true, hidden: true },
-                    { header: '报关状态', dataIndex: 'DECLSTATUS', width: 90, renderer: renderOrder },
-                    { header: '报检状态', dataIndex: 'INSPSTATUS', width: 90, renderer: renderOrder },
-                    { header: '订单编号', dataIndex: 'CODE', width: 100 },
-                    { header: '客户编号', dataIndex: 'CUSNO', width: 120 },
-                    { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 100 },
-                    { header: '合同号', dataIndex: 'CONTRACTNO', width: 100 },
+                    { xtype: 'rownumberer', width: 35, locked: true },
+                    { header: 'ID', dataIndex: 'ID', width: 110, locked: true, hidden: true },
+                    { header: '报关状态', dataIndex: 'DECLSTATUS', width: 90, locked: true, renderer: renderOrder },
+                    { header: '报检状态', dataIndex: 'INSPSTATUS', locked: true, width: 90, renderer: renderOrder },
+                    { header: '订单编号', dataIndex: 'CODE', locked: true, width: 100 },
+                    { header: '客户编号', dataIndex: 'CUSNO', locked: true, width: 120 },
+                    { header: '合同号', dataIndex: 'CONTRACTNO', locked: true, width: 100 },
+                    { header: '经营单位', dataIndex: 'BUSIUNITNAME', locked: true, width: 200 },
                     { header: '申报方式', dataIndex: 'REPWAYID', width: 100, renderer: renderOrder },
                     { header: '件数/重量', dataIndex: 'GOODSNUM', width: 100 },
                     { header: '申报关区', dataIndex: 'CUSTOMAREACODE', width: 70 },
                     { header: '进/出口岸', dataIndex: 'PORTCODE', width: 70 },
-                    { header: '转关预录号', dataIndex: 'TURNPRENO', width: 70 },
+                    { header: '转关预录号', dataIndex: 'TURNPRENO', width: 150 },
                     { header: '法检', dataIndex: 'LAWFLAG', width: 60, renderer: renderOrder },
                     { header: '委托时间', dataIndex: 'SUBMITTIME', width: 130 }
                     ],
@@ -104,8 +104,7 @@
                     },
                     viewConfig: {
                         enableTextSelection: true
-                    },
-                    forceFit: true
+                    }
                 })
             }
         });
