@@ -119,20 +119,6 @@
         opencenterwin("/OrderSeaIn/Create", 1600, 900);
     }
 
-    function openwin(type) {
-        var recs = gridpanel.getSelectionModel().getSelection();
-        if (recs.length == 0) {
-            Ext.MessageBox.alert('提示', '请选择需要维护的记录！');
-            return;
-        }
-        var plwhids = "";
-        for (var i = 0; i < recs.length; i++) {
-            plwhids += recs[i].data.ID + ',';
-        }
-        plwhids = plwhids.substr(0, plwhids.length - 1);
-        opencenterwin("/Common/BatchMaintain?ids=" + plwhids + "&type=" + type, 1200, 600);
-    }
-
     function Views() {
         var recs = gridpanel.getSelectionModel().getSelection();
         if (recs.length == 0) {
@@ -162,12 +148,8 @@
     <div>
         <div class="btn-group" role="group">
             <button onclick="Open()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;添加</button>
-            <button onclick="DeleteNotGuoNei()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-trash-o"></i>&nbsp;删除</button>
-            <div class="btn-group">
-                <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="openwin('HYJK')">
-                    <i class="fa fa-pencil-square-o fa-fw"></i>&nbsp;批量维护
-                </button>
-            </div>
+            <button onclick="DeleteNotGuoNei()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-trash-o"></i>&nbsp;删除</button>            
+            <button type="button" class="btn btn-primary btn-sm dropdown-toggle" onclick="openwin('HYJK')"><i class="fa fa-pencil-square-o fa-fw"></i>&nbsp;批量维护</button>            
             <button type="button" onclick="Views()" class="btn btn-primary btn-sm"><i class="fa fa-file-text-o"></i>&nbsp;详细</button>
         </div>
         <div class="btn-group fr" role="group">

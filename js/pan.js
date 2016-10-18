@@ -1570,3 +1570,17 @@ function renderOrder(value, cellmeta, record, rowIndex, columnIndex, store) {
     }
     return rtn;
 }
+
+function openwin(type) {
+    var recs = gridpanel.getSelectionModel().getSelection();
+    if (recs.length == 0) {
+        Ext.MessageBox.alert('提示', '请选择需要维护的记录！');
+        return;
+    }
+    var plwhids = "";
+    for (var i = 0; i < recs.length; i++) {
+        plwhids += recs[i].data.ID + ',';
+    }
+    plwhids = plwhids.substr(0, plwhids.length - 1);
+    opencenterwin("/Common/BatchMaintain?ids=" + plwhids + "&type=" + type, 1200, 600);
+}
