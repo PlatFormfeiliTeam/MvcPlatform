@@ -676,14 +676,20 @@ function selectmyfs(cb_myfs, tradeway_m) {//传入需要赋值的控件tradeway_
             text: '<i class="fa fa-check-square-o"></i>&nbsp;确定', handler: function () {
                 if (sm_selrecs.length > 0) {
                     var codes = "";
+                    var remark = tradeway_m.getValue();
+                    if (remark) { 
+                        var start = remark.indexOf('贸易方式<@');
+                        var end = remark.indexOf('>@');
+                        var sub = remark.substring(start, end + 2);
+                        tradeway_m.setValue(remark.replace(sub, ''));
+                    }
                     Ext.each(sm_selrecs, function (rec) {
                         codes += codes ? "|" + rec.get("NAME") : rec.get("NAME");
                     })
                     cb_myfs.setValue(sm_selrecs[0].get("CODE"));
-                    //tradeway_s.setValue(sm_selrecs[0]);
                     //如果贸易方式超过一个,需要将贸易方式写入备注信息  2016-10-18 by panhuaguo
                     if (sm_selrecs.length > 1) {
-                        tradeway_m.setValue(tradeway_m.getValue() + ' 贸易方式:' + codes);
+                        tradeway_m.setValue(tradeway_m.getValue() + ' 贸易方式<@' + codes + ">@");
                     }
                     win_myfs.close();
                 }
