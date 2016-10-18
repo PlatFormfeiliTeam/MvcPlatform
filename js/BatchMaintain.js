@@ -274,7 +274,7 @@
         buttons: [
             {
                 text: '保存', handler: function () {
-                    var recs = gridpanel.getSelectionModel().getSelection();
+                    /*var recs = gridpanel.getSelectionModel().getSelection();
                     if (recs.length == 0) {
                         Ext.MessageBox.alert('提示', '请选择需要维护的记录！');
                         return;
@@ -286,7 +286,7 @@
                     plwhids = plwhids.substr(0, plwhids.length - 1);
                     var formdata = formpanel.getForm().getValues();
                     var json = Ext.encode(Ext.pluck(store.data.items, 'data'));
-                    /*Ext.Ajax.request({
+                    Ext.Ajax.request({
                         url: "/Common/BatchOrderUpdate",
                         params: {
                             formdata: Ext.encode(formdata),
