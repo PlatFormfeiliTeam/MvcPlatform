@@ -130,9 +130,14 @@
         hideTrigger: true,
         forceSelection: true,
         anyMatch: true,
-        tabIndex: 4
-          , allowBlank: false,
+        tabIndex: 4,
+        allowBlank: false,
         blankText: '申报关区不能为空!',
+        listeners: {
+            focus: function (cb) {
+                cb.clearInvalid();
+            }
+        },
         listConfig: {
             maxHeight: 110,
             getInnerTpl: function () {
@@ -326,6 +331,9 @@
         anyMatch: true,
         forceSelection: true,
         listeners: {
+            focus: function (cb) {
+                cb.clearInvalid();
+            },
             select: function (records) {
                 field_PORTNAME.setValue(records.rawValue.substr(0, records.rawValue.lastIndexOf('(')));
             }
@@ -411,7 +419,11 @@
         queryMode: 'local',
         anyMatch: true,
         listeners: {
-            focus: function () { if (combo_PACKKINDNAME.getValue() == null) { combo_PACKKINDNAME.expand(); } }
+            focus: function () {
+                if (combo_PACKKINDNAME.getValue() == null) {
+                    combo_PACKKINDNAME.expand();
+                }
+            }
         },
         flex: .5,
         margin: 0,
@@ -427,16 +439,35 @@
         xtype: 'fieldcontainer',
         fieldLabel: '件数/包装',
         layout: 'hbox',
-        items: [{
-            id: 'GOODSNUM', name: 'GOODSNUM', xtype: 'numberfield', tabIndex: 11, flex: .5, margin: 0, allowBlank: false, blankText: '不能为空!', hideTrigger: true
-        }, combo_PACKKINDNAME]
+        items: [
+            {
+                id: 'GOODSNUM', name: 'GOODSNUM', xtype: 'numberfield', tabIndex: 11, flex: .5, margin: 0,
+                allowBlank: false, blankText: '不能为空!', hideTrigger: true, listeners: {
+                    focus: function (cb) {
+                        cb.clearInvalid();
+                    }
+                }
+            },
+        combo_PACKKINDNAME]
     }
     var field_weight = { //毛重/净重
         xtype: 'fieldcontainer',
         fieldLabel: '毛重/净重',
         layout: 'hbox',
-        items: [{ id: 'GOODSGW', name: 'GOODSGW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 13, margin: 0, allowBlank: false, blankText: '不能为空!', hideTrigger: true, decimalPrecision: 4 },
-                { id: 'GOODSNW', name: 'GOODSNW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 14, margin: 0, hideTrigger: true, decimalPrecision: 4 }]
+        items: [
+            {
+                id: 'GOODSGW', name: 'GOODSGW', xtype: 'numberfield', flex: .5, tabIndex: 13, margin: 0, allowBlank: false,
+                blankText: '不能为空!', hideTrigger: true, decimalPrecision: 4, listeners: {
+                    focus: function (cb) {
+                        cb.clearInvalid();
+                    }
+                }
+            },
+                {
+                    id: 'GOODSNW', name: 'GOODSNW', xtype: 'numberfield', flex: .5, tabIndex: 14, margin: 0,
+                    hideTrigger: true, decimalPrecision: 4
+                }
+        ]
     }
     //合同号
     var field_contractno = {
