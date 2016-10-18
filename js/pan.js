@@ -1567,6 +1567,12 @@ function renderOrder(value, cellmeta, record, rowIndex, columnIndex, store) {
                 rtn = record.get("GOODSNUM") + '/' + record.get("GOODSGW");
             }
             break;
+        case "WOODPACKINGID"://木质包装
+            var rec = store_mzbz.findRecord('CODE', value);
+            if (rec) {
+                rtn = rec.get("NAME");
+            }
+            break;
     }
     return rtn;
 }

@@ -2030,5 +2030,17 @@ namespace MvcPlatform.Controllers
             }
             return "{success:false}";
         }
+
+
+        // 加载批量维护订单
+        public string LoadBatchMaintain()
+        {
+            string sql = @"select t.* from list_order t where t.id in (" + Request["ids"] + ")";
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "createtime", "desc"));
+            var json = JsonConvert.SerializeObject(dt);
+            return "{rows:" + json + "}";
+        }
+
+
     }
 }
