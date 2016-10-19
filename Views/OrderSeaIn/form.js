@@ -55,6 +55,7 @@
         triggerAction: 'all',
         forceSelection: true,
         tabIndex: 2,
+        value: '03',
         queryMode: 'local',
         anyMatch: true,
         listeners: {

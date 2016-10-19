@@ -17,10 +17,11 @@
     <script type="text/javascript">
         var ids = getQueryString("ids"); var type = getQueryString("type");
 
-        var store_Trade, gridpanel, formpanel, file_store; var store_mzbz;
-
-        var common_data_jydw = [], common_data_sbfs = [], common_data_sbgq = [], common_data_bgfs = []
-            , common_data_bzzl = [], common_data_myfs = [], common_data_mzbz = [], common_data_truckno = [];
+        var store_Trade, gridpanel, formpanel, file_store，win_container_truck, uploader;
+        var store_mzbz;
+        var common_data_jydw = [], common_data_sbfs = [], common_data_sbgq = []
+            , common_data_bgfs = [], common_data_bzzl = [], common_data_myfs = []
+            , common_data_containertype = [], common_data_containersize = [], common_data_truckno = [], common_data_relacontainer = [], common_data_mzbz = [], common_data_adminurl = "";
 
         var busitype = "";
         switch (type) {
@@ -49,22 +50,28 @@
                 },
                 success: function (response, opts) {
                     var commondata = Ext.decode(response.responseText)
-                    common_data_jydw = commondata.jydw;//经营单位  查询区要用
-                    common_data_sbfs = commondata.sbfs;//申报方式  
+                    common_data_jydw = commondata.jydw;//经营单位
+                    common_data_sbfs = commondata.sbfs;//申报方式
                     common_data_sbgq = commondata.sbgq;//申报关区 进口口岸
                     common_data_bgfs = commondata.bgfs;//报关方式
                     common_data_bzzl = commondata.bzzl;//包装种类
                     common_data_myfs = commondata.myfs;//贸易方式
-                    common_data_mzbz = commondata.mzbz;//木质包装
+                    common_data_containertype = commondata.containertype;//箱型
+                    common_data_containersize = commondata.containersize;//集装箱尺寸
                     common_data_truckno = commondata.truckno;//报关车号
+                    common_data_relacontainer = commondata.relacontainer;//关联集装箱
+                    common_data_mzbz = commondata.mzbz;//木质包装
+                    common_data_adminurl = commondata.adminurl;//文件服务器URL
+
+                    Batchform_ini();//表单初始化
+                    Batchpanel_file_ini();//随附文件初始化
 
                     store_mzbz = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_mzbz });
 
-
                     Ext.regModel('TRADE', {
-                        fields: ['ID', 'CODE', 'CUSNO', 'BUSIUNITNAME', 'CUSTOMAREACODE', 'TOTALNO', 'TURNPRENO', 'WOODPACKINGID', 'DECLCARNO'
+                        fields: ['ID', 'ENTRUSTTYPE', 'CODE', 'CUSNO', 'BUSIUNITNAME', 'CUSTOMAREACODE', 'TOTALNO', 'TURNPRENO', 'WOODPACKINGID', 'DECLCARNO'
                             , 'PORTCODE', 'SHIPNAME', 'FILGHTNO', 'SECONDLADINGBILLNO', 'ARRIVEDNO', 'MANIFEST', 'ENTRUSTREQUEST', 'LAWFLAG'
-                            , 'LAWFLAG']
+                            , 'DECLSTATUS', 'INSPSTATUS']
                     });
                     store_Trade = Ext.create('Ext.data.JsonStore', {
                         model: 'TRADE',
@@ -104,6 +111,8 @@
                         columns: [
                             { xtype: 'rownumberer', width: 0 },
                             { header: 'ID', dataIndex: 'ID', hidden: true },
+                            { header: '报关状态', dataIndex: 'DECLSTATUS', width: 75, renderer: renderOrder },
+                            { header: '报检状态', dataIndex: 'INSPSTATUS', width: 75, renderer: renderOrder },
                             { header: '订单编号', dataIndex: 'CODE', width: 90 },
                             { header: '客户编号', dataIndex: 'CUSNO', width: 120 },
                             { header: '经营单位', dataIndex: 'BUSIUNITNAME', minWidth: 200 },
@@ -131,8 +140,6 @@
                         }
                     });
 
-                    Batchform_ini();//表单初始化
-                    Batchpanel_file_ini();//随附文件初始化
 
                 }
             });

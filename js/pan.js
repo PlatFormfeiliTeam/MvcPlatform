@@ -765,23 +765,28 @@ function LoadOrderFromErp(busitype) {
         return;
     }
     //2016/9/26 add heguiqin：如果订单中存在重复的客户编号需要进行确认
-    Ext.Ajax.request({
-        url: "/Common/OperateIdRepeate",
-        params: { operateid: Ext.String.trim(Ext.getCmp('NUMBER').getValue()) },
-        success: function (response, option) {
-            var json = Ext.decode(response.responseText);
-            if (parseInt(json.result) > 0) {
-                Ext.MessageBox.confirm('提示', '该订单编号已经存在，确定要继续导入吗？', function (btn) {
-                    if (btn == "yes") {
-                        importorderFromErp();
-                    }
-                })
+    if (ordercode) {
+        importorderFromErp();
+    }
+    else {//只有新增的情况下才需要判断重复
+        Ext.Ajax.request({
+            url: "/Common/OperateIdRepeate",
+            params: { operateid: Ext.String.trim(Ext.getCmp('NUMBER').getValue()) },
+            success: function (response, option) {
+                var json = Ext.decode(response.responseText);
+                if (parseInt(json.result) > 0) {
+                    Ext.MessageBox.confirm('提示', '该订单编号已经存在，确定要继续导入吗？', function (btn) {
+                        if (btn == "yes") {
+                            importorderFromErp();
+                        }
+                    })
+                }
+                else {
+                    importorderFromErp();
+                }
             }
-            else {
-                importorderFromErp();
-            }
-        }
-    });
+        });
+    }
 }
 
 function importorderFromErp() {
@@ -819,7 +824,7 @@ function importorderFromErp() {
                         if (!item.value && item.id != "tf_bjsbdw" && item.id != "tf_bgsbdw") {
                             if (typeof (data.data[item.name]) != "undefined") {
                                 item.setValue(data.data[item.name]);
-                            } 
+                            }
                         }
                     });
                 }
@@ -924,12 +929,14 @@ function loadform() {
         success: function (response, opts) {
             var data = Ext.decode(response.responseText);
             formpanel.getForm().setValues(data.formdata);
-            file_store.loadData(data.filedata);
-            
-            repunitcode = data.formdata.REPUNITNAME != null ? (data.formdata.REPUNITNAME + '(' + data.formdata.REPUNITCODE + ')') : "";
-            Ext.getCmp('tf_bgsbdw').setValue(repunitcode);
-            inspunitcode = data.formdata.INSPUNITNAME != null ? (data.formdata.INSPUNITNAME + '(' + data.formdata.INSPUNITCODE + ')') : "";
-            Ext.getCmp('tf_bjsbdw').setValue(inspunitcode);
+            file_store.loadData(data.filedata);  
+            //如果是修改时申报单位取先前保存的值,如无则取默认值2016-10-19 by panhuaguo  
+            if (data.formdata.REPUNITNAME) {
+                repunitcode = data.formdata.REPUNITNAME + '(' + data.formdata.REPUNITCODE + ')';
+            }
+            if (data.formdata.INSPUNITNAME) {
+                inspunitcode = data.formdata.INSPUNITNAME + '(' + data.formdata.INSPUNITCODE + ')';
+            } 
             //如果是修改需要将随附文件的ID拼接成字符串 赋值到
             var fileids = "";
             Ext.each(file_store.getRange(), function (rec) {
