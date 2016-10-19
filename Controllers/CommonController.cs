@@ -2051,7 +2051,7 @@ namespace MvcPlatform.Controllers
 
         public string LoadDeclaration()
         {
-            string sql = @"select ID,LARATIONCODE,GOODSGW,GOODSNW,GOODSNUM,SHEETNUM,BUSITYPE,TRADECODE,CUSTOMSSTATUS from list_declaration  
+            string sql = @"select ID,DECLARATIONCODE，GOODSGW,GOODSNW,GOODSNUM,SHEETNUM,BUSITYPE,TRADECODE,CUSTOMSSTATUS from list_declaration  
                          WHERE ordercode='" + Request["ORDERCODE"] + "'";
             var json = DBMgr.ExecuteNonQuery(sql);
             return "{rows:" + json + "}";
