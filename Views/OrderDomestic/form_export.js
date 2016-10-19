@@ -274,7 +274,6 @@
         displayField: 'NAME',
         valueField: 'CODE',
         queryMode: 'local',
-        submitValue: false,//不随表单提交一起提交
         anyMatch: true,
         forceSelection: true,
         tabIndex: 31,
@@ -326,7 +325,7 @@
             xtype: 'button',
             listeners: {
                 //click: function () {
-                //    selectmyfs(combo_myfs, field_TRADEWAYCODES, field_TRADEWAYCODES1);
+                //    selectmyfs(combo_myfs, field_TRADEWAYCODES);
                 //}
             },
             text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0

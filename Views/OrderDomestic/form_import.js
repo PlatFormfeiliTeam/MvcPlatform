@@ -272,7 +272,6 @@
         name: 'TRADEWAYCODES',
         store: store_myfs,
         displayField: 'NAME',
-        submitValue: false,//不随表单提交一起提交
         valueField: 'CODE',
         queryMode: 'local',
         anyMatch: true,

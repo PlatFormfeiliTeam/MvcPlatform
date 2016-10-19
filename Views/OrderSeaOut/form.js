@@ -524,7 +524,6 @@
         queryMode: 'local',
         anyMatch: true,
         forceSelection: true,
-        submitValue: false,//不随表单提交一起提交
         tabIndex: 19,
         hideTrigger: true,
         multiSelect: false,

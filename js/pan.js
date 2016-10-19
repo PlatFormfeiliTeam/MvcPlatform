@@ -929,18 +929,14 @@ function loadform() {
         success: function (response, opts) {
             var data = Ext.decode(response.responseText);
             formpanel.getForm().setValues(data.formdata);
-            file_store.loadData(data.filedata);
-            //  repunitcode = data.formdata.REPUNITNAME != null ? (data.formdata.REPUNITNAME + '(' + data.formdata.REPUNITCODE + ')') : "";
+            file_store.loadData(data.filedata);  
             //如果是修改时申报单位取先前保存的值,如无则取默认值2016-10-19 by panhuaguo  
             if (data.formdata.REPUNITNAME) {
                 repunitcode = data.formdata.REPUNITNAME + '(' + data.formdata.REPUNITCODE + ')';
             }
             if (data.formdata.INSPUNITNAME) {
                 inspunitcode = data.formdata.INSPUNITNAME + '(' + data.formdata.INSPUNITCODE + ')';
-            }
-            //Ext.getCmp('tf_bgsbdw').setValue(repunitcode);
-            //inspunitcode = data.formdata.INSPUNITNAME != null ? (data.formdata.INSPUNITNAME + '(' + data.formdata.INSPUNITCODE + ')') : "";
-            //Ext.getCmp('tf_bjsbdw').setValue(inspunitcode);
+            } 
             //如果是修改需要将随附文件的ID拼接成字符串 赋值到
             var fileids = "";
             Ext.each(file_store.getRange(), function (rec) {
@@ -1621,4 +1617,14 @@ function openwin(type) {
     }
     plwhids = plwhids.substr(0, plwhids.length - 1);
     opencenterwin("/Common/BatchMaintain?ids=" + plwhids + "&type=" + type, 1200, 600);
+}
+
+
+function Views() {
+    var recs = gridpanel.getSelectionModel().getSelection();
+    if (recs.length == 0) {
+        Ext.MessageBox.alert('提示', '请选择需要查看详细的记录！');
+        return;
+    }
+    opencenterwin("/Common/OrderView?OrderId=" + recs[0].get("ID") + "&ordercode=" + recs[0].get("CODE") + "&busitypeid=" + recs[0].get("BUSITYPE"), 1200, 800);
 }
