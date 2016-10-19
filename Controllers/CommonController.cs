@@ -2119,13 +2119,13 @@ namespace MvcPlatform.Controllers
             string declnos = "";//保存所有的预制报关_预制报检单号
             if (source == "declare")
             {
-                sql = @"select * from list_predeclaration lp where ordercode = '" + ordercode + "' ";
-                dt_pre = DBMgr.GetDataTable(sql);
-                for (int i = 0; i < dt_pre.Rows.Count; i++)
-                {
-                    predeclnos += dt_pre.Rows[i]["PREDECLCODE"];
-                }
-                total1 = dt_pre.Rows.Count; //查询报关草单的总数量
+                //sql = @"select * from list_predeclaration lp where ordercode = '" + ordercode + "' ";
+                //dt_pre = DBMgr.GetDataTable(sql);
+                //for (int i = 0; i < dt_pre.Rows.Count; i++)
+                //{
+                //    predeclnos += dt_pre.Rows[i]["PREDECLCODE"];
+                //}
+                //total1 = dt_pre.Rows.Count; //查询报关草单的总数量
                 sql = @"select * from list_declaration ld where ordercode='" + ordercode + "'";
                 dt = DBMgr.GetDataTable(sql);
                 for (int i = 0; i < dt.Rows.Count; i++)
@@ -2136,13 +2136,13 @@ namespace MvcPlatform.Controllers
             }
             else
             {
-                sql = @"select * from list_preinspection lp where ordercode = '" + ordercode + "' ";
-                dt_pre = DBMgr.GetDataTable(sql);
-                for (int i = 0; i < dt_pre.Rows.Count; i++)
-                {
-                    predeclnos += dt_pre.Rows[i]["PREINSPCODE"];
-                }
-                total1 = dt_pre.Rows.Count; //查询草单的总数量
+                //sql = @"select * from list_preinspection lp where ordercode = '" + ordercode + "' ";
+                //dt_pre = DBMgr.GetDataTable(sql);
+                //for (int i = 0; i < dt_pre.Rows.Count; i++)
+                //{
+                //    predeclnos += dt_pre.Rows[i]["PREINSPCODE"];
+                //}
+                //total1 = dt_pre.Rows.Count; //查询草单的总数量
                 sql = @"select * from list_inspection ld where ordercode='" + ordercode + "'";
                 dt = DBMgr.GetDataTable(sql);
                 for (int i = 0; i < dt.Rows.Count; i++)
@@ -2171,7 +2171,8 @@ namespace MvcPlatform.Controllers
                 DataRow dr_cus = dt_cus.NewRow();
                 status = json.Value<int>("CODE");
                 int finished = 0; int exception = 0;
-                if (status <= 60)
+               // if (status <= 60)
+                if (false)
                 {
                     foreach (DataRow dr in dt_pre.Rows)//循环报关草单
                     {
