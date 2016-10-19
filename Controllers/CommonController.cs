@@ -716,7 +716,7 @@ namespace MvcPlatform.Controllers
             return "{jydw:" + json_jydw + ",sbfs:" + json_sbfs + ",sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",bzzl:" + json_bzzl
                 + ",myfs:" + json_myfs + ",containertype:" + json_containertype + ",containersize:" + json_containersize + ",truckno:" + json_truckno
                 + ",relacontainer:" + json_relacontainer + ",mzbz:" + json_mzbz + ",jylb:" + json_jylb + ",json_sbkb:" + json_sbkb
-                + ",inspbzzl:" + json_inspbzzl + ",adminurl:'" + AdminUrl + "'}";
+                + ",inspbzzl:" + json_inspbzzl + ",adminurl:'" + AdminUrl + "',curuser:" + Extension.Get_UserInfo(HttpContext.User.Identity.Name) + "}";
         }
 
         /*保存查询条件设置 by panhuaguo 2016-01-17*/
@@ -884,23 +884,10 @@ namespace MvcPlatform.Controllers
             string ordercode = Request["ordercode"];
             string copyordercode = Request["copyordercode"];
             DataTable dt;
-            string bgsb_unit = "";
-            string bjsb_unit = "";
+            string sql = ""; 
             string result = "{}";
             if (string.IsNullOrEmpty(ordercode))//如果订单号为空、即新增的时候
-            {
-                string sql = "select * from base_company where CODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "' AND ENABLED=1 AND ROWNUM=1";//根据海关的10位编码查询申报单位
-                dt = DBMgrBase.GetDataTable(sql);
-                if (dt.Rows.Count > 0)
-                {
-                    bgsb_unit = dt.Rows[0]["NAME"] + "";
-                }
-                sql = "select * from base_company where INSPCODE='" + json_user.Value<string>("CUSTOMERCIQCODE") + "' AND ENABLED=1 AND ROWNUM=1";//根据海关的10位编码查询申报单位
-                dt = DBMgrBase.GetDataTable(sql);
-                if (dt.Rows.Count > 0)
-                {
-                    bjsb_unit = dt.Rows[0]["NAME"] + "";
-                }
+            {                
                 if (string.IsNullOrEmpty(copyordercode))//如果不是复制新增
                 {
                     //add 2016/10/9 by heguiqin
@@ -912,7 +899,8 @@ namespace MvcPlatform.Controllers
                         WEIGHTCHECK = dt.Rows[0]["WEIGHTCHECK"].ToString();
                     }
                     //end
-                    string formdata = "{STATUS:0,REPUNITNAME:'" + bgsb_unit + "',REPUNITCODE:'" + json_user.Value<string>("CUSTOMERHSCODE") + "',INSPUNITNAME:'" + bjsb_unit + "',INSPUNITCODE:'" + json_user.Value<string>("CUSTOMERCIQCODE") + "',WEIGHTCHECK:'" + WEIGHTCHECK + "'}";
+                    //   string formdata = "{STATUS:0,REPUNITNAME:'" + bgsb_unit + "',REPUNITCODE:'" + json_user.Value<string>("CUSTOMERHSCODE") + "',INSPUNITNAME:'" + bjsb_unit + "',INSPUNITCODE:'" + json_user.Value<string>("CUSTOMERCIQCODE") + "',WEIGHTCHECK:'" + WEIGHTCHECK + "'}";
+                    string formdata = "{STATUS:0,WEIGHTCHECK:'" + WEIGHTCHECK + "'}";
                     result = "{formdata:" + formdata + ",filedata:[]}";
                 }
                 else//如果是复制新增
@@ -921,7 +909,7 @@ namespace MvcPlatform.Controllers
                     t.TRADEWAYCODES,'' CONTAINERTRUCK from LIST_ORDER t where t.CODE = '" + copyordercode + "' and rownum=1";
                     dt = DBMgr.GetDataTable(sql);
                     if (dt.Rows.Count > 0)
-                    { 
+                    {
                         string formdata = JsonConvert.SerializeObject(dt).TrimStart('[').TrimEnd(']');
                         result = "{formdata:" + formdata + ",filedata:[]}";
                     }
@@ -930,7 +918,7 @@ namespace MvcPlatform.Controllers
             else //如果订单号不为空
             {
                 //订单基本信息 CONTAINERTRUCK 这个字段本身不属于list_order表,虚拟出来存储集装箱和报关车号记录,是个数组形式的字符串
-                string sql = @"select t.*,'' CONTAINERTRUCK from LIST_ORDER t where t.CODE = '" + Request["ordercode"] + "' and rownum=1";
+                sql = @"select t.*,'' CONTAINERTRUCK from LIST_ORDER t where t.CODE = '" + Request["ordercode"] + "' and rownum=1";
                 dt = DBMgr.GetDataTable(sql);
                 IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
                 iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
@@ -2161,7 +2149,7 @@ namespace MvcPlatform.Controllers
                 DataRow dr_cus = dt_cus.NewRow();
                 status = json.Value<int>("CODE");
                 int finished = 0; int exception = 0;
-               // if (status <= 60)
+                // if (status <= 60)
                 if (false)
                 {
                     foreach (DataRow dr in dt_pre.Rows)//循环报关草单

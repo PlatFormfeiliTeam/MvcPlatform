@@ -930,13 +930,17 @@ function loadform() {
             var data = Ext.decode(response.responseText);
             formpanel.getForm().setValues(data.formdata);
             file_store.loadData(data.filedata);
-            if (data.formdata.TRADEWAYCODES1) {
-                Ext.getCmp('combo_myfs').setValue(data.formdata.TRADEWAYCODES1.split(','));
+            //  repunitcode = data.formdata.REPUNITNAME != null ? (data.formdata.REPUNITNAME + '(' + data.formdata.REPUNITCODE + ')') : "";
+            //如果是修改时申报单位取先前保存的值,如无则取默认值2016-10-19 by panhuaguo  
+            if (data.formdata.REPUNITNAME) {
+                repunitcode = data.formdata.REPUNITNAME + '(' + data.formdata.REPUNITCODE + ')';
             }
-            repunitcode = data.formdata.REPUNITNAME != null ? (data.formdata.REPUNITNAME + '(' + data.formdata.REPUNITCODE + ')') : "";
-            Ext.getCmp('tf_bgsbdw').setValue(repunitcode);
-            inspunitcode = data.formdata.INSPUNITNAME != null ? (data.formdata.INSPUNITNAME + '(' + data.formdata.INSPUNITCODE + ')') : "";
-            Ext.getCmp('tf_bjsbdw').setValue(inspunitcode);
+            if (data.formdata.INSPUNITNAME) {
+                inspunitcode = data.formdata.INSPUNITNAME + '(' + data.formdata.INSPUNITCODE + ')';
+            }
+            //Ext.getCmp('tf_bgsbdw').setValue(repunitcode);
+            //inspunitcode = data.formdata.INSPUNITNAME != null ? (data.formdata.INSPUNITNAME + '(' + data.formdata.INSPUNITCODE + ')') : "";
+            //Ext.getCmp('tf_bjsbdw').setValue(inspunitcode);
             //如果是修改需要将随附文件的ID拼接成字符串 赋值到
             var fileids = "";
             Ext.each(file_store.getRange(), function (rec) {

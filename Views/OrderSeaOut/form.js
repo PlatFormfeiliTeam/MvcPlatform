@@ -448,7 +448,12 @@
         fieldLabel: '件数/包装',
         layout: 'hbox',
         items: [{
-            id: 'GOODSNUM', name: 'GOODSNUM', xtype: 'numberfield', tabIndex: 11, flex: .5, margin: 0, hideTrigger: true, allowBlank: false, blankText: '不能为空!'
+            id: 'GOODSNUM', name: 'GOODSNUM', xtype: 'numberfield', tabIndex: 11, flex: .5, margin: 0,
+            hideTrigger: true, allowBlank: false, blankText: '不能为空!', listeners: {
+                focus: function (cb) {
+                    cb.clearInvalid();
+                }
+            }
         }, combo_PACKKINDNAME]
     }
     //毛重/净重
@@ -458,10 +463,16 @@
         layout: 'hbox',
         items: [
             {
-                id: 'GOODSGW', name: 'GOODSGW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 13, margin: 0, allowBlank: false, blankText: '不能为空!', hideTrigger: true, decimalPrecision: 4
+                id: 'GOODSGW', name: 'GOODSGW', xtype: 'numberfield', flex: .5, tabIndex: 13, margin: 0, allowBlank: false,
+                blankText: '不能为空!', hideTrigger: true, decimalPrecision: 4, listeners: {
+                    focus: function (cb) {
+                        cb.clearInvalid();
+                    }
+                }
             },
            {
-               id: 'GOODSNW', name: 'GOODSNW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 14, margin: 0, hideTrigger: true, decimalPrecision: 4
+               id: 'GOODSNW', name: 'GOODSNW', xtype: 'numberfield', flex: .5, tabIndex: 14, margin: 0, hideTrigger: true,
+               decimalPrecision: 4
            }]
     }
     //合同号
