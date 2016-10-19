@@ -44,8 +44,10 @@ namespace MvcPlatform.Common
                 //2016-08-02增加字段报关服务单位SCENEDECLAREID 报检服务单位SCENEINSPECTID 因为订单里面创建时取当前用户的默认值 故提前放到缓存
                 //CUSTOMERID 这个字段在sysuser表中有
                 string sql = @"select c.NAME as CUSTOMERNAME,c.HSCODE as CUSTOMERHSCODE,c.CIQCODE as CUSTOMERCIQCODE,c.CODE CUSTOMERCODE,
-                             c.SCENEDECLAREID,c.SCENEINSPECTID,u.* from SYS_USER u 
-                             left join sys_customer c on u.customerid = c.id where u.name ='" + account + "'";
+                             c.SCENEDECLAREID,c.SCENEINSPECTID,d.NAME as REPUNITNAME,e.NAME as INSPUNITNAME,u.* from SYS_USER u 
+                             left join sys_customer c on u.customerid = c.id 
+                             left join cusdoc.base_company d on c.hscode=d.code
+                             left join cusdoc.base_company e on c.ciqcode=e.INSPCODE where u.name ='" + account + "'";
                 DataTable dt = DBMgr.GetDataTable(sql);
                 IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
                 iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";

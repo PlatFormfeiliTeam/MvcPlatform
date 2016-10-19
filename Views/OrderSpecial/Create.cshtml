@@ -38,8 +38,9 @@
                 common_data_containersize = commondata.containersize;//集装箱尺寸
                 common_data_truckno = commondata.truckno;//报关车号
                 common_data_relacontainer = commondata.relacontainer;//关联集装箱
-                common_data_adminurl = commondata.adminurl;//文件服务器URL
-
+                common_data_adminurl = commondata.adminurl;//文件服务器URL 
+                repunitcode = commondata.curuser.REPUNITNAME + "(" + commondata.curuser.CUSTOMERHSCODE + ")";//报关申报单位
+                inspunitcode = commondata.curuser.INSPUNITNAME + "(" + commondata.curuser.CUSTOMERCIQCODE + ")";//报检申报单位
                 form_ini();//表单初始化
                 panel_file_ini();//随附文件初始化
                 loadform(); //初始化表单信息,无论是新增还是修改
