@@ -122,7 +122,7 @@ namespace MvcPlatform.Controllers
                         ,'{26}','{27}','{28}','{29}','{30}'
                         ,'{31}','{32}','{33}','{34}','{35}'
                         ,'{36}','{37}','{38}','{39}','{40}'
-                        ,'{41}','{42}',sysdate,{43},'{44}','{45}'
+                        ,'{41}',sysdate,{42},'{43}','{44}','{45}'
                         ,'{46}','{47}'
                         )";
                 sql = string.Format(sql, "20", ordercode, json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME"), json.Value<string>("CONTRACTNO")
