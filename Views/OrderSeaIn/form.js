@@ -441,7 +441,12 @@
         fieldLabel: '件数/包装',
         layout: 'hbox',
         items: [{
-            id: 'GOODSNUM', name: 'GOODSNUM', xtype: 'numberfield', tabIndex: 11, flex: .5, margin: 0, hideTrigger: true, allowBlank: false, blankText: '不能为空!'
+            id: 'GOODSNUM', name: 'GOODSNUM', xtype: 'numberfield', tabIndex: 11, flex: .5, margin: 0, hideTrigger: true,
+            allowBlank: false, blankText: '不能为空!', listeners: {
+                focus: function (cb) {
+                    cb.clearInvalid();
+                }
+            }
         }, combo_PACKKINDNAME]
     }
     //毛重/净重
@@ -451,11 +456,18 @@
         layout: 'hbox',
         items: [
             {
-                id: 'GOODSGW', name: 'GOODSGW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 13, margin: 0, allowBlank: false, blankText: '不能为空!', hideTrigger: true, decimalPrecision: 4
+                id: 'GOODSGW', name: 'GOODSGW', xtype: 'numberfield', flex: .5, tabIndex: 13, margin: 0, allowBlank: false,
+                blankText: '不能为空!', hideTrigger: true, decimalPrecision: 4, listeners: {
+                    focus: function (cb) {
+                        cb.clearInvalid();
+                    }
+                }
             },
            {
-               id: 'GOODSNW', name: 'GOODSNW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 14, margin: 0, hideTrigger: true, decimalPrecision: 4
-           }]
+               id: 'GOODSNW', name: 'GOODSNW', xtype: 'numberfield', flex: .5, tabIndex: 14, margin: 0,
+               hideTrigger: true, decimalPrecision: 4
+           }
+        ]
     }
     //船名/航次
     var field_ship = {
@@ -464,10 +476,20 @@
         layout: 'hbox',
         items: [
             {
-                id: 'SHIPNAME', name: 'SHIPNAME', xtype: 'textfield', flex: .5, tabIndex: 15, margin: 0, allowBlank: false, blankText: '不能为空!', hideTrigger: true
+                id: 'SHIPNAME', name: 'SHIPNAME', xtype: 'textfield', flex: .5, tabIndex: 15, margin: 0, allowBlank: false,
+                blankText: '不能为空!', hideTrigger: true, listeners: {
+                    focus: function (cb) {
+                        cb.clearInvalid();
+                    }
+                }
             },
             {
-                id: 'FILGHTNO', name: 'FILGHTNO', xtype: 'textfield', flex: .5, tabIndex: 16, margin: 0, hideTrigger: true, allowBlank: false, blankText: '不能为空!'
+                id: 'FILGHTNO', name: 'FILGHTNO', xtype: 'textfield', flex: .5, tabIndex: 16, margin: 0, hideTrigger: true,
+                allowBlank: false, blankText: '不能为空!', listeners: {
+                    focus: function (cb) {
+                        cb.clearInvalid();
+                    }
+                }
             }]
     }
     //合同号
@@ -498,7 +520,7 @@
     })
     var combo_myfs = Ext.create('Ext.form.field.ComboBox', {//贸易方式
         id: 'combo_myfs',
-        name:'TRADEWAYCODES',
+        name: 'TRADEWAYCODES',
         store: store_myfs,
         displayField: 'NAME',
         valueField: 'CODE',
@@ -534,7 +556,13 @@
         xtype: 'fieldcontainer',
         fieldLabel: '贸易方式',
         layout: 'hbox',
-        items: [combo_myfs, { id: 'myfs_btn', xtype: 'button', listeners: { click: function () { selectmyfs(combo_myfs, field_TRADEWAYCODES, field_TRADEWAYCODES1); } }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0 }]
+        items: [combo_myfs, {
+            id: 'myfs_btn', xtype: 'button', listeners: {
+                click: function () {
+                    selectmyfs(combo_myfs, field_TRADEWAYCODES, field_TRADEWAYCODES1);
+                }
+            }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
+        }]
     }
     //转关预录号
     var field_TURNPRENO = Ext.create('Ext.form.field.Text', {
@@ -767,7 +795,7 @@
         }
     });
     var bbar = Ext.create('Ext.toolbar.Toolbar', {
-        items: [combo_filetype,field_fileno1, bbar_l, '->', bbar_r]
+        items: [combo_filetype, field_fileno1, bbar_l, '->', bbar_r]
     })
     formpanel = Ext.create('Ext.form.Panel', {
         renderTo: 'div_form',
