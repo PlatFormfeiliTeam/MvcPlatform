@@ -925,9 +925,7 @@ function loadform() {
             var data = Ext.decode(response.responseText);
             formpanel.getForm().setValues(data.formdata);
             file_store.loadData(data.filedata);
-            if (data.formdata.TRADEWAYCODES1) {
-                Ext.getCmp('combo_myfs').setValue(data.formdata.TRADEWAYCODES1.split(','));
-            }
+            
             repunitcode = data.formdata.REPUNITNAME != null ? (data.formdata.REPUNITNAME + '(' + data.formdata.REPUNITCODE + ')') : "";
             Ext.getCmp('tf_bgsbdw').setValue(repunitcode);
             inspunitcode = data.formdata.INSPUNITNAME != null ? (data.formdata.INSPUNITNAME + '(' + data.formdata.INSPUNITCODE + ')') : "";

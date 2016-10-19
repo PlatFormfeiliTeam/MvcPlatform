@@ -912,7 +912,7 @@ namespace MvcPlatform.Controllers
                     string subsql = "";
                     sql = @"select '{0}' as REPUNITCODE ,'{1}' as INSPUNITCODE, '1' ORDERWAY ,'' BUSIUNITCODE,'' BUSIUNITNAME,d.CB_CODE,d.BJ_COOPER,'' ENTRUSTTYPE,
                       d.DECLARE_CUSTOM CUSTOMAREACODE,(select CHINNAME from Crm_Enterprise c where c.enterpriseid=d.EP_CODE) CHINNAME,d.BG_MODE REPWAYID,TRIM(d.MANUAL_NO) RECORDCODE,
-                      d.PIECES GOODSNUM ,d.WEIGHT GOODSGW ,d.RELATION_NO ASSOCIATENO,d.INV_NO CONTRACTNO,d.MYFS TRADEWAYCODES1,d.MYFS TRADEWAYCODES,d.OPERATION_ID CUSNO,'' IETYPE,'M' DECLWAY,
+                      d.PIECES GOODSNUM ,d.WEIGHT GOODSGW ,d.RELATION_NO ASSOCIATENO,d.INV_NO CONTRACTNO,d.MYFS TRADEWAYCODES,d.OPERATION_ID CUSNO,'' IETYPE,'M' DECLWAY,
                       '' CUSTOMDISTRICTNAME,";
                     sql = string.Format(sql, repunitcode, inspunitcode);
                     subsql = "(select count(1) from ops_jz_head where operation_id = 'GJEK" + operateid + "')  RELATEQUAN from ops_jz_head d where d.operation_id = 'GJIK" + operateid + "'";
@@ -948,7 +948,7 @@ namespace MvcPlatform.Controllers
                     sql = @"select  '{0}' as REPUNITCODE ,'{1}' as INSPUNITCODE,'1' ORDERWAY ,'' BUSIUNITCODE,'' BUSIUNITNAME,d.CB_CODE,d.BJ_COOPER,'' ENTRUSTTYPE,
                       (select CHINNAME from Crm_Enterprise c where c.enterpriseid=d.EP_CODE) CHINNAME ,d.BG_MODE REPWAYID,TRIM(d.MANUAL_NO) RECORDCODE,                         
                       d.DECLARE_CUSTOM CUSTOMAREACODE,d.PIECES GOODSNUM  ,d.WEIGHT GOODSGW,d.RELATION_NO ASSOCIATENO,d.INV_NO CONTRACTNO,                         
-                      d.MYFS TRADEWAYCODES1 ,d.MYFS TRADEWAYCODES ,d.OPERATION_ID CUSNO,'' IETYPE,'M' DECLWAY,'' CUSTOMDISTRICTNAME,";
+                      d.MYFS TRADEWAYCODES ,d.OPERATION_ID CUSNO,'' IETYPE,'M' DECLWAY,'' CUSTOMDISTRICTNAME,";
                     sql = string.Format(sql, repunitcode, inspunitcode);
                     subsql = "(select count(1) from ops_dj_head where operation_id = 'DJRE" + operateid + "')  RELATEQUAN from ops_dj_head d where d.operation_id = 'DJRI" + operateid + "'";
                     ds = DBMgrERP.GetDataSet(sql + subsql);
