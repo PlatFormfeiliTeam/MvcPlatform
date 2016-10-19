@@ -268,8 +268,9 @@
     })
     var combo_myfs4 = Ext.create('Ext.form.field.ComboBox', {//贸易方式
         id: 'combo_myfs4',
+        name: 'TRADEWAYCODES',
         store: store_myfs4,
-        displayField: 'CODE',
+        displayField: 'NAME',
         valueField: 'CODE',
         queryMode: 'local',
         anyMatch: true,
@@ -285,10 +286,6 @@
                     cb.store.clearFilter();
                     cb.expand();
                 }
-            },
-            select: function (combo, records, eOpts) {
-                field_TRADEWAYCODES4.setValue(combo.rawValue.substr(0, 4));
-                field_TRADEWAYCODES14.setValue(combo.rawValue.substr(0, 4));
             }
         },
         flex: 0.85,
@@ -302,12 +299,6 @@
         allowBlank: false,
         blankText: '贸易方式不能为空!'
     })
-    var field_TRADEWAYCODES4 = Ext.create('Ext.form.field.Hidden', {
-        name: 'TRADEWAYCODES'
-    });
-    var field_TRADEWAYCODES14 = Ext.create('Ext.form.field.Hidden', {
-        name: 'TRADEWAYCODES1'//贸易方式多选时,保存多选的值
-    });
     //贸易方式
     var field_myfs4 = {
         xtype: 'fieldcontainer',
@@ -316,7 +307,7 @@
         layout: 'hbox',
         items: [combo_myfs4, {
             xtype: 'button', id: 'myfs_btn4', listeners: {
-                click: function () { selectmyfs(combo_myfs4, field_TRADEWAYCODES4, field_TRADEWAYCODES14); }
+                click: function () { selectmyfs(combo_myfs4, field_ENTRUSTREQUEST4); }
             }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
         }]
     }
@@ -437,6 +428,7 @@
         { layout: 'column', height: 42, border: 0, items: [field_quanpackage4, field_weight4, field_contractno4, field_myfs4, zcbah_container4] },
         { layout: 'column', height: 42, border: 0, items: [chk_CHKLAWCONDITION4, field_CLEARANCENO4, field_ASSOCIATEPEDECLNO4, cont_bgsbdw4, cont_bjsbdw4] },
         { layout: 'column', height: 42, border: 0, items: [field_ENTRUSTREQUEST4, field_STATUS4] },
-         field_BUSIUNITNAME4, field_TRADEWAYCODES4, field_TRADEWAYCODES14]
+         field_BUSIUNITNAME4
+        ]
     })
 }

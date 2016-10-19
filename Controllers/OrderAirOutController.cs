@@ -112,10 +112,10 @@ namespace MvcPlatform.Controllers
                             ,REPUNITCODE,REPUNITNAME,DECLWAY,PORTCODE,INSPUNITCODE
                             ,INSPUNITNAME,ENTRUSTREQUEST,CREATEUSERID,CREATEUSERNAME,STATUS
                             ,SUBMITUSERID,SUBMITUSERNAME,CUSTOMERCODE,CUSTOMERNAME,DECLCARNO
-                            ,TRADEWAYCODES,TRADEWAYCODES1,GOODSGW,GOODSNW,PACKKIND
-                            ,BUSIKIND,ORDERWAY,CLEARUNIT,CLEARUNITNAME,CREATETIME,SUBMITTIME
-                            ,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES,WEIGHTCHECK,ISWEIGHTCHECK
-                            ,DECLSTATUS,INSPSTATUS
+                            ,TRADEWAYCODES,GOODSGW,GOODSNW,PACKKIND,BUSIKIND
+                            ,ORDERWAY,CLEARUNIT,CLEARUNITNAME,CREATETIME,SUBMITTIME,SPECIALRELATIONSHIP
+                            ,PRICEIMPACT,PAYPOYALTIES,WEIGHTCHECK,ISWEIGHTCHECK,DECLSTATUS
+                            ,INSPSTATUS
                             ) 
                       VALUES (LIST_ORDER_id.Nextval
                             , '{0}','{1}','{2}','{3}','{4}','{5}'
@@ -125,9 +125,9 @@ namespace MvcPlatform.Controllers
                             ,'{21}','{22}','{23}','{24}','{25}'
                             ,'{26}','{27}','{28}','{29}','{30}'
                             ,'{31}','{32}','{33}','{34}','{35}'
-                            ,'{36}','{37}','{38}','{39}', sysdate,{40}
+                            ,'{36}','{37}','{38}', sysdate,{39},'{40}'
                             ,'{41}','{42}','{43}','{44}','{45}'
-                            ,'{46}','{47}')";
+                            ,'{46}')";
                 sql = string.Format(sql
                             , "10", ordercode, json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME"), json.Value<string>("CONTRACTNO")
                             , json.Value<string>("TOTALNO"), json.Value<string>("DIVIDENO"), json.Value<string>("TURNPRENO"), json.Value<string>("GOODSNUM"), json.Value<string>("ARRIVEDNO")
@@ -135,10 +135,10 @@ namespace MvcPlatform.Controllers
                             , GetCode(json.Value<string>("REPUNITCODE")), GetName(json.Value<string>("REPUNITCODE")), json.Value<string>("DECLWAY"), json.Value<string>("PORTCODE"), GetCode(json.Value<string>("INSPUNITCODE"))
                             , GetName(json.Value<string>("INSPUNITCODE")), json.Value<string>("ENTRUSTREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"), json.Value<string>("STATUS")
                             , json.Value<string>("SUBMITUSERID"), json.Value<string>("SUBMITUSERNAME"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLCARNO")
-                            , json.Value<string>("TRADEWAYCODES"), json.Value<string>("TRADEWAYCODES1"), json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW"), json.Value<string>("PACKKIND")
-                            , "001", "1", json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("SUBMITTIME")
-                            , GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT")), GetChk(json.Value<string>("PAYPOYALTIES")), GetChk(json.Value<string>("WEIGHTCHECK")), GetChk(json.Value<string>("ISWEIGHTCHECK"))
-                            , json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS")
+                            , json.Value<string>("TRADEWAYCODES"), json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW"), json.Value<string>("PACKKIND"), "001"
+                            , "1", json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("SUBMITTIME"), GetChk(json.Value<string>("SPECIALRELATIONSHIP"))
+                            , GetChk(json.Value<string>("PRICEIMPACT")), GetChk(json.Value<string>("PAYPOYALTIES")), GetChk(json.Value<string>("WEIGHTCHECK")), GetChk(json.Value<string>("ISWEIGHTCHECK")), json.Value<string>("DECLSTATUS")
+                            , json.Value<string>("INSPSTATUS")
                         );
             }
             else//修改
@@ -150,15 +150,15 @@ namespace MvcPlatform.Controllers
                             ,CLEARANCENO='{11}',LAWFLAG='{12}',ENTRUSTTYPE='{13}',REPWAYID='{14}',CUSTOMAREACODE='{15}'
                             ,REPUNITCODE='{16}',REPUNITNAME='{17}',DECLWAY='{18}',PORTCODE='{19}',INSPUNITCODE='{20}'
                             ,INSPUNITNAME='{21}' ,ENTRUSTREQUEST='{22}',STATUS='{23}',SUBMITUSERID='{24}',SUBMITUSERNAME='{25}'
-                            ,CUSTOMERCODE='{26}',CUSTOMERNAME='{27}',DECLCARNO='{28}',TRADEWAYCODES='{29}',TRADEWAYCODES1='{30}'
-                            ,SUBMITTIME={31},GOODSGW='{32}',GOODSNW='{33}',PACKKIND='{34}',BUSIKIND='{35}'
-                            ,ORDERWAY='{36}' ,CLEARUNIT='{37}',CLEARUNITNAME='{38}',SPECIALRELATIONSHIP='{39}',PRICEIMPACT='{40}'
-                            ,PAYPOYALTIES='{41}',WEIGHTCHECK='{42}',ISWEIGHTCHECK='{43}' 
+                            ,CUSTOMERCODE='{26}',CUSTOMERNAME='{27}',DECLCARNO='{28}',TRADEWAYCODES='{29}',SUBMITTIME={30}
+                            ,GOODSGW='{31}',GOODSNW='{32}',PACKKIND='{33}',BUSIKIND='{34}',ORDERWAY='{35}'
+                            ,CLEARUNIT='{36}',CLEARUNITNAME='{37}',SPECIALRELATIONSHIP='{38}',PRICEIMPACT='{39}',PAYPOYALTIES='{40}'
+                            ,WEIGHTCHECK='{41}',ISWEIGHTCHECK='{42}' 
                         ";
 
                 if (IsSubmitAfterSave == false)//提交之后保存，就不更新报关报检状态；
                 {
-                    sql += @",DECLSTATUS='{44}',INSPSTATUS='{45}'";
+                    sql += @",DECLSTATUS='{43}',INSPSTATUS='{44}'";
                 }
                 sql += @" WHERE CODE = '{0}'";
 
@@ -168,10 +168,10 @@ namespace MvcPlatform.Controllers
                             , json.Value<string>("CLEARANCENO"), GetChk(json.Value<string>("LAWFLAG")), json.Value<string>("ENTRUSTTYPE"), json.Value<string>("REPWAYID"), json.Value<string>("CUSTOMAREACODE")
                             , GetCode(json.Value<string>("REPUNITCODE")), GetName(json.Value<string>("REPUNITCODE")), json.Value<string>("DECLWAY"), json.Value<string>("PORTCODE"), GetCode(json.Value<string>("INSPUNITCODE"))
                             , GetName(json.Value<string>("INSPUNITCODE")), json.Value<string>("ENTRUSTREQUEST"), json.Value<string>("STATUS"), json.Value<string>("SUBMITUSERID"), json.Value<string>("SUBMITUSERNAME")
-                            , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLCARNO"), json.Value<string>("TRADEWAYCODES"), json.Value<string>("TRADEWAYCODES1")
-                            , json.Value<string>("SUBMITTIME"), json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW"), json.Value<string>("PACKKIND"), "001"
-                            , "1", json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT"))
-                            , GetChk(json.Value<string>("PAYPOYALTIES")), GetChk(json.Value<string>("WEIGHTCHECK")), GetChk(json.Value<string>("ISWEIGHTCHECK"))
+                            , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLCARNO"), json.Value<string>("TRADEWAYCODES"), json.Value<string>("SUBMITTIME")
+                            , json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW"), json.Value<string>("PACKKIND"), "001", "1"
+                            , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT")), GetChk(json.Value<string>("PAYPOYALTIES"))
+                            , GetChk(json.Value<string>("WEIGHTCHECK")), GetChk(json.Value<string>("ISWEIGHTCHECK"))
                             , json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS")
                       );
             }

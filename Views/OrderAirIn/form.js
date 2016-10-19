@@ -487,8 +487,9 @@
     })
     var combo_myfs = Ext.create('Ext.form.field.ComboBox', {//贸易方式
         id: 'combo_myfs',
+        name: 'TRADEWAYCODES',
         store: store_myfs,
-        displayField: 'CODE',
+        displayField: 'NAME',
         valueField: 'CODE',
         queryMode: 'local',
         anyMatch: true,
@@ -503,10 +504,6 @@
                     cb.expand();
                     cb.store.clearFilter();
                 }
-            },
-            select: function (records) {
-                field_TRADEWAYCODES1.setValue(records.rawValue);
-                field_TRADEWAYCODES.setValue(records.rawValue.substr(0, 4));
             }
         },
         flex: 0.85,
@@ -520,12 +517,6 @@
         , allowBlank: false,
         blankText: '贸易方式不能为空!'
     })
-    var field_TRADEWAYCODES = Ext.create('Ext.form.field.Hidden', {
-        name: 'TRADEWAYCODES'
-    });
-    var field_TRADEWAYCODES1 = Ext.create('Ext.form.field.Hidden', {
-        name: 'TRADEWAYCODES1'
-    });
     //贸易方式
     var field_myfs = {
         xtype: 'fieldcontainer',
@@ -533,7 +524,7 @@
         layout: 'hbox',
         items: [combo_myfs, {
             id: 'myfs_btn', xtype: 'button', handler: function () {
-                selectmyfs(combo_myfs, field_TRADEWAYCODES, field_TRADEWAYCODES1);
+                selectmyfs(combo_myfs, field_CLEARREMARK);
             },
             text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
         }]
@@ -731,9 +722,7 @@
         { layout: 'column', height: 42, border: 0, items: [field_CUSNO, combo_PORTCODE, field_jydw, field_TOTALNO, field_DIVIDENO] },
         { layout: 'column', height: 42, border: 0, items: [field_quanpackage, field_weight, field_contractno, field_myfs, field_TURNPRENO] },
         { layout: 'column', height: 42, border: 0, items: [combo_mzbz, field_CLEARANCENO, container_bgch, field_CLEARREMARK, chk_CHKLAWCONDITION] },
-        field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME,
-        field_ID, field_TRADEWAYCODES, field_TRADEWAYCODES1,
-        field_CONTAINERTRUCK, field_ORIGINALFILEIDS
+        field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_ID, field_CONTAINERTRUCK, field_ORIGINALFILEIDS
         ]
     });
 }

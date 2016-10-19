@@ -269,8 +269,9 @@
     })
     var combo_myfs3 = Ext.create('Ext.form.field.ComboBox', {//贸易方式
         id: 'combo_myfs3',
+        name: 'TRADEWAYCODES',
         store: store_myfs3,
-        displayField: 'CODE',
+        displayField: 'NAME',
         valueField: 'CODE',
         queryMode: 'local',
         submitValue: false,//不随表单提交一起提交
@@ -285,10 +286,6 @@
                     cb.store.clearFilter();
                     cb.expand();
                 }
-            },
-            select: function (combo, records, eOpts) {
-                field_TRADEWAYCODES3.setValue(combo.rawValue.substr(0, 4));
-                field_TRADEWAYCODES13.setValue(combo.rawValue.substr(0, 4));
             }
         },
         flex: 0.85,
@@ -302,12 +299,6 @@
         allowBlank: false,
         blankText: '贸易方式不能为空!'
     })
-    var field_TRADEWAYCODES3 = Ext.create('Ext.form.field.Hidden', {
-        name: 'TRADEWAYCODES'
-    });
-    var field_TRADEWAYCODES13 = Ext.create('Ext.form.field.Hidden', {
-        name: 'TRADEWAYCODES1'//贸易方式多选时,保存多选的值
-    });
     //贸易方式
     var field_myfs3 = {
         xtype: 'fieldcontainer',
@@ -315,7 +306,7 @@
         layout: 'hbox',
         items: [combo_myfs3, {
             xtype: 'button', id: 'myfs_btn3',
-            listeners: { click: function () { selectmyfs(combo_myfs3, field_TRADEWAYCODES3, field_TRADEWAYCODES13); } },
+            listeners: { click: function () { selectmyfs(combo_myfs3, field_ENTRUSTREQUEST3); } },
             text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
         }]
     }
@@ -438,6 +429,7 @@
                 { layout: 'column', height: 42, border: 0, items: [field_quanpackage3, field_weight3, field_contractno3, field_myfs3, zcbah_container3] },
                 { layout: 'column', height: 42, border: 0, items: [chk_CHKLAWCONDITION3, field_CLEARANCENO3, field_ASSOCIATEPEDECLNO3, cont_bgsbdw3, cont_bjsbdw3] },
                 { layout: 'column', height: 42, border: 0, items: [field_ENTRUSTREQUEST3, field_STATUS3] },
-                field_BUSIUNITNAME3, field_TRADEWAYCODES3, field_TRADEWAYCODES13]
+                field_BUSIUNITNAME3
+        ]
     })
 }
