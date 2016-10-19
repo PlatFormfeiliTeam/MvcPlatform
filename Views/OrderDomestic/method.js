@@ -610,7 +610,7 @@ function save(action) {
                 else {
                     Ext.MessageBox.alert("提示", action == 'submit' ? "提交成功！" : "保存成功！", function () {
                         ordercode = data.ordercode;
-                        setHistoryUrl("/OrderDomestic/Create?ordercode=" + data.ordercode);
+                        //setHistoryUrl("/OrderDomestic/Create?ordercode=" + data.ordercode);
                         loadform();
                     });
                 }
