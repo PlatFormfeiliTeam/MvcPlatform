@@ -559,7 +559,7 @@
         items: [combo_myfs, {
             id: 'myfs_btn', xtype: 'button', listeners: {
                 click: function () {
-                    selectmyfs(combo_myfs, field_TRADEWAYCODES, field_TRADEWAYCODES1);
+                    selectmyfs(combo_myfs, field_CLEARREMARK);
                 }
             }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
         }]
