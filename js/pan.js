@@ -683,7 +683,7 @@ function selectmyfs(cb_myfs, tradeway_m) {//传入需要赋值的控件tradeway_
                 if (sm_selrecs.length > 0) {
                     var codes = "";
                     var remark = tradeway_m.getValue();
-                    if (remark) { 
+                    if (remark) {
                         var start = remark.indexOf('贸易方式<@');
                         var end = remark.indexOf('>@');
                         var sub = remark.substring(start, end + 2);
@@ -764,7 +764,6 @@ function LoadOrderFromErp(busitype) {
         Ext.MessageBox.alert("提示", "请输入相同的客户编号！");
         return;
     }
-
     //2016/9/26 add heguiqin：如果订单中存在重复的客户编号需要进行确认
     Ext.Ajax.request({
         url: "/Common/OperateIdRepeate",
@@ -793,30 +792,38 @@ function importorderFromErp() {
         params: { operationid: Ext.String.trim(Ext.getCmp('NUMBER').getValue()), busitype: busitype },
         success: function (response, success, option) {
             var data = Ext.decode(response.responseText);
-            if (data.success) {  //erp上存在该业务编号
-                Ext.MessageBox.alert("提示", "数据导入成功！");
-                formpanel.getForm().setValues(data.data);
-                if (Ext.getCmp('combo_jydw').getValue()) { //导入时如果经营单位有值 就给简称字段赋值
-                    var rec = Ext.getCmp('combo_jydw').store.findRecord('CODE', Ext.getCmp('combo_jydw').getValue());
-                }
-                if (Ext.getCmp('combo_PORTCODE') && Ext.getCmp('combo_PORTCODE').getValue()) {//如果进出口岸有值就给portname赋值
-                    var rec = Ext.getCmp('combo_PORTCODE').store.findRecord('CODE', Ext.getCmp('combo_PORTCODE').getValue());
-                    Ext.getCmp('field_PORTNAME').setValue(rec.get("NAME"));
-                }
-                Ext.Ajax.request({
-                    url: "/Common/getErpfile",
-                    params: { id: Ext.String.trim(Ext.getCmp('NUMBER').getValue()), busitype: busitype },
-                    success: function (response, success, option) {
-                        var data = Ext.decode(response.responseText);
-
-                        var timestamp = Ext.Date.now();  //1351666679575  这个方法只是获取的时间戳
-                        var date = new Date(timestamp);
-
-                        Ext.each(data.rows, function (item) {
-                            file_store.insert(file_store.data.length, { FILENAME: '/FileUpload/file/' + item.MAINNAME.substr(item.MAINNAME.lastIndexOf("CustomsFile") + 11), ORIGINALNAME: item.MAINNAME.substr(item.MAINNAME.lastIndexOf("CustomsFile") + 11), SIZES: item.FILE_SIZE, FILETYPENAME: "订单文件", FILETYPE: "44", UPLOADTIME: Ext.Date.format(date, 'Y-m-d H:i:s') });
-                        })
+            if (data.success) {  //erp上存在该业务编号              
+                //如果当前页面订单号为空，表示创建模式,则直接赋值
+                if (!Ext.getCmp('field_CODE').getValue()) {
+                    formpanel.getForm().setValues(data.data);
+                    if (Ext.getCmp('combo_PORTCODE') && Ext.getCmp('combo_PORTCODE').getValue()) {//如果进出口岸有值就给portname赋值
+                        var rec = Ext.getCmp('combo_PORTCODE').store.findRecord('CODE', Ext.getCmp('combo_PORTCODE').getValue());
+                        Ext.getCmp('field_PORTNAME').setValue(rec.get("NAME"));
                     }
-                });
+                    Ext.Ajax.request({
+                        url: "/Common/getErpfile",
+                        params: { id: Ext.String.trim(Ext.getCmp('NUMBER').getValue()), busitype: busitype },
+                        success: function (response, success, option) {
+                            var data = Ext.decode(response.responseText);
+                            var timestamp = Ext.Date.now();  //1351666679575  这个方法只是获取的时间戳
+                            var date = new Date(timestamp);
+                            Ext.each(data.rows, function (item) {
+                                file_store.insert(file_store.data.length, { FILENAME: '/FileUpload/file/' + item.MAINNAME.substr(item.MAINNAME.lastIndexOf("CustomsFile") + 11), ORIGINALNAME: item.MAINNAME.substr(item.MAINNAME.lastIndexOf("CustomsFile") + 11), SIZES: item.FILE_SIZE, FILETYPENAME: "订单文件", FILETYPE: "44", UPLOADTIME: Ext.Date.format(date, 'Y-m-d H:i:s') });
+                            })
+                        }
+                    });
+                }
+                else {
+                    //如果订单号存在,表示修改模式,则只需要给空值赋值
+                    Ext.Array.each(formpanel.getForm().getFields().items, function (item) {
+                        if (!item.value && item.id != "tf_bjsbdw" && item.id != "tf_bgsbdw") {
+                            if (typeof (data.data[item.name]) != "undefined") {
+                                item.setValue(data.data[item.name]);
+                            } 
+                        }
+                    });
+                }
+                Ext.MessageBox.alert("提示", "数据导入成功！");
             }
             else {
                 Ext.MessageBox.alert("提示", "对应的订单号在ERP上无记录！");

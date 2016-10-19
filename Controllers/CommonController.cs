@@ -917,21 +917,11 @@ namespace MvcPlatform.Controllers
                 }
                 else//如果是复制新增
                 {
-                    sql = @"select t.ENTRUSTTYPE,t.REPWAYID,t.CUSTOMAREACODE,t.DECLWAY,t.PORTCODE,'' CONTAINERTRUCK from LIST_ORDER t where t.CODE = '" + copyordercode + "' and rownum=1";
+                    sql = @"select t.ENTRUSTTYPE,t.REPWAYID,t.CUSTOMAREACODE,t.DECLWAY,t.PORTCODE,t.REPUNITCODE,t.REPUNITNAME,t.INSPUNITCODE,t.INSPUNITNAME,
+                    t.TRADEWAYCODES,'' CONTAINERTRUCK from LIST_ORDER t where t.CODE = '" + copyordercode + "' and rownum=1";
                     dt = DBMgr.GetDataTable(sql);
                     if (dt.Rows.Count > 0)
-                    {
-                        //    dt.Rows[0]["CODE"] = DBNull.Value; dt.Rows[0]["STATUS"] = "0";
-                        //    dt.Rows[0]["CREATEUSERID"] = DBNull.Value; dt.Rows[0]["CREATEUSERNAME"] = DBNull.Value;
-                        //    dt.Rows[0]["SUBMITTIME"] = DBNull.Value; dt.Rows[0]["CREATETIME"] = DBNull.Value;
-                        //    dt.Rows[0]["SUBMITUSERNAME"] = DBNull.Value; dt.Rows[0]["SUBMITUSERID"] = DBNull.Value;
-                        //    dt.Rows[0]["CONTAINERNO"] = DBNull.Value; dt.Rows[0]["DECLCARNO"] = DBNull.Value;
-                        //    //报关、报检申报单位
-                        //    dt.Rows[0]["REPUNITNAME"] = bgsb_unit; dt.Rows[0]["REPUNITCODE"] = json_user.Value<string>("CUSTOMERHSCODE");
-                        //    dt.Rows[0]["INSPUNITNAME"] = bjsb_unit; dt.Rows[0]["INSPUNITCODE"] = json_user.Value<string>("CUSTOMERCIQCODE");
-                        //    //件数和重量也要清空
-                        //    dt.Rows[0]["GOODSNUM"] = DBNull.Value; dt.Rows[0]["PACKKIND"] = DBNull.Value;
-                        //    dt.Rows[0]["GOODSGW"] = DBNull.Value; dt.Rows[0]["GOODSNW"] = DBNull.Value;
+                    { 
                         string formdata = JsonConvert.SerializeObject(dt).TrimStart('[').TrimEnd(']');
                         result = "{formdata:" + formdata + ",filedata:[]}";
                     }
