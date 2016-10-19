@@ -45,7 +45,8 @@
                 common_data_bzzl = commondata.bzzl;//包装种类
                 common_data_myfs = commondata.myfs;//贸易方式
                 common_data_adminurl = commondata.adminurl;//文件服务器URL
-                
+                repunitcode = commondata.curuser.REPUNITNAME + "(" + commondata.curuser.CUSTOMERHSCODE + ")";//报关申报单位
+                inspunitcode = commondata.curuser.INSPUNITNAME + "(" + commondata.curuser.CUSTOMERCIQCODE + ")";//报检申报单位 
                 form_head_ini();
                 form_import_ini();
                 form_export_ini();
