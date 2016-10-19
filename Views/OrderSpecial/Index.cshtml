@@ -118,14 +118,6 @@
         opencenterwin("/OrderSpecial/Create", 1600, 900);
     }
     
-    function View() {
-        var recs = gridpanel.getSelectionModel().getSelection();
-        if (recs.length == 0) {
-            Ext.MessageBox.alert('提示', '请选择需要查看详细的记录！');
-            return;
-        }
-        opencenterwin("/Common/OrderView?OrderId=" + recs[0].get("ID") + "&OrderCode=" + recs[0].get("CODE") + "&busitypeid=" + recs[0].get("BUSITYPE"), 1200, 800);
-    }
 
     function changeOnlySelfStyle() {
         var OnlySelfDom = Ext.get('OnlySelfi');

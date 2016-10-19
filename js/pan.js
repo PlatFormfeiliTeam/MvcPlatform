@@ -1611,3 +1611,13 @@ function openwin(type) {
     plwhids = plwhids.substr(0, plwhids.length - 1);
     opencenterwin("/Common/BatchMaintain?ids=" + plwhids + "&type=" + type, 1200, 600);
 }
+
+
+function Views() {
+    var recs = gridpanel.getSelectionModel().getSelection();
+    if (recs.length == 0) {
+        Ext.MessageBox.alert('提示', '请选择需要查看详细的记录！');
+        return;
+    }
+    opencenterwin("/Common/OrderView?OrderId=" + recs[0].get("ID") + "&ordercode=" + recs[0].get("CODE") + "&busitypeid=" + recs[0].get("BUSITYPE"), 1200, 800);
+}

@@ -2051,7 +2051,7 @@ namespace MvcPlatform.Controllers
 
         public string LoadDeclaration()
         {
-            string sql = @"select DECLARATIONCODE,GOODSGW,GOODSNW,GOODSNUM,SHEETNUM,BUSITYPE from list_declaration  
+            string sql = @"select ID,LARATIONCODE,GOODSGW,GOODSNW,GOODSNUM,SHEETNUM,BUSITYPE,TRADECODE,CUSTOMSSTATUS from list_declaration  
                          WHERE ordercode='" + Request["ORDERCODE"] + "'";
             var json = DBMgr.ExecuteNonQuery(sql);
             return "{rows:" + json + "}";
@@ -2060,7 +2060,7 @@ namespace MvcPlatform.Controllers
         public string LoadInspection()
         {
             string sql = @"SELECT li.ID,li.CODE, li.APPROVALCODE,li.INSPECTIONCODE,lo.INSPUNITNAME,lo.WOODPACKINGID,li.ORDERCODE,lo.CUSNO,li.ISPRINT,lo.GOODSNUM,lo.BUSITYPE,lo.INSPUNITNAME,lo.CONTRACTNO,
-                          lo.TOTALNO,li.INSPECTIONCODE
+                          lo.TOTALNO,li.INSPECTIONCODE,li.INSPSTATUS
                          FROM list_inspection li  LEFT JOIN list_order lo ON li.ordercode = lo.code   
                          WHERE li.ORDERCODE='" + Request["ordercode"] + "'";
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式

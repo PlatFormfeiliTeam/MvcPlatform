@@ -96,45 +96,45 @@
             params: { ordercode: ordercode, dec_insp_status: JSON.stringify(orderstatus_js_data) },
             success: function (response, opts) {
                 var data = Ext.decode(response.responseText);
-                var html = "";
-                Ext.each(orderstatus_js_data, function (item) {
-                    if (item.CODE <= data.status) {
-                        html += '<div class="pie"><div style="color:green"><i class="fa fa-circle fa-5x" aria-hidden="true"></i></div><div style="text">' + item.NAME + '</div></div>';
-                    }
-                    else {
-                        html += '<div class="pie"><div style="color:gray"><i class="fa fa-circle fa-5x" aria-hidden="true"></i></div><div>' + item.NAME + '</div></div>';
-                    }
-                })
-                Ext.getDom("chart1").innerHTML = html;
+                //var html = "";
+                //Ext.each(orderstatus_js_data, function (item) {
+                //    if (item.CODE <= data.status) {
+                //        html += '<div class="pie"><div style="color:green"><i class="fa fa-circle fa-5x" aria-hidden="true"></i></div><div style="text">' + item.NAME + '</div></div>';
+                //    }
+                //    else {
+                //        html += '<div class="pie"><div style="color:gray"><i class="fa fa-circle fa-5x" aria-hidden="true"></i></div><div>' + item.NAME + '</div></div>';
+                //    }
+                //})
+                //Ext.getDom("chart1").innerHTML = html;
 
-                var store_orderstatus = Ext.create('Ext.data.JsonStore', {
-                    fields: ['TIMES', 'STATUS'],
-                    data: data.rows
-                })
-                var grid_orderstatus = Ext.create('Ext.grid.Panel', { //状态变更日志
-                    store: store_orderstatus,
-                    region: 'center',
-                    selModel: { selType: 'checkboxmodel' },
-                    columns: [
-                    { xtype: 'rownumberer', width: 35 },
-                    { header: '时间', dataIndex: 'TIMES', width: 130 },
-                    { header: '状态', dataIndex: 'STATUS', width: 130, renderer: render },
-                    { header: '描述', dataIndex: 'SUBMITTIME', width: 300 }
-                    ]
-                })
-                var panel1_1 = Ext.create('Ext.panel.Panel', {
-                    border: 0,
-                    region: 'north',
-                    height: 180,
-                    contentEl: 'chart1'
-                })
-                var panel1 = Ext.create('Ext.panel.Panel', {
-                    title: '<i class="fa fa-hand-o-right" aria-hidden="true"></i>&nbsp;业务动态' + ordercode,
-                    layout: 'border',
-                    border: 0,
-                    items: [panel1_1, grid_orderstatus]
-                })
-                var items = [panel1];
+                //var store_orderstatus = Ext.create('Ext.data.JsonStore', {
+                //    fields: ['TIMES', 'STATUS'],
+                //    data: data.rows
+                //})
+                //var grid_orderstatus = Ext.create('Ext.grid.Panel', { //状态变更日志
+                //    store: store_orderstatus,
+                //    region: 'center',
+                //    selModel: { selType: 'checkboxmodel' },
+                //    columns: [
+                //    { xtype: 'rownumberer', width: 35 },
+                //    { header: '时间', dataIndex: 'TIMES', width: 130 },
+                //    { header: '状态', dataIndex: 'STATUS', width: 130, renderer: render },
+                //    { header: '描述', dataIndex: 'SUBMITTIME', width: 300 }
+                //    ]
+                //})
+                //var panel1_1 = Ext.create('Ext.panel.Panel', {
+                //    border: 0,
+                //    region: 'north',
+                //    height: 180,
+                //    contentEl: 'chart1'
+                //})
+                //var panel1 = Ext.create('Ext.panel.Panel', {
+                //    title: '<i class="fa fa-hand-o-right" aria-hidden="true"></i>&nbsp;业务动态' + ordercode,
+                //    layout: 'border',
+                //    border: 0,
+                //    items: [panel1_1, grid_orderstatus]
+                //})
+                var items = [];
                 //报关单跟踪
                 if (data.entrusttypeid == '01' || data.entrusttypeid == '03')//委托类型 01 报关单  02报检单  03报关报检
                 {

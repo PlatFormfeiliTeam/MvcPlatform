@@ -122,15 +122,6 @@
         opencenterwin("/OrderAirIn/Create", 1600, 900);
     }
 
-    function Views() {
-        var recs = gridpanel.getSelectionModel().getSelection();
-        if (recs.length == 0) {
-            Ext.MessageBox.alert('提示', '请选择需要操作的记录！');
-            return;
-        }
-        opencenterwin("/Common/OrderView?OrderId=" + recs[0].get("ID") + "&ordercode=" + recs[0].get("CODE") + "&busitypeid=" + recs[0].get("BUSITYPE"), 1200, 800);
-    }
-
     function changeOnlySelfStyle() {
         var OnlySelfDom = Ext.get('OnlySelfi');
         if (Ext.get('OnlySelfi').el.dom.className.replace(/(^\s*)|(\s*$)/g, "") == "fa fa-check-square-o") {

@@ -94,13 +94,6 @@
         readOnly: true
     })
 
-    //委托电话
-    var field_SUBMITUSERPHONE = Ext.create('Ext.form.field.Text', {
-        name: 'SUBMITUSERPHONE',
-        fieldLabel: '委托电话',
-        readOnly: true
-    })
-
     //报检申报单位
     var field_INSPUNITNAME = Ext.create('Ext.form.field.Text', {
         name: 'INSPUNITNAME',
@@ -119,20 +112,6 @@
     var field_CREATETIME = Ext.create('Ext.form.field.Text', {
         name: 'CREATETIME1',
         fieldLabel: '维护时间',
-        readOnly: true
-    });
-
-    //平台客服
-    var field_CSNAME = Ext.create('Ext.form.field.Text', {
-        name: 'CSNAME',
-        fieldLabel: '平台客服',
-        readOnly: true
-    })
-
-    //客服电话
-    var field_CSPHONE = Ext.create('Ext.form.field.Text', {
-        name: 'CSPHONE',
-        fieldLabel: '客服电话',
         readOnly: true
     });
 
@@ -304,8 +283,8 @@
         items: [
               { layout: 'column', border: 42, border: 0, items: [label_baseinfo] },
               { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_CODE, field_ENTRUSTTYPE, field_REPWAY, field_CUSTOMDISTRICT, field_REPUNIT] },
-              { layout: 'column', height: 42, border: 0, items: [field_DECLWAY, field_SUBMITUSERNAME, field_SUBMITTIME, field_SUBMITUSERPHONE, field_INSPUNITNAME] },
-              { layout: 'column', height: 42, border: 0, items: [field_CREATEUSERNAME, field_CREATETIME, field_CSNAME, field_CSPHONE, field_STATUS] },
+              { layout: 'column', height: 42, border: 0, items: [field_DECLWAY, field_SUBMITUSERNAME, field_SUBMITTIME, field_INSPUNITNAME, field_STATUS] },
+              { layout: 'column', height: 42, border: 0, items: [field_CREATEUSERNAME, field_CREATETIME] },
               { layout: 'column', border: 42, border: 0, items: [label_busiinfo] },
               { layout: 'column', height: 42, border: 0, items: [field_CUSNO, field_PORTCODE, field_BUSIUNIT, field_TOTALNO, field_DIVIDENO] },
               { layout: 'column', height: 42, border: 0, items: [field_quanpackage, field_weight, field_contractno, field_TRADEWAYCODES, field_TURNPRENO] },
