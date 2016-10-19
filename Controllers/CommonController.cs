@@ -899,7 +899,6 @@ namespace MvcPlatform.Controllers
                         WEIGHTCHECK = dt.Rows[0]["WEIGHTCHECK"].ToString();
                     }
                     //end
-                    //   string formdata = "{STATUS:0,REPUNITNAME:'" + bgsb_unit + "',REPUNITCODE:'" + json_user.Value<string>("CUSTOMERHSCODE") + "',INSPUNITNAME:'" + bjsb_unit + "',INSPUNITCODE:'" + json_user.Value<string>("CUSTOMERCIQCODE") + "',WEIGHTCHECK:'" + WEIGHTCHECK + "'}";
                     string formdata = "{STATUS:0,WEIGHTCHECK:'" + WEIGHTCHECK + "'}";
                     result = "{formdata:" + formdata + ",filedata:[]}";
                 }
