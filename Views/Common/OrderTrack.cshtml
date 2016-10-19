@@ -26,8 +26,8 @@
 </style>
 <script type="text/javascript">
     var ordercode = getQueryString("ORDERCODE");
-    var orderstatus_enum = [{ "CODE": 1, "NAME": "草稿" }, { "CODE": 10, "NAME": "文件已上传" }, { "CODE": 15, "NAME": "订单已委托" }, { "CODE": 20, "NAME": "订单已受理" }, { "CODE": 25, "NAME": "订单预审中" }, { "CODE": 30, "NAME": "文件处理中" }, { "CODE": 35, "NAME": "文件处理完成" }, { "CODE": 40, "NAME": "订单预审完成" }, { "CODE": 45, "NAME": "订单处理中" }, { "CODE": 110, "NAME": "订单已交付" }];
-    var dec_insp_status_enum = [{ CODE: 25, NAME: '预审中' }, { CODE: 40, NAME: '预审完成' }, { CODE: 45, NAME: '制单已受理' }, { CODE: 50, NAME: '制单中' }, { CODE: 55, NAME: '制单完成' }, { CODE: 60, NAME: '待审核' }, { CODE: 65, NAME: '审核已受理' }, { CODE: 70, NAME: '审核中' }, { CODE: 75, NAME: '审核完成' }, { CODE: 78, NAME: '待预录' }, { CODE: 80, NAME: '预录已受理' }, { CODE: 85, NAME: '预录中' }, { CODE: 90, NAME: '预录完成' }, { CODE: 95, NAME: '预录校验完成' }, { CODE: 100, NAME: '申报中' }, { CODE: 105, NAME: '申报完成' }, { CODE: 110, NAME: '申报完结' }];
+   //var orderstatus_enum = [{ "CODE": 1, "NAME": "草稿" }, { "CODE": 10, "NAME": "文件已上传" }, { "CODE": 15, "NAME": "订单已委托" }, { "CODE": 20, "NAME": "订单已受理" }, { "CODE": 25, "NAME": "订单预审中" }, { "CODE": 30, "NAME": "文件处理中" }, { "CODE": 35, "NAME": "文件处理完成" }, { "CODE": 40, "NAME": "订单预审完成" }, { "CODE": 45, "NAME": "订单处理中" }, { "CODE": 110, "NAME": "订单已交付" }];
+   // var dec_insp_status_enum = [{ CODE: 25, NAME: '预审中' }, { CODE: 40, NAME: '预审完成' }, { CODE: 45, NAME: '制单已受理' }, { CODE: 50, NAME: '制单中' }, { CODE: 55, NAME: '制单完成' }, { CODE: 60, NAME: '待审核' }, { CODE: 65, NAME: '审核已受理' }, { CODE: 70, NAME: '审核中' }, { CODE: 75, NAME: '审核完成' }, { CODE: 78, NAME: '待预录' }, { CODE: 80, NAME: '预录已受理' }, { CODE: 85, NAME: '预录中' }, { CODE: 90, NAME: '预录完成' }, { CODE: 95, NAME: '预录校验完成' }, { CODE: 100, NAME: '申报中' }, { CODE: 105, NAME: '申报完成' }, { CODE: 110, NAME: '申报完结' }];
     var labelTop = {
         normal: {
             label: {
@@ -89,15 +89,15 @@
             color: 'rgba(135,202,37,1)'
         }
     };
+
     Ext.onReady(function () {
         Ext.Ajax.request({
             url: "/Common/LoadOrderTrack?",
-            params: { ordercode: ordercode },
+            params: { ordercode: ordercode, dec_insp_status: JSON.stringify(orderstatus_js_data) },
             success: function (response, opts) {
-                alert("safasdf");
                 var data = Ext.decode(response.responseText);
                 var html = "";
-                Ext.each(orderstatus_enum, function (item) {
+                Ext.each(orderstatus_js_data, function (item) {
                     if (item.CODE <= data.status) {
                         html += '<div class="pie"><div style="color:green"><i class="fa fa-circle fa-5x" aria-hidden="true"></i></div><div style="text">' + item.NAME + '</div></div>';
                     }
@@ -139,7 +139,7 @@
                 if (data.entrusttypeid == '01' || data.entrusttypeid == '03')//委托类型 01 报关单  02报检单  03报关报检
                 {
                     var html2 = "";
-                    Ext.each(dec_insp_status_enum, function (item) {
+                    Ext.each(orderstatus_js_data, function (item) {
                         html2 += '<div class="pie2" id="dec_' + item.CODE + '">1</div>';
                     })
                     Ext.getDom("chart2").innerHTML = html2;
@@ -214,7 +214,7 @@
                 if (data.entrusttypeid == '02' || data.entrusttypeid == '03')//委托类型 01 报关单  02报检单  03报关报检
                 {
                     var html3 = "";
-                    Ext.each(dec_insp_status_enum, function (item) {
+                    Ext.each(orderstatus_js_data, function (item) {
                         html3 += '<div class="pie2" id="insp_' + item.CODE + '">1</div>';
                     })
                     Ext.getDom("chart3").innerHTML = html3;
