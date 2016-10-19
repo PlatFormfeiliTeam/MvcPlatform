@@ -1,0 +1,312 @@
+﻿@{
+    ViewBag.Title = "OrderTrack";
+    Layout = "~/Views/Shared/Empty.cshtml";
+}
+<link href="/js/Extjs42/resources/css/ext-all.css" rel="stylesheet" />
+<script src="/js/Extjs42/bootstrap.js" type="text/javascript"></script>
+<script src="/js/pan.js" type="text/javascript"></script>
+<link href="/css/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+<script src="~/js/commondata.js"></script>
+<script src="/js/echart/echarts-all.js"></script>
+<style type="text/css">
+    .pie {
+        float: left;
+        width: 75px;
+        margin: 5px;
+        text-align: center;
+    }
+
+    .pie2 {
+        float: left;
+        width: 80px;
+        height: 90px;
+        margin: 3px;
+        text-align: center;
+    }
+</style>
+<script type="text/javascript">
+    var ordercode = getQueryString("ORDERCODE");
+    var orderstatus_enum = [{ "CODE": 1, "NAME": "草稿" }, { "CODE": 10, "NAME": "文件已上传" }, { "CODE": 15, "NAME": "订单已委托" }, { "CODE": 20, "NAME": "订单已受理" }, { "CODE": 25, "NAME": "订单预审中" }, { "CODE": 30, "NAME": "文件处理中" }, { "CODE": 35, "NAME": "文件处理完成" }, { "CODE": 40, "NAME": "订单预审完成" }, { "CODE": 45, "NAME": "订单处理中" }, { "CODE": 110, "NAME": "订单已交付" }];
+    var dec_insp_status_enum = [{ CODE: 25, NAME: '预审中' }, { CODE: 40, NAME: '预审完成' }, { CODE: 45, NAME: '制单已受理' }, { CODE: 50, NAME: '制单中' }, { CODE: 55, NAME: '制单完成' }, { CODE: 60, NAME: '待审核' }, { CODE: 65, NAME: '审核已受理' }, { CODE: 70, NAME: '审核中' }, { CODE: 75, NAME: '审核完成' }, { CODE: 78, NAME: '待预录' }, { CODE: 80, NAME: '预录已受理' }, { CODE: 85, NAME: '预录中' }, { CODE: 90, NAME: '预录完成' }, { CODE: 95, NAME: '预录校验完成' }, { CODE: 100, NAME: '申报中' }, { CODE: 105, NAME: '申报完成' }, { CODE: 110, NAME: '申报完结' }];
+    var labelTop = {
+        normal: {
+            label: {
+                show: false,
+                position: 'center',
+                formatter: '{b}',
+                textStyle: {
+                    baseline: 'top'
+                }
+            },
+            labelLine: {
+                show: false
+            },
+            color: 'rgba(133,133,133,1)'
+        }
+    };
+    var labelCenter = {
+        normal: {
+            label: {
+                show: false,
+                position: 'center',
+                formatter: '{b}',
+                textStyle: {
+                    baseline: 'middle',
+                    color: 'rgba(255,0,0,1)'
+                },
+                lineStyle: {
+                    color: 'rgba(255,0,0,1)'
+                }
+            },
+            labelLine: {
+                show: false
+            },
+            color: 'rgba(181,37,33,1)'
+        }
+    };
+    var labelFromatter = {
+        normal: {
+            label: {
+
+                textStyle: {
+                    baseline: 'top'
+                }
+            }
+        },
+    }
+    var labelBottom = {
+        normal: {
+            label: {
+                show: false,
+                position: 'center',
+                textStyle: {
+                    baseline: 'bottom'
+                }
+            },
+            labelLine: {
+                show: false
+            },
+            color: 'rgba(135,202,37,1)'
+        }
+    };
+    Ext.onReady(function () {
+        Ext.Ajax.request({
+            url: "/Common/LoadOrderTrack?",
+            params: { ordercode: ordercode },
+            success: function (response, opts) {
+                alert("safasdf");
+                var data = Ext.decode(response.responseText);
+                var html = "";
+                Ext.each(orderstatus_enum, function (item) {
+                    if (item.CODE <= data.status) {
+                        html += '<div class="pie"><div style="color:green"><i class="fa fa-circle fa-5x" aria-hidden="true"></i></div><div style="text">' + item.NAME + '</div></div>';
+                    }
+                    else {
+                        html += '<div class="pie"><div style="color:gray"><i class="fa fa-circle fa-5x" aria-hidden="true"></i></div><div>' + item.NAME + '</div></div>';
+                    }
+                })
+                Ext.getDom("chart1").innerHTML = html;
+
+                var store_orderstatus = Ext.create('Ext.data.JsonStore', {
+                    fields: ['TIMES', 'STATUS'],
+                    data: data.rows
+                })
+                var grid_orderstatus = Ext.create('Ext.grid.Panel', { //状态变更日志
+                    store: store_orderstatus,
+                    region: 'center',
+                    selModel: { selType: 'checkboxmodel' },
+                    columns: [
+                    { xtype: 'rownumberer', width: 35 },
+                    { header: '时间', dataIndex: 'TIMES', width: 130 },
+                    { header: '状态', dataIndex: 'STATUS', width: 130, renderer: render },
+                    { header: '描述', dataIndex: 'SUBMITTIME', width: 300 }
+                    ]
+                })
+                var panel1_1 = Ext.create('Ext.panel.Panel', {
+                    border: 0,
+                    region: 'north',
+                    height: 180,
+                    contentEl: 'chart1'
+                })
+                var panel1 = Ext.create('Ext.panel.Panel', {
+                    title: '<i class="fa fa-hand-o-right" aria-hidden="true"></i>&nbsp;业务动态' + ordercode,
+                    layout: 'border',
+                    border: 0,
+                    items: [panel1_1, grid_orderstatus]
+                })
+                var items = [panel1];
+                //报关单跟踪
+                if (data.entrusttypeid == '01' || data.entrusttypeid == '03')//委托类型 01 报关单  02报检单  03报关报检
+                {
+                    var html2 = "";
+                    Ext.each(dec_insp_status_enum, function (item) {
+                        html2 += '<div class="pie2" id="dec_' + item.CODE + '">1</div>';
+                    })
+                    Ext.getDom("chart2").innerHTML = html2;
+                    Ext.each(data.declare, function (item) {//开始绘制饼图
+                        var myChart = echarts.init(document.getElementById('dec_' + item.status));
+                        var option = {
+                            title: {
+                                text: item.name,
+                                x: 'center',
+                                y: 'bottom',
+                                textStyle: {
+                                    fontSize: 12,
+                                    //  marginTop:5,
+                                    fontFamily: 'sans-serif',
+                                    fontWeight: 'normal'
+                                }
+                            },
+                            series: [
+                                {
+                                    type: 'pie',
+                                    center: ['50%', '40%'],
+                                    //   radius: radius,
+                                    x: '0%', // for funnel  itemStyle: labelFromatter,
+                                    data: [
+                                        //需要注意当草单和预制单都还没有生成时的情形即total=0
+                                        { name: '未完成', value: item.total == 0 ? 1 : (item.total - item.finished), itemStyle: labelTop },
+                                        { name: '异常', value: item.exception, itemStyle: labelCenter },
+                                        { name: '已完成', value: item.finished, itemStyle: labelBottom }
+                                    ]
+                                }
+                            ]
+                        }
+                        myChart.setOption(option);
+                    })
+                    var store_declstatus = Ext.create('Ext.data.JsonStore', {
+                        fields: ['total', 'finished', 'exception', 'times', 'status', 'name'],
+                        data: data.declare
+                    })
+                    var filter = new Ext.util.Filter({//过滤时间为空的记录
+                        filterFn: function (item) {
+                            return item.get("times");
+                        }
+                    });
+                    store_declstatus.filter(filter);
+                    var grid_declstatus = Ext.create('Ext.grid.Panel', { //报关状态变更日志
+                        store: store_declstatus,
+                        region: 'center',
+                        selModel: { selType: 'checkboxmodel' },
+                        columns: [
+                        { xtype: 'rownumberer', width: 35 },
+                        { header: '已完成/总单数', dataIndex: 'finished', width: 130, renderer: render },
+                        { header: '时间', dataIndex: 'times', width: 130 },
+                        { header: '状态', dataIndex: 'name', width: 130 },
+                        { header: '描述', width: 300 }
+                        ]
+                    })
+                    var panel2_1 = Ext.create('Ext.panel.Panel', {
+                        border: 0,
+                        region: 'north',
+                        height: 200,
+                        contentEl: 'chart2'
+                    })
+                    var panel2 = Ext.create('Ext.panel.Panel', {
+                        title: '<i class="fa fa-hand-o-right" aria-hidden="true"></i>&nbsp;报关处理动态' + ordercode,
+                        border: 0,
+                        layout: 'border',
+                        items: [panel2_1, grid_declstatus]
+                    })
+                    items.push(panel2);
+                }
+                //报检单跟踪  如果存在报检单
+                if (data.entrusttypeid == '02' || data.entrusttypeid == '03')//委托类型 01 报关单  02报检单  03报关报检
+                {
+                    var html3 = "";
+                    Ext.each(dec_insp_status_enum, function (item) {
+                        html3 += '<div class="pie2" id="insp_' + item.CODE + '">1</div>';
+                    })
+                    Ext.getDom("chart3").innerHTML = html3;
+                    Ext.each(data.insptrack, function (item) {//开始绘制饼图
+                        var myChart = echarts.init(document.getElementById('insp_' + item.status));
+                        var option = {
+                            title: {
+                                text: item.name,
+                                x: 'center',
+                                y: 'bottom',
+                                textStyle: {
+                                    fontSize: 12,
+                                    //  marginTop:5,
+                                    fontFamily: 'sans-serif',
+                                    fontWeight: 'normal'
+                                }
+                            },
+                            series: [
+                                {
+                                    type: 'pie',
+                                    center: ['50%', '40%'],
+                                    //   radius: radius,
+                                    x: '0%', // for funnel  itemStyle: labelFromatter,
+                                    data: [
+                                        { name: '未完成', value: item.total == 0 ? 1 : (item.total - item.finished), itemStyle: labelTop },
+                                        { name: '异常', value: item.exception, itemStyle: labelCenter },
+                                        { name: '已完成', value: item.finished, itemStyle: labelBottom }
+                                    ]
+                                }
+                            ]
+                        }
+                        myChart.setOption(option);
+                    })
+                    var store_inspstatus = Ext.create('Ext.data.JsonStore', {
+                        fields: ['total', 'finished', 'exception', 'times', 'status', 'name'],
+                        data: data.insptrack
+                    })
+                    var filter2 = new Ext.util.Filter({//过滤时间为空的记录
+                        filterFn: function (item) {
+                            return item.get("times");
+                        }
+                    });
+                    store_inspstatus.filter(filter2);
+                    var grid_inspstatus = Ext.create('Ext.grid.Panel', { //报关状态变更日志
+                        store: store_inspstatus,
+                        region: 'center',
+                        selModel: { selType: 'checkboxmodel' },
+                        columns: [
+                        { xtype: 'rownumberer', width: 35 },
+                        { header: '已完成/总单数', dataIndex: 'finished', width: 130, renderer: render },
+                        { header: '时间', dataIndex: 'times', width: 130 },
+                        { header: '状态', dataIndex: 'name', width: 130 },
+                        { header: '描述', width: 300 }
+                        ]
+                    })
+                    var panel3_1 = Ext.create('Ext.panel.Panel', {
+                        border: 0,
+                        region: 'north',
+                        height: 200,
+                        contentEl: 'chart3'
+                    })
+                    var panel3 = Ext.create('Ext.panel.Panel', {
+                        title: '<i class="fa fa-hand-o-right" aria-hidden="true"></i>&nbsp;报检处理动态' + ordercode,
+                        border: 0,
+                        layout: 'border',
+                        items: [panel3_1, grid_inspstatus]
+                    })
+                    items.push(panel3);
+                }
+                var viewport = Ext.create('Ext.container.Viewport', {
+                    layout: 'accordion',
+                    items: items
+                })
+            }
+        })
+    })
+    function render(value, cellmeta, record, rowIndex, columnIndex, store) {
+        var rtn = "";
+        var dataindex = cellmeta.column.dataIndex;
+        switch (dataindex) {
+            case "STATUS":
+                rtn = orders_tatus[value];
+                break;
+            case "finished":
+                rtn = value + "/" + record.get("total");
+                break;
+        }
+        return rtn;
+    }
+</script>
+<li id="chart1" style=" margin:10px 5px 10px 5px"></li>
+<li id="chart2" style=" margin:10px 5px 10px 5px"></li>
+<li id="chart3" style=" margin:10px 5px 10px 5px"></li>
+
+

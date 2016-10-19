@@ -67,6 +67,14 @@ namespace MvcPlatform.Controllers
         {
             return View();
         }
+        public ActionResult OrderView()
+        {
+            return View();
+        }
+        public ActionResult OrderTrack()
+        {
+            return View();
+        }
         public ActionResult InspectList()//报检单管理
         {
             switch (Request["busitypeid"].ToString())
@@ -2041,6 +2049,186 @@ namespace MvcPlatform.Controllers
             return "{rows:" + json + "}";
         }
 
+        public string loadOrderView()
+        {
+            string sql = @"select t.* from LIST_ORDER t where t.CODE = '" + Request["ordercode"] + "' and rownum=1";
+            DataTable dt = DBMgr.GetDataTable(sql);
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            string result = JsonConvert.SerializeObject(dt, iso);
+            return "{success:true,data:" + result.TrimStart('[').TrimEnd(']') + "}";
+        }
+
+        public string LoadDeclaration()
+        {
+            string sql = @"select DECLARATIONCODE,GOODSGW,GOODSNW,GOODSNUM,SHEETNUM,BUSITYPE from list_declaration  
+                         WHERE ordercode='" + Request["ORDERCODE"] + "'";
+            var json = DBMgr.ExecuteNonQuery(sql);
+            return "{rows:" + json + "}";
+        }
+
+        public string LoadInspection()
+        {
+            string sql = @"SELECT li.ID,li.CODE, li.APPROVALCODE,li.INSPECTIONCODE,lo.INSPUNITNAME,lo.WOODPACKINGID,li.ORDERCODE,lo.CUSNO,li.ISPRINT,lo.GOODSNUM,lo.BUSITYPE,lo.INSPUNITNAME,lo.CONTRACTNO,
+                          lo.TOTALNO,li.INSPECTIONCODE
+                         FROM list_inspection li  LEFT JOIN list_order lo ON li.ordercode = lo.code   
+                         WHERE li.ORDERCODE='" + Request["ordercode"] + "'";
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            DataTable dt = DBMgr.GetDataTable(sql);
+            var json = JsonConvert.SerializeObject(dt, iso);
+            return "{rows:" + json + "}";
+        }
+
+        public string LoadOrderTrack()
+        {
+            string ordercode = Request["ordercode"];
+            //根据订单号获取当前状态信息和所有状态变更的时间
+            string sql = @"select * from list_order t where t.code='" + ordercode + "'";
+            DataTable dt = DBMgr.GetDataTable(sql);
+            string status_cur = dt.Rows[0]["STATUS"] + "";
+            string entrusttypeid = dt.Rows[0]["ENTRUSTTYPE"] + "";//委托类型 01 报关单  02报检单  03报关报检
+            //类型（1订单、2报关草单、3报检草单、4预制报关单、5预制报检单）
+            //查询订单已经走过的节点lt.ID, lt.CODE, lt.TIMES, lt.STATUS, lt.ISPAUSE, lt.REASON, tb2.VALUE AS STATUS_NAMEAND (lt.STATUS <= 45 OR lt.STATUS >= 110) 
+            sql = @"SELECT lt.TIMES,lt.STATUS FROM list_times lt WHERE lt.CODE = '" + ordercode + "' AND lt.TYPE = 1 ORDER BY lt.STATUS asc, lt.TIMES asc";
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            dt = DBMgr.GetDataTable(sql);
+            string decltrack = "[]";
+            if (entrusttypeid == "01" || entrusttypeid == "03")
+            {
+                decltrack = Declare_Inspect_Track(ordercode, "declare");
+            }
+            string insptrack = "[]";
+            if (entrusttypeid == "02" || entrusttypeid == "03")
+            {
+                insptrack = Declare_Inspect_Track(ordercode, "inspection");
+            }
+            return "{entrusttypeid:'" + entrusttypeid + "',status:'" + status_cur + "',rows:" + JsonConvert.SerializeObject(dt, iso) + ",declare:" + decltrack + ",insptrack:" + insptrack + "}";
+        }
+        public string Declare_Inspect_Track(string ordercode, string source)
+        {
+            string sql = "";
+            int total1 = 0;
+            int total2 = 0;
+            int status = 0;
+            DataTable dt_pre = null;
+            DataTable dt = null;
+            DataTable dt_times = null;
+            string predeclnos = "";//保存所有的报关_报检草单号
+            string declnos = "";//保存所有的预制报关_预制报检单号
+            if (source == "declare")
+            {
+                sql = @"select * from list_predeclaration lp where ordercode = '" + ordercode + "' ";
+                dt_pre = DBMgr.GetDataTable(sql);
+                for (int i = 0; i < dt_pre.Rows.Count; i++)
+                {
+                    predeclnos += dt_pre.Rows[i]["PREDECLCODE"];
+                }
+                total1 = dt_pre.Rows.Count; //查询报关草单的总数量
+                sql = @"select * from list_declaration ld where ordercode='" + ordercode + "'";
+                dt = DBMgr.GetDataTable(sql);
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    declnos += dt.Rows[i]["CODE"];
+                }
+                total2 = dt.Rows.Count;
+            }
+            else
+            {
+                sql = @"select * from list_preinspection lp where ordercode = '" + ordercode + "' ";
+                dt_pre = DBMgr.GetDataTable(sql);
+                for (int i = 0; i < dt_pre.Rows.Count; i++)
+                {
+                    predeclnos += dt_pre.Rows[i]["PREINSPCODE"];
+                }
+                total1 = dt_pre.Rows.Count; //查询草单的总数量
+                sql = @"select * from list_inspection ld where ordercode='" + ordercode + "'";
+                dt = DBMgr.GetDataTable(sql);
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    declnos += dt.Rows[i]["CODE"];
+                }
+                total2 = dt.Rows.Count;
+            }
+            DataTable dt_cus = new DataTable();
+            DataColumn dc = new DataColumn("total");
+            dt_cus.Columns.Add(dc);
+            dc = new DataColumn("finished");
+            dt_cus.Columns.Add(dc);
+            dc = new DataColumn("exception");
+            dt_cus.Columns.Add(dc);
+            dc = new DataColumn("times");
+            dt_cus.Columns.Add(dc);
+            dc = new DataColumn("status");
+            dt_cus.Columns.Add(dc);
+            dc = new DataColumn("name");
+            dt_cus.Columns.Add(dc);
+            string dec_insp_status = "[{CODE: 25,NAME:'预审中'}, {CODE: 40,NAME: '预审完成'},{CODE: 45,NAME:'制单已受理'},{CODE: 50,NAME:'制单中'},{CODE: 55,NAME:'制单完成'},{CODE: 60,NAME:'待审核'},{CODE: 65,NAME:'审核已受理'},{CODE:70,NAME:'审核中'},{CODE:75,NAME:'审核完成'},{CODE:78,NAME:'待预录'},{CODE:80,NAME:'预录已受理'},{CODE:85,NAME:'预录中'},{CODE:90,NAME:'预录完成'},{CODE:95,NAME:'预录校验完成'},{CODE:100,NAME:'申报中'},{CODE:105,NAME:'申报完成'},{CODE:110,NAME:'申报完结'}]";
+            JArray jarray = JArray.Parse(dec_insp_status);
+            foreach (JObject json in jarray)
+            {
+                DataRow dr_cus = dt_cus.NewRow();
+                status = json.Value<int>("CODE");
+                int finished = 0; int exception = 0;
+                if (status <= 60)
+                {
+                    foreach (DataRow dr in dt_pre.Rows)//循环报关草单
+                    {
+                        int declstatus = source == "declare" ? Convert.ToInt32(dr["DECLSTATUS"] + "") : Convert.ToInt32(dr["INSPNODE"] + "");//草单当前状态                        
+                        if (declstatus == status && (dr["ISPAUSE"] + "") == "1")//先判断是否异常 暂存了       是否暂存（0非暂存，1暂存）
+                        {
+                            exception++;
+                        }
+                        else if (declstatus >= status)
+                        {
+                            finished++;
+                        }
+                    }
+                    dr_cus["total"] = total1; dr_cus["finished"] = finished; dr_cus["exception"] = exception;
+                    //注意25预审中 和40 预审完成 这两个状态草单还没有生成 list_times记录的还是订单号 AND lt.TYPE = 2
+                    if (status == 25 || status == 40)
+                    {
+                        sql = @"SELECT lt.TIMES,lt.STATUS FROM list_times lt WHERE  lt.CODE='" + ordercode + "' AND lt.TYPE = 1 and lt.STATUS='" + status + "' order by lt.TIMES desc";
+                    }
+                    else
+                    {
+                        sql = @"SELECT lt.TIMES,lt.STATUS FROM list_times lt WHERE instr('" + predeclnos + "',lt.CODE)>0 and lt.STATUS='" + status + "' order by lt.TIMES desc";
+                    }
+                    dt_times = DBMgr.GetDataTable(sql);
+                    if (dt_times.Rows.Count > 0)
+                    {
+                        dr_cus["times"] = dt_times.Rows[0]["TIMES"];//J16060159088  J16060159088001
+                    }
+                }
+                else
+                {
+                    foreach (DataRow dr in dt.Rows)//循环预制报关_报检单
+                    {
+                        int declstatus = Convert.ToInt32(dr["STATUS"] + "");//预制报关单当前状态
+                        if (declstatus == status && (dr["ISPAUSE"] + "") == "1")//先判断是否异常 暂存了 预录是否暂存（0正常，1暂存）AND lt.TYPE = 4 
+                        {
+                            exception++;
+                        }
+                        else if (declstatus >= status)
+                        {
+                            finished++;
+                        }
+                    }
+                    dr_cus["total"] = total2; dr_cus["finished"] = finished; dr_cus["exception"] = exception;
+                    sql = @"SELECT lt.TIMES,lt.STATUS FROM list_times lt WHERE instr('" + declnos + "',lt.CODE)>0 and lt.STATUS='" + status + "' order by lt.TIMES desc";
+                    dt_times = DBMgr.GetDataTable(sql);
+                    if (dt_times.Rows.Count > 0)
+                    {
+                        dr_cus["times"] = dt_times.Rows[0]["TIMES"];
+                    }
+                }
+                dr_cus["status"] = json.Value<string>("CODE");
+                dr_cus["name"] = json.Value<string>("NAME");
+                dt_cus.Rows.Add(dr_cus);
+            }
+            return JsonConvert.SerializeObject(dt_cus);
+        }
 
     }
 }
