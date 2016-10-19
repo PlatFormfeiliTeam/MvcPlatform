@@ -274,7 +274,6 @@
         valueField: 'CODE',
         queryMode: 'local',
         anyMatch: true,
-        submitValue: false,//不随表单提交一起提交
         forceSelection: true,
         tabIndex: 71,
         hideTrigger: true,
