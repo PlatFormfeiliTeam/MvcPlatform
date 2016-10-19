@@ -108,11 +108,6 @@ function loadform() {
 }
 
 function form_control(formdata, index) {
-    if (Ext.getCmp('combo_myfs' + index)) {//贸易方式     
-        if (formdata.TRADEWAYCODES1) {
-            Ext.getCmp('combo_myfs' + index).setValue(formdata.TRADEWAYCODES1.split(','));
-        }
-    }
     if (Ext.getCmp("combo_ENTRUSTTYPENAME" + index)) {//委托类型对报关报检申报单位的控制
         bg_bj_sbdw_control(Ext.getCmp("combo_ENTRUSTTYPENAME" + index), index);
     }

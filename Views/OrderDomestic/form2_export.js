@@ -324,7 +324,7 @@
             xtype: 'button',
             listeners: {
                 //click: function () {
-                //    selectmyfs(combo_myfs, field_TRADEWAYCODES, field_TRADEWAYCODES1);
+                //    selectmyfs(combo_myfs, field_TRADEWAYCODES);
                 //}
             },
             text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
