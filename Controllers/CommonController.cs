@@ -2038,9 +2038,11 @@ namespace MvcPlatform.Controllers
 
         public string LoadDeclaration()
         {
-            string sql = @"select ID,DECLARATIONCODE,GOODSGW,GOODSNW,GOODSNUM,SHEETNUM,BUSITYPE from list_declaration  
+            string sql = @"select ID,DECLARATIONCODE,GOODSGW,GOODSNW,GOODSNUM,SHEETNUM,BUSITYPE,CUSTOMSSTATUS,TRADECODE from list_declaration  
                          WHERE ordercode='" + Request["ORDERCODE"] + "'";
-            var json = DBMgr.ExecuteNonQuery(sql);
+            DataTable dt = DBMgr.GetDataTable(sql);
+            var json = JsonConvert.SerializeObject(dt);
+
             return "{rows:" + json + "}";
         }
 
