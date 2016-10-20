@@ -15,6 +15,7 @@
         data: common_data_sbgq
     })
     var combo_CUSTOMDISTRICTNAME = Ext.create('Ext.form.field.ComboBox', {//申报关区 这个数据比较多需要根据输入字符到后台动态模糊匹配
+        id: 'combo_CUSTOMDISTRICTNAME',
         name: 'CUSTOMAREACODE',
         store: store_CUSTOMDISTRICTNAME,
         fieldLabel: '申报关区',
@@ -42,6 +43,7 @@
 
     //总单号
     var field_TOTALNO = Ext.create('Ext.form.field.Text', {
+        id: 'field_TOTALNO',
         name: 'TOTALNO',
         enforceMaxLength: true,
         maxLength: 11,
@@ -50,6 +52,7 @@
     //转关预录号
     var field_TURNPRENO = Ext.create('Ext.form.field.Text', {
         fieldLabel: '转关预录号',
+        id: 'field_TURNPRENO',
         name: 'TURNPRENO',
         enforceMaxLength: true,
         maxLength: 16
@@ -61,6 +64,7 @@
     })
     var combo_mzbz = Ext.create('Ext.form.field.ComboBox', {
         name: 'WOODPACKINGID',
+        id: 'combo_mzbz',
         store: store_mzbz,
         fieldLabel: '木质包装',
         displayField: 'NAME',
@@ -88,9 +92,10 @@
         }
     })
     //需求备注
-    var field_CLEARREMARK = Ext.create('Ext.form.field.Text', {
+    var field_ENTRUSTREQUEST = Ext.create('Ext.form.field.Text', {
         fieldLabel: '备注',
-        name: 'ENTRUSTREQUEST'
+        name: 'ENTRUSTREQUEST',
+        id: 'field_ENTRUSTREQUEST'
     });
     //报关车号
     var field_CONTAINERTRUCK = Ext.create('Ext.form.field.Hidden', {
@@ -125,6 +130,7 @@
     })
     var combo_PORTCODE = Ext.create('Ext.form.field.ComboBox', {
         name: 'PORTCODE',
+        id: 'combo_PORTCODE',
         store: store_PORTNAME,
         fieldLabel: '进出口岸',
         displayField: 'NAME',
@@ -150,21 +156,25 @@
     //船名
     var field_SHIPNAME = Ext.create('Ext.form.field.Text', {
         fieldLabel: '船名',
-        name: 'SHIPNAME'
+        name: 'SHIPNAME',
+        id: 'field_SHIPNAME'
     });
     //航次
     var field_FILGHTNO = Ext.create('Ext.form.field.Text', {
         fieldLabel: '航次',
-        name: 'FILGHTNO'
+        name: 'FILGHTNO',
+        id: 'field_FILGHTNO'
     });
     //提单号
     var field_LADINGBILLNO = Ext.create('Ext.form.field.Text', {
         name: 'SECONDLADINGBILLNO',
-        fieldLabel: '提单号'
+        fieldLabel: '提单号',
+        id: 'field_LADINGBILLNO'
     });
     //运抵编号
     var field_ARRIVEDNO = Ext.create('Ext.form.field.Text', {
         name: 'ARRIVEDNO',
+        id: 'field_ARRIVEDNO',
         maxLength: 18,
         minLength: 18,
         emptyText: '请填写18位运抵编号',
@@ -173,12 +183,14 @@
     //载货清单号
     var field_MANIFEST = Ext.create('Ext.form.field.Text', {
         fieldLabel: '载货清单号',
-        name: 'MANIFEST'
+        name: 'MANIFEST',
+        id: 'field_MANIFEST'
     });
     //转关预录号 对方转关号
     var field_TURNPRENO_TWO = Ext.create('Ext.form.field.Text', {
         fieldLabel: '对方转关号',
         name: 'TURNPRENO',
+        id: 'field_TURNPRENO_TWO',
         enforceMaxLength: true,
         maxLength: 16
     });
@@ -186,7 +198,8 @@
     var chk_CHKLAWCONDITION = Ext.create('Ext.form.field.Checkbox', {
         tabIndex: 16,
         fieldLabel: '法检状况',
-        name: 'LAWFLAG'
+        name: 'LAWFLAG',
+        id: 'chk_CHKLAWCONDITION'
     })
 
     var itemsArray = new Array();
@@ -196,7 +209,7 @@
         itemsArray = [
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_CUSTOMDISTRICTNAME] },
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_TOTALNO, field_TURNPRENO, combo_mzbz] },
-                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [container_bgch, field_CLEARREMARK] }
+                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [container_bgch, field_ENTRUSTREQUEST] }
                 , field_CONTAINERTRUCK
         ]
     }
@@ -205,7 +218,7 @@
         itemsArray = [
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_CUSTOMDISTRICTNAME] },
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_TOTALNO, combo_PORTCODE, container_bgch] },
-                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_CLEARREMARK] }
+                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_ENTRUSTREQUEST] }
                 , field_CONTAINERTRUCK
         ]
     }
@@ -214,7 +227,7 @@
         itemsArray = [
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_CUSTOMDISTRICTNAME] },
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_TURNPRENO, combo_mzbz, combo_PORTCODE] },
-                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [container_bgch, field_CLEARREMARK] }
+                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [container_bgch, field_ENTRUSTREQUEST] }
                 , field_CONTAINERTRUCK
         ]
     }
@@ -224,7 +237,7 @@
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_CUSTOMDISTRICTNAME] },
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_PORTCODE, field_SHIPNAME, field_FILGHTNO] },
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_LADINGBILLNO, field_ARRIVEDNO, container_bgch] },
-                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_CLEARREMARK] }
+                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_ENTRUSTREQUEST] }
                 , field_CONTAINERTRUCK
         ]
     }
@@ -233,7 +246,7 @@
         itemsArray = [
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_CUSTOMDISTRICTNAME] },
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_mzbz, field_LADINGBILLNO, field_MANIFEST] },
-                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [container_bgch, field_CLEARREMARK] }
+                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [container_bgch, field_ENTRUSTREQUEST] }
                 , field_CONTAINERTRUCK
         ]
     }
@@ -242,7 +255,7 @@
         itemsArray = [
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_CUSTOMDISTRICTNAME] },
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_PORTCODE, field_ARRIVEDNO, container_bgch] },
-                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_CLEARREMARK] }
+                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_ENTRUSTREQUEST] }
                 , field_CONTAINERTRUCK
         ]
     }
@@ -250,7 +263,7 @@
     if (type == "TSQY") {
         itemsArray = [
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_CUSTOMDISTRICTNAME] },
-                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_TURNPRENO_TWO, container_bgch, field_CLEARREMARK] }
+                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_TURNPRENO_TWO, container_bgch, field_ENTRUSTREQUEST] }
                 , field_CONTAINERTRUCK
         ]
     }
@@ -258,7 +271,7 @@
     if (type == "GNJZ") {
         itemsArray = [
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_CUSTOMDISTRICTNAME] },
-                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [chk_CHKLAWCONDITION, field_CLEARREMARK] }
+                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [chk_CHKLAWCONDITION, field_ENTRUSTREQUEST] }
         ]
     }
 
@@ -321,6 +334,7 @@
             }
         ]
     });
+    ini_container_truck();//初始化集装箱和报关车号选择界面
 }
 
 function Batchpanel_file_ini() {
@@ -390,15 +404,16 @@ function Batchpanel_file_ini() {
 
 //设置数据信息区域可用
 function loadbatchform() {
-    var recs = gridpanel.getSelectionModel().getSelection();
-    //ini_container_truck();//初始化集装箱和报关车号选择界面
+    var recs = gridpanel.getSelectionModel().getSelection();    
     
+    var bf = false; var a = 0, b = 0, c = 0, d = 0, e = 0, f = 0, g = 0, h = 0, i = 0;
+
     //空运进口
     if (type == 'KYJK') {
         //申报关区//报关车号//备注//总单号//转关预录号//木质包装
-        combo_CUSTOMDISTRICTNAME.setDisabled(false); Ext.getCmp('declcarno_btn').setDisabled(false); field_CLEARREMARK.setDisabled(false);
-        field_TOTALNO.setDisabled(false); field_TURNPRENO.setDisabled(false); combo_mzbz.setDisabled(false);
-        var bf = false;
+        Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(false); Ext.getCmp('declcarno_btn').setDisabled(false); Ext.getCmp('field_ENTRUSTREQUEST').setDisabled(false);
+        Ext.getCmp('field_TOTALNO').setDisabled(false); Ext.getCmp('field_TURNPRENO').setDisabled(false); Ext.getCmp('combo_mzbz').setDisabled(false);
+
         for (var i = 0; i < recs.length; i++) {
 
             if (recs[i].data.ENTRUSTTYPE == "01") { if (recs[i].data.DECLSTATUS != '0') { bf = true; } }
@@ -406,31 +421,19 @@ function loadbatchform() {
             if (recs[i].data.ENTRUSTTYPE == "03") { if (recs[i].data.DECLSTATUS != '0' || recs[i].data.INSPSTATUS != '0') { bf = true; } }
 
             if (bf) {
-                //申报关区
-                if (isNull(recs[i].data.CUSTOMAREACODE)) {
-                    combo_CUSTOMDISTRICTNAME.setDisabled(true);
-                }
-                //报关车号
-                if (isNull(recs[i].data.DECLCARNO)) {
-                    combo_bgch.setDisabled(true);
-                }
-                //备注
-                if (isNull(recs[i].data.ENTRUSTREQUEST)) {
-                    field_CLEARREMARK.setDisabled(true);
-                }
-                //总单号
-                if (isNull(recs[i].data.TOTALNO)) {
-                    field_TOTALNO.setDisabled(true);
-                }
-                //转关预录号
-                if (isNull(recs[i].data.TURNPRENO)) {
-                    field_TURNPRENO.setDisabled(true);
-                }
-                //木质包装
-                if (isNull(recs[i].data.WOODPACKINGID)) {
-                    combo_mzbz.setDisabled(true);
-                }
+                if (isNull(recs[i].data.CUSTOMAREACODE)) { a = a + 1; }//申报关区
+                if (isNull(recs[i].data.DECLCARNO)) { b = b + 1; }//报关车号
+                if (isNull(recs[i].data.ENTRUSTREQUEST)) { c = c + 1; }//备注
+                if (isNull(recs[i].data.TOTALNO)) { d = d + 1; }//总单号
+                if (isNull(recs[i].data.TURNPRENO)) { e = e + 1; }//转关预录号
+                if (isNull(recs[i].data.WOODPACKINGID)) { f = f + 1; }//木质包装
             }
+            if (a > 0) { Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(true); }//申报关区
+            if (b > 0) { Ext.getCmp('declcarno_btn').setDisabled(true); }//报关车号
+            if (c > 0) { Ext.getCmp('field_ENTRUSTREQUEST').setDisabled(true); }//备注
+            if (d > 0) { Ext.getCmp('field_TOTALNO').setDisabled(true); }//总单号
+            if (e > 0) { Ext.getCmp('field_TURNPRENO').setDisabled(true); }//转关预录号
+            if (f > 0) { Ext.getCmp('combo_mzbz').setDisabled(true); }//木质包装
         }
     }
 
