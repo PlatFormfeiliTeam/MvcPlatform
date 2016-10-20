@@ -509,7 +509,7 @@
         layout: 'hbox',
         items: [combo_myfs, {
             id: 'myfs_btn', xtype: 'button', handler: function () {
-                selectmyfs(combo_myfs, field_ENTRUSTREQUEST);
+                selectmyfs(combo_myfs, field_ORDERREQUEST);
             },
             text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
         }]
@@ -623,10 +623,10 @@
     })
 
     //需求备注
-    var field_ENTRUSTREQUEST = Ext.create('Ext.form.field.Text', {
+    var field_ORDERREQUEST = Ext.create('Ext.form.field.Text', {
         tabIndex: 26,
         fieldLabel: '需求备注',
-        name: 'ENTRUSTREQUEST'
+        name: 'ORDERREQUEST'
     });
 
     //隐藏的字段
@@ -741,7 +741,7 @@
     { layout: 'column', height: 42, border: 0, items: [field_CUSNO, combo_PORTCODE, field_jydw, flightno, field_DIVIDENO] },
     { layout: 'column', height: 42, border: 0, items: [field_quanpackage, field_weight, field_contractno, field_myfs, field_MANIFEST] },
     { layout: 'column', height: 42, border: 0, items: [combo_mzbz, field_CLEARANCENO, chk_CHKLAWCONDITION, field_containerno, container_bgch] },
-    { layout: 'column', height: 42, border: 0, items: [field_ENTRUSTREQUEST] },
+    { layout: 'column', height: 42, border: 0, items: [field_ORDERREQUEST] },
     field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_ID, field_ContainerJson, field_ORIGINALFILEIDS, field_CONTAINERTRUCK
         ]
     });

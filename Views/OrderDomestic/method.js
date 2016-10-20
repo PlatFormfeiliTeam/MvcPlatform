@@ -119,7 +119,7 @@ function readonly_init(formpanel_tmp, formhead_tmp, index) {
         var status = Ext.getCmp('field_status' + index).getValue();
 
         Ext.Array.each(formpanel_tmp.getForm().getFields().items, function (item) {
-            if (item.value != "" && item.value != null && item.value != undefined && item.id != 'field_ENTRUSTREQUEST' + index && item.id != "field_status" + index&&item.id != "tf_bgsbdw" + index&&item.id != "tf_bjsbdw" + index) {
+            if (item.value != "" && item.value != null && item.value != undefined && item.id != 'field_ORDERREQUEST' + index && item.id != "field_status" + index && item.id != "tf_bgsbdw" + index && item.id != "tf_bjsbdw" + index) {
                 item.setReadOnly(status >= 15);
             }
         });

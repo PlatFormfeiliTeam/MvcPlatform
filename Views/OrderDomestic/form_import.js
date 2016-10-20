@@ -307,7 +307,7 @@
         layout: 'hbox',
         items: [combo_myfs, {
             xtype: 'button', id: 'myfs_btn1',
-            listeners: { click: function () { selectmyfs(combo_myfs, field_ENTRUSTREQUEST); } },
+            listeners: { click: function () { selectmyfs(combo_myfs, field_ORDERREQUEST); } },
             text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
         }]
     }
@@ -383,11 +383,11 @@
     })
     //--------------------------------------------------------------------需求备注，业务状态-----------------------------------------------------------------
     //需求备注
-    var field_ENTRUSTREQUEST = Ext.create('Ext.form.field.Text', {
-        id: 'field_ENTRUSTREQUEST1',
+    var field_ORDERREQUEST = Ext.create('Ext.form.field.Text', {
+        id: 'field_ORDERREQUEST1',
         fieldLabel: '需求备注',
         tabIndex: 20,
-        name: 'ENTRUSTREQUEST'
+        name: 'ORDERREQUEST'
     });
     var store_status = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
@@ -424,7 +424,7 @@
                 { layout: 'column', height: 42, border: 0, items: [field_CODE, combo_ENTRUSTTYPENAME, field_CUSNO, field_jydw, combo_DECLWAY] },
                 { layout: 'column', height: 42, border: 0, items: [field_quanpackage, field_weight, field_contractno, field_myfs, zcbah_container] },
                 { layout: 'column', height: 42, border: 0, items: [chk_CHKLAWCONDITION, field_CLEARANCENO, field_ASSOCIATEPEDECLNO, cont_bgsbdw, cont_bjsbdw] },
-                { layout: 'column', height: 42, border: 0, items: [field_ENTRUSTREQUEST, field_STATUS] },
+                { layout: 'column', height: 42, border: 0, items: [field_ORDERREQUEST, field_STATUS] },
                 field_BUSIUNITNAME
         ]
     })

@@ -291,43 +291,43 @@ namespace MvcPlatform.Common
                 case "41"://国内进口
                     JsonFieldComments = @"{SPECIALRELATIONSHIP:'特殊关系确认',PRICEIMPACT:'价格影响确认',PAYPOYALTIES:'支付特许权使用费确认',
                         CUSNO:'客户编号',GOODSNUM:'件数',PACKKIND:'包装',GOODSGW:'毛重',GOODSNW:'净重',CONTRACTNO:'合同号',RECORDCODE:'备案号',
-                        LAWFLAG:'法检状况',CLEARANCENO:'通关单号',ASSOCIATEPEDECLNO:'出口报关单',REPUNITCODE:'报关申报单位',INSPUNITCODE:'报检申报单位',ENTRUSTREQUEST:'需求备注'}";
+                        LAWFLAG:'法检状况',CLEARANCENO:'通关单号',ASSOCIATEPEDECLNO:'出口报关单',REPUNITCODE:'报关申报单位',INSPUNITCODE:'报检申报单位',ORDERREQUEST:'需求备注'}";
                     break;
                 case "10"://空运出口
                     JsonFieldComments = @"{SPECIALRELATIONSHIP:'特殊关系确认',PRICEIMPACT:'价格影响确认',PAYPOYALTIES:'支付特许权使用费确认',
                         CUSNO:'客户编号',TOTALNO:'总单号',DIVIDENO:'分单号',GOODSNUM:'件数',PACKKIND:'包装',GOODSGW:'毛重'',GOODSNW:'净重',CONTRACTNO:'合同号',ARRIVEDNO:'运抵编号',TURNPRENO:'转关预录号',
-                        CLEARANCENO:'通关单号',DECLCARNO:'报关车号',ENTRUSTREQUEST:'需求备注',LAWFLAG:'法检状况',WEIGHTCHECK:'需重量确认',ISWEIGHTCHECK:'重量确认'}";
+                        CLEARANCENO:'通关单号',DECLCARNO:'报关车号',ORDERREQUEST:'需求备注',LAWFLAG:'法检状况',WEIGHTCHECK:'需重量确认',ISWEIGHTCHECK:'重量确认'}";
                     break;
                 case "11"://空运进口                    
                     JsonFieldComments = @"{SPECIALRELATIONSHIP:'特殊关系确认',PRICEIMPACT:'价格影响确认',PAYPOYALTIES:'支付特许权使用费确认',
                         CUSNO:'客户编号',TOTALNO:'总单号',GOODSNUM:'件数',PACKKIND:'包装',GOODSNW:'净重',CONTRACTNO:'合同号',TURNPRENO:'转关预录号',
-                        CLEARANCENO:'通关单号',DECLCARNO:'报关车号',ENTRUSTREQUEST:'需求备注',LAWFLAG:'法检状况'}";
+                        CLEARANCENO:'通关单号',DECLCARNO:'报关车号',ORDERREQUEST:'需求备注',LAWFLAG:'法检状况'}";
                     break;
                 case "20"://海运出口       
                     JsonFieldComments = @"{SPECIALRELATIONSHIP:'特殊关系确认',PRICEIMPACT:'价格影响确认',PAYPOYALTIES:'支付特许权使用费确认',
                         CUSNO:'客户编号',PACKKIND:'包装',GOODSNW:'净重',CONTRACTNO:'合同号',SECONDLADINGBILLNO:'提单号',ARRIVEDNO:'运抵编号',
-                        LAWFLAG:'法检状况',CLEARANCENO:'通关单号',CONTAINERNO:'集装箱号',DECLCARNO:'报关车号',TURNPRENO:'转关预录号',ENTRUSTREQUEST:'需求备注'}";
+                        LAWFLAG:'法检状况',CLEARANCENO:'通关单号',CONTAINERNO:'集装箱号',DECLCARNO:'报关车号',TURNPRENO:'转关预录号',ORDERREQUEST:'需求备注'}";
                     break;
                 case "21"://海运进口     
                     JsonFieldComments = @"{SPECIALRELATIONSHIP:'特殊关系确认',PRICEIMPACT:'价格影响确认',PAYPOYALTIES:'支付特许权使用费确认',
                         CUSNO:'客户编号',PACKKIND:'包装',GOODSNW:'净重',CONTRACTNO:'合同号',FIRSTLADINGBILLNO:'国检提单号',SECONDLADINGBILLNO:'海关提单号',TRADEWAYCODES_ZS:'贸易方式',
-                        TURNPRENO:'转关预录号',WOODPACKINGID:'木质包装',CLEARANCENO:'通关单号',LAWFLAG:'法检状况',CONTAINERNO:'集装箱号',DECLCARNO:'报关车号',ENTRUSTREQUEST:'需求备注'}";
+                        TURNPRENO:'转关预录号',WOODPACKINGID:'木质包装',CLEARANCENO:'通关单号',LAWFLAG:'法检状况',CONTAINERNO:'集装箱号',DECLCARNO:'报关车号',ORDERREQUEST:'需求备注'}";
                     break;
                 case "30"://陆运出口       
                     JsonFieldComments = @"{SPECIALRELATIONSHIP:'特殊关系确认',PRICEIMPACT:'价格影响确认',PAYPOYALTIES:'支付特许权使用费确认',
                         CUSNO:'客户编号',FILGHTNO:'航次号',CONTRACTNO:'合同号',PACKKIND:'包装',GOODSNW:'净重',ARRIVEDNO:'运抵编号',LAWFLAG:'法检状况',
-                        CLEARANCENO:'通关单号',CONTAINERNO:'集装箱号',DECLCARNO:'报关车号',TURNPRENO:'转关预录号',TOTALNO:'总单号',DIVIDENO:'分单号',ENTRUSTREQUEST:'需求备注'}";
+                        CLEARANCENO:'通关单号',CONTAINERNO:'集装箱号',DECLCARNO:'报关车号',TURNPRENO:'转关预录号',TOTALNO:'总单号',DIVIDENO:'分单号',ORDERREQUEST:'需求备注'}";
                     break;
                 case "31"://陆运进口     
                     JsonFieldComments = @"{SPECIALRELATIONSHIP:'特殊关系确认',PRICEIMPACT:'价格影响确认',PAYPOYALTIES:'支付特许权使用费确认',
                         CUSNO:'客户编号',FILGHTNO:'航次号',DIVIDENO:'分单号',GOODSNUM:'件数',PACKKIND:'包装',GOODSNW:'净重',CONTRACTNO:'合同号',MANIFEST:'载货清单号',
-                        CLEARANCENO:'通关单号',LAWFLAG:'法检状况',CONTAINERNO:'集装箱号',DECLCARNO:'报关车号',ENTRUSTREQUEST:'需求备注'}";
+                        CLEARANCENO:'通关单号',LAWFLAG:'法检状况',CONTAINERNO:'集装箱号',DECLCARNO:'报关车号',ORDERREQUEST:'需求备注'}";
                     break;
                 case "50"://特殊区域出口                         
                 case "51"://特殊区域进口      
                     JsonFieldComments = @"{SPECIALRELATIONSHIP:'特殊关系确认',PRICEIMPACT:'价格影响确认',PAYPOYALTIES:'支付特许权使用费确认',
                         CUSNO:'客户编号',PACKKIND:'包装',GOODSNW:'净重',CONTRACTNO:'合同号',TURNPRENO:'对方转关号',LAWFLAG:'法检状况',CLEARANCENO:'通关单号',
-                        GOODSTYPEID:'货物类型',CONTAINERNO:'集装箱号',DECLCARNO:'报关车号',ENTRUSTREQUEST:'需求备注',BUSITYPE:'业务类型'}";
+                        GOODSTYPEID:'货物类型',CONTAINERNO:'集装箱号',DECLCARNO:'报关车号',ORDERREQUEST:'需求备注',BUSITYPE:'业务类型'}";
                     break;
             }
 

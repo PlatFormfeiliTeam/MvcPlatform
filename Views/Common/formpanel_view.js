@@ -257,8 +257,8 @@
     });
 
     //需求备注
-    var field_CLEARREMARK = Ext.create('Ext.form.field.Text', {
-        name: 'ENTRUSTREQUEST',
+    var field_ORDERREQUEST = Ext.create('Ext.form.field.Text', {
+        name: 'ORDERREQUEST',
         fieldLabel: '需求备注',
         readOnly: true
     });
@@ -288,7 +288,7 @@
               { layout: 'column', border: 42, border: 0, items: [label_busiinfo] },
               { layout: 'column', height: 42, border: 0, items: [field_CUSNO, field_PORTCODE, field_BUSIUNIT, field_TOTALNO, field_DIVIDENO] },
               { layout: 'column', height: 42, border: 0, items: [field_quanpackage, field_weight, field_contractno, field_TRADEWAYCODES, field_TURNPRENO] },
-              { layout: 'column', height: 42, border: 0, items: [field_WOODPACKING, field_CLEARANCENO, field_DECLCARNO, field_CLEARREMARK, field_LAWCONDITION] },
+              { layout: 'column', height: 42, border: 0, items: [field_WOODPACKING, field_CLEARANCENO, field_DECLCARNO, field_ORDERREQUEST, field_LAWCONDITION] },
               field_ID
         ]
     });

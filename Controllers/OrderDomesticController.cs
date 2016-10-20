@@ -125,7 +125,7 @@ namespace MvcPlatform.Controllers
             {
                 string sql_pre = @"select ID,CODE,BUSITYPE,CUSNO,BUSIUNITCODE,BUSIUNITNAME,CONTRACTNO,CLEARANCENO,LAWFLAG,GOODSNUM,REPWAYID
                       ,CUSTOMAREACODE,PORTCODE,REPUNITNAME||'('||REPUNITCODE||')' REPUNITCODE,INSPUNITNAME||'('||INSPUNITCODE||')' INSPUNITCODE
-                      ,CUSTOMERCODE,CREATEUSERID,CREATETIME,SUBMITUSERID,SUBMITTIME,STATUS,ENTRUSTREQUEST, ENTRUSTTYPE,SHIPNAME                      
+                      ,CUSTOMERCODE,CREATEUSERID,CREATETIME,SUBMITUSERID,SUBMITTIME,STATUS,ORDERREQUEST, ENTRUSTTYPE,SHIPNAME                      
                       ,FILGHTNO,TRADEWAYCODES,DECLCARNO,DECLWAY,PACKKIND,GOODSGW,GOODSNW,ARRIVEDNO,ISINVALID,FIRSTLADINGBILLNO
                       ,SECONDLADINGBILLNO,GOODSTYPEID,CONTAINERNO,ASSOCIATENO,CORRESPONDNO,REPUNITNAME,INSPUNITNAME
                       ,CUSTOMERNAME,CREATEUSERNAME,SUBMITUSERNAME,RECORDCODE,ASSOCIATEPEDECLNO
@@ -458,7 +458,7 @@ namespace MvcPlatform.Controllers
                                 ,BUSITYPE,ASSOCIATEPEDECLNO,CODE,CUSNO,BUSIUNITCODE,BUSIUNITNAME
                                 ,CONTRACTNO,GOODSNUM,CLEARANCENO,LAWFLAG,ENTRUSTTYPE
                                 ,REPWAYID,CUSTOMAREACODE,REPUNITCODE,REPUNITNAME,DECLWAY
-                                ,INSPUNITCODE,INSPUNITNAME,ENTRUSTREQUEST,CREATEUSERID,CREATEUSERNAME
+                                ,INSPUNITCODE,INSPUNITNAME,ORDERREQUEST,CREATEUSERID,CREATEUSERNAME
                                 ,STATUS,CUSTOMERCODE,CUSTOMERNAME,TRADEWAYCODES,ASSOCIATENO
                                 ,CORRESPONDNO,PACKKIND,GOODSGW,GOODSNW,RECORDCODE
                                 ,IETYPE,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES,SUBMITUSERNAME
@@ -481,7 +481,7 @@ namespace MvcPlatform.Controllers
             update_sql = @"update LIST_ORDER  SET ASSOCIATEPEDECLNO='{0}',CUSNO='{1}',BUSIUNITCODE='{2}',BUSIUNITNAME='{3}',CONTRACTNO='{4}',GOODSNUM='{5}'
                                     ,CLEARANCENO='{6}',LAWFLAG='{7}',ENTRUSTTYPE='{8}' ,REPWAYID='{9}',CUSTOMAREACODE='{10}'
                                     ,REPUNITCODE='{11}',REPUNITNAME='{12}',DECLWAY='{13}',INSPUNITCODE='{14}',INSPUNITNAME='{15}'
-                                    ,ENTRUSTREQUEST='{16}',TRADEWAYCODES='{17}',ASSOCIATENO='{18}',CORRESPONDNO='{19}',PACKKIND='{20}'
+                                    ,ORDERREQUEST='{16}',TRADEWAYCODES='{17}',ASSOCIATENO='{18}',CORRESPONDNO='{19}',PACKKIND='{20}'
                                     ,GOODSGW='{21}',GOODSNW='{22}',RECORDCODE='{23}',IETYPE='{24}',SPECIALRELATIONSHIP='{25}'
                                     ,PRICEIMPACT='{26}',PAYPOYALTIES='{27}',STATUS='{28}',SUBMITTIME={29},SUBMITUSERNAME='{30}'
                                     ,SUBMITUSERID='{31}',ASSOCIATETRADEWAY='{32}',BUSIKIND='{33}',ORDERWAY='{34}',PORTCODE='{35}'                                    
@@ -517,7 +517,7 @@ namespace MvcPlatform.Controllers
                             , "41", json1.Value<string>("ASSOCIATEPEDECLNO"), code1, json1.Value<string>("CUSNO"), json1.Value<string>("BUSIUNITCODE"), json1.Value<string>("BUSIUNITNAME")
                             , json1.Value<string>("CONTRACTNO"), json1.Value<string>("GOODSNUM"), json1.Value<string>("CLEARANCENO"),GetChk(json1.Value<string>("LAWFLAG")), json1.Value<string>("ENTRUSTTYPE")
                             , json_head1.Value<string>("REPWAYID"),json_head1.Value<string>("CUSTOMAREACODE"), GetCode(json1.Value<string>("REPUNITCODE")),GetName(json1.Value<string>("REPUNITCODE")), json1.Value<string>("DECLWAY")
-                            , GetCode(json1.Value<string>("INSPUNITCODE")),GetName(json1.Value<string>("INSPUNITCODE")), json1.Value<string>("ENTRUSTREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
+                            , GetCode(json1.Value<string>("INSPUNITCODE")), GetName(json1.Value<string>("INSPUNITCODE")), json1.Value<string>("ORDERREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
                             , json1.Value<string>("STATUS"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json1.Value<string>("TRADEWAYCODES"), AssociateNo
                             , CorrespondNo, json1.Value<string>("PACKKIND"), json1.Value<string>("GOODSGW"), json1.Value<string>("GOODSNW"),json1.Value<string>("RECORDCODE")
                             , json_head1.Value<string>("IETYPE"), GetChk(json1.Value<string>("SPECIALRELATIONSHIP")), GetChk(json1.Value<string>("PRICEIMPACT")), GetChk(json1.Value<string>("PAYPOYALTIES")), json_head1.Value<string>("SUBMITUSERNAME")
@@ -533,7 +533,7 @@ namespace MvcPlatform.Controllers
                     sql = string.Format(update_sql, json1.Value<string>("ASSOCIATEPEDECLNO"), json1.Value<string>("CUSNO"), json1.Value<string>("BUSIUNITCODE"), json1.Value<string>("BUSIUNITNAME"), json1.Value<string>("CONTRACTNO"), json1.Value<string>("GOODSNUM")
                             , json1.Value<string>("CLEARANCENO"), GetChk(json1.Value<string>("LAWFLAG")), json1.Value<string>("ENTRUSTTYPE"), json_head1.Value<string>("REPWAYID"), json_head1.Value<string>("CUSTOMAREACODE")
                             , GetCode(json1.Value<string>("REPUNITCODE")), GetName(json1.Value<string>("REPUNITCODE")), json1.Value<string>("DECLWAY"), GetCode(json1.Value<string>("INSPUNITCODE")), GetName(json1.Value<string>("INSPUNITCODE"))
-                            , json1.Value<string>("ENTRUSTREQUEST"), json1.Value<string>("TRADEWAYCODES"), AssociateNo, CorrespondNo, json1.Value<string>("PACKKIND")
+                            , json1.Value<string>("ORDERREQUEST"), json1.Value<string>("TRADEWAYCODES"), AssociateNo, CorrespondNo, json1.Value<string>("PACKKIND")
                             , json1.Value<string>("GOODSGW"), json1.Value<string>("GOODSNW"), json1.Value<string>("RECORDCODE"), json_head1.Value<string>("IETYPE"), GetChk(json1.Value<string>("SPECIALRELATIONSHIP"))
                             , GetChk(json1.Value<string>("PRICEIMPACT")), GetChk(json1.Value<string>("PAYPOYALTIES")), json1.Value<string>("STATUS"), json_head1.Value<string>("SUBMITTIME"), json_head1.Value<string>("SUBMITUSERNAME")
                             , json_head1.Value<string>("SUBMITUSERID"), json1.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_head1.Value<string>("CUSTOMAREACODE")
@@ -575,7 +575,7 @@ namespace MvcPlatform.Controllers
                     sql = string.Format(insert_sql, "40", json2.Value<string>("ASSOCIATEPEDECLNO"), code2, json2.Value<string>("CUSNO"), json2.Value<string>("BUSIUNITCODE"),json2.Value<string>("BUSIUNITNAME")
                             , json2.Value<string>("CONTRACTNO"), json2.Value<string>("GOODSNUM"), json2.Value<string>("CLEARANCENO"), GetChk(json2.Value<string>("LAWFLAG")), json2.Value<string>("ENTRUSTTYPE")
                             , json_head1.Value<string>("REPWAYID"), json_head1.Value<string>("CUSTOMAREACODE"), GetCode(json2.Value<string>("REPUNITCODE")), GetName(json2.Value<string>("REPUNITCODE")), json2.Value<string>("DECLWAY")
-                            , GetCode(json2.Value<string>("INSPUNITCODE")), GetName(json2.Value<string>("INSPUNITCODE")), json2.Value<string>("ENTRUSTREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
+                            , GetCode(json2.Value<string>("INSPUNITCODE")), GetName(json2.Value<string>("INSPUNITCODE")), json2.Value<string>("ORDERREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
                             , json2.Value<string>("STATUS"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json2.Value<string>("TRADEWAYCODES"), AssociateNo
                             , CorrespondNo, json2.Value<string>("PACKKIND"), json2.Value<string>("GOODSGW"), json2.Value<string>("GOODSNW"),json2.Value<string>("RECORDCODE")
                             , json_head1.Value<string>("IETYPE"), GetChk(json2.Value<string>("SPECIALRELATIONSHIP")), GetChk(json2.Value<string>("PRICEIMPACT")), GetChk(json2.Value<string>("PAYPOYALTIES")), json_head1.Value<string>("SUBMITUSERNAME")
@@ -591,7 +591,7 @@ namespace MvcPlatform.Controllers
                     sql = string.Format(update_sql, json2.Value<string>("ASSOCIATEPEDECLNO"), json2.Value<string>("CUSNO"), json2.Value<string>("BUSIUNITCODE"), json2.Value<string>("BUSIUNITNAME"), json2.Value<string>("CONTRACTNO"), json2.Value<string>("GOODSNUM")
                             , json2.Value<string>("CLEARANCENO"), GetChk(json2.Value<string>("LAWFLAG")), json2.Value<string>("ENTRUSTTYPE"), json_head1.Value<string>("REPWAYID"), json_head1.Value<string>("CUSTOMAREACODE")
                             , GetCode(json2.Value<string>("REPUNITCODE")), GetName(json2.Value<string>("REPUNITCODE")), json2.Value<string>("DECLWAY"), GetCode(json2.Value<string>("INSPUNITCODE")), GetName(json2.Value<string>("INSPUNITCODE"))
-                            , json2.Value<string>("ENTRUSTREQUEST"), json2.Value<string>("TRADEWAYCODES"), AssociateNo, CorrespondNo, json2.Value<string>("PACKKIND")
+                            , json2.Value<string>("ORDERREQUEST"), json2.Value<string>("TRADEWAYCODES"), AssociateNo, CorrespondNo, json2.Value<string>("PACKKIND")
                             , json2.Value<string>("GOODSGW"), json2.Value<string>("GOODSNW"), json2.Value<string>("RECORDCODE"), json_head1.Value<string>("IETYPE"), GetChk(json2.Value<string>("SPECIALRELATIONSHIP"))
                             , GetChk(json2.Value<string>("PRICEIMPACT")), GetChk(json2.Value<string>("PAYPOYALTIES")), json2.Value<string>("STATUS"), json_head1.Value<string>("SUBMITTIME"), json_head1.Value<string>("SUBMITUSERNAME")
                             , json_head1.Value<string>("SUBMITUSERID"), json2.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_head1.Value<string>("CUSTOMAREACODE")
@@ -632,7 +632,7 @@ namespace MvcPlatform.Controllers
                             , "41", json3.Value<string>("ASSOCIATEPEDECLNO"), code3, json3.Value<string>("CUSNO"), json3.Value<string>("BUSIUNITCODE"), json3.Value<string>("BUSIUNITNAME")
                             , json3.Value<string>("CONTRACTNO"), json3.Value<string>("GOODSNUM"), json3.Value<string>("CLEARANCENO"), GetChk(json3.Value<string>("LAWFLAG")), json3.Value<string>("ENTRUSTTYPE")
                             , json_head1.Value<string>("REPWAYID"), json_head2.Value<string>("CUSTOMAREACODE"), GetCode(json3.Value<string>("REPUNITCODE")), GetName(json3.Value<string>("REPUNITCODE")), json3.Value<string>("DECLWAY")
-                            , GetCode(json3.Value<string>("INSPUNITCODE")), GetName(json3.Value<string>("INSPUNITCODE")), json3.Value<string>("ENTRUSTREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
+                            , GetCode(json3.Value<string>("INSPUNITCODE")), GetName(json3.Value<string>("INSPUNITCODE")), json3.Value<string>("ORDERREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
                             , json3.Value<string>("STATUS"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json3.Value<string>("TRADEWAYCODES"), AssociateNo2
                             , CorrespondNo, json3.Value<string>("PACKKIND"), json3.Value<string>("GOODSGW"), json3.Value<string>("GOODSNW"), json3.Value<string>("RECORDCODE")
                             , json_head2.Value<string>("IETYPE"), GetChk(json3.Value<string>("SPECIALRELATIONSHIP")), GetChk(json3.Value<string>("PRICEIMPACT")), GetChk(json3.Value<string>("PAYPOYALTIES")), json_head2.Value<string>("SUBMITUSERNAME")
@@ -648,7 +648,7 @@ namespace MvcPlatform.Controllers
                     sql = string.Format(update_sql, json3.Value<string>("ASSOCIATEPEDECLNO"), json3.Value<string>("CUSNO"), json3.Value<string>("BUSIUNITCODE"), json3.Value<string>("BUSIUNITNAME"), json3.Value<string>("CONTRACTNO"), json3.Value<string>("GOODSNUM")
                             , json3.Value<string>("CLEARANCENO"), GetChk(json3.Value<string>("LAWFLAG")), json3.Value<string>("ENTRUSTTYPE"), json_head2.Value<string>("REPWAYID"), json_head2.Value<string>("CUSTOMAREACODE")
                             , GetCode(json3.Value<string>("REPUNITCODE")), GetName(json3.Value<string>("REPUNITCODE")), json3.Value<string>("DECLWAY"), GetCode(json3.Value<string>("INSPUNITCODE")), GetName(json3.Value<string>("INSPUNITCODE"))
-                            , json3.Value<string>("ENTRUSTREQUEST"), json3.Value<string>("TRADEWAYCODES"), AssociateNo2, CorrespondNo, json3.Value<string>("PACKKIND")
+                            , json3.Value<string>("ORDERREQUEST"), json3.Value<string>("TRADEWAYCODES"), AssociateNo2, CorrespondNo, json3.Value<string>("PACKKIND")
                             , json3.Value<string>("GOODSGW"), json3.Value<string>("GOODSNW"), json3.Value<string>("RECORDCODE"), json_head2.Value<string>("IETYPE"), GetChk(json3.Value<string>("SPECIALRELATIONSHIP"))
                             , GetChk(json3.Value<string>("PRICEIMPACT")), GetChk(json3.Value<string>("PAYPOYALTIES")), json3.Value<string>("STATUS"), json_head2.Value<string>("SUBMITTIME"), json_head2.Value<string>("SUBMITUSERNAME")
                             , json_head2.Value<string>("SUBMITUSERID"), json3.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_head2.Value<string>("CUSTOMAREACODE")
@@ -691,7 +691,7 @@ namespace MvcPlatform.Controllers
                             , "40", json4.Value<string>("ASSOCIATEPEDECLNO"), code4, json4.Value<string>("CUSNO"), json4.Value<string>("BUSIUNITCODE"), json4.Value<string>("BUSIUNITNAME")
                             , json4.Value<string>("CONTRACTNO"), json4.Value<string>("GOODSNUM"), json4.Value<string>("CLEARANCENO"), GetChk(json4.Value<string>("LAWFLAG")), json4.Value<string>("ENTRUSTTYPE")
                             , json_head2.Value<string>("REPWAYID"),json_head2.Value<string>("CUSTOMAREACODE"), GetCode(json4.Value<string>("REPUNITCODE")),GetName(json4.Value<string>("REPUNITCODE")), json4.Value<string>("DECLWAY")
-                            , GetCode(json4.Value<string>("INSPUNITCODE")), GetName(json4.Value<string>("INSPUNITCODE")), json4.Value<string>("ENTRUSTREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
+                            , GetCode(json4.Value<string>("INSPUNITCODE")), GetName(json4.Value<string>("INSPUNITCODE")), json4.Value<string>("ORDERREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
                             , json4.Value<string>("STATUS"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json4.Value<string>("TRADEWAYCODES"), AssociateNo2
                             , CorrespondNo, json4.Value<string>("PACKKIND"), json4.Value<string>("GOODSGW"), json4.Value<string>("GOODSNW"), json4.Value<string>("RECORDCODE")
                             , json_head2.Value<string>("IETYPE"), GetChk(json4.Value<string>("SPECIALRELATIONSHIP")), GetChk(json4.Value<string>("PRICEIMPACT")), GetChk(json4.Value<string>("PAYPOYALTIES")), json_head2.Value<string>("SUBMITUSERNAME")
@@ -707,7 +707,7 @@ namespace MvcPlatform.Controllers
                     sql = string.Format(update_sql, json4.Value<string>("ASSOCIATEPEDECLNO"), json4.Value<string>("CUSNO"), json4.Value<string>("BUSIUNITCODE"),json4.Value<string>("BUSIUNITNAME"), json4.Value<string>("CONTRACTNO"), json4.Value<string>("GOODSNUM")
                             , json4.Value<string>("CLEARANCENO"), GetChk(json4.Value<string>("LAWFLAG")), json4.Value<string>("ENTRUSTTYPE"), json_head2.Value<string>("REPWAYID"), json_head2.Value<string>("CUSTOMAREACODE")
                             , GetCode(json4.Value<string>("REPUNITCODE")), GetName(json4.Value<string>("REPUNITCODE")), json4.Value<string>("DECLWAY"), GetCode(json4.Value<string>("INSPUNITCODE")), GetName(json4.Value<string>("INSPUNITCODE"))
-                            , json4.Value<string>("ENTRUSTREQUEST"), json4.Value<string>("TRADEWAYCODES"), AssociateNo2, CorrespondNo, json4.Value<string>("PACKKIND")
+                            , json4.Value<string>("ORDERREQUEST"), json4.Value<string>("TRADEWAYCODES"), AssociateNo2, CorrespondNo, json4.Value<string>("PACKKIND")
                             , json4.Value<string>("GOODSGW"), json4.Value<string>("GOODSNW"), json4.Value<string>("RECORDCODE"), json_head2.Value<string>("IETYPE"), GetChk(json4.Value<string>("SPECIALRELATIONSHIP"))
                             , GetChk(json4.Value<string>("PRICEIMPACT")), GetChk(json4.Value<string>("PAYPOYALTIES")), json4.Value<string>("STATUS"), json_head2.Value<string>("SUBMITTIME"), json_head2.Value<string>("SUBMITUSERNAME")
                             , json_head2.Value<string>("SUBMITUSERID"), json4.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_head2.Value<string>("CUSTOMAREACODE")

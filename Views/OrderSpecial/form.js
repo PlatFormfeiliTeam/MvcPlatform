@@ -529,7 +529,7 @@
         layout: 'hbox',
         items: [combo_myfs, {
             xtype: 'button', id: 'myfs_btn', handler: function () {
-                selectmyfs(combo_myfs, field_ENTRUSTREQUEST);
+                selectmyfs(combo_myfs, field_ORDERREQUEST);
             },
             text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
         }]
@@ -619,11 +619,11 @@
         blankText: '货物类型不能为空!'
     })
     //需求备注
-    var field_ENTRUSTREQUEST = Ext.create('Ext.form.field.Text', {
+    var field_ORDERREQUEST = Ext.create('Ext.form.field.Text', {
         tabIndex: 20,
         fieldLabel: '需求备注',
-        name: 'ENTRUSTREQUEST',
-        id: 'ENTRUSTREQUEST'
+        name: 'ORDERREQUEST',
+        id: 'ORDERREQUEST'
     })
     //集装箱号
     var combo_containerno = Ext.create('Ext.form.field.Text', {
@@ -769,7 +769,7 @@
         { layout: 'column', border: 42, border: 0, items: [label_busiinfo, chk_container] },
         { layout: 'column', height: 42, border: 0, items: [field_CUSNO, combo_PORTCODE, field_jydw, field_quanpackage, field_weight] },
         { layout: 'column', height: 42, border: 0, items: [field_contractno, field_myfs, field_TURNPRENO, chk_CHKLAWCONDITION, field_CLEARANCENO] },
-        { layout: 'column', height: 42, border: 0, items: [combo_GOODSTYPENAME, field_containerno, container_bgch, field_ENTRUSTREQUEST, combo_busitype] },
+        { layout: 'column', height: 42, border: 0, items: [combo_GOODSTYPENAME, field_containerno, container_bgch, field_ORDERREQUEST, combo_busitype] },
         field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_ID, field_CONTAINERTRUCK, field_ORIGINALFILEIDS
         ]
     });

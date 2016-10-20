@@ -92,10 +92,10 @@
         }
     })
     //需求备注
-    var field_ENTRUSTREQUEST = Ext.create('Ext.form.field.Text', {
+    var field_ORDERREQUEST = Ext.create('Ext.form.field.Text', {
         fieldLabel: '备注',
-        name: 'ENTRUSTREQUEST',
-        id: 'field_ENTRUSTREQUEST'
+        name: 'ORDERREQUEST',
+        id: 'field_ORDERREQUEST'
     });
     //报关车号
     var field_CONTAINERTRUCK = Ext.create('Ext.form.field.Hidden', {
@@ -209,7 +209,7 @@
         itemsArray = [
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_CUSTOMDISTRICTNAME] },
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_TOTALNO, field_TURNPRENO, combo_mzbz] },
-                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [container_bgch, field_ENTRUSTREQUEST] }
+                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [container_bgch, field_ORDERREQUEST] }
                 , field_CONTAINERTRUCK
         ]
     }
@@ -218,7 +218,7 @@
         itemsArray = [
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_CUSTOMDISTRICTNAME] },
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_TOTALNO, combo_PORTCODE, container_bgch] },
-                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_ENTRUSTREQUEST] }
+                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_ORDERREQUEST] }
                 , field_CONTAINERTRUCK
         ]
     }
@@ -227,7 +227,7 @@
         itemsArray = [
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_CUSTOMDISTRICTNAME] },
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_TURNPRENO, combo_mzbz, combo_PORTCODE] },
-                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [container_bgch, field_ENTRUSTREQUEST] }
+                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [container_bgch, field_ORDERREQUEST] }
                 , field_CONTAINERTRUCK
         ]
     }
@@ -237,7 +237,7 @@
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_CUSTOMDISTRICTNAME] },
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_PORTCODE, field_SHIPNAME, field_FILGHTNO] },
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_LADINGBILLNO, field_ARRIVEDNO, container_bgch] },
-                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_ENTRUSTREQUEST] }
+                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_ORDERREQUEST] }
                 , field_CONTAINERTRUCK
         ]
     }
@@ -246,7 +246,7 @@
         itemsArray = [
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_CUSTOMDISTRICTNAME] },
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_mzbz, field_LADINGBILLNO, field_MANIFEST] },
-                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [container_bgch, field_ENTRUSTREQUEST] }
+                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [container_bgch, field_ORDERREQUEST] }
                 , field_CONTAINERTRUCK
         ]
     }
@@ -255,7 +255,7 @@
         itemsArray = [
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_CUSTOMDISTRICTNAME] },
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_PORTCODE, field_ARRIVEDNO, container_bgch] },
-                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_ENTRUSTREQUEST] }
+                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_ORDERREQUEST] }
                 , field_CONTAINERTRUCK
         ]
     }
@@ -263,7 +263,7 @@
     if (type == "TSQY") {
         itemsArray = [
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_CUSTOMDISTRICTNAME] },
-                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_TURNPRENO_TWO, container_bgch, field_ENTRUSTREQUEST] }
+                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_TURNPRENO_TWO, container_bgch, field_ORDERREQUEST] }
                 , field_CONTAINERTRUCK
         ]
     }
@@ -271,7 +271,7 @@
     if (type == "GNJZ") {
         itemsArray = [
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_CUSTOMDISTRICTNAME] },
-                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [chk_CHKLAWCONDITION, field_ENTRUSTREQUEST] }
+                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [chk_CHKLAWCONDITION, field_ORDERREQUEST] }
         ]
     }
 
@@ -411,7 +411,7 @@ function loadbatchform() {
     //空运进口
     if (type == 'KYJK') {
         //申报关区//报关车号//备注//总单号//转关预录号//木质包装
-        Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(false); Ext.getCmp('declcarno_btn').setDisabled(false); Ext.getCmp('field_ENTRUSTREQUEST').setDisabled(false);
+        Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(false); Ext.getCmp('declcarno_btn').setDisabled(false); Ext.getCmp('field_ORDERREQUEST').setDisabled(false);
         Ext.getCmp('field_TOTALNO').setDisabled(false); Ext.getCmp('field_TURNPRENO').setDisabled(false); Ext.getCmp('combo_mzbz').setDisabled(false);
 
         for (var i = 0; i < recs.length; i++) {
@@ -423,14 +423,14 @@ function loadbatchform() {
             if (bf) {
                 if (isNull(recs[i].data.CUSTOMAREACODE)) { a = a + 1; }//申报关区
                 if (isNull(recs[i].data.DECLCARNO)) { b = b + 1; }//报关车号
-                if (isNull(recs[i].data.ENTRUSTREQUEST)) { c = c + 1; }//备注
+                if (isNull(recs[i].data.ORDERREQUEST)) { c = c + 1; }//备注
                 if (isNull(recs[i].data.TOTALNO)) { d = d + 1; }//总单号
                 if (isNull(recs[i].data.TURNPRENO)) { e = e + 1; }//转关预录号
                 if (isNull(recs[i].data.WOODPACKINGID)) { f = f + 1; }//木质包装
             }
             if (a > 0) { Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(true); }//申报关区
             if (b > 0) { Ext.getCmp('declcarno_btn').setDisabled(true); }//报关车号
-            if (c > 0) { Ext.getCmp('field_ENTRUSTREQUEST').setDisabled(true); }//备注
+            if (c > 0) { Ext.getCmp('field_ORDERREQUEST').setDisabled(true); }//备注
             if (d > 0) { Ext.getCmp('field_TOTALNO').setDisabled(true); }//总单号
             if (e > 0) { Ext.getCmp('field_TURNPRENO').setDisabled(true); }//转关预录号
             if (f > 0) { Ext.getCmp('combo_mzbz').setDisabled(true); }//木质包装
@@ -444,7 +444,7 @@ function loadbatchform() {
     //    //报关车号
     //    combo_bgch.setDisabled(false);
     //    //备注
-    //    field_CLEARREMARK.setDisabled(false);
+    //    field_ORDERREQUEST.setDisabled(false);
     //    //总单号
     //    field_TOTALNO.setDisabled(false);
     //    //进出口岸
@@ -460,8 +460,8 @@ function loadbatchform() {
     //                combo_bgch.setDisabled(true);
     //            }
     //            //备注
-    //            if (isNull(recs[i].data.ENTRUSTREQUEST)) {
-    //                field_CLEARREMARK.setDisabled(true);
+    //            if (isNull(recs[i].data.ORDERREQUEST)) {
+    //                field_ORDERREQUEST.setDisabled(true);
     //            }
     //            //总单号
     //            if (isNull(recs[i].data.TOTALNO)) {
@@ -482,7 +482,7 @@ function loadbatchform() {
     //    //报关车号
     //    combo_bgch.setDisabled(false);
     //    //备注
-    //    field_CLEARREMARK.setDisabled(false);
+    //    field_ORDERREQUEST.setDisabled(false);
     //    //转关预录号
     //    field_TURNPRENO.setDisabled(false);
     //    //木质包装
@@ -500,8 +500,8 @@ function loadbatchform() {
     //                combo_bgch.setDisabled(true);
     //            }
     //            //备注
-    //            if (isNull(recs[i].data.ENTRUSTREQUEST)) {
-    //                field_CLEARREMARK.setDisabled(true);
+    //            if (isNull(recs[i].data.ORDERREQUEST)) {
+    //                field_ORDERREQUEST.setDisabled(true);
     //            }
     //            //转关预录号
     //            if (isNull(recs[i].data.TURNPRENO)) {
@@ -526,7 +526,7 @@ function loadbatchform() {
     //    //报关车号
     //    combo_bgch.setDisabled(false);
     //    //备注
-    //    field_CLEARREMARK.setDisabled(false);
+    //    field_ORDERREQUEST.setDisabled(false);
     //    //进出口岸
     //    combo_PORTCODE.setDisabled(false);
     //    field_SHIPNAME.setDisabled(false);
@@ -545,8 +545,8 @@ function loadbatchform() {
     //                combo_bgch.setDisabled(true);
     //            }
     //            //备注
-    //            if (isNull(recs[i].data.ENTRUSTREQUEST)) {
-    //                field_CLEARREMARK.setDisabled(true);
+    //            if (isNull(recs[i].data.ORDERREQUEST)) {
+    //                field_ORDERREQUEST.setDisabled(true);
     //            }
     //            //进出口岸
     //            if (isNull(recs[i].data.PORTCODE)) {
@@ -575,7 +575,7 @@ function loadbatchform() {
     //    //报关车号
     //    combo_bgch.setDisabled(false);
     //    //备注
-    //    field_CLEARREMARK.setDisabled(false);
+    //    field_ORDERREQUEST.setDisabled(false);
     //    combo_mzbz.setDisabled(false);
     //    field_LADINGBILLNO.setDisabled(false);
     //    field_MANIFEST.setDisabled(false);
@@ -591,8 +591,8 @@ function loadbatchform() {
     //                combo_bgch.setDisabled(true);
     //            }
     //            //备注
-    //            if (isNull(recs[i].data.ENTRUSTREQUEST)) {
-    //                field_CLEARREMARK.setDisabled(true);
+    //            if (isNull(recs[i].data.ORDERREQUEST)) {
+    //                field_ORDERREQUEST.setDisabled(true);
     //            }
     //            if (isNull(recs[i].data.WOODPACKINGID)) {
     //                combo_mzbz.setDisabled(true);
@@ -614,7 +614,7 @@ function loadbatchform() {
     //    //报关车号
     //    combo_bgch.setDisabled(false);
     //    //备注
-    //    field_CLEARREMARK.setDisabled(false);
+    //    field_ORDERREQUEST.setDisabled(false);
     //    combo_PORTCODE.setDisabled(false);
     //    field_ARRIVEDNO.setDisabled(false);
 
@@ -629,8 +629,8 @@ function loadbatchform() {
     //                combo_bgch.setDisabled(true);
     //            }
     //            //备注
-    //            if (isNull(recs[i].data.ENTRUSTREQUEST)) {
-    //                field_CLEARREMARK.setDisabled(true);
+    //            if (isNull(recs[i].data.ORDERREQUEST)) {
+    //                field_ORDERREQUEST.setDisabled(true);
     //            }
     //            if (isNull(recs[i].data.PORTCODE)) {
     //                combo_PORTCODE.setDisabled(true);
@@ -649,7 +649,7 @@ function loadbatchform() {
     //    //报关车号
     //    combo_bgch.setDisabled(false);
     //    //备注
-    //    field_CLEARREMARK.setDisabled(false);
+    //    field_ORDERREQUEST.setDisabled(false);
     //    field_TURNPRENO_TWO.setDisabled(false);
 
     //    for (var i = 0; i < recs.length; i++) {
@@ -663,8 +663,8 @@ function loadbatchform() {
     //                combo_bgch.setDisabled(true);
     //            }
     //            //备注
-    //            if (isNull(recs[i].data.ENTRUSTREQUEST)) {
-    //                field_CLEARREMARK.setDisabled(true);
+    //            if (isNull(recs[i].data.ORDERREQUEST)) {
+    //                field_ORDERREQUEST.setDisabled(true);
     //            }
     //            if (isNull(recs[i].data.TURNPRENO)) {
     //                field_TURNPRENO_TWO.setDisabled(true);
@@ -678,7 +678,7 @@ function loadbatchform() {
     //    //申报关区
     //    combo_CUSTOMDISTRICTNAME.setDisabled(false);
     //    //备注
-    //    field_CLEARREMARK.setDisabled(false);
+    //    field_ORDERREQUEST.setDisabled(false);
     //    for (var i = 0; i < recs.length; i++) {
     //        if (recs[i].data.STATUS != '1' && recs[i].data.STATUS != '10') {
     //            //申报关区
@@ -686,8 +686,8 @@ function loadbatchform() {
     //                combo_CUSTOMDISTRICTNAME.setDisabled(true);
     //            }
     //            //备注
-    //            if (isNull(recs[i].data.ENTRUSTREQUEST)) {
-    //                field_CLEARREMARK.setDisabled(true);
+    //            if (isNull(recs[i].data.ORDERREQUEST)) {
+    //                field_ORDERREQUEST.setDisabled(true);
     //            }
     //        }
     //    }

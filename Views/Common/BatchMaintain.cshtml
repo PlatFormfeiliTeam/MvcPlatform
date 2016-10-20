@@ -70,7 +70,7 @@
 
                     Ext.regModel('TRADE', {
                         fields: ['ID', 'ENTRUSTTYPE', 'CODE', 'CUSNO', 'BUSIUNITNAME', 'CUSTOMAREACODE', 'TOTALNO', 'TURNPRENO', 'WOODPACKINGID', 'DECLCARNO'
-                            , 'PORTCODE', 'SHIPNAME', 'FILGHTNO', 'SECONDLADINGBILLNO', 'ARRIVEDNO', 'MANIFEST', 'ENTRUSTREQUEST', 'LAWFLAG'
+                            , 'PORTCODE', 'SHIPNAME', 'FILGHTNO', 'SECONDLADINGBILLNO', 'ARRIVEDNO', 'MANIFEST', 'ORDERREQUEST', 'LAWFLAG'
                             , 'DECLSTATUS', 'INSPSTATUS']
                     });
                     store_Trade = Ext.create('Ext.data.JsonStore', {
@@ -130,7 +130,7 @@
                             { header: '对方转关号', dataIndex: 'TURNPRENO', width: 100, hidden: !(type == 'TSQY') },
                             { header: '法检状况', dataIndex: 'LAWFLAG', renderer: renderOrder, width: 90, hidden: !(type == 'GNJZ') },
                             { header: '报关车号', dataIndex: 'DECLCARNO', width: 100, hidden: (type == 'GNJZ') },
-                            { header: '备注', dataIndex: 'ENTRUSTREQUEST', minWidth: 100, flex: 1 }
+                            { header: '备注', dataIndex: 'ORDERREQUEST', minWidth: 100, flex: 1 }
 
                         ],
                         listeners: //选项发生改变

@@ -306,7 +306,7 @@
         layout: 'hbox',
         items: [combo_myfs4, {
             xtype: 'button', id: 'myfs_btn4', listeners: {
-                click: function () { selectmyfs(combo_myfs4, field_ENTRUSTREQUEST4); }
+                click: function () { selectmyfs(combo_myfs4, field_ORDERREQUEST4); }
             }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
         }]
     }
@@ -386,11 +386,11 @@
         items: [tf_bjsbdw4, { xtype: 'button', id: 'bjsbdw_btn4', listeners: { click: function () { bjsbdw_win(tf_bjsbdw4); } }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0 }]
     })
     //需求备注
-    var field_ENTRUSTREQUEST4 = Ext.create('Ext.form.field.Text', {
-        id: 'field_ENTRUSTREQUEST4',
+    var field_ORDERREQUEST4 = Ext.create('Ext.form.field.Text', {
+        id: 'field_ORDERREQUEST4',
         fieldLabel: '需求备注',
         tabIndex: 76,
-        name: 'ENTRUSTREQUEST'
+        name: 'ORDERREQUEST'
     });
     var store_status4 = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
@@ -426,7 +426,7 @@
         { layout: 'column', height: 42, border: 0, items: [field_CODE4, combo_ENTRUSTTYPENAME4, field_CUSNO4, field_jydw4, combo_DECLWAY4] },
         { layout: 'column', height: 42, border: 0, items: [field_quanpackage4, field_weight4, field_contractno4, field_myfs4, zcbah_container4] },
         { layout: 'column', height: 42, border: 0, items: [chk_CHKLAWCONDITION4, field_CLEARANCENO4, field_ASSOCIATEPEDECLNO4, cont_bgsbdw4, cont_bjsbdw4] },
-        { layout: 'column', height: 42, border: 0, items: [field_ENTRUSTREQUEST4, field_STATUS4] },
+        { layout: 'column', height: 42, border: 0, items: [field_ORDERREQUEST4, field_STATUS4] },
          field_BUSIUNITNAME4
         ]
     })

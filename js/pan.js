@@ -978,7 +978,7 @@ function formcontrol() {
     //以前是要加状态判断,考虑到撤单后页面字段状态需要重新控制 故去掉status>=15条件 by panhuaguo 2016-08-29
     //2016-08-30测试发现field_STATUS这个控件在默认只读的情况,循环表单控件的时候会将其只读属性去掉，所以要过滤掉这个控件 自始至终这个控件应该是只读的
     Ext.Array.each(formpanel.getForm().getFields().items, function (item) {
-        if (item.value != "" && item.value != null && item.value != undefined && item.id != 'field_ENTRUSTREQUEST' && item.id != "field_STATUS" && item.id != "tf_bjsbdw" && item.id != "tf_bgsbdw") {
+        if (item.value != "" && item.value != null && item.value != undefined && item.id != 'field_ORDERREQUEST' && item.id != "field_STATUS" && item.id != "tf_bjsbdw" && item.id != "tf_bgsbdw") {
             item.setReadOnly(status >= 10);
         }
     });

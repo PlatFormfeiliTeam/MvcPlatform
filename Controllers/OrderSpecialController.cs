@@ -102,7 +102,7 @@ namespace MvcPlatform.Controllers
                             ,BUSITYPE,CODE,CUSNO,BUSIUNITCODE,BUSIUNITNAME,CONTRACTNO
                             ,TURNPRENO,GOODSNUM,CLEARANCENO,LAWFLAG,ENTRUSTTYPE
                             ,REPWAYID,CUSTOMAREACODE,REPUNITCODE,REPUNITNAME,DECLWAY
-                            ,PORTCODE,INSPUNITCODE,INSPUNITNAME,ENTRUSTREQUEST,CREATEUSERID
+                            ,PORTCODE,INSPUNITCODE,INSPUNITNAME,ORDERREQUEST,CREATEUSERID
                             ,CREATEUSERNAME,STATUS,SUBMITUSERID,SUBMITUSERNAME,CUSTOMERCODE
                             ,CUSTOMERNAME,DECLCARNO,TRADEWAYCODES,GOODSGW,GOODSNW
                             ,PACKKIND,CREATETIME,SUBMITTIME,GOODSTYPEID,CONTAINERNO,ORDERWAY
@@ -124,7 +124,7 @@ namespace MvcPlatform.Controllers
                         , json.Value<string>("BUSITYPE"), ordercode, json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME"), json.Value<string>("CONTRACTNO")
                         , json.Value<string>("TURNPRENO"), json.Value<string>("GOODSNUM"), json.Value<string>("CLEARANCENO"), GetChk(json.Value<string>("LAWFLAG")), json.Value<string>("ENTRUSTTYPE")
                         , json.Value<string>("REPWAYID"), json.Value<string>("CUSTOMAREACODE"), GetCode(json.Value<string>("REPUNITCODE")), GetName(json.Value<string>("REPUNITCODE")), json.Value<string>("DECLWAY")
-                        , json.Value<string>("PORTCODE"), GetCode(json.Value<string>("INSPUNITCODE")), GetName(json.Value<string>("INSPUNITCODE")), json.Value<string>("ENTRUSTREQUEST"), json_user.Value<string>("ID")
+                        , json.Value<string>("PORTCODE"), GetCode(json.Value<string>("INSPUNITCODE")), GetName(json.Value<string>("INSPUNITCODE")), json.Value<string>("ORDERREQUEST"), json_user.Value<string>("ID")
                         , json_user.Value<string>("REALNAME"), json.Value<string>("STATUS"), json.Value<string>("SUBMITUSERID"), json.Value<string>("SUBMITUSERNAME"), json_user.Value<string>("CUSTOMERCODE")
                         , json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLCARNO"), json.Value<string>("TRADEWAYCODES"), json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW")
                         , json.Value<string>("PACKKIND"), json.Value<string>("SUBMITTIME"), json.Value<string>("GOODSTYPEID"), json.Value<string>("CONTAINERNO")
@@ -139,7 +139,7 @@ namespace MvcPlatform.Controllers
                         SET BUSITYPE='{1}',BUSIKIND='{2}',CUSNO='{3}',BUSIUNITCODE='{4}',BUSIUNITNAME='{5}'
                             ,CONTRACTNO='{6}',TURNPRENO='{7}',GOODSNUM='{8}',CLEARANCENO='{9}',LAWFLAG='{10}'
                             ,ENTRUSTTYPE='{11}',REPWAYID='{12}',CUSTOMAREACODE='{13}',REPUNITCODE='{14}',REPUNITNAME='{15}'
-                            ,DECLWAY='{16}',PORTCODE='{17}',INSPUNITCODE='{18}',INSPUNITNAME='{19}',ENTRUSTREQUEST='{20}'
+                            ,DECLWAY='{16}',PORTCODE='{17}',INSPUNITCODE='{18}',INSPUNITNAME='{19}',ORDERREQUEST='{20}'
                             ,STATUS='{21}',SUBMITUSERID='{22}',SUBMITUSERNAME='{23}',CUSTOMERCODE='{24}',CUSTOMERNAME='{25}'
                             ,DECLCARNO='{26}',TRADEWAYCODES='{27}',SUBMITTIME={28},GOODSGW='{29}',GOODSNW='{30}'
                             ,PACKKIND='{31}',GOODSTYPEID='{32}',CONTAINERNO='{33}',ORDERWAY='{34}'
@@ -156,7 +156,7 @@ namespace MvcPlatform.Controllers
                         , ordercode, json.Value<string>("BUSITYPE"), "002", json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME")
                         , json.Value<string>("CONTRACTNO"), json.Value<string>("TURNPRENO"), json.Value<string>("GOODSNUM"), json.Value<string>("CLEARANCENO"), GetChk(json.Value<string>("LAWFLAG"))
                         , json.Value<string>("ENTRUSTTYPE"), json.Value<string>("REPWAYID"), json.Value<string>("CUSTOMAREACODE"), GetCode(json.Value<string>("REPUNITCODE")), GetName(json.Value<string>("REPUNITCODE"))
-                        , json.Value<string>("DECLWAY"), json.Value<string>("PORTCODE"), GetCode(json.Value<string>("INSPUNITCODE")), GetName(json.Value<string>("INSPUNITCODE")), json.Value<string>("ENTRUSTREQUEST")
+                        , json.Value<string>("DECLWAY"), json.Value<string>("PORTCODE"), GetCode(json.Value<string>("INSPUNITCODE")), GetName(json.Value<string>("INSPUNITCODE")), json.Value<string>("ORDERREQUEST")
                         , json.Value<string>("STATUS"), json.Value<string>("SUBMITUSERID"), json.Value<string>("SUBMITUSERNAME"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
                         , json.Value<string>("DECLCARNO"), json.Value<string>("TRADEWAYCODES"), json.Value<string>("SUBMITTIME"), json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW")
                         , json.Value<string>("PACKKIND"), json.Value<string>("GOODSTYPEID"), json.Value<string>("CONTAINERNO"), "1"
