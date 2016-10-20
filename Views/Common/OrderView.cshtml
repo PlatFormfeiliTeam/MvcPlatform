@@ -48,7 +48,7 @@
                         if (data.data.ENTRUSTTYPE == '01' || data.data.ENTRUSTTYPE == '03') {
                             //3 绘制报关单列表
                             var store_declaration = Ext.create('Ext.data.JsonStore', {
-                                fields: ['ID','DECLARATIONCODE', 'GOODSNUM', 'GOODSNW', 'GOODSGW', 'SHEETNUM', 'BUSITYPE', 'TRADECODE', 'CUSTOMSSTATUS'],
+                                fields: ['ID', 'DECLARATIONCODE', 'GOODSNUM', 'GOODSNW', 'GOODSGW', 'SHEETNUM', 'BUSITYPE', 'TRADECODE', 'CUSTOMSSTATUS', 'COMMODITYNUM'],
                                 proxy: {
                                     type: 'ajax',
                                     url: '/Common/LoadDeclaration',
@@ -69,7 +69,7 @@
                                     { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 170, locked: true },
                                     { header: '业务类型', dataIndex: 'BUSITYPE', width: 110, locked: true, renderer: render },
                                     { header: '贸易方式', dataIndex: 'TRADECODE', width: 90, locked: true },
-                                    //{ header: '商品数量', dataIndex: 'NUMS', width: 70, locked: true },
+                                    { header: '商品项数', dataIndex: 'COMMODITYNUM', width: 70, locked: true },
                                     { header: '件数', dataIndex: 'GOODSNUM', width: 50, locked: true },
                                     { header: '毛重', dataIndex: 'GOODSGW', width: 100, locked: true },
                                     { header: '净重', dataIndex: 'GOODSNW', width: 100, locked: true },
@@ -104,9 +104,9 @@
                                         { header: '核放单号', dataIndex: 'APPROVALCODE', width: 170 },
                                         { header: '报检单号', dataIndex: 'INSPECTIONCODE', width: 180 },
                                         //{ header: '是否需通关单', dataIndex: 'INSPSTATUS', width: 120 },
-                                       // { header: '通关单入库', dataIndex: 'ISHAVECLEARANCE', width: 100 },
-                                       // { header: '法检标志', dataIndex: 'ISFORCELAW', width: 100 },
-                                       // { header: '客户备注', dataIndex: 'CUSTOMERREMARK', width: 100 },
+                                        //{ header: '通关单入库', dataIndex: 'ISHAVECLEARANCE', width: 100 },
+                                        //{ header: '法检标志', dataIndex: 'ISFORCELAW', width: 100 },
+                                        //{ header: '客户备注', dataIndex: 'CUSTOMERREMARK', width: 100 },
                                         //{ header: '客服备注', dataIndex: 'CSREMARK', width: 100 },
                                         { header: '国检状态', dataIndex: 'INSPSTATUS', width: 100 }
                                         //{ header: '状态时间', dataIndex: 'zhuangtaishijian', width: 100 }

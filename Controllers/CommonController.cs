@@ -2038,7 +2038,7 @@ namespace MvcPlatform.Controllers
 
         public string LoadDeclaration()
         {
-            string sql = @"select ID,DECLARATIONCODE,GOODSGW,GOODSNW,GOODSNUM,SHEETNUM,BUSITYPE,CUSTOMSSTATUS,TRADECODE from list_declaration  
+            string sql = @"select ID,DECLARATIONCODE,GOODSGW,GOODSNW,GOODSNUM,SHEETNUM,BUSITYPE,CUSTOMSSTATUS,TRADECODE,COMMODITYNUM from list_declaration  
                          WHERE ordercode='" + Request["ORDERCODE"] + "'";
             DataTable dt = DBMgr.GetDataTable(sql);
             var json = JsonConvert.SerializeObject(dt);
