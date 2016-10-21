@@ -57,7 +57,7 @@
     })
     var combo_ENTRUSTTYPENAME2 = Ext.create('Ext.form.field.ComboBox', {
         id: 'combo_ENTRUSTTYPENAME2',
-        name: 'ENTRUSTTYPEID',
+        name: 'ENTRUSTTYPE',
         store: store_ENTRUSTTYPENAME2,
         fieldLabel: '委托类型',
         displayField: 'NAME',

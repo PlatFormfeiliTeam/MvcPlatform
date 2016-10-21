@@ -59,7 +59,7 @@
     })
     var combo_ENTRUSTTYPENAME = Ext.create('Ext.form.field.ComboBox', {
         id: 'combo_ENTRUSTTYPENAME1',
-        name: 'ENTRUSTTYPEID',
+        name: 'ENTRUSTTYPE',
         store: store_ENTRUSTTYPENAME,
         fieldLabel: '委托类型',
         displayField: 'NAME',
@@ -269,7 +269,7 @@
     var chk_CHKLAWCONDITION = Ext.create('Ext.form.field.Checkbox', {
         tabIndex: 16,
         fieldLabel: '法检状况',
-        name: 'LAWCONDITION'
+        name: 'LAWFLAG'
     })
     //通关单号
     var field_CLEARANCENO = Ext.create('Ext.form.field.Text', {
