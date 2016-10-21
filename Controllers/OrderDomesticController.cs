@@ -58,7 +58,10 @@ namespace MvcPlatform.Controllers
                 return combin.Substring(start + 1, end - start - 1);
             }
         }
-
+        public ActionResult OrderView()
+        {
+            return View();
+        }
         //删除订单
         public string Delete()
         {
