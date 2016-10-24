@@ -101,26 +101,27 @@ namespace MvcPlatform.Controllers
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             string ordercodes = "";//存储所有的订单号
-            string bgsb_unit = "";
-            string bjsb_unit = "";
+            //string bgsb_unit = "";
+            //string bjsb_unit = "";
 
             if (string.IsNullOrEmpty(ordercode))//如果订单号为空、即新增的时候
             {
-                string sql = "select * from base_company where CODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "' AND ENABLED=1 AND ROWNUM=1";//根据海关的10位编码查询申报单位
-                dt = DBMgrBase.GetDataTable(sql);
-                if (dt.Rows.Count > 0)
-                {
-                    bgsb_unit = dt.Rows[0]["NAME"] + "";
-                }
-                sql = "select * from base_company where INSPCODE='" + json_user.Value<string>("CUSTOMERCIQCODE") + "' AND ENABLED=1 AND ROWNUM=1";//根据海关的10位编码查询申报单位
-                dt = DBMgrBase.GetDataTable(sql);
-                if (dt.Rows.Count > 0)
-                {
-                    bjsb_unit = dt.Rows[0]["NAME"] + "";
-                }
-                string repunitcode = bgsb_unit + "(" + json_user.Value<string>("CUSTOMERHSCODE") + ")";
-                string inspunitcode = bjsb_unit + "(" + json_user.Value<string>("CUSTOMERCIQCODE") + ")";
-                string result = "{STATUS:0,REPUNITCODE:'" + repunitcode + "' ,INSPUNITCODE:'" + inspunitcode + "'}";
+                //string sql = "select * from base_company where CODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "' AND ENABLED=1 AND ROWNUM=1";//根据海关的10位编码查询申报单位
+                //dt = DBMgrBase.GetDataTable(sql);
+                //if (dt.Rows.Count > 0)
+                //{
+                //    bgsb_unit = dt.Rows[0]["NAME"] + "";
+                //}
+                //sql = "select * from base_company where INSPCODE='" + json_user.Value<string>("CUSTOMERCIQCODE") + "' AND ENABLED=1 AND ROWNUM=1";//根据海关的10位编码查询申报单位
+                //dt = DBMgrBase.GetDataTable(sql);
+                //if (dt.Rows.Count > 0)
+                //{
+                //    bjsb_unit = dt.Rows[0]["NAME"] + "";
+                //}
+                //string repunitcode = bgsb_unit + "(" + json_user.Value<string>("CUSTOMERHSCODE") + ")";
+                //string inspunitcode = bjsb_unit + "(" + json_user.Value<string>("CUSTOMERCIQCODE") + ")";
+                //string result = "{STATUS:0,REPUNITCODE:'" + repunitcode + "' ,INSPUNITCODE:'" + inspunitcode + "'}";
+                string result = "{STATUS:0}";
                 return "{data1:" + result + ",data2:" + result + ",data3:" + result + ",data4:" + result + ",filedata1:" + filedata1 + ",filedata2:" + filedata2 + "}";
 
             }
@@ -132,8 +133,8 @@ namespace MvcPlatform.Controllers
                       ,FILGHTNO,TRADEWAYCODES,DECLCARNO,DECLWAY,PACKKIND,GOODSGW,GOODSNW,ARRIVEDNO,ISINVALID,FIRSTLADINGBILLNO
                       ,SECONDLADINGBILLNO,GOODSTYPEID,CONTAINERNO,ASSOCIATENO,CORRESPONDNO,REPUNITNAME,INSPUNITNAME
                       ,CUSTOMERNAME,CREATEUSERNAME,SUBMITUSERNAME,RECORDCODE,ASSOCIATEPEDECLNO
-                      ,ASSOCIATETRADEWAY,IETYPE,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES  from LIST_ORDER t";      
-                                                                                               
+                      ,ASSOCIATETRADEWAY,IETYPE,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES  from LIST_ORDER t";
+
                 string sql = sql_pre + " where CODE = '" + ordercode + "'";
                 DataTable dt1 = DBMgr.GetDataTable(sql);
                 if (!string.IsNullOrEmpty(dt1.Rows[0]["CORRESPONDNO"] + ""))//如果存在多单关联号 多单关联号一定在主订单组里面
@@ -296,7 +297,7 @@ namespace MvcPlatform.Controllers
                 {
                     sql = "delete from list_times where CODE='" + dr["CODE"] + "' AND STATUS=10";
                     DBMgr.ExecuteNonQuery(sql);
-                    
+
                 }
                 return "{success:true}";
             }
@@ -395,7 +396,7 @@ namespace MvcPlatform.Controllers
             string AssociateNo = ""; string AssociateNo2 = "";//两单关联号
             string CorrespondNo = "";//多单关联号 
             string original_codes = json_head1.Value<string>("ORDERCODES");//旧的订单号
-            string insert_sql = ""; string update_sql = ""; string sql = ""; string ordercode = ""; 
+            string insert_sql = ""; string update_sql = ""; string sql = ""; string ordercode = "";
 
             if (json_head1.Value<string>("IETYPE") == "进/出口业务")//根据顶部表单的进出类型生成或者获取订单编号
             {
@@ -456,7 +457,7 @@ namespace MvcPlatform.Controllers
 
             //比对新的订单号和前端已经存在的订单号 删除已经废弃的订单号及其相关表记录           
             Del_Order(original_codes);
-                       
+
             insert_sql = @"INSERT INTO LIST_ORDER (ID
                                 ,BUSITYPE,ASSOCIATEPEDECLNO,CODE,CUSNO,BUSIUNITCODE,BUSIUNITNAME
                                 ,CONTRACTNO,GOODSNUM,CLEARANCENO,LAWFLAG,ENTRUSTTYPE
@@ -479,8 +480,8 @@ namespace MvcPlatform.Controllers
                                 ,'{36}','{37}','{38}','{39}','{40}'
                                 ,'{41}',sysdate,{42},'{43}','{44}'
                                 ,'{45}'
-                                )";           
-           
+                                )";
+
             update_sql = @"update LIST_ORDER  SET ASSOCIATEPEDECLNO='{0}',CUSNO='{1}',BUSIUNITCODE='{2}',BUSIUNITNAME='{3}',CONTRACTNO='{4}',GOODSNUM='{5}'
                                     ,CLEARANCENO='{6}',LAWFLAG='{7}',ENTRUSTTYPE='{8}' ,REPWAYID='{9}',CUSTOMAREACODE='{10}'
                                     ,REPUNITCODE='{11}',REPUNITNAME='{12}',DECLWAY='{13}',INSPUNITCODE='{14}',INSPUNITNAME='{15}'
@@ -496,7 +497,7 @@ namespace MvcPlatform.Controllers
             }
             update_sql += @" WHERE CODE = '{36}'";
 
-            
+
             string exe_desc = "";//订单保存时记录各订单的执行情况
             int order_res = 1;
             if (!string.IsNullOrEmpty(code1))//如果code1不为空 
@@ -518,11 +519,11 @@ namespace MvcPlatform.Controllers
                 {
                     sql = string.Format(insert_sql
                             , "41", json1.Value<string>("ASSOCIATEPEDECLNO"), code1, json1.Value<string>("CUSNO"), json1.Value<string>("BUSIUNITCODE"), json1.Value<string>("BUSIUNITNAME")
-                            , json1.Value<string>("CONTRACTNO"), json1.Value<string>("GOODSNUM"), json1.Value<string>("CLEARANCENO"),GetChk(json1.Value<string>("LAWFLAG")), json1.Value<string>("ENTRUSTTYPE")
-                            , json_head1.Value<string>("REPWAYID"),json_head1.Value<string>("CUSTOMAREACODE"), GetCode(json1.Value<string>("REPUNITCODE")),GetName(json1.Value<string>("REPUNITCODE")), json1.Value<string>("DECLWAY")
+                            , json1.Value<string>("CONTRACTNO"), json1.Value<string>("GOODSNUM"), json1.Value<string>("CLEARANCENO"), GetChk(json1.Value<string>("LAWFLAG")), json1.Value<string>("ENTRUSTTYPE")
+                            , json_head1.Value<string>("REPWAYID"), json_head1.Value<string>("CUSTOMAREACODE"), GetCode(json1.Value<string>("REPUNITCODE")), GetName(json1.Value<string>("REPUNITCODE")), json1.Value<string>("DECLWAY")
                             , GetCode(json1.Value<string>("INSPUNITCODE")), GetName(json1.Value<string>("INSPUNITCODE")), json1.Value<string>("ORDERREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
                             , json1.Value<string>("STATUS"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json1.Value<string>("TRADEWAYCODES"), AssociateNo
-                            , CorrespondNo, json1.Value<string>("PACKKIND"), json1.Value<string>("GOODSGW"), json1.Value<string>("GOODSNW"),json1.Value<string>("RECORDCODE")
+                            , CorrespondNo, json1.Value<string>("PACKKIND"), json1.Value<string>("GOODSGW"), json1.Value<string>("GOODSNW"), json1.Value<string>("RECORDCODE")
                             , json_head1.Value<string>("IETYPE"), GetChk(json1.Value<string>("SPECIALRELATIONSHIP")), GetChk(json1.Value<string>("PRICEIMPACT")), GetChk(json1.Value<string>("PAYPOYALTIES")), json_head1.Value<string>("SUBMITUSERNAME")
                             , json_head1.Value<string>("SUBMITUSERID"), json1.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_user.Value<string>("CUSTOMERCODE")
                             , json_user.Value<string>("CUSTOMERNAME"), json_head1.Value<string>("SUBMITTIME"), json_head1.Value<string>("CUSTOMAREACODE"), json1.Value<string>("DECLSTATUS")
@@ -554,7 +555,7 @@ namespace MvcPlatform.Controllers
                 {
                     exe_desc = "订单：" + code1 + "保存失败!<br />";
                 }
-                
+
                 Extension.add_list_time(json1.Value<Int32>("STATUS"), code1, json_user);
             }
 
@@ -575,14 +576,14 @@ namespace MvcPlatform.Controllers
 
                 if (string.IsNullOrEmpty(json2.Value<string>("CODE")))//新增
                 {
-                    sql = string.Format(insert_sql, "40", json2.Value<string>("ASSOCIATEPEDECLNO"), code2, json2.Value<string>("CUSNO"), json2.Value<string>("BUSIUNITCODE"),json2.Value<string>("BUSIUNITNAME")
+                    sql = string.Format(insert_sql, "40", json2.Value<string>("ASSOCIATEPEDECLNO"), code2, json2.Value<string>("CUSNO"), json2.Value<string>("BUSIUNITCODE"), json2.Value<string>("BUSIUNITNAME")
                             , json2.Value<string>("CONTRACTNO"), json2.Value<string>("GOODSNUM"), json2.Value<string>("CLEARANCENO"), GetChk(json2.Value<string>("LAWFLAG")), json2.Value<string>("ENTRUSTTYPE")
                             , json_head1.Value<string>("REPWAYID"), json_head1.Value<string>("CUSTOMAREACODE"), GetCode(json2.Value<string>("REPUNITCODE")), GetName(json2.Value<string>("REPUNITCODE")), json2.Value<string>("DECLWAY")
                             , GetCode(json2.Value<string>("INSPUNITCODE")), GetName(json2.Value<string>("INSPUNITCODE")), json2.Value<string>("ORDERREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
                             , json2.Value<string>("STATUS"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json2.Value<string>("TRADEWAYCODES"), AssociateNo
-                            , CorrespondNo, json2.Value<string>("PACKKIND"), json2.Value<string>("GOODSGW"), json2.Value<string>("GOODSNW"),json2.Value<string>("RECORDCODE")
+                            , CorrespondNo, json2.Value<string>("PACKKIND"), json2.Value<string>("GOODSGW"), json2.Value<string>("GOODSNW"), json2.Value<string>("RECORDCODE")
                             , json_head1.Value<string>("IETYPE"), GetChk(json2.Value<string>("SPECIALRELATIONSHIP")), GetChk(json2.Value<string>("PRICEIMPACT")), GetChk(json2.Value<string>("PAYPOYALTIES")), json_head1.Value<string>("SUBMITUSERNAME")
-                            , json_head1.Value<string>("SUBMITUSERID"), json2.Value<string>("ASSOCIATETRADEWAY"),"002", "1", json_user.Value<string>("CUSTOMERCODE")
+                            , json_head1.Value<string>("SUBMITUSERID"), json2.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_user.Value<string>("CUSTOMERCODE")
                             , json_user.Value<string>("CUSTOMERNAME"), json_head1.Value<string>("SUBMITTIME"), json_head1.Value<string>("CUSTOMAREACODE"), json2.Value<string>("DECLSTATUS")
                             , json2.Value<string>("INSPSTATUS")
                          );
@@ -611,7 +612,7 @@ namespace MvcPlatform.Controllers
                 {
                     exe_desc = "订单：" + code2 + "保存失败!<br />";
                 }
-                
+
                 Extension.add_list_time(json2.Value<Int32>("STATUS"), code2, json_user);
             }
             if (!string.IsNullOrEmpty(code3))
@@ -657,8 +658,8 @@ namespace MvcPlatform.Controllers
                             , json_head2.Value<string>("SUBMITUSERID"), json3.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_head2.Value<string>("CUSTOMAREACODE")
                             , code3, json3.Value<string>("DECLSTATUS"), json3.Value<string>("INSPSTATUS")
                             );
-                         
-                         
+
+
                     if (json3.Value<Int32>("STATUS") >= 20)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
                     {
                         Extension.Insert_FieldUpdate_History(code3, json3, json_user, "41");
@@ -670,7 +671,7 @@ namespace MvcPlatform.Controllers
                 {
                     exe_desc = "订单：" + code3 + "保存失败!<br />";
                 }
-                
+
                 Extension.add_list_time(json3.Value<Int32>("STATUS"), code3, json_user);
             }
             if (!string.IsNullOrEmpty(code4))
@@ -693,7 +694,7 @@ namespace MvcPlatform.Controllers
                     sql = string.Format(insert_sql
                             , "40", json4.Value<string>("ASSOCIATEPEDECLNO"), code4, json4.Value<string>("CUSNO"), json4.Value<string>("BUSIUNITCODE"), json4.Value<string>("BUSIUNITNAME")
                             , json4.Value<string>("CONTRACTNO"), json4.Value<string>("GOODSNUM"), json4.Value<string>("CLEARANCENO"), GetChk(json4.Value<string>("LAWFLAG")), json4.Value<string>("ENTRUSTTYPE")
-                            , json_head2.Value<string>("REPWAYID"),json_head2.Value<string>("CUSTOMAREACODE"), GetCode(json4.Value<string>("REPUNITCODE")),GetName(json4.Value<string>("REPUNITCODE")), json4.Value<string>("DECLWAY")
+                            , json_head2.Value<string>("REPWAYID"), json_head2.Value<string>("CUSTOMAREACODE"), GetCode(json4.Value<string>("REPUNITCODE")), GetName(json4.Value<string>("REPUNITCODE")), json4.Value<string>("DECLWAY")
                             , GetCode(json4.Value<string>("INSPUNITCODE")), GetName(json4.Value<string>("INSPUNITCODE")), json4.Value<string>("ORDERREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
                             , json4.Value<string>("STATUS"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json4.Value<string>("TRADEWAYCODES"), AssociateNo2
                             , CorrespondNo, json4.Value<string>("PACKKIND"), json4.Value<string>("GOODSGW"), json4.Value<string>("GOODSNW"), json4.Value<string>("RECORDCODE")
@@ -707,7 +708,7 @@ namespace MvcPlatform.Controllers
                 }
                 else
                 {
-                    sql = string.Format(update_sql, json4.Value<string>("ASSOCIATEPEDECLNO"), json4.Value<string>("CUSNO"), json4.Value<string>("BUSIUNITCODE"),json4.Value<string>("BUSIUNITNAME"), json4.Value<string>("CONTRACTNO"), json4.Value<string>("GOODSNUM")
+                    sql = string.Format(update_sql, json4.Value<string>("ASSOCIATEPEDECLNO"), json4.Value<string>("CUSNO"), json4.Value<string>("BUSIUNITCODE"), json4.Value<string>("BUSIUNITNAME"), json4.Value<string>("CONTRACTNO"), json4.Value<string>("GOODSNUM")
                             , json4.Value<string>("CLEARANCENO"), GetChk(json4.Value<string>("LAWFLAG")), json4.Value<string>("ENTRUSTTYPE"), json_head2.Value<string>("REPWAYID"), json_head2.Value<string>("CUSTOMAREACODE")
                             , GetCode(json4.Value<string>("REPUNITCODE")), GetName(json4.Value<string>("REPUNITCODE")), json4.Value<string>("DECLWAY"), GetCode(json4.Value<string>("INSPUNITCODE")), GetName(json4.Value<string>("INSPUNITCODE"))
                             , json4.Value<string>("ORDERREQUEST"), json4.Value<string>("TRADEWAYCODES"), AssociateNo2, CorrespondNo, json4.Value<string>("PACKKIND")
@@ -727,7 +728,7 @@ namespace MvcPlatform.Controllers
                 {
                     exe_desc = "订单：" + code4 + "保存失败!<br />";
                 }
-                
+
                 Extension.add_list_time(json4.Value<Int32>("STATUS"), code4, json_user);
             }
             string file_data1 = Request["file_data1"] + "";
@@ -737,8 +738,8 @@ namespace MvcPlatform.Controllers
             string file_data2 = Request["file_data2"] + "";
             string originalids2 = Request["originalids2"] + "";
             Update_Attachment(code3, code4, file_data2, originalids2);
-            
-           
+
+
             return "{ordercode:'" + ordercode + "',result:'" + exe_desc + "'}";
         }
 
@@ -1012,8 +1013,8 @@ namespace MvcPlatform.Controllers
             catch (Exception ex)
             {
                 result = "";//2016/9/26 add heguiqin:有可能输入的客户编号长度不对，导致operateid截取异常
-            }              
-                        
+            }
+
             return "{result:'" + result + "',data1:" + data1 + ",data2:" + data2 + ",data3:" + data3 + ",data4:" + data4 + "}";
         }
 

@@ -13,7 +13,7 @@
                 //2016-06-21发现工具栏迁移后IE下面上传控件功能异常 为此需要根据订单状态将上传按钮重新初始化一次
                 //四个订单的状态除了在草稿和文件已上传 后面所有的状态是一致的 所以只需要取原始订单的状态
                 //var status = Ext.getCmp('field_status1') ? Ext.getCmp('field_status1').getValue() : Ext.getCmp('field_status2').getValue();
-                var status = formpanelin.isVisible() ? Ext.getCmp('field_status1').getValue() : Ext.getCmp('field_status2').getValue();                
+                var status = formpanelin.isVisible() ? Ext.getCmp('field_status1').getValue() : Ext.getCmp('field_status2').getValue();
                 button_control(status);
             }
         }
@@ -28,18 +28,36 @@ function loadform() {
         success: function (response, opts) {
             var data = Ext.decode(response.responseText);
             formpanelhead.getForm().setValues(data.data1.IETYPE ? data.data1 : data.data2);
-            Ext.getCmp("field_ordercodes").setValue(data.ORDERCODES);//记录所有已经存在的订单号,方便改变进出口类型时进行比对    
-            repunitcode = data.data1.REPUNITCODE.length != 2 ? data.data1.REPUNITCODE : data.data2.REPUNITCODE;//初始化报关报检单位
-            inspunitcode = data.data1.INSPUNITCODE.length != 2 ? data.data1.INSPUNITCODE : data.data2.INSPUNITCODE;
-            if (repunitcode.length == 2)
-                repunitcode = "";
-            if (inspunitcode.length == 2)
-                inspunitcode = "";
-                
+            Ext.getCmp("field_ordercodes").setValue(data.ORDERCODES);//记录所有已经存在的订单号,方便改变进出口类型时进行比对  
+            //因为REPUNITCODE拼接过了,所以用REPUNITNAME判断
+            if (data.data1.REPUNITNAME) {
+                repunitcode1 = data.data1.REPUNITCODE;
+            }
+            if (data.data1.INSPUNITNAME) {
+                inspunitcode1 = data.data1.INSPUNITCODE;
+            }
+            if (data.data2.REPUNITNAME) {
+                repunitcode2 = data.data2.REPUNITCODE;
+            }
+            if (data.data2.INSPUNITNAME) {
+                inspunitcode2 = data.data2.INSPUNITCODE;
+            }
+            if (data.data3.REPUNITNAME) {
+                repunitcode3 = data.data3.REPUNITCODE;
+            }
+            if (data.data3.INSPUNITNAME) {
+                inspunitcode3 = data.data3.INSPUNITCODE;
+            }
+            if (data.data4.REPUNITNAME) {
+                repunitcode4 = data.data4.REPUNITCODE;
+            }
+            if (data.data4.INSPUNITNAME) {
+                inspunitcode4 = data.data4.INSPUNITCODE;
+            } 
             formpanelin.getForm().setValues(data.data1);
             form_control(data.data1, 1);
             readonly_init(formpanelin, formpanelhead, 1);
-           
+
             formpanelout.getForm().setValues(data.data2);
             form_control(data.data2, 2);
             readonly_init(formpanelout, formpanelhead, 2);//设置控件只读
@@ -50,7 +68,7 @@ function loadform() {
             Ext.each(store_file1.data.items, function (rec) {
                 fileids1 += rec.get("ID") + ",";
             })
-            
+
             //记录当前的订单状态,方便进行按钮及其他控制 取原始订单某一个订单的状态即可
             var status = formpanelin.isVisible() ? Ext.getCmp('field_status1').getValue() : Ext.getCmp('field_status2').getValue();
             button_control(status);//按钮的控制
@@ -135,7 +153,7 @@ function readonly_init(formpanel_tmp, formhead_tmp, index) {
         if (Ext.getCmp('tf_bgsbdw' + index)) {
             if (Ext.getCmp('tf_bjsbdw' + index).getValue()) {
                 Ext.getCmp('bgsbdw_btn' + index).setDisabled(status >= 15);
-            }            
+            }
         }
         if (Ext.getCmp('tf_bjsbdw' + index)) {
             if (Ext.getCmp('tf_bjsbdw' + index).getValue()) {
@@ -164,7 +182,7 @@ function button_control(status) {
                 }
             }
         })
-    } 
+    }
     if (status < 15) {
         upload_ini(); //未提交时才初始化上传控件 
     }
@@ -183,7 +201,7 @@ function bg_bj_sbdw_control(cb, index) {
     if (cb.getValue() == '01')//仅报关 repunitcode, inspunitcode
     {
         bgsbdw_input.enable();
-        bgsbdw_input.setValue(repunitcode);
+        bgsbdw_input.setValue(eval('repunitcode' + index));
         bgsbdw_container.enable();
         bjsbdw_input.setValue('');
         bjsbdw_input.disable();
@@ -191,7 +209,7 @@ function bg_bj_sbdw_control(cb, index) {
     }
     if (cb.getValue() == '02') {
         bjsbdw_input.enable();
-        bjsbdw_input.setValue(inspunitcode);
+        bjsbdw_input.setValue(eval('inspunitcode' + index));
         bjsbdw_container.enable();
         bgsbdw_input.setValue('');
         bgsbdw_input.disable();
@@ -199,10 +217,10 @@ function bg_bj_sbdw_control(cb, index) {
     }
     if (cb.getValue() == '03') {
         bgsbdw_input.enable();
-        bgsbdw_input.setValue(repunitcode);
+        bgsbdw_input.setValue(eval('repunitcode' + index));
         bgsbdw_container.enable();
         bjsbdw_input.enable();
-        bjsbdw_input.setValue(inspunitcode);
+        bjsbdw_input.setValue(eval('inspunitcode' + index));
         bjsbdw_container.enable();
     }
 }
@@ -340,11 +358,11 @@ function get_orderfile_fromerp(mask) {
                     Ext.each(data.filedata4, function (item) {
                         store_file2.insert(store_file2.data.length, { FILENAME: '/FileUpload/file/' + item.MAINNAME.substr(item.MAINNAME.lastIndexOf("CustomsFile") + 11), ORIGINALNAME: item.MAINNAME.substr(item.MAINNAME.lastIndexOf("CustomsFile") + 11), SIZES: item.FILE_SIZE, FILETYPENAME: "订单文件", FILETYPE: "44", IETYPE: '仅出口', UPLOADTIME: Ext.Date.format(date, 'Y-m-d H:i:s') });
                     })
-                } 
+                }
                 mask.hide();
                 Ext.MessageBox.alert("提示", "数据导入成功！");
             }
-        }); 
+        });
     }
     else {
         mask.hide();
