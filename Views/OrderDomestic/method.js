@@ -30,30 +30,55 @@ function loadform() {
             formpanelhead.getForm().setValues(data.data1.IETYPE ? data.data1 : data.data2);
             Ext.getCmp("field_ordercodes").setValue(data.ORDERCODES);//记录所有已经存在的订单号,方便改变进出口类型时进行比对  
             //因为REPUNITCODE拼接过了,所以用REPUNITNAME判断
+            //if (data.data1.REPUNITNAME) {
+            //    repunitcode1 = data.data1.REPUNITCODE;
+            //}
+            //if (data.data1.INSPUNITNAME) {
+            //    inspunitcode1 = data.data1.INSPUNITCODE;
+            //}
+            //if (data.data2.REPUNITNAME) {
+            //    repunitcode2 = data.data2.REPUNITCODE;
+            //}
+            //if (data.data2.INSPUNITNAME) {
+            //    inspunitcode2 = data.data2.INSPUNITCODE;
+            //}
+            //if (data.data3.REPUNITNAME) {
+            //    repunitcode3 = data.data3.REPUNITCODE;
+            //}
+            //if (data.data3.INSPUNITNAME) {
+            //    inspunitcode3 = data.data3.INSPUNITCODE;
+            //}
+            //if (data.data4.REPUNITNAME) {
+            //    repunitcode4 = data.data4.REPUNITCODE;
+            //}
+            //if (data.data4.INSPUNITNAME) {
+            //    inspunitcode4 = data.data4.INSPUNITCODE;
+            //}
             if (data.data1.REPUNITNAME) {
-                repunitcode1 = data.data1.REPUNITCODE;
+                repunitcode1 = data.data1.REPUNITNAME + '(' + data.data1.REPUNITCODE + ')';
             }
             if (data.data1.INSPUNITNAME) {
-                inspunitcode1 = data.data1.INSPUNITCODE;
+                inspunitcode1 = data.data1.INSPUNITNAME + '(' + data.data1.INSPUNITCODE + ')';
             }
             if (data.data2.REPUNITNAME) {
-                repunitcode2 = data.data2.REPUNITCODE;
+                repunitcode2 = data.data2.REPUNITNAME + '(' + data.data2.REPUNITCODE + ')';
             }
             if (data.data2.INSPUNITNAME) {
-                inspunitcode2 = data.data2.INSPUNITCODE;
+                inspunitcode2 = data.data2.INSPUNITNAME + '(' + data.data2.INSPUNITCODE + ')';
             }
             if (data.data3.REPUNITNAME) {
-                repunitcode3 = data.data3.REPUNITCODE;
+                repunitcode3 = data.data3.REPUNITNAME + '(' + data.data3.REPUNITCODE + ')';
             }
             if (data.data3.INSPUNITNAME) {
-                inspunitcode3 = data.data3.INSPUNITCODE;
+                inspunitcode3 = data.data3.INSPUNITNAME + '(' + data.data3.INSPUNITCODE + ')';
             }
             if (data.data4.REPUNITNAME) {
-                repunitcode4 = data.data4.REPUNITCODE;
+                repunitcode4 = data.data4.REPUNITNAME + '(' + data.data4.REPUNITCODE + ')';
             }
             if (data.data4.INSPUNITNAME) {
-                inspunitcode4 = data.data4.INSPUNITCODE;
-            } 
+                inspunitcode4 = data.data4.INSPUNITNAME + '(' + data.data4.INSPUNITCODE + ')';
+            }
+           
             formpanelin.getForm().setValues(data.data1);
             form_control(data.data1, 1);
             readonly_init(formpanelin, formpanelhead, 1);
