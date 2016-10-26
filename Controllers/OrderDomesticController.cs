@@ -544,7 +544,7 @@ namespace MvcPlatform.Controllers
                             , code1, json1.Value<string>("DECLSTATUS"), json1.Value<string>("INSPSTATUS")
                              );
 
-                    if (json1.Value<Int32>("STATUS") > 10)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
+                    if (json1.Value<Int32>("STATUS") >= 15)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
                     {
                         Extension.Insert_FieldUpdate_History(code1, json1, json_user, "41");
                     }
@@ -601,7 +601,7 @@ namespace MvcPlatform.Controllers
                             , json_head1.Value<string>("SUBMITUSERID"), json2.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_head1.Value<string>("CUSTOMAREACODE")
                             , code2, json2.Value<string>("DECLSTATUS"), json2.Value<string>("INSPSTATUS")
                          );
-                    if (json2.Value<Int32>("STATUS") >= 20)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
+                    if (json2.Value<Int32>("STATUS") >= 15)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
                     {
                         Extension.Insert_FieldUpdate_History(code2, json2, json_user, "40");
                     }
@@ -660,7 +660,7 @@ namespace MvcPlatform.Controllers
                             );
 
 
-                    if (json3.Value<Int32>("STATUS") >= 20)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
+                    if (json3.Value<Int32>("STATUS") >= 15)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
                     {
                         Extension.Insert_FieldUpdate_History(code3, json3, json_user, "41");
                     }
@@ -717,7 +717,7 @@ namespace MvcPlatform.Controllers
                             , json_head2.Value<string>("SUBMITUSERID"), json4.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_head2.Value<string>("CUSTOMAREACODE")
                             , code4, json4.Value<string>("DECLSTATUS"), json4.Value<string>("INSPSTATUS")
                          );
-                    if (json4.Value<Int32>("STATUS") >= 20)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
+                    if (json4.Value<Int32>("STATUS") >= 15)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
                     {
                         Extension.Insert_FieldUpdate_History(code4, json4, json_user, "40");
                     }
