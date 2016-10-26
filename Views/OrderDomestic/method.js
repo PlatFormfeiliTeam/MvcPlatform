@@ -138,33 +138,33 @@ function readonly_init(formpanel_tmp, formhead_tmp, index) {
 
         Ext.Array.each(formpanel_tmp.getForm().getFields().items, function (item) {
             if (item.value != "" && item.value != null && item.value != undefined && item.id != 'field_ORDERREQUEST' + index && item.id != "field_status" + index && item.id != "tf_bgsbdw" + index && item.id != "tf_bjsbdw" + index) {
-                item.setReadOnly(status >= 15);
+                item.setReadOnly(status >= 10);
             }
         });
         Ext.Array.each(formhead_tmp.getForm().getFields().items, function (item) {
             if (item.value != "" && item.value != null && item.value != undefined) {
-                item.setReadOnly(status >= 15);
+                item.setReadOnly(status >= 10);
             }
         });
 
-        Ext.getCmp('jydw_btn' + index).setDisabled(status >= 15);
-        Ext.getCmp("myfs_btn" + index).setDisabled(status >= 15);
+        Ext.getCmp('jydw_btn' + index).setDisabled(status >= 10);
+        Ext.getCmp("myfs_btn" + index).setDisabled(status >= 10);
 
         if (Ext.getCmp('tf_bgsbdw' + index)) {
             if (Ext.getCmp('tf_bjsbdw' + index).getValue()) {
-                Ext.getCmp('bgsbdw_btn' + index).setDisabled(status >= 15);
+                Ext.getCmp('bgsbdw_btn' + index).setDisabled(status >= 10);
             }
         }
         if (Ext.getCmp('tf_bjsbdw' + index)) {
             if (Ext.getCmp('tf_bjsbdw' + index).getValue()) {
-                Ext.getCmp('bjsbdw_btn' + index).setDisabled(status >= 15);
+                Ext.getCmp('bjsbdw_btn' + index).setDisabled(status >= 10);
             }
         }
     }
 }
 
 function button_control(status) {
-    if (status >= 15) {
+    if (status >= 10) {
         Ext.Ajax.request({//上传文件按钮除了基本的控制外，还有一种情形就是当后台开启上传权限的数量，即使提交还是可以上传的16050508667
             url: "/OrderDomestic/AdditionFile",
             params: { ORDERCODE: ordercode },
@@ -183,14 +183,14 @@ function button_control(status) {
             }
         })
     }
-    if (status < 15) {
+    if (status < 10) {
         upload_ini(); //未提交时才初始化上传控件 
     }
     //上传按钮---已受理后正常情况下不允许上传文件   
-    document.getElementById("deletefile").disabled = status >= 15; //删除按钮  --提交后不允许删除setVisibilityMode
-    document.getElementById("btn_cancelsubmit").disabled = status != 15;//撤单按钮  只有在提交后受理前才可以撤单
-    document.getElementById("btn_addlinkorder").disabled = status >= 15;//新增关联订单
-    document.getElementById("btn_submitorder").disabled = status >= 15;//提交按钮     
+    document.getElementById("deletefile").disabled = status >= 10; //删除按钮  --提交后不允许删除setVisibilityMode
+    document.getElementById("btn_cancelsubmit").disabled = status != 10;//撤单按钮  只有在提交后受理前才可以撤单
+    document.getElementById("btn_addlinkorder").disabled = status >= 10;//新增关联订单
+    document.getElementById("btn_submitorder").disabled = status >= 10;//提交按钮     
 }
 
 function bg_bj_sbdw_control(cb, index) {
@@ -283,7 +283,7 @@ function importorder() {
                 if (data.result == "true") {
                     //相同则判断订单状态是草稿或者文件已上传时直接覆盖界面数据；如果已委托的订单，则只修改空白字段
                     var status = Ext.getCmp('field_status1') ? Ext.getCmp('field_status1').getValue() : Ext.getCmp('field_status2').getValue();
-                    if (status < 15) {
+                    if (status < 10) {
                         formpanelhead.getForm().setValues(data.data1.CUSNO ? data.data1 : data.data2);
                         formpanelin.getForm().setValues(data.data1);
                         formpanelout.getForm().setValues(data.data2);
@@ -303,7 +303,7 @@ function importorder() {
                             tabpanel.add({ title: '关联订单', closable: true, items: [formpanelhead2, formpanelin2, formpanelout2, panel_file2] });
                         }
                         var task = new Ext.util.DelayedTask(function () { //需要在此做一些延迟处理 有可能界面还未初始化完成直接赋值可能会失败
-                            if (status < 15) {
+                            if (status < 10) {
                                 formpanelhead2.getForm().setValues(data.data3);
                                 formpanelin2.getForm().setValues(data.data3);
                                 formpanelout2.getForm().setValues(data.data4);
@@ -334,7 +334,7 @@ function importorder() {
 function get_orderfile_fromerp(mask) {
     var status = Ext.getCmp('field_status1') ? Ext.getCmp('field_status1').getValue() : Ext.getCmp('field_status2').getValue();
     //提交后的订单,再次从ERP获取信息时，如果已提交不需要重新加载文件   
-    if (status < 15) {
+    if (status < 10) {
         Ext.Ajax.request({
             url: "/OrderDomestic/getErpfile_kunshan",
             params: { 'operation_id': Ext.String.trim(Ext.getCmp('NUMBER').getValue()) },
@@ -507,11 +507,11 @@ function order_cancel_submit() {//撤单,防止页面停留后后台已经受理
         params: { ordercode: ordercode },
         success: function (response, opts) {
             var json = Ext.decode(response.responseText);
-            if (json.STATUS > 15) {
+            if (json.STATUS > 10) {
                 Ext.MessageBox.alert("提示", "已受理的订单不能执行撤单操作！");
                 return;
             }
-            if (json.STATUS == 15 && json.ORDERWAY == "1") {//线上订单已委托，执行撤单功能    
+            if (json.STATUS == 10 && json.ORDERWAY == "1") {//线上订单已委托，执行撤单功能    
                 Ext.MessageBox.confirm("提示", "确定要执行撤单操作吗？", function (btn) {
                     if (btn == "yes") {
                         Ext.Ajax.request({
@@ -539,7 +539,7 @@ function order_cancel_submit() {//撤单,防止页面停留后后台已经受理
 function save(action) {
     //提交后的订单如果开启的文件上传按钮，且已经上传了 
     var status = Ext.getCmp('field_status1') ? Ext.getCmp('field_status1').getValue() : Ext.getCmp('field_status2').getValue();
-    if (status >= 15) {
+    if (status >= 10) {
         if ((store_file1.getModifiedRecords().length > 0) || (store_file2 && store_file2.getModifiedRecords().length > 0)) {
             Ext.getCmp("file_addition").setValue(ordercode);
         }
@@ -633,7 +633,7 @@ function save(action) {
 }
 
 function submit() {
-    if (Ext.getCmp('field_status1').getValue() >= 15) {//15表示订单已委托    
+    if (Ext.getCmp('field_status1').getValue() >= 10) {//10表示订单已委托    
         Ext.MessageBox.alert('提示', '已委托的订单不能再次提交！');
         return;
     }
