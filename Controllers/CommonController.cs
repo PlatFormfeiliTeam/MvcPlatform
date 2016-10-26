@@ -893,7 +893,7 @@ namespace MvcPlatform.Controllers
                     //add 2016/10/9 by heguiqin
                     string WEIGHTCHECK = "";
                     sql = "select * from Sys_Customer where ID='" + json_user.Value<string>("CUSTOMERID") + "' AND instr(BUSITYPES,'" + Request["busitype"] + "')>0 AND ENABLED=1 AND ROWNUM=1";//根据客户ID，查询需自审，需重量确认
-                    dt = DBMgr.GetDataTable(sql);
+                    dt = DBMgrBase.GetDataTable(sql);
                     if (dt.Rows.Count > 0)
                     {
                         WEIGHTCHECK = dt.Rows[0]["WEIGHTCHECK"].ToString();
@@ -1075,7 +1075,7 @@ namespace MvcPlatform.Controllers
                          cus.SCENEDECLAREID                                                                          
                          from list_declaration det 
                               left join list_order ort on det.ordercode = ort.code 
-                              left join sys_customer cus on ort.customercode = cus.code 
+                              left join cusdoc.sys_customer cus on ort.customercode = cus.code 
                          where DECLSTATUS=130 and det.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where;//(ort.DECLPDF =1 or ort.PREPDF=1) 
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
@@ -1769,7 +1769,7 @@ namespace MvcPlatform.Controllers
                          FROM list_inspection li 
                          LEFT JOIN list_preinspection lp ON li.preinspcode = lp.preinspcode
                          LEFT JOIN list_order lo ON li.ordercode = lo.code 
-                         left join sys_customer cus on ort.customercode=cus.code 
+                         left join cusdoc.sys_customer cus on ort.customercode=cus.code 
                          left join base_insppackage bi on lp.packagetype=bi.code
                          left join sys_REPORTLIBRARY sr on sr.code=lp.DECLTYPE 
                          WHERE li.STATUS >=103 and INSTR('" + busitypeid + "',li.busitype)>0 " + where;*/
@@ -1783,7 +1783,7 @@ namespace MvcPlatform.Controllers
                               ,cus.SCENEINSPECTID    
                             FROM list_inspection li 
                                  LEFT JOIN list_order lo ON li.ordercode = lo.code 
-                                 left join sys_customer cus on lo.customercode=cus.code 
+                                 left join cusdoc.sys_customer cus on lo.customercode=cus.code 
                             WHERE li.STATUS >=103  and INSTR('" + busitypeid + "',lo.busitype)>0 " + where;
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
@@ -1815,7 +1815,7 @@ namespace MvcPlatform.Controllers
             if (customerId > 0)
             {
                 string erpCodeSql = "select INTERFACECODE from sys_customer where id = " + customerId;
-                DataTable erpCodeDt = DBMgr.GetDataTable(erpCodeSql);
+                DataTable erpCodeDt = DBMgrBase.GetDataTable(erpCodeSql);
                 if (erpCodeDt.Rows[0]["INTERFACECODE"] != null)
                 {
                     erpCode = (erpCodeDt.Rows[0]["INTERFACECODE"]).ToString();

@@ -46,9 +46,9 @@ namespace MvcPlatform.Common
                 string sql = @"select c.NAME as CUSTOMERNAME,c.HSCODE as CUSTOMERHSCODE,c.CIQCODE as CUSTOMERCIQCODE,c.CODE CUSTOMERCODE,
                              c.SCENEDECLAREID,c.SCENEINSPECTID,d.NAME as REPUNITNAME,e.NAME as INSPUNITNAME,u.* from SYS_USER u 
                              left join sys_customer c on u.customerid = c.id 
-                             left join cusdoc.base_company d on c.hscode=d.code
-                             left join cusdoc.base_company e on c.ciqcode=e.INSPCODE where u.name ='" + account + "'";
-                DataTable dt = DBMgr.GetDataTable(sql);
+                             left join base_company d on c.hscode=d.code
+                             left join base_company e on c.ciqcode=e.INSPCODE where u.name ='" + account + "'";
+                DataTable dt = DBMgrBase.GetDataTable(sql);
                 IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
                 iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 string jsonstr = JsonConvert.SerializeObject(dt, iso);

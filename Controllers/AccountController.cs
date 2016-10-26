@@ -91,7 +91,7 @@ namespace MvcPlatform.Controllers
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string sql = @"select t.CUSTOMERID,t.NAME,t.EMAIL,t.TELEPHONE,t.MOBILEPHONE,t.IMGPATH,t.COMPANYNAMES,t.TYPE,t.REALNAME,
                          b.SCENEDECLAREID,b.SCENEINSPECTID,b.Name COMPANYNAME,b.ISCUSTOMER,b.WEIGHTCHECK,b.BUSITYPES
-                         from Sys_User t left join Sys_Customer b on t.CustomerId=b.Id
+                         from Sys_User t left join cusdoc.Sys_Customer b on t.CustomerId=b.Id
                          where t.id='" + json_user.GetValue("ID") + "'";
             DataTable dt = DBMgr.GetDataTable(sql);
             string json = JsonConvert.SerializeObject(dt);
@@ -123,7 +123,7 @@ namespace MvcPlatform.Controllers
         public string LoadSupplier()
         {
             string sql = "select t.* from sys_customer t where t.enabled=1 and t.isshipper=1";
-            DataTable dt = DBMgr.GetDataTable(sql);
+            DataTable dt = DBMgrBase.GetDataTable(sql);
             string json = JsonConvert.SerializeObject(dt);
             return "{success:true,rows:" + json + "}";
         }
@@ -136,7 +136,7 @@ namespace MvcPlatform.Controllers
                 JObject json = (JObject)JsonConvert.DeserializeObject(data);
                 string sql = @"update sys_customer set WEIGHTCHECK='{0}',BUSITYPES='{1}' where id='{2}'";
                 sql = string.Format(sql,json.Value<string>("WEIGHTCHECK") == "on" ? 1 : 0, Request["busitypes"], json.Value<string>("CUSTOMERID"));
-                int result = DBMgr.ExecuteNonQuery(sql);
+                int result = DBMgrBase.ExecuteNonQuery(sql);
                 return "{result:'" + result + "'}";
             }
             catch (Exception ex)
@@ -389,7 +389,7 @@ namespace MvcPlatform.Controllers
             JObject json = (JObject)JsonConvert.DeserializeObject(data);
             string sql = @"update sys_customer set SCENEDECLAREID='{0}',SCENEINSPECTID='{1}' where id='{2}'";
             sql = string.Format(sql, json.Value<string>("SCENEDECLAREID"), json.Value<string>("SCENEINSPECTID"), json.Value<string>("CUSTOMERID"));
-            int result = DBMgr.ExecuteNonQuery(sql);
+            int result = DBMgrBase.ExecuteNonQuery(sql);
             return "{result:'" + result + "'}";
         }
 
