@@ -9,7 +9,7 @@
     <script type="text/javascript" src="/js/upload/plupload.full.min.js"></script>
     <link href="/js/Extjs42/resources/css/ext-all-gray.css" rel="stylesheet" type="text/css" />
     <script src="/js/Extjs42/bootstrap.js" type="text/javascript"></script>
-
+    <script src="/js/commondata.js"></script>
     <script src="/js/pan.js" type="text/javascript"></script>
     <script src="/js/BatchMaintain.js"></script>
 
@@ -107,30 +107,30 @@
                         renderTo: 'gridpanel',
                         store: store_Trade,
                         tbar: grid_tbar,
-                        minHeight: 250,
+                        height: 250,
                         selModel: { selType: 'checkboxmodel' },
                         columns: [
                             { xtype: 'rownumberer', width: 0 },
                             { header: 'ID', dataIndex: 'ID', hidden: true },
-                            { header: '报关状态', dataIndex: 'DECLSTATUS', width: 75, renderer: renderOrder },
-                            { header: '报检状态', dataIndex: 'INSPSTATUS', width: 75, renderer: renderOrder },
-                            { header: '订单编号', dataIndex: 'CODE', width: 90 },
-                            { header: '客户编号', dataIndex: 'CUSNO', width: 120 },
-                            { header: '经营单位', dataIndex: 'BUSIUNITNAME', minWidth: 200 },
-                            { header: '申报关区', dataIndex: 'CUSTOMAREACODE', width: 100 },
-                            { header: '总单号', dataIndex: 'TOTALNO', width: 100, hidden: !(type == 'KYJK' || type == 'KYCK') },
-                            { header: '转关预录号', dataIndex: 'TURNPRENO', width: 120, hidden: !(type == 'KYJK' || type == 'HYJK') },
-                            { header: '木质包装', dataIndex: 'WOODPACKINGID', renderer: renderOrder, width: 180, hidden: !(type == 'KYJK' || type == 'HYJK' || type == 'LYJK') },
-                            { header: '进出口岸', dataIndex: 'PORTCODE', width: 100, hidden: !(type == 'KYCK' || type == 'HYJK' || type == 'HYCK' || type == 'LYCK') },
-                            { header: '船名', dataIndex: 'SHIPNAME', width: 100, hidden: !(type == 'HYCK') },
-                            { header: '船次', dataIndex: 'FILGHTNO', width: 100, hidden: !(type == 'HYCK') },
-                            { header: '提单号', dataIndex: 'SECONDLADINGBILLNO', width: 100, hidden: !(type == 'HYCK' || type == 'LYJK') },
-                            { header: '运抵编号', dataIndex: 'ARRIVEDNO', width: 100, hidden: !(type == 'HYCK' || type == 'LYCK') },
-                            { header: '载货清单号', dataIndex: 'MANIFEST', width: 100, hidden: !(type == 'LYJK') },
-                            { header: '对方转关号', dataIndex: 'TURNPRENO', width: 100, hidden: !(type == 'TSQY') },
+                            { header: '报关状态', dataIndex: 'DECLSTATUS', width: 90, renderer: renderOrder, locked: true },
+                            { header: '报检状态', dataIndex: 'INSPSTATUS', width: 90, renderer: renderOrder, locked: true },
+                            { header: '订单编号', dataIndex: 'CODE', width: 120, locked: true },
+                            { header: '客户编号', dataIndex: 'CUSNO', width: 120, locked: true },
+                            { header: '经营单位', dataIndex: 'BUSIUNITNAME', minWidth: 200, locked: true },
+                            { header: '申报关区', dataIndex: 'CUSTOMAREACODE', width: 90 },
+                            { header: '总单号', dataIndex: 'TOTALNO', width: 90, hidden: !(type == 'KYJK' || type == 'KYCK') },
+                            { header: '转关预录号', dataIndex: 'TURNPRENO', width: 90, hidden: !(type == 'KYJK' || type == 'HYJK') },
+                            { header: '木质包装', dataIndex: 'WOODPACKINGID', renderer: renderOrder, width: 150, hidden: !(type == 'KYJK' || type == 'HYJK' || type == 'LYJK') },
+                            { header: '进出口岸', dataIndex: 'PORTCODE', width: 90, hidden: !(type == 'KYCK' || type == 'HYJK' || type == 'HYCK' || type == 'LYCK') },
+                            { header: '船名', dataIndex: 'SHIPNAME', width: 90, hidden: !(type == 'HYCK') },
+                            { header: '船次', dataIndex: 'FILGHTNO', width: 90, hidden: !(type == 'HYCK') },
+                            { header: '提单号', dataIndex: 'SECONDLADINGBILLNO', width: 120, hidden: !(type == 'HYCK' || type == 'LYJK') },
+                            { header: '运抵编号', dataIndex: 'ARRIVEDNO', width: 120, hidden: !(type == 'HYCK' || type == 'LYCK') },
+                            { header: '载货清单号', dataIndex: 'MANIFEST', width: 120, hidden: !(type == 'LYJK') },
+                            { header: '对方转关号', dataIndex: 'TURNPRENO', width: 120, hidden: !(type == 'TSQY') },
                             { header: '法检状况', dataIndex: 'LAWFLAG', renderer: renderOrder, width: 90, hidden: !(type == 'GNJZ') },
-                            { header: '报关车号', dataIndex: 'DECLCARNO', width: 100, hidden: (type == 'GNJZ') },
-                            { header: '备注', dataIndex: 'ORDERREQUEST', minWidth: 100, flex: 1 }
+                            { header: '报关车号', dataIndex: 'DECLCARNO', width: 120, hidden: (type == 'GNJZ') },
+                            { header: '备注', dataIndex: 'ORDERREQUEST', minWidth: 180, flex: 1 }
 
                         ],
                         listeners: //选项发生改变

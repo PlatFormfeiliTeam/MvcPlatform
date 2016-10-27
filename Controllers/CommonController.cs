@@ -2026,6 +2026,55 @@ namespace MvcPlatform.Controllers
             return "{rows:" + json + "}";
         }
 
+        public string BatchMaintainSave()
+        {
+            string ordercodes = Request["ordercodes"]; 
+            JObject json = (JObject)JsonConvert.DeserializeObject(Request["formdata"]); string filedata = Request["filedata"];
+            string sql = ""; bool IsCONTAINERTRUCK = false; string[] ordercodelist = ordercodes.Split(',');
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            foreach (JProperty jp in (JToken)json)
+            {
+                if (jp.Name != "CONTAINERTRUCK" && jp.Value.ToString() != "")
+                {
+                    sql += jp.Name + "='" + jp.Value.ToString() + "',";
+                }
+                if (jp.Name == "CONTAINERTRUCK" && jp.Value.ToString() != "")
+                {
+                    IsCONTAINERTRUCK = true;
+                }
+            }
+            if (sql != "")
+            {
+                sql = sql.Substring(0, sql.Length - 1);
+                sql = "update list_order set " + sql + " where code in ('" + ordercodes.Replace(",", "','") + "')";
+            }
+
+            int result = DBMgr.ExecuteNonQuery(sql);
+            if (result >= 1)
+            {
+                if (IsCONTAINERTRUCK) //集装箱及报关车号列表更新
+                {                   
+                    for (int i = 0; i < ordercodelist.Length; i++)
+                    {
+                        Extension.predeclcontainer_update(ordercodelist[i], json.Value<string>("CONTAINERTRUCK"));
+                    }
+                    
+                }
+                //更新随附文件 
+                for (int i = 0; i < ordercodelist.Length; i++)
+                {
+                    Extension.Update_Attachment(ordercodelist[i], filedata, json.Value<string>("ORIGINALFILEIDS"), json_user);
+                }
+
+                return "{success:true}";
+            }
+            else
+            {
+                return "{success:false}";
+            }
+        }
+
         public string loadOrderView()
         {
             string sql = @"select t.* from LIST_ORDER t where t.CODE = '" + Request["ordercode"] + "' and rownum=1";
