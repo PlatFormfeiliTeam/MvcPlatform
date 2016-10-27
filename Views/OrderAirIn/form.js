@@ -472,7 +472,7 @@
         xtype: 'fieldcontainer',
         fieldLabel: '毛重/净重',
         layout: 'hbox',
-        items: [{ id: 'GOODSGW', name: 'GOODSGW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 15, margin: 0, allowBlank: false, blankText: '不能为空!', hideTrigger: true, decimalPrecision: 4 },
+        items: [{ id: 'GOODSGW', name: 'GOODSGW', xtype: 'numberfield', flex: .5,tabIndex: 15, margin: 0, allowBlank: false, blankText: '不能为空!', hideTrigger: true, decimalPrecision: 4 },
                 { id: 'GOODSNW', name: 'GOODSNW', xtype: 'numberfield', flex: .5, msgTarget: 'qtip', tabIndex: 16, margin: 0, hideTrigger: true, decimalPrecision: 4 }]
     }
     //合同号
