@@ -102,6 +102,7 @@
 
                                     //保证载入跟踪信息及随附文件时传入的ordercode随订单类型改变的
                                     ordercode = newValue.ordergroup;
+                                    store_declaration.load();//再次加载
                                 }
                             }
                         })
@@ -111,13 +112,20 @@
                             proxy: {
                                 type: 'ajax',
                                 url: '/Common/LoadDeclaration',
-                                extraParams: { ORDERCODE: ordercode },
                                 reader: {
                                     root: 'rows',
                                     type: 'json'
                                 }
                             },
-                            autoLoad: true
+                            autoLoad: true,
+                            listeners: {
+                                beforeload: function (store, options) {
+                                    var new_params = {
+                                        ORDERCODE: ordercode
+                                    }
+                                    Ext.apply(store.proxy.extraParams, new_params);
+                                }
+                            }
                         })
                         var panel_declaration = Ext.create('Ext.grid.Panel', {
                             store: store_declaration,
@@ -185,6 +193,9 @@
             }
         })
     })
+
+
+
 </script>
 <iframe id="trackIframe" width="100%" height="100%" name="mainContent" frameborder="no" border="0" marginwidth="0" marginheight="0"></iframe>
 <iframe id="fileIframe" width="100%" height="100%" name="mainContent" frameborder="no" border="0" marginwidth="0" marginheight="0"></iframe>
