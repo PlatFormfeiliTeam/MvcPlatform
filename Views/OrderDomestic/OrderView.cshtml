@@ -11,7 +11,6 @@
 <script src="~/Views/OrderDomestic/form_head.js"></script>
 <script src="~/Views/OrderDomestic/form_import_view.js"></script>
 <script src="~/Views/OrderDomestic/form_export_view.js"></script>
-<link href="/css/comme.css" rel="stylesheet" />
 <link href="/css/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
 <script type="text/javascript">
     var formpanelhead, formpanelin, formpanelout, formpanelhead2, formpanelin2, formpanelout2;
@@ -108,11 +107,10 @@
                         })
                         //3 绘制报关单列表
                         var store_declaration = Ext.create('Ext.data.JsonStore', {
-                            fields: ['ID', 'DECLARATIONCODE', 'TRADEMETHOD', 'NUMS', 'GOODSNUM', 'GOODSNW', 'GOODSGW', 'SHEETNUM', 'CUSTOMRREMARK',
-                                'CSREMARK', 'DECLREMARK', 'BUSITYPE', 'haiguanzhuangtai', 'zhuangtaishijian', 'shangaidan', 'dayinyulan'],
+                            fields: ['ID', 'DECLARATIONCODE', 'GOODSNUM', 'GOODSNW', 'GOODSGW', 'SHEETNUM', 'BUSITYPE', 'TRADECODE', 'CUSTOMSSTATUS', 'COMMODITYNUM'],
                             proxy: {
                                 type: 'ajax',
-                                url: '/Common/LoadDeclarationByOrderCode',
+                                url: '/Common/LoadDeclaration',
                                 extraParams: { ORDERCODE: ordercode },
                                 reader: {
                                     root: 'rows',
@@ -136,11 +134,11 @@
                                 { header: '毛重', dataIndex: 'GOODSGW', width: 100 },
                                 { header: '净重', dataIndex: 'GOODSNW', width: 100 },
                                 { header: '张数', dataIndex: 'SHEETNUM', width: 80 },
-                                { header: '客户备注', dataIndex: 'CUSTOMERREMARK', width: 100 },
-                                { header: '客服备注', dataIndex: 'CSREMARK', width: 100 },
-                                { header: '海关状态', dataIndex: 'haiguanzhuangtai', width: 100 },
-                                { header: '状态时间', dataIndex: 'zhuangtaishijian', width: 100 },
-                                { header: '删改单', dataIndex: 'shangaidan', flex: 1 }
+                                //{ header: '客户备注', dataIndex: 'CUSTOMERREMARK', width: 100 },
+                               // { header: '客服备注', dataIndex: 'CSREMARK', width: 100 },
+                                { header: '海关状态', dataIndex: 'CUSTOMSSTATUS', width: 100 }
+                                //{ header: '状态时间', dataIndex: 'zhuangtaishijian', width: 100 },
+                                //{ header: '删改单', dataIndex: 'shangaidan', flex: 1 }
                             ]
                         });
                         var panel1 = Ext.create('Ext.panel.Panel', {

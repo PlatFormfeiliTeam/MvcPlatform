@@ -164,7 +164,7 @@
                                     //   radius: radius,
                                     x: '0%', // for funnel  itemStyle: labelFromatter,
                                     data: [
-                                        //需要注意当草单和预制单都还没有生成时的情形即total=0
+                                       // 需要注意当草单和预制单都还没有生成时的情形即total=0
                                         { name: '未完成', value: item.total == 0 ? 1 : (item.total - item.finished), itemStyle: labelTop },
                                         { name: '异常', value: item.exception, itemStyle: labelCenter },
                                         { name: '已完成', value: item.finished, itemStyle: labelBottom }
