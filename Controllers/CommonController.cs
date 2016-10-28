@@ -2051,18 +2051,13 @@ namespace MvcPlatform.Controllers
                 }
                 if (sql != "")
                 {
-                }
-            }
-            if (sql != "")
-            {
-                sql = sql.Substring(0, sql.Length - 1);
-                sql = "update list_order set " + sql + " where code in ('" + ordercodes.Replace(",", "','") + "')";
-            }
+                    sql = sql.Substring(0, sql.Length - 1);
+                    sql = "update list_order set " + sql + " where code in ('" + ordercodes.Replace(",", "','") + "')";
+                    DBMgr.ExecuteNonQuery(sql);
+                }                
 
-            int result = DBMgr.ExecuteNonQuery(sql);
-            if (result >= 1)
-            {
                 if (IsCONTAINERTRUCK) //集装箱及报关车号列表更新
+                {
                     for (int i = 0; i < ordercodelist.Length; i++)
                     {
                         Extension.predeclcontainer_update(ordercodelist[i], json.Value<string>("CONTAINERTRUCK"));
@@ -2071,10 +2066,16 @@ namespace MvcPlatform.Controllers
                 //更新随附文件 
                 for (int i = 0; i < ordercodelist.Length; i++)
                 {
+                    Extension.Update_Attachment(ordercodelist[i], filedata, "", json_user);//json.Value<string>("ORIGINALFILEIDS")
                 }
+                resultmsg = "{success:true}";
             }
+            catch (Exception ex)
             {
+                resultmsg = "{success:false}";
             }
+            return resultmsg;
+
         }
 
         public string loadOrderView()
