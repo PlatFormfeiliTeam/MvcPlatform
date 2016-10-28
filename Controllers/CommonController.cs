@@ -2028,20 +2028,29 @@ namespace MvcPlatform.Controllers
 
         public string BatchMaintainSave()
         {
-            string ordercodes = Request["ordercodes"]; 
-            JObject json = (JObject)JsonConvert.DeserializeObject(Request["formdata"]); string filedata = Request["filedata"];
-            string sql = ""; bool IsCONTAINERTRUCK = false; string[] ordercodelist = ordercodes.Split(',');
-            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string resultmsg = "";
+            string ordercodes = Request["ordercodes"]; string filedata = Request["filedata"];
 
-            foreach (JProperty jp in (JToken)json)
+            try
             {
-                if (jp.Name != "CONTAINERTRUCK" && jp.Value.ToString() != "")
+                JObject json = (JObject)JsonConvert.DeserializeObject(Request["formdata"]);
+                JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+                string sql = ""; bool IsCONTAINERTRUCK = false; string[] ordercodelist = ordercodes.Split(',');
+
+                foreach (JProperty jp in (JToken)json)
                 {
-                    sql += jp.Name + "='" + jp.Value.ToString() + "',";
+                    if (jp.Name != "CONTAINERTRUCK" && jp.Value.ToString() != "")
+                    {
+                        sql += jp.Name + "='" + jp.Value.ToString() + "',";
+                    }
+                    if (jp.Name == "CONTAINERTRUCK" && jp.Value.ToString() != "")
+                    {
+                        IsCONTAINERTRUCK = true;
+                    }
                 }
-                if (jp.Name == "CONTAINERTRUCK" && jp.Value.ToString() != "")
+                if (sql != "")
                 {
-                    IsCONTAINERTRUCK = true;
                 }
             }
             if (sql != "")
@@ -2054,24 +2063,17 @@ namespace MvcPlatform.Controllers
             if (result >= 1)
             {
                 if (IsCONTAINERTRUCK) //集装箱及报关车号列表更新
-                {                   
                     for (int i = 0; i < ordercodelist.Length; i++)
                     {
                         Extension.predeclcontainer_update(ordercodelist[i], json.Value<string>("CONTAINERTRUCK"));
                     }
-                    
                 }
                 //更新随附文件 
                 for (int i = 0; i < ordercodelist.Length; i++)
                 {
-                    Extension.Update_Attachment(ordercodelist[i], filedata, json.Value<string>("ORIGINALFILEIDS"), json_user);
                 }
-
-                return "{success:true}";
             }
-            else
             {
-                return "{success:false}";
             }
         }
 

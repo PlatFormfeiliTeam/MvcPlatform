@@ -307,10 +307,10 @@
                             var data = Ext.decode(option.responseText); 
                             if (data.success) {
                                 store_Trade.load();
-                                //Ext.getCmp('w_grid').store.loadData(Ext.decode(Ext.getCmp('field_CONTAINERTRUCK').getValue()));
+                                file_store.loadData(Ext.decode("[]"));
                                 Ext.MessageBox.alert("提示", "保存成功！");
                             } else {
-                                Ext.MessageBox.alert("提示", "未保存信息！");
+                                Ext.MessageBox.alert("提示", "保存失败！");
                             }
                         }
                     })
@@ -394,7 +394,6 @@ function Batchpanel_file_ini() {
 
 //设置数据信息区域可用
 function loadbatchform() {
-    
     var recs = gridpanel.getSelectionModel().getSelection();        
     var bf = false; var bfs = 0, a = 0, b = 0, c = 0, d = 0, e = 0, f = 0, g = 0, h = 0, i = 0;
 
@@ -691,7 +690,7 @@ function formcontrol(bfs) {
     document.getElementById("pickfiles").disabled = bfs >0;
     document.getElementById("deletefile").disabled = bfs > 0; //删除按钮  --提交后不允许删除setVisibilityMode
 
-    if (bfs == 0) {
+    if (bfs == 0 && !uploader) {
         upload_ini();
     }
     if (bfs > 0 && uploader) {
