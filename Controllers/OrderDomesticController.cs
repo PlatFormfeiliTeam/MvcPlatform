@@ -127,13 +127,13 @@ namespace MvcPlatform.Controllers
             }
             else
             {
-//                string sql_pre = @"select ID,CODE,BUSITYPE,CUSNO,BUSIUNITCODE,BUSIUNITNAME,CONTRACTNO,CLEARANCENO,LAWFLAG,GOODSNUM,REPWAYID
-//                      ,CUSTOMAREACODE,PORTCODE,REPUNITNAME||'('||REPUNITCODE||')' REPUNITCODE,INSPUNITNAME||'('||INSPUNITCODE||')' INSPUNITCODE
-//                      ,CUSTOMERCODE,CREATEUSERID,CREATETIME,SUBMITUSERID,SUBMITTIME,STATUS,ORDERREQUEST, ENTRUSTTYPE,SHIPNAME                      
-//                      ,FILGHTNO,TRADEWAYCODES,DECLCARNO,DECLWAY,PACKKIND,GOODSGW,GOODSNW,ARRIVEDNO,ISINVALID,FIRSTLADINGBILLNO
-//                      ,SECONDLADINGBILLNO,GOODSTYPEID,CONTAINERNO,ASSOCIATENO,CORRESPONDNO,REPUNITNAME,INSPUNITNAME
-//                      ,CUSTOMERNAME,CREATEUSERNAME,SUBMITUSERNAME,RECORDCODE,ASSOCIATEPEDECLNO
-//                      ,ASSOCIATETRADEWAY,IETYPE,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES  from LIST_ORDER t";
+                //                string sql_pre = @"select ID,CODE,BUSITYPE,CUSNO,BUSIUNITCODE,BUSIUNITNAME,CONTRACTNO,CLEARANCENO,LAWFLAG,GOODSNUM,REPWAYID
+                //                      ,CUSTOMAREACODE,PORTCODE,REPUNITNAME||'('||REPUNITCODE||')' REPUNITCODE,INSPUNITNAME||'('||INSPUNITCODE||')' INSPUNITCODE
+                //                      ,CUSTOMERCODE,CREATEUSERID,CREATETIME,SUBMITUSERID,SUBMITTIME,STATUS,ORDERREQUEST, ENTRUSTTYPE,SHIPNAME                      
+                //                      ,FILGHTNO,TRADEWAYCODES,DECLCARNO,DECLWAY,PACKKIND,GOODSGW,GOODSNW,ARRIVEDNO,ISINVALID,FIRSTLADINGBILLNO
+                //                      ,SECONDLADINGBILLNO,GOODSTYPEID,CONTAINERNO,ASSOCIATENO,CORRESPONDNO,REPUNITNAME,INSPUNITNAME
+                //                      ,CUSTOMERNAME,CREATEUSERNAME,SUBMITUSERNAME,RECORDCODE,ASSOCIATEPEDECLNO
+                //                      ,ASSOCIATETRADEWAY,IETYPE,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES  from LIST_ORDER t";
 
                 string sql_pre = @"select ID,CODE,BUSITYPE,CUSNO,BUSIUNITCODE,BUSIUNITNAME,CONTRACTNO,CLEARANCENO,LAWFLAG,GOODSNUM,REPWAYID
                       ,CUSTOMAREACODE,PORTCODE,REPUNITCODE,INSPUNITCODE
@@ -476,7 +476,7 @@ namespace MvcPlatform.Controllers
                                 ,IETYPE,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES,SUBMITUSERNAME
                                 ,SUBMITUSERID,ASSOCIATETRADEWAY,BUSIKIND,ORDERWAY,CLEARUNIT
                                 ,CLEARUNITNAME,CREATETIME,SUBMITTIME,PORTCODE,DECLSTATUS
-                                ,INSPSTATUS) 
+                                ,INSPSTATUS,ENTRUSTWAY,DOCSERVICECODE) 
                             VALUES (LIST_ORDER_id.Nextval
                                 ,'{0}','{1}','{2}','{3}','{4}','{5}'
                                 ,'{6}','{7}','{8}','{9}','{10}'
@@ -487,7 +487,7 @@ namespace MvcPlatform.Controllers
                                 ,'{31}','{32}','{33}','{34}','{35}'
                                 ,'{36}','{37}','{38}','{39}','{40}'
                                 ,'{41}',sysdate,{42},'{43}','{44}'
-                                ,'{45}'
+                                ,'{45}','{46}','{47}'
                                 )";
 
             update_sql = @"update LIST_ORDER  SET ASSOCIATEPEDECLNO='{0}',CUSNO='{1}',BUSIUNITCODE='{2}',BUSIUNITNAME='{3}',CONTRACTNO='{4}',GOODSNUM='{5}'
@@ -535,7 +535,7 @@ namespace MvcPlatform.Controllers
                             , json_head1.Value<string>("IETYPE"), GetChk(json1.Value<string>("SPECIALRELATIONSHIP")), GetChk(json1.Value<string>("PRICEIMPACT")), GetChk(json1.Value<string>("PAYPOYALTIES")), json_head1.Value<string>("SUBMITUSERNAME")
                             , json_head1.Value<string>("SUBMITUSERID"), json1.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_user.Value<string>("CUSTOMERCODE")
                             , json_user.Value<string>("CUSTOMERNAME"), json_head1.Value<string>("SUBMITTIME"), json_head1.Value<string>("CUSTOMAREACODE"), json1.Value<string>("DECLSTATUS")
-                            , json1.Value<string>("INSPSTATUS")
+                            , json1.Value<string>("INSPSTATUS"), "进口企业", "GWYKS"
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code1;
@@ -593,7 +593,7 @@ namespace MvcPlatform.Controllers
                             , json_head1.Value<string>("IETYPE"), GetChk(json2.Value<string>("SPECIALRELATIONSHIP")), GetChk(json2.Value<string>("PRICEIMPACT")), GetChk(json2.Value<string>("PAYPOYALTIES")), json_head1.Value<string>("SUBMITUSERNAME")
                             , json_head1.Value<string>("SUBMITUSERID"), json2.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_user.Value<string>("CUSTOMERCODE")
                             , json_user.Value<string>("CUSTOMERNAME"), json_head1.Value<string>("SUBMITTIME"), json_head1.Value<string>("CUSTOMAREACODE"), json2.Value<string>("DECLSTATUS")
-                            , json2.Value<string>("INSPSTATUS")
+                            , json2.Value<string>("INSPSTATUS"), "出口企业", "GWYKS"
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code2;
@@ -650,7 +650,7 @@ namespace MvcPlatform.Controllers
                             , json_head2.Value<string>("IETYPE"), GetChk(json3.Value<string>("SPECIALRELATIONSHIP")), GetChk(json3.Value<string>("PRICEIMPACT")), GetChk(json3.Value<string>("PAYPOYALTIES")), json_head2.Value<string>("SUBMITUSERNAME")
                             , json_head2.Value<string>("SUBMITUSERID"), json3.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_user.Value<string>("CUSTOMERCODE")
                             , json_user.Value<string>("CUSTOMERNAME"), json_head2.Value<string>("SUBMITTIME"), json_head2.Value<string>("CUSTOMAREACODE"), json3.Value<string>("DECLSTATUS")
-                            , json3.Value<string>("INSPSTATUS")
+                            , json3.Value<string>("INSPSTATUS"), "HUB仓进", "GWYKS"
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code3;
@@ -709,7 +709,7 @@ namespace MvcPlatform.Controllers
                             , json_head2.Value<string>("IETYPE"), GetChk(json4.Value<string>("SPECIALRELATIONSHIP")), GetChk(json4.Value<string>("PRICEIMPACT")), GetChk(json4.Value<string>("PAYPOYALTIES")), json_head2.Value<string>("SUBMITUSERNAME")
                             , json_head2.Value<string>("SUBMITUSERID"), json4.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_user.Value<string>("CUSTOMERCODE")
                             , json_user.Value<string>("CUSTOMERNAME"), json_head2.Value<string>("SUBMITTIME"), json_head2.Value<string>("CUSTOMAREACODE"), json4.Value<string>("DECLSTATUS")
-                            , json4.Value<string>("INSPSTATUS")
+                            , json4.Value<string>("INSPSTATUS"), "HUB仓出", "GWYKS"
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code4;
