@@ -427,262 +427,211 @@ function loadbatchform() {
         if (e > 0) { Ext.getCmp('field_TURNPRENO').setDisabled(true); }//转关预录号
         if (f > 0) { Ext.getCmp('combo_mzbz').setDisabled(true); }//木质包装
     }
-/*
+
     //空运出口
     if (type == 'KYCK') {
-        //申报关区
-        combo_CUSTOMDISTRICTNAME.setDisabled(false);
-        //报关车号
-        combo_bgch.setDisabled(false);
-        //备注
-        field_ORDERREQUEST.setDisabled(false);
-        //总单号
-        field_TOTALNO.setDisabled(false);
-        //进出口岸
-        combo_PORTCODE.setDisabled(false);
+        //申报关区//报关车号//备注//总单号//进出口岸
+        Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(false); Ext.getCmp('declcarno_btn').setDisabled(false); Ext.getCmp('field_ORDERREQUEST').setDisabled(false);
+        Ext.getCmp('field_TOTALNO').setDisabled(false); Ext.getCmp('combo_PORTCODE').setDisabled(false);
+       
         for (var i = 0; i < recs.length; i++) {
-            if (recs[i].data.STATUS != '1' && recs[i].data.STATUS != '10') {
-                //申报关区
-                if (isNull(recs[i].data.CUSTOMDISTRICTNAME)) {
-                    combo_CUSTOMDISTRICTNAME.setDisabled(true);
-                }
-                //报关车号
-                if (isNull(recs[i].data.DECLCARNO)) {
-                    combo_bgch.setDisabled(true);
-                }
-                //备注
-                if (isNull(recs[i].data.ORDERREQUEST)) {
-                    field_ORDERREQUEST.setDisabled(true);
-                }
-                //总单号
-                if (isNull(recs[i].data.TOTALNO)) {
-                    field_TOTALNO.setDisabled(true);
-                }
-                //进出口岸
-                if (isNull(recs[i].data.PORTCODE)) {
-                    combo_PORTCODE.setDisabled(true);
-                }
+
+            if (recs[i].data.ENTRUSTTYPE == "01") { if (recs[i].data.DECLSTATUS != '0') { bf = true; } }
+            if (recs[i].data.ENTRUSTTYPE == "02") { if (recs[i].data.INSPSTATUS != '0') { bf = true; } }
+            if (recs[i].data.ENTRUSTTYPE == "03") { if (recs[i].data.DECLSTATUS != '0' || recs[i].data.INSPSTATUS != '0') { bf = true; } }
+
+            if (bf) {
+                bfs = bfs + 1;
+                if (isNull(recs[i].data.CUSTOMAREACODE)) { a = a + 1; }//申报关区
+                if (isNull(recs[i].data.DECLCARNO)) { b = b + 1; }//报关车号
+                if (isNull(recs[i].data.ORDERREQUEST)) { c = c + 1; }//备注
+                if (isNull(recs[i].data.TOTALNO)) { d = d + 1; }//总单号
+                if (isNull(recs[i].data.PORTCODE)) { e = e + 1; }//进出口岸
             }
         }
-    }
 
+        if (a > 0) { Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(true); }//申报关区
+        if (b > 0) { Ext.getCmp('declcarno_btn').setDisabled(true); }//报关车号
+        if (c > 0) { Ext.getCmp('field_ORDERREQUEST').setDisabled(true); }//备注
+        if (d > 0) { Ext.getCmp('field_TOTALNO').setDisabled(true); }//总单号
+        if (e > 0) { Ext.getCmp('combo_PORTCODE').setDisabled(true); }//进出口岸
+    }
+    
     //海运进口
     if (type == 'HYJK') {
-        //申报关区
-        combo_CUSTOMDISTRICTNAME.setDisabled(false);
-        //报关车号
-        combo_bgch.setDisabled(false);
-        //备注
-        field_ORDERREQUEST.setDisabled(false);
-        //转关预录号
-        field_TURNPRENO.setDisabled(false);
-        //木质包装
-        combo_mzbz.setDisabled(false);
-        //进出口岸
-        combo_PORTCODE.setDisabled(false);
+        //申报关区 //报关车号//备注//转关预录号//木质包装//进出口岸
+        Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(false); Ext.getCmp('declcarno_btn').setDisabled(false); Ext.getCmp('field_ORDERREQUEST').setDisabled(false);
+        Ext.getCmp('field_TURNPRENO').setDisabled(false); Ext.getCmp('combo_mzbz').setDisabled(false);Ext.getCmp('combo_PORTCODE').setDisabled(false);        
+
         for (var i = 0; i < recs.length; i++) {
-            if (recs[i].data.STATUS != '1' && recs[i].data.STATUS != '10') {
-                //申报关区
-                if (isNull(recs[i].data.CUSTOMDISTRICTNAME)) {
-                    combo_CUSTOMDISTRICTNAME.setDisabled(true);
-                }
-                //报关车号
-                if (isNull(recs[i].data.DECLCARNO)) {
-                    combo_bgch.setDisabled(true);
-                }
-                //备注
-                if (isNull(recs[i].data.ORDERREQUEST)) {
-                    field_ORDERREQUEST.setDisabled(true);
-                }
-                //转关预录号
-                if (isNull(recs[i].data.TURNPRENO)) {
-                    field_TURNPRENO.setDisabled(true);
-                }
-                //木质包装
-                if (isNull(recs[i].data.WOODPACKINGNAME)) {
-                    combo_mzbz.setDisabled(true);
-                }
-                //进出口岸
-                if (isNull(recs[i].data.PORTCODE)) {
-                    combo_PORTCODE.setDisabled(true);
-                }
+
+            if (recs[i].data.ENTRUSTTYPE == "01") { if (recs[i].data.DECLSTATUS != '0') { bf = true; } }
+            if (recs[i].data.ENTRUSTTYPE == "02") { if (recs[i].data.INSPSTATUS != '0') { bf = true; } }
+            if (recs[i].data.ENTRUSTTYPE == "03") { if (recs[i].data.DECLSTATUS != '0' || recs[i].data.INSPSTATUS != '0') { bf = true; } }
+
+            if (bf) {
+                bfs = bfs + 1;
+                if (isNull(recs[i].data.CUSTOMAREACODE)) { a = a + 1; }//申报关区
+                if (isNull(recs[i].data.DECLCARNO)) { b = b + 1; }//报关车号
+                if (isNull(recs[i].data.ORDERREQUEST)) { c = c + 1; }//备注
+                if (isNull(recs[i].data.TURNPRENO)) { d = d + 1; }//转关预录号
+                if (isNull(recs[i].data.WOODPACKINGID)) { e = e + 1; }//木质包装
+                if (isNull(recs[i].data.PORTCODE)) { f = f + 1; }//进出口岸
             }
         }
+
+        if (a > 0) { Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(true); }//申报关区
+        if (b > 0) { Ext.getCmp('declcarno_btn').setDisabled(true); }//报关车号
+        if (c > 0) { Ext.getCmp('field_ORDERREQUEST').setDisabled(true); }//备注
+        if (d > 0) { Ext.getCmp('field_TURNPRENO').setDisabled(true); }//转关预录号
+        if (e > 0) { Ext.getCmp('combo_mzbz').setDisabled(true); }//木质包装
+        if (f > 0) { Ext.getCmp('combo_PORTCODE').setDisabled(true); }//进出口岸
     }
 
     //海运出口
     if (type == 'HYCK') {
-        //申报关区
-        combo_CUSTOMDISTRICTNAME.setDisabled(false);
-        //报关车号
-        combo_bgch.setDisabled(false);
-        //备注
-        field_ORDERREQUEST.setDisabled(false);
-        //进出口岸
-        combo_PORTCODE.setDisabled(false);
-        field_SHIPNAME.setDisabled(false);
-        field_FILGHTNO.setDisabled(false);
-        field_LADINGBILLNO.setDisabled(false);
-        field_ARRIVEDNO.setDisabled(false);
+        //申报关区//报关车号//备注 //进出口岸//船名//航次//提单号//运抵编号
+        Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(false); Ext.getCmp('declcarno_btn').setDisabled(false); Ext.getCmp('field_ORDERREQUEST').setDisabled(false);
+        Ext.getCmp('combo_PORTCODE').setDisabled(false); Ext.getCmp('field_SHIPNAME').setDisabled(false); Ext.getCmp('field_FILGHTNO').setDisabled(false);
+        Ext.getCmp('field_LADINGBILLNO').setDisabled(false); Ext.getCmp('field_ARRIVEDNO').setDisabled(false);
 
         for (var i = 0; i < recs.length; i++) {
-            if (recs[i].data.STATUS != '1' && recs[i].data.STATUS != '10') {
-                //申报关区
-                if (isNull(recs[i].data.CUSTOMDISTRICTNAME)) {
-                    combo_CUSTOMDISTRICTNAME.setDisabled(true);
-                }
-                //报关车号
-                if (isNull(recs[i].data.DECLCARNO)) {
-                    combo_bgch.setDisabled(true);
-                }
-                //备注
-                if (isNull(recs[i].data.ORDERREQUEST)) {
-                    field_ORDERREQUEST.setDisabled(true);
-                }
-                //进出口岸
-                if (isNull(recs[i].data.PORTCODE)) {
-                    combo_PORTCODE.setDisabled(true);
-                }
-                if (isNull(recs[i].data.SHIPNAME)) {
-                    field_SHIPNAME.setDisabled(true);
-                }
-                if (isNull(recs[i].data.FILGHTNO)) {
-                    field_FILGHTNO.setDisabled(true);
-                }
-                if (isNull(recs[i].data.SECONDLADINGBILLNO)) {
-                    field_LADINGBILLNO.setDisabled(true);
-                }
-                if (isNull(recs[i].data.ARRIVEDNO)) {
-                    field_ARRIVEDNO.setDisabled(true);
-                }
+
+            if (recs[i].data.ENTRUSTTYPE == "01") { if (recs[i].data.DECLSTATUS != '0') { bf = true; } }
+            if (recs[i].data.ENTRUSTTYPE == "02") { if (recs[i].data.INSPSTATUS != '0') { bf = true; } }
+            if (recs[i].data.ENTRUSTTYPE == "03") { if (recs[i].data.DECLSTATUS != '0' || recs[i].data.INSPSTATUS != '0') { bf = true; } }
+
+            if (bf) {
+                bfs = bfs + 1;
+                if (isNull(recs[i].data.CUSTOMAREACODE)) { a = a + 1; }//申报关区
+                if (isNull(recs[i].data.DECLCARNO)) { b = b + 1; }//报关车号
+                if (isNull(recs[i].data.ORDERREQUEST)) { c = c + 1; }//备注
+                if (isNull(recs[i].data.PORTCODE)) { d = d + 1; }//进出口岸
+                if (isNull(recs[i].data.SHIPNAME)) { e = e + 1; }//船名
+                if (isNull(recs[i].data.FILGHTNO)) { f = f + 1; }//航次
+                if (isNull(recs[i].data.SECONDLADINGBILLNO)) { g = g + 1; }//提单号
+                if (isNull(recs[i].data.ARRIVEDNO)) { h = h + 1; }//运抵编号
             }
         }
-    }
 
+        if (a > 0) { Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(true); }//申报关区
+        if (b > 0) { Ext.getCmp('declcarno_btn').setDisabled(true); }//报关车号
+        if (c > 0) { Ext.getCmp('field_ORDERREQUEST').setDisabled(true); }//备注
+        if (d > 0) { Ext.getCmp('combo_PORTCODE').setDisabled(true); }//进出口岸
+        if (e > 0) { Ext.getCmp('field_SHIPNAME').setDisabled(true); }//船名
+        if (f > 0) { Ext.getCmp('field_FILGHTNO').setDisabled(true); }//航次
+        if (g > 0) { Ext.getCmp('field_LADINGBILLNO').setDisabled(true); }//提单号
+        if (h > 0) { Ext.getCmp('field_ARRIVEDNO').setDisabled(true); }//运抵编号
+    }
+    
     //陆运进口
     if (type == 'LYJK') {
-        //申报关区
-        combo_CUSTOMDISTRICTNAME.setDisabled(false);
-        //报关车号
-        combo_bgch.setDisabled(false);
-        //备注
-        field_ORDERREQUEST.setDisabled(false);
-        combo_mzbz.setDisabled(false);
-        field_LADINGBILLNO.setDisabled(false);
-        field_MANIFEST.setDisabled(false);
+        //申报关区//报关车号//备注//木质包装//提单号//载货清单号
+        Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(false); Ext.getCmp('declcarno_btn').setDisabled(false); Ext.getCmp('field_ORDERREQUEST').setDisabled(false);
+        Ext.getCmp('combo_mzbz').setDisabled(false); Ext.getCmp('field_LADINGBILLNO').setDisabled(false); Ext.getCmp('field_MANIFEST').setDisabled(false);
 
         for (var i = 0; i < recs.length; i++) {
-            if (recs[i].data.STATUS != '1' && recs[i].data.STATUS != '10') {
-                //申报关区
-                if (isNull(recs[i].data.CUSTOMDISTRICTNAME)) {
-                    combo_CUSTOMDISTRICTNAME.setDisabled(true);
-                }
-                //报关车号
-                if (isNull(recs[i].data.DECLCARNO)) {
-                    combo_bgch.setDisabled(true);
-                }
-                //备注
-                if (isNull(recs[i].data.ORDERREQUEST)) {
-                    field_ORDERREQUEST.setDisabled(true);
-                }
-                if (isNull(recs[i].data.WOODPACKINGID)) {
-                    combo_mzbz.setDisabled(true);
-                }
-                if (isNull(recs[i].data.SECONDLADINGBILLNO)) {
-                    field_LADINGBILLNO.setDisabled(true);
-                }
-                if (isNull(recs[i].data.MANIFEST)) {
-                    field_MANIFEST.setDisabled(true);
-                }
+
+            if (recs[i].data.ENTRUSTTYPE == "01") { if (recs[i].data.DECLSTATUS != '0') { bf = true; } }
+            if (recs[i].data.ENTRUSTTYPE == "02") { if (recs[i].data.INSPSTATUS != '0') { bf = true; } }
+            if (recs[i].data.ENTRUSTTYPE == "03") { if (recs[i].data.DECLSTATUS != '0' || recs[i].data.INSPSTATUS != '0') { bf = true; } }
+
+            if (bf) {
+                bfs = bfs + 1;
+                if (isNull(recs[i].data.CUSTOMAREACODE)) { a = a + 1; }//申报关区
+                if (isNull(recs[i].data.DECLCARNO)) { b = b + 1; }//报关车号
+                if (isNull(recs[i].data.ORDERREQUEST)) { c = c + 1; }//备注
+                if (isNull(recs[i].data.WOODPACKINGID)) { d = d + 1; }//木质包装
+                if (isNull(recs[i].data.SECONDLADINGBILLNO)) { e = e + 1; }//提单号
+                if (isNull(recs[i].data.MANIFEST)) { f = f + 1; }//载货清单号
             }
         }
-    }
 
+        if (a > 0) { Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(true); }//申报关区
+        if (b > 0) { Ext.getCmp('declcarno_btn').setDisabled(true); }//报关车号
+        if (c > 0) { Ext.getCmp('field_ORDERREQUEST').setDisabled(true); }//备注
+        if (d > 0) { Ext.getCmp('combo_mzbz').setDisabled(true); }//木质包装
+        if (e > 0) { Ext.getCmp('field_LADINGBILLNO').setDisabled(true); }//提单号
+        if (f > 0) { Ext.getCmp('field_MANIFEST').setDisabled(true); }//载货清单号
+    }
+    
     //陆运出口
     if (type == 'LYCK') {
-        //申报关区
-        combo_CUSTOMDISTRICTNAME.setDisabled(false);
-        //报关车号
-        combo_bgch.setDisabled(false);
-        //备注
-        field_ORDERREQUEST.setDisabled(false);
-        combo_PORTCODE.setDisabled(false);
-        field_ARRIVEDNO.setDisabled(false);
+        //申报关区//报关车号//备注//进出口岸//运抵编号
+        Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(false); Ext.getCmp('declcarno_btn').setDisabled(false); Ext.getCmp('field_ORDERREQUEST').setDisabled(false);
+        Ext.getCmp('combo_PORTCODE').setDisabled(false); Ext.getCmp('field_ARRIVEDNO').setDisabled(false);
 
         for (var i = 0; i < recs.length; i++) {
-            if (recs[i].data.STATUS != '1' && recs[i].data.STATUS != '10') {
-                //申报关区
-                if (isNull(recs[i].data.CUSTOMDISTRICTNAME)) {
-                    combo_CUSTOMDISTRICTNAME.setDisabled(true);
-                }
-                //报关车号
-                if (isNull(recs[i].data.DECLCARNO)) {
-                    combo_bgch.setDisabled(true);
-                }
-                //备注
-                if (isNull(recs[i].data.ORDERREQUEST)) {
-                    field_ORDERREQUEST.setDisabled(true);
-                }
-                if (isNull(recs[i].data.PORTCODE)) {
-                    combo_PORTCODE.setDisabled(true);
-                }
-                if (isNull(recs[i].data.ARRIVEDNO)) {
-                    field_ARRIVEDNO.setDisabled(true);
-                }
+
+            if (recs[i].data.ENTRUSTTYPE == "01") { if (recs[i].data.DECLSTATUS != '0') { bf = true; } }
+            if (recs[i].data.ENTRUSTTYPE == "02") { if (recs[i].data.INSPSTATUS != '0') { bf = true; } }
+            if (recs[i].data.ENTRUSTTYPE == "03") { if (recs[i].data.DECLSTATUS != '0' || recs[i].data.INSPSTATUS != '0') { bf = true; } }
+
+            if (bf) {
+                bfs = bfs + 1;
+                if (isNull(recs[i].data.CUSTOMAREACODE)) { a = a + 1; }//申报关区
+                if (isNull(recs[i].data.DECLCARNO)) { b = b + 1; }//报关车号
+                if (isNull(recs[i].data.ORDERREQUEST)) { c = c + 1; }//备注
+                if (isNull(recs[i].data.PORTCODE)) { d = d + 1; }//进出口岸
+                if (isNull(recs[i].data.ARRIVEDNO)) { e = e + 1; }//运抵编号
             }
         }
-    }
 
+        if (a > 0) { Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(true); }//申报关区
+        if (b > 0) { Ext.getCmp('declcarno_btn').setDisabled(true); }//报关车号
+        if (c > 0) { Ext.getCmp('field_ORDERREQUEST').setDisabled(true); }//备注
+        if (d > 0) { Ext.getCmp('combo_PORTCODE').setDisabled(true); }//进出口岸
+        if (e > 0) { Ext.getCmp('field_ARRIVEDNO').setDisabled(true); }//运抵编号
+    }
+    
     //特殊区域
     if (type == 'TSQY') {
-        //申报关区
-        combo_CUSTOMDISTRICTNAME.setDisabled(false);
-        //报关车号
-        combo_bgch.setDisabled(false);
-        //备注
-        field_ORDERREQUEST.setDisabled(false);
-        field_TURNPRENO_TWO.setDisabled(false);
+        //申报关区//报关车号//备注//对方转关号
+        Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(false); Ext.getCmp('declcarno_btn').setDisabled(false); Ext.getCmp('field_ORDERREQUEST').setDisabled(false);
+        Ext.getCmp('field_TURNPRENO_TWO').setDisabled(false);
 
         for (var i = 0; i < recs.length; i++) {
-            if (recs[i].data.STATUS != '1' && recs[i].data.STATUS != '10') {
-                //申报关区
-                if (isNull(recs[i].data.CUSTOMDISTRICTNAME)) {
-                    combo_CUSTOMDISTRICTNAME.setDisabled(true);
-                }
-                //报关车号
-                if (isNull(recs[i].data.DECLCARNO)) {
-                    combo_bgch.setDisabled(true);
-                }
-                //备注
-                if (isNull(recs[i].data.ORDERREQUEST)) {
-                    field_ORDERREQUEST.setDisabled(true);
-                }
-                if (isNull(recs[i].data.TURNPRENO)) {
-                    field_TURNPRENO_TWO.setDisabled(true);
-                }
+
+            if (recs[i].data.ENTRUSTTYPE == "01") { if (recs[i].data.DECLSTATUS != '0') { bf = true; } }
+            if (recs[i].data.ENTRUSTTYPE == "02") { if (recs[i].data.INSPSTATUS != '0') { bf = true; } }
+            if (recs[i].data.ENTRUSTTYPE == "03") { if (recs[i].data.DECLSTATUS != '0' || recs[i].data.INSPSTATUS != '0') { bf = true; } }
+
+            if (bf) {
+                bfs = bfs + 1;
+                if (isNull(recs[i].data.CUSTOMAREACODE)) { a = a + 1; }//申报关区
+                if (isNull(recs[i].data.DECLCARNO)) { b = b + 1; }//报关车号
+                if (isNull(recs[i].data.ORDERREQUEST)) { c = c + 1; }//备注
+                if (isNull(recs[i].data.TURNPRENO)) { d = d + 1; }//对方转关号
             }
         }
-    }
 
+        if (a > 0) { Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(true); }//申报关区
+        if (b > 0) { Ext.getCmp('declcarno_btn').setDisabled(true); }//报关车号
+        if (c > 0) { Ext.getCmp('field_ORDERREQUEST').setDisabled(true); }//备注
+        if (d > 0) { Ext.getCmp('field_TURNPRENO_TWO').setDisabled(true); }//对方转关号
+    }
+   
     //国内结转
     if (type == 'GNJZ') {
-        //申报关区
-        combo_CUSTOMDISTRICTNAME.setDisabled(false);
-        //备注
-        field_ORDERREQUEST.setDisabled(false);
+        //申报关区//备注
+        Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(false); Ext.getCmp('field_ORDERREQUEST').setDisabled(false);
+
         for (var i = 0; i < recs.length; i++) {
-            if (recs[i].data.STATUS != '1' && recs[i].data.STATUS != '10') {
-                //申报关区
-                if (isNull(recs[i].data.CUSTOMDISTRICTNAME)) {
-                    combo_CUSTOMDISTRICTNAME.setDisabled(true);
-                }
-                //备注
-                if (isNull(recs[i].data.ORDERREQUEST)) {
-                    field_ORDERREQUEST.setDisabled(true);
-                }
+
+            if (recs[i].data.ENTRUSTTYPE == "01") { if (recs[i].data.DECLSTATUS != '0') { bf = true; } }
+            if (recs[i].data.ENTRUSTTYPE == "02") { if (recs[i].data.INSPSTATUS != '0') { bf = true; } }
+            if (recs[i].data.ENTRUSTTYPE == "03") { if (recs[i].data.DECLSTATUS != '0' || recs[i].data.INSPSTATUS != '0') { bf = true; } }
+
+            if (bf) {
+                bfs = bfs + 1;
+                if (isNull(recs[i].data.CUSTOMAREACODE)) { a = a + 1; }//申报关区
+                if (isNull(recs[i].data.ORDERREQUEST)) { b = b + 1; }//备注
             }
         }
-    }*/
+
+        if (a > 0) { Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(true); }//申报关区
+        if (b > 0) { Ext.getCmp('field_ORDERREQUEST').setDisabled(true); }//备注
+    }
     formcontrol(bfs);
 }
 
