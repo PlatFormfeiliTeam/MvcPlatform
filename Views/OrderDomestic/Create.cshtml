@@ -24,11 +24,11 @@
 <script type="text/javascript">
     var ordercode = getQueryString("ordercode");
     var OrderId = getQueryString("OrderId");
-    var common_data_jydw = [], common_data_sbfs = [], common_data_sbgq = [], common_data_bgfs = [], common_data_bzzl = [], common_data_myfs = [], common_data_adminurl="";
+    var common_data_jydw = [], common_data_sbfs = [], common_data_sbgq = [], common_data_bgfs = [], common_data_bzzl = [], common_data_myfs = [], common_data_adminurl = "", common_data_dzfwdw = [];
 
     var ID, CODEIN, CODEOUT, field_btn1, field_btn2, field_ID, field_TRADEWAYCODES;
     var tabindex = 1;
-    
+
     var uploader;
     var topbar, formpanelhead, formpanelin, formpanelout, toolbar1, store_file1, panel_file1, formpanelhead2, formpanelin2, formpanelout2, store_file2, panel_file2, tabpanel, fileids1, fileids2;
     var repunitcode1, inspunitcode1, repunitcode2, inspunitcode2, repunitcode3, inspunitcode3, repunitcode4, inspunitcode4;//当前用户默认的报关报检申报单位
@@ -45,14 +45,15 @@
                 common_data_bzzl = commondata.bzzl;//包装种类
                 common_data_myfs = commondata.myfs;//贸易方式
                 common_data_adminurl = commondata.adminurl;//文件服务器URL
+                common_data_dzfwdw = commondata.dzfwdw;//单证服务单位
                 repunitcode1 = commondata.curuser.REPUNITNAME + "(" + commondata.curuser.CUSTOMERHSCODE + ")";//报关申报单位
                 inspunitcode1 = commondata.curuser.INSPUNITNAME + "(" + commondata.curuser.CUSTOMERCIQCODE + ")";//报检申报单位
                 repunitcode2 = commondata.curuser.REPUNITNAME + "(" + commondata.curuser.CUSTOMERHSCODE + ")";//报关申报单位
-                inspunitcode2 = commondata.curuser.INSPUNITNAME + "(" + commondata.curuser.CUSTOMERCIQCODE + ")";//报检申报单位 
+                inspunitcode2 = commondata.curuser.INSPUNITNAME + "(" + commondata.curuser.CUSTOMERCIQCODE + ")";//报检申报单位
                 repunitcode3 = commondata.curuser.REPUNITNAME + "(" + commondata.curuser.CUSTOMERHSCODE + ")";//报关申报单位
-                inspunitcode3 = commondata.curuser.INSPUNITNAME + "(" + commondata.curuser.CUSTOMERCIQCODE + ")";//报检申报单位 
+                inspunitcode3 = commondata.curuser.INSPUNITNAME + "(" + commondata.curuser.CUSTOMERCIQCODE + ")";//报检申报单位
                 repunitcode4 = commondata.curuser.REPUNITNAME + "(" + commondata.curuser.CUSTOMERHSCODE + ")";//报关申报单位
-                inspunitcode4 = commondata.curuser.INSPUNITNAME + "(" + commondata.curuser.CUSTOMERCIQCODE + ")";//报检申报单位 
+                inspunitcode4 = commondata.curuser.INSPUNITNAME + "(" + commondata.curuser.CUSTOMERCIQCODE + ")";//报检申报单位
                 form_head_ini();
                 form_import_ini();
                 form_export_ini();

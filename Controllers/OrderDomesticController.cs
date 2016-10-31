@@ -535,7 +535,7 @@ namespace MvcPlatform.Controllers
                             , json_head1.Value<string>("IETYPE"), GetChk(json1.Value<string>("SPECIALRELATIONSHIP")), GetChk(json1.Value<string>("PRICEIMPACT")), GetChk(json1.Value<string>("PAYPOYALTIES")), json_head1.Value<string>("SUBMITUSERNAME")
                             , json_head1.Value<string>("SUBMITUSERID"), json1.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_user.Value<string>("CUSTOMERCODE")
                             , json_user.Value<string>("CUSTOMERNAME"), json_head1.Value<string>("SUBMITTIME"), json_head1.Value<string>("CUSTOMAREACODE"), json1.Value<string>("DECLSTATUS")
-                            , json1.Value<string>("INSPSTATUS"), "进口企业", "GWYKS"
+                            , json1.Value<string>("INSPSTATUS"), "进口企业", json_head1.Value<string>("DOCSERVICECODE")
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code1;
@@ -593,7 +593,7 @@ namespace MvcPlatform.Controllers
                             , json_head1.Value<string>("IETYPE"), GetChk(json2.Value<string>("SPECIALRELATIONSHIP")), GetChk(json2.Value<string>("PRICEIMPACT")), GetChk(json2.Value<string>("PAYPOYALTIES")), json_head1.Value<string>("SUBMITUSERNAME")
                             , json_head1.Value<string>("SUBMITUSERID"), json2.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_user.Value<string>("CUSTOMERCODE")
                             , json_user.Value<string>("CUSTOMERNAME"), json_head1.Value<string>("SUBMITTIME"), json_head1.Value<string>("CUSTOMAREACODE"), json2.Value<string>("DECLSTATUS")
-                            , json2.Value<string>("INSPSTATUS"), "出口企业", "GWYKS"
+                            , json2.Value<string>("INSPSTATUS"), "出口企业", json_head1.Value<string>("DOCSERVICECODE")
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code2;
@@ -650,7 +650,7 @@ namespace MvcPlatform.Controllers
                             , json_head2.Value<string>("IETYPE"), GetChk(json3.Value<string>("SPECIALRELATIONSHIP")), GetChk(json3.Value<string>("PRICEIMPACT")), GetChk(json3.Value<string>("PAYPOYALTIES")), json_head2.Value<string>("SUBMITUSERNAME")
                             , json_head2.Value<string>("SUBMITUSERID"), json3.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_user.Value<string>("CUSTOMERCODE")
                             , json_user.Value<string>("CUSTOMERNAME"), json_head2.Value<string>("SUBMITTIME"), json_head2.Value<string>("CUSTOMAREACODE"), json3.Value<string>("DECLSTATUS")
-                            , json3.Value<string>("INSPSTATUS"), "HUB仓进", "GWYKS"
+                            , json3.Value<string>("INSPSTATUS"), "HUB仓进", json_head1.Value<string>("DOCSERVICECODE")
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code3;
@@ -709,7 +709,7 @@ namespace MvcPlatform.Controllers
                             , json_head2.Value<string>("IETYPE"), GetChk(json4.Value<string>("SPECIALRELATIONSHIP")), GetChk(json4.Value<string>("PRICEIMPACT")), GetChk(json4.Value<string>("PAYPOYALTIES")), json_head2.Value<string>("SUBMITUSERNAME")
                             , json_head2.Value<string>("SUBMITUSERID"), json4.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_user.Value<string>("CUSTOMERCODE")
                             , json_user.Value<string>("CUSTOMERNAME"), json_head2.Value<string>("SUBMITTIME"), json_head2.Value<string>("CUSTOMAREACODE"), json4.Value<string>("DECLSTATUS")
-                            , json4.Value<string>("INSPSTATUS"), "HUB仓出", "GWYKS"
+                            , json4.Value<string>("INSPSTATUS"), "HUB仓出", json_head1.Value<string>("DOCSERVICECODE")
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code4;

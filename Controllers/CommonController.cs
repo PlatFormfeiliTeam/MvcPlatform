@@ -712,11 +712,22 @@ namespace MvcPlatform.Controllers
                 json_inspbzzl = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
                 db.StringSet("common_data:inspbzzl", json_inspbzzl);
             }
-
+            //单证服务单位
+            string json_dzfwdw = "[]";
+            if (db.KeyExists("common_data:dzfwdw"))
+            {
+                json_dzfwdw = db.StringGet("common_data:dzfwdw");
+            }
+            else
+            {
+                sql = @"select * from sys_customer where DOCSERVICECOMPANY=1";
+                json_dzfwdw = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:dzfwdw", json_dzfwdw);
+            }
             return "{jydw:" + json_jydw + ",sbfs:" + json_sbfs + ",sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",bzzl:" + json_bzzl
                 + ",myfs:" + json_myfs + ",containertype:" + json_containertype + ",containersize:" + json_containersize + ",truckno:" + json_truckno
                 + ",relacontainer:" + json_relacontainer + ",mzbz:" + json_mzbz + ",jylb:" + json_jylb + ",json_sbkb:" + json_sbkb
-                + ",inspbzzl:" + json_inspbzzl + ",adminurl:'" + AdminUrl + "',curuser:" + Extension.Get_UserInfo(HttpContext.User.Identity.Name) + "}";
+                + ",inspbzzl:" + json_inspbzzl + ",adminurl:'" + AdminUrl + "',curuser:" + Extension.Get_UserInfo(HttpContext.User.Identity.Name) + ",dzfwdw:" + json_dzfwdw + "}";
         }
 
         /*保存查询条件设置 by panhuaguo 2016-01-17*/
@@ -2054,7 +2065,7 @@ namespace MvcPlatform.Controllers
                     sql = sql.Substring(0, sql.Length - 1);
                     sql = "update list_order set " + sql + " where code in ('" + ordercodes.Replace(",", "','") + "')";
                     DBMgr.ExecuteNonQuery(sql);
-                }                
+                }
 
                 if (IsCONTAINERTRUCK) //集装箱及报关车号列表更新
                 {
