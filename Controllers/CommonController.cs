@@ -1854,7 +1854,7 @@ namespace MvcPlatform.Controllers
             switch (busitype)
             {
                 case "10":
-                    sql = @"select '10' BUSITYPE,d.CUSTOM_CODE CUSTOMDISTRICTCODE,'' CUSTOMDISTRICTNAME,d.SB_CUSTOM_CODE PORTCODE ,'' PORTNAME , 
+                    sql = @"select '10' BUSITYPE,d.CUSTOM_CODE CUSTOMAREACODE,'' CUSTOMDISTRICTNAME,d.SB_CUSTOM_CODE PORTCODE ,'' PORTNAME , 
                     '' BUSIUNITCODE ,'' BUSIUNITNAME ,'{0}' CUSTOMERCODE,'{1}' CUSTOMERNAME,'{0}' CLEARUNIT,                       
                     '{1}' CLEARUNITNAME,d.MBL TOTALNO ,d.HBL DIVIDENO  ,d.PIECES GOODSNUM ,d.WEIGHT GOODSGW ,d.OPERATION_ID CUSNO,  
                     (select CHINNAME from Crm_Enterprise c where c.enterpriseid=d.Customer_code) CHINNAME,
@@ -1862,7 +1862,7 @@ namespace MvcPlatform.Controllers
                      d.customer_invoice_no CONTRACTNO from OPS_AIRE_HEAD d  where d.operation_id = '{2}'";
                     break;
                 case "11"://空进
-                    sql = @"select '11' BUSITYPE,d.Cusom_code CUSTOMDISTRICTCODE,'' BUSIUNITCODE,'' BUSIUNITNAME,
+                    sql = @"select '11' BUSITYPE,d.Cusom_code CUSTOMAREACODE,'' BUSIUNITCODE,'' BUSIUNITNAME,
                           '{0}' CUSTOMERCODE,'{1}' CUSTOMERNAME,'{0}' CLEARUNIT,'{1}' CLEARUNITNAME,'001' BUSIKIND,d.MBL TOTALNO,d.HBL DIVIDENO,
                           d.PIECES GOODSNUM,d.WEIGHT GOODSGW,'1' ORDERWAY,d.OPERATION_ID CUSNO,
                           (select CHINNAME from Crm_Enterprise c where c.enterpriseid=d.Customer_code) CHINNAME,                       
@@ -1870,7 +1870,7 @@ namespace MvcPlatform.Controllers
                           d.customer_invoice_no CONTRACTNO from OPS_AIRI_ASN d where d.operation_id = '{2}'";
                     break;
                 case "20"://海出
-                    sql = @"select  '20' BUSITYPE,d.SB_CUSTOM CUSTOMDISTRICTCODE,'' CUSTOMDISTRICTNAME,'' BUSIUNITCODE,'' BUSIUNITNAME, 
+                    sql = @"select  '20' BUSITYPE,d.SB_CUSTOM CUSTOMAREACODE,'' CUSTOMDISTRICTNAME,'' BUSIUNITCODE,'' BUSIUNITNAME, 
                     '{0}' CUSTOMERCODE,'{1}' CUSTOMERNAME,'{0}' CLEARUNIT,'{1}' CLEARUNITNAME, 
                     '001' BUSIKIND,d.FIRST_SHIP SHIPNAME  ,d.FIRST_VOYAGES FILGHTNO,d.BOOK_BILL_NUMBER SECONDLADINGBILLNO,
                     d.PIECES_TOTAL GOODSNUM,d.WEIGHT_TOTAL GOODSGW  ,d.PACK_CODE PACKKIND  ,'1' ORDERWAY ,d.OPERATION_ID CUSNO,
@@ -1878,7 +1878,7 @@ namespace MvcPlatform.Controllers
                     from OPS_SEAO_HEAD d  where d.OPERATION_ID = '{2}'";
                     break;
                 case "21":
-                    sql = @"select  '21' BUSITYPE,d.CUSOM_CODE CUSTOMDISTRICTCODE,'' CUSTOMDISTRICTNAME,'' BUSIUNITCODE,'' BUSIUNITNAME,
+                    sql = @"select  '21' BUSITYPE,d.CUSOM_CODE CUSTOMAREACODE,'' CUSTOMDISTRICTNAME,'' BUSIUNITCODE,'' BUSIUNITNAME,
                           '{0}' CUSTOMERCODE,'{1}' CUSTOMERNAME,'{0}' CLEARUNIT,'{1}' CLEARUNITNAME,                         
                           d.SECOND_SHIP SHIPNAME,d.SECOND_VOYAGES FILGHTNO,d.FIRST_BILL FIRSTLADINGBILLNO,d.main_no MAIN_NO, 
                           d.SECOND_BILL SECONDLADINGBILLNO ,d.PIECES_TOTAL GOODSNUM,d.WEIGHT_TOTAL GOODSGW,d.PACK_CODE PACKKIND,d.OPERATION_ID CUSNO,
@@ -1887,7 +1887,7 @@ namespace MvcPlatform.Controllers
                     break;
                 case "50":
                 case "51":
-                    sql = @"select d.DECLARE_CUSTOM CUSTOMDISTRICTCODE,CUSTOM_CODE PORTCODE  ,CONSIGN_CODE BUSIUNITCODE,PIECES GOODSNUM,  
+                    sql = @"select d.DECLARE_CUSTOM CUSTOMAREACODE,CUSTOM_CODE PORTCODE  ,CONSIGN_CODE BUSIUNITCODE,PIECES GOODSNUM,  
                     WEIGHT GOODSGW,PACK_TYPE  PACKKIND,'' BUSITYPE,'1' ORDERWAY ,OPERATION_ID CUSNO ,INV_NO CONTRACTNO ,'' CUSTOMDISTRICTNAME,'' BUSIUNITNAME,  
                     '{0}' CUSTOMERCODE ,'{0}' CLEARUNIT,'003' BUSIKIND ,'{1}' CUSTOMERNAME,'{1}' CLEARUNITNAME,DECLARE_MODE,     
                     '' REPWAYID,(select CHINNAME from Crm_Enterprise c where c.enterpriseid=d.CONSIGN_CODE) CHINNAME  from ops_ts_head d   where d.operation_id = '{2}'";
