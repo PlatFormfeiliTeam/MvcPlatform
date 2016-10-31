@@ -188,7 +188,7 @@ namespace MvcPlatform.Controllers
                     }
                     else//如果不存在两单关联号
                     {
-                        if (dt1.Rows[0]["ASSOCIATENO"] == "41")
+                        if (dt1.Rows[0]["BUSITYPE"].ToString() == "41")
                         {
                             data1 = JsonConvert.SerializeObject(dt1, iso).TrimStart('[').TrimEnd(']');
                             code1 = dt1.Rows[0]["CODE"] + "";
@@ -420,15 +420,13 @@ namespace MvcPlatform.Controllers
             if (json_head1.Value<string>("IETYPE") == "仅进口")
             {
                 code1 = string.IsNullOrEmpty(json1.Value<string>("CODE")) ? Extension.getOrderCode() : json1.Value<string>("CODE");
-                // AssociateNo = "GL" + code1;
                 json2 = new JObject();//防止前端切换了进出口类型后，表单并没有销毁，但是数据送到了后台
                 original_codes = original_codes.Replace(code1, "");
             }
             if (json_head1.Value<string>("IETYPE") == "仅出口")
             {
                 json1 = new JObject();//防止前端切换了进出口类型后，表单并没有销毁，但是数据送到了后台
-                code2 = string.IsNullOrEmpty(json2.Value<string>("CODE")) ? Extension.getOrderCode() : json2.Value<string>("CODE");
-                //AssociateNo = "GL" + code2;
+                code2 = string.IsNullOrEmpty(json2.Value<string>("CODE")) ? Extension.getOrderCode() : json2.Value<string>("CODE");             
                 original_codes = original_codes.Replace(code2, "");
             }
             if (json_head2.Value<string>("IETYPE") == "进/出口业务")
@@ -446,7 +444,6 @@ namespace MvcPlatform.Controllers
             if (json_head2.Value<string>("IETYPE") == "仅进口")
             {
                 code3 = string.IsNullOrEmpty(json3.Value<string>("CODE")) ? Extension.getOrderCode() : json3.Value<string>("CODE");
-                //  AssociateNo2 = "GL" + code3;
                 json4 = new JObject();//防止前端切换了进出口类型后，表单并没有销毁，但是数据送到了后台
                 original_codes = original_codes.Replace(code3, "");
             }
@@ -454,7 +451,6 @@ namespace MvcPlatform.Controllers
             {
                 json3 = new JObject();//防止前端切换了进出口类型后，表单并没有销毁，但是数据送到了后台
                 code4 = string.IsNullOrEmpty(json4.Value<string>("CODE")) ? Extension.getOrderCode() : json4.Value<string>("CODE");
-                //AssociateNo2 = "GL" + code4;
                 original_codes = original_codes.Replace(code4, "");
             }
             if ((!string.IsNullOrEmpty(code1) || !string.IsNullOrEmpty(code2)) && (!string.IsNullOrEmpty(code3) || !string.IsNullOrEmpty(code4)))
@@ -868,7 +864,7 @@ namespace MvcPlatform.Controllers
                     {
                         dt.Rows[0][filedname] = Convert.ToInt32(dt.Rows[0]["RELATEQUAN"]) > 0 ? "进/出口业务" : "仅进口";
                     }
-                    break;              
+                    break;
             }
         }
         //客户通过客户订单编号从ERP导入数据时需要进行判断有无重复,如果有需要确认是否继续导入  梁 2016-5-14
@@ -926,7 +922,7 @@ namespace MvcPlatform.Controllers
                         SwitchField(ds.Tables[0], "REPWAYID"); //对报关方式进行转换 集中C对应本系统的012  逐笔A对应本系统013  转厂B对应本系统015
                         SwitchField(ds.Tables[0], "ENTRUSTTYPE");//根据报关协作体和报检协作体确定委托类型
                         SwitchField(ds.Tables[0], "CHINNAME");
-                        SwitchField(ds.Tables[0], "IETYPE"); 
+                        SwitchField(ds.Tables[0], "IETYPE");
                         data1 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
                     }
                     subsql = "(select count(1) from ops_jz_head where operation_id = 'GJIK" + operateid + "')  RELATEQUAN from ops_jz_head d where d.operation_id = 'GJEK" + operateid + "'";
@@ -937,7 +933,7 @@ namespace MvcPlatform.Controllers
                         SwitchField(ds.Tables[0], "REPWAYID"); //对报关方式进行转换 集中C对应本系统的012  逐笔A对应本系统013  转厂B对应本系统015
                         SwitchField(ds.Tables[0], "ENTRUSTTYPE");//根据报关协作体和报检协作体确定委托类型
                         SwitchField(ds.Tables[0], "CHINNAME");
-                        SwitchField(ds.Tables[0], "IETYPE"); 
+                        SwitchField(ds.Tables[0], "IETYPE");
                         data2 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
                     }
                 }
@@ -959,7 +955,7 @@ namespace MvcPlatform.Controllers
                         SwitchField(ds.Tables[0], "REPWAYID"); //对报关方式进行转换 集中C对应本系统的012  逐笔A对应本系统013  转厂B对应本系统015 from ops_dj_head d
                         SwitchField(ds.Tables[0], "ENTRUSTTYPE");//根据报关协作体和报检协作体确定委托类型
                         SwitchField(ds.Tables[0], "CHINNAME");
-                        SwitchField(ds.Tables[0], "IETYPE"); 
+                        SwitchField(ds.Tables[0], "IETYPE");
                         result = "true";
                         data1 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
                     }
@@ -970,7 +966,7 @@ namespace MvcPlatform.Controllers
                         SwitchField(ds.Tables[0], "REPWAYID");
                         SwitchField(ds.Tables[0], "ENTRUSTTYPE");
                         SwitchField(ds.Tables[0], "CHINNAME");
-                        SwitchField(ds.Tables[0], "IETYPE"); 
+                        SwitchField(ds.Tables[0], "IETYPE");
                         result = "true";
                         data2 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
                     }
@@ -981,7 +977,7 @@ namespace MvcPlatform.Controllers
                         SwitchField(ds.Tables[0], "REPWAYID");
                         SwitchField(ds.Tables[0], "ENTRUSTTYPE");
                         SwitchField(ds.Tables[0], "CHINNAME");
-                        SwitchField(ds.Tables[0], "IETYPE"); 
+                        SwitchField(ds.Tables[0], "IETYPE");
                         result = "true";
                         data3 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
                     }
@@ -992,7 +988,7 @@ namespace MvcPlatform.Controllers
                         SwitchField(ds.Tables[0], "REPWAYID");
                         SwitchField(ds.Tables[0], "ENTRUSTTYPE");
                         SwitchField(ds.Tables[0], "CHINNAME");
-                        SwitchField(ds.Tables[0], "IETYPE"); 
+                        SwitchField(ds.Tables[0], "IETYPE");
                         result = "true";
                         data4 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
                     }

@@ -406,15 +406,7 @@
         labelWidth: 80,
         value: 0,
         store: store_status
-    });
-    var field_DECLSTATUS1 = Ext.create('Ext.form.field.Hidden', {
-        id: 'field_DECLSTATUS1',
-        name: 'DECLSTATUS'
-    })
-    var field_INSPSTATUS1 = Ext.create('Ext.form.field.Hidden', {
-        id:'field_INSPSTATUS1',
-        name: 'INSPSTATUS'
-    })    
+    }); 
     formpanelin = Ext.create('Ext.form.Panel', {
         border: 0,
         fieldDefaults: {
@@ -433,7 +425,7 @@
                 { layout: 'column', height: 42, border: 0, items: [field_quanpackage, field_weight, field_contractno, field_myfs, zcbah_container] },
                 { layout: 'column', height: 42, border: 0, items: [chk_CHKLAWCONDITION, field_CLEARANCENO, field_ASSOCIATEPEDECLNO, cont_bgsbdw, cont_bjsbdw] },
                 { layout: 'column', height: 42, border: 0, items: [field_ORDERREQUEST, field_STATUS] },
-                field_BUSIUNITNAME, field_DECLSTATUS1, field_INSPSTATUS1
+                field_BUSIUNITNAME 
         ]
     })
 }
