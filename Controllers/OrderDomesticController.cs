@@ -100,27 +100,9 @@ namespace MvcPlatform.Controllers
             string code1 = "", code2 = "", code3 = "", code4 = "";
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-            string ordercodes = "";//存储所有的订单号
-            //string bgsb_unit = "";
-            //string bjsb_unit = "";
-
+            string ordercodes = "";//存储所有的订单号 
             if (string.IsNullOrEmpty(ordercode))//如果订单号为空、即新增的时候
             {
-                //string sql = "select * from base_company where CODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "' AND ENABLED=1 AND ROWNUM=1";//根据海关的10位编码查询申报单位
-                //dt = DBMgrBase.GetDataTable(sql);
-                //if (dt.Rows.Count > 0)
-                //{
-                //    bgsb_unit = dt.Rows[0]["NAME"] + "";
-                //}
-                //sql = "select * from base_company where INSPCODE='" + json_user.Value<string>("CUSTOMERCIQCODE") + "' AND ENABLED=1 AND ROWNUM=1";//根据海关的10位编码查询申报单位
-                //dt = DBMgrBase.GetDataTable(sql);
-                //if (dt.Rows.Count > 0)
-                //{
-                //    bjsb_unit = dt.Rows[0]["NAME"] + "";
-                //}
-                //string repunitcode = bgsb_unit + "(" + json_user.Value<string>("CUSTOMERHSCODE") + ")";
-                //string inspunitcode = bjsb_unit + "(" + json_user.Value<string>("CUSTOMERCIQCODE") + ")";
-                //string result = "{STATUS:0,REPUNITCODE:'" + repunitcode + "' ,INSPUNITCODE:'" + inspunitcode + "'}";
                 string result = "{STATUS:0}";
                 return "{data1:" + result + ",data2:" + result + ",data3:" + result + ",data4:" + result + ",filedata1:" + filedata1 + ",filedata2:" + filedata2 + "}";
 
@@ -134,7 +116,6 @@ namespace MvcPlatform.Controllers
                 //                      ,SECONDLADINGBILLNO,GOODSTYPEID,CONTAINERNO,ASSOCIATENO,CORRESPONDNO,REPUNITNAME,INSPUNITNAME
                 //                      ,CUSTOMERNAME,CREATEUSERNAME,SUBMITUSERNAME,RECORDCODE,ASSOCIATEPEDECLNO
                 //                      ,ASSOCIATETRADEWAY,IETYPE,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES  from LIST_ORDER t";
-
                 string sql_pre = @"select ID,CODE,BUSITYPE,CUSNO,BUSIUNITCODE,BUSIUNITNAME,CONTRACTNO,CLEARANCENO,LAWFLAG,GOODSNUM,REPWAYID
                       ,CUSTOMAREACODE,PORTCODE,REPUNITCODE,INSPUNITCODE
                       ,CUSTOMERCODE,CREATEUSERID,CREATETIME,SUBMITUSERID,SUBMITTIME,STATUS,ORDERREQUEST, ENTRUSTTYPE,SHIPNAME                      
@@ -142,15 +123,14 @@ namespace MvcPlatform.Controllers
                       ,SECONDLADINGBILLNO,GOODSTYPEID,CONTAINERNO,ASSOCIATENO,CORRESPONDNO,REPUNITNAME,INSPUNITNAME
                       ,CUSTOMERNAME,CREATEUSERNAME,SUBMITUSERNAME,RECORDCODE,ASSOCIATEPEDECLNO
                       ,ASSOCIATETRADEWAY,IETYPE,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES  from LIST_ORDER t";
-
                 string sql = sql_pre + " where CODE = '" + ordercode + "'";
                 DataTable dt1 = DBMgr.GetDataTable(sql);
                 if (!string.IsNullOrEmpty(dt1.Rows[0]["CORRESPONDNO"] + ""))//如果存在多单关联号 多单关联号一定在主订单组里面
                 {
                     string correspondno = dt1.Rows[0]["CORRESPONDNO"] + "";
-                    ASSOCIATENO = correspondno.Replace("GF", "GL");//通过多单关联号，如果两单关联号存在的话，可以通过这种方式计算出来
-
-                    sql = sql_pre + " where t.BUSITYPE = '41' and ASSOCIATENO='" + ASSOCIATENO + "' and CORRESPONDNO='" + correspondno + "'";
+                    // ASSOCIATENO = correspondno.Replace("GF", "GL");//通过多单关联号，如果两单关联号存在的话，可以通过这种方式计算出来
+                    // sql = sql_pre + " where t.BUSITYPE = '41' and ASSOCIATENO='" + ASSOCIATENO + "' and CORRESPONDNO='" + correspondno + "'";
+                    sql = sql_pre + " where t.BUSITYPE = '41' and ENTRUSTWAY='进口企业'  and CORRESPONDNO='" + correspondno + "'";
                     dt = DBMgr.GetDataTable(sql);
                     if (dt.Rows.Count > 0)//有可能主订单组里面只有出没有进，所以要判断一下
                     {
@@ -158,7 +138,8 @@ namespace MvcPlatform.Controllers
                         code1 = dt.Rows[0]["CODE"] + "";
                         ordercodes += string.IsNullOrEmpty(ordercodes) ? code1 : "," + code1;
                     }
-                    sql = sql_pre + " where BUSITYPE = '40' and ASSOCIATENO='" + ASSOCIATENO + "' and CORRESPONDNO='" + correspondno + "'";
+                    // sql = sql_pre + " where BUSITYPE = '40' and ASSOCIATENO='" + ASSOCIATENO + "' and CORRESPONDNO='" + correspondno + "'";
+                    sql = sql_pre + " where BUSITYPE = '40' and  ENTRUSTWAY='出口企业'  and CORRESPONDNO='" + correspondno + "'";
                     dt = DBMgr.GetDataTable(sql);
                     if (dt.Rows.Count > 0)
                     {
@@ -166,7 +147,8 @@ namespace MvcPlatform.Controllers
                         code2 = dt.Rows[0]["CODE"] + "";
                         ordercodes += string.IsNullOrEmpty(ordercodes) ? code2 : "," + code2;
                     }
-                    sql = sql_pre + " where BUSITYPE = '41' and ASSOCIATENO!='" + ASSOCIATENO + "' and CORRESPONDNO='" + correspondno + "'";
+                    // sql = sql_pre + " where BUSITYPE = '41' and ASSOCIATENO!='" + ASSOCIATENO + "' and CORRESPONDNO='" + correspondno + "'";
+                    sql = sql_pre + " where BUSITYPE = '41' and ENTRUSTWAY='HUB仓进' and CORRESPONDNO='" + correspondno + "'";
                     dt = DBMgr.GetDataTable(sql);
                     if (dt.Rows.Count > 0)
                     {
@@ -174,7 +156,8 @@ namespace MvcPlatform.Controllers
                         code3 = dt.Rows[0]["CODE"] + "";
                         ordercodes += string.IsNullOrEmpty(ordercodes) ? code3 : "," + code3;
                     }
-                    sql = sql_pre + " where BUSITYPE = '40' and ASSOCIATENO!='" + ASSOCIATENO + "' and CORRESPONDNO='" + correspondno + "'";
+                    // sql = sql_pre + " where BUSITYPE = '40' and ASSOCIATENO!='" + ASSOCIATENO + "' and CORRESPONDNO='" + correspondno + "'";
+                    sql = sql_pre + " where BUSITYPE = '40' and ENTRUSTWAY='HUB仓出' and CORRESPONDNO='" + correspondno + "'";
                     dt = DBMgr.GetDataTable(sql);
                     if (dt.Rows.Count > 0)
                     {
@@ -183,22 +166,38 @@ namespace MvcPlatform.Controllers
                         ordercodes += string.IsNullOrEmpty(ordercodes) ? code4 : "," + code4;
                     }
                 }
-                else if (!string.IsNullOrEmpty(dt1.Rows[0]["ASSOCIATENO"] + ""))//如果存在两单关联号
+                else
                 {
-                    ASSOCIATENO = dt1.Rows[0]["ASSOCIATENO"] + "";
-                    sql = sql_pre + " where BUSITYPE = '41' and ASSOCIATENO='" + ASSOCIATENO + "'";
-                    dt = DBMgr.GetDataTable(sql);
-                    if (dt.Rows.Count > 0)
+                    if (!string.IsNullOrEmpty(dt1.Rows[0]["ASSOCIATENO"] + ""))//如果存在两单关联号
                     {
-                        data1 = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
-                        code1 = dt.Rows[0]["CODE"] + "";
+                        ASSOCIATENO = dt1.Rows[0]["ASSOCIATENO"] + "";
+                        sql = sql_pre + " where BUSITYPE = '41' and ASSOCIATENO='" + ASSOCIATENO + "'";
+                        dt = DBMgr.GetDataTable(sql);
+                        if (dt.Rows.Count > 0)
+                        {
+                            data1 = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
+                            code1 = dt.Rows[0]["CODE"] + "";
+                        }
+                        sql = sql_pre + " where BUSITYPE = '40' and ASSOCIATENO='" + ASSOCIATENO + "'";
+                        dt = DBMgr.GetDataTable(sql);
+                        if (dt.Rows.Count > 0)
+                        {
+                            data2 = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
+                            code2 = dt.Rows[0]["CODE"] + "";
+                        }
                     }
-                    sql = sql_pre + " where BUSITYPE = '40' and ASSOCIATENO='" + ASSOCIATENO + "'";
-                    dt = DBMgr.GetDataTable(sql);
-                    if (dt.Rows.Count > 0)
+                    else//如果不存在两单关联号
                     {
-                        data2 = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
-                        code2 = dt.Rows[0]["CODE"] + "";
+                        if (dt1.Rows[0]["ASSOCIATENO"] == "41")
+                        {
+                            data1 = JsonConvert.SerializeObject(dt1, iso).TrimStart('[').TrimEnd(']');
+                            code1 = dt1.Rows[0]["CODE"] + "";
+                        }
+                        else
+                        {
+                            data2 = JsonConvert.SerializeObject(dt1, iso).TrimStart('[').TrimEnd(']');
+                            code2 = dt1.Rows[0]["CODE"] + "";
+                        }
                     }
                 }
                 //获取随附文件信息
@@ -421,7 +420,7 @@ namespace MvcPlatform.Controllers
             if (json_head1.Value<string>("IETYPE") == "仅进口")
             {
                 code1 = string.IsNullOrEmpty(json1.Value<string>("CODE")) ? Extension.getOrderCode() : json1.Value<string>("CODE");
-                AssociateNo = "GL" + code1;
+                // AssociateNo = "GL" + code1;
                 json2 = new JObject();//防止前端切换了进出口类型后，表单并没有销毁，但是数据送到了后台
                 original_codes = original_codes.Replace(code1, "");
             }
@@ -429,7 +428,7 @@ namespace MvcPlatform.Controllers
             {
                 json1 = new JObject();//防止前端切换了进出口类型后，表单并没有销毁，但是数据送到了后台
                 code2 = string.IsNullOrEmpty(json2.Value<string>("CODE")) ? Extension.getOrderCode() : json2.Value<string>("CODE");
-                AssociateNo = "GL" + code2;
+                //AssociateNo = "GL" + code2;
                 original_codes = original_codes.Replace(code2, "");
             }
             if (json_head2.Value<string>("IETYPE") == "进/出口业务")
@@ -447,7 +446,7 @@ namespace MvcPlatform.Controllers
             if (json_head2.Value<string>("IETYPE") == "仅进口")
             {
                 code3 = string.IsNullOrEmpty(json3.Value<string>("CODE")) ? Extension.getOrderCode() : json3.Value<string>("CODE");
-                AssociateNo2 = "GL" + code3;
+                //  AssociateNo2 = "GL" + code3;
                 json4 = new JObject();//防止前端切换了进出口类型后，表单并没有销毁，但是数据送到了后台
                 original_codes = original_codes.Replace(code3, "");
             }
@@ -455,7 +454,7 @@ namespace MvcPlatform.Controllers
             {
                 json3 = new JObject();//防止前端切换了进出口类型后，表单并没有销毁，但是数据送到了后台
                 code4 = string.IsNullOrEmpty(json4.Value<string>("CODE")) ? Extension.getOrderCode() : json4.Value<string>("CODE");
-                AssociateNo2 = "GL" + code4;
+                //AssociateNo2 = "GL" + code4;
                 original_codes = original_codes.Replace(code4, "");
             }
             if ((!string.IsNullOrEmpty(code1) || !string.IsNullOrEmpty(code2)) && (!string.IsNullOrEmpty(code3) || !string.IsNullOrEmpty(code4)))
@@ -496,14 +495,14 @@ namespace MvcPlatform.Controllers
                                     ,ORDERREQUEST='{16}',TRADEWAYCODES='{17}',ASSOCIATENO='{18}',CORRESPONDNO='{19}',PACKKIND='{20}'
                                     ,GOODSGW='{21}',GOODSNW='{22}',RECORDCODE='{23}',IETYPE='{24}',SPECIALRELATIONSHIP='{25}'
                                     ,PRICEIMPACT='{26}',PAYPOYALTIES='{27}',STATUS='{28}',SUBMITTIME={29},SUBMITUSERNAME='{30}'
-                                    ,SUBMITUSERID='{31}',ASSOCIATETRADEWAY='{32}',BUSIKIND='{33}',ORDERWAY='{34}',PORTCODE='{35}'                                    
+                                    ,SUBMITUSERID='{31}',ASSOCIATETRADEWAY='{32}',BUSIKIND='{33}',ORDERWAY='{34}',PORTCODE='{35}',DOCSERVICECODE='{36}'                                   
                             ";
 
             if (IsSubmitAfterSave == false)//提交之后保存，就不更新报关报检状态；
             {
-                update_sql += @",DECLSTATUS='{37}',INSPSTATUS='{38}'";
+                update_sql += @",DECLSTATUS='{38}',INSPSTATUS='{39}'";
             }
-            update_sql += @" WHERE CODE = '{36}'";
+            update_sql += @" WHERE CODE = '{37}'";
 
 
             string exe_desc = "";//订单保存时记录各订单的执行情况
@@ -549,7 +548,7 @@ namespace MvcPlatform.Controllers
                             , json1.Value<string>("GOODSGW"), json1.Value<string>("GOODSNW"), json1.Value<string>("RECORDCODE"), json_head1.Value<string>("IETYPE"), GetChk(json1.Value<string>("SPECIALRELATIONSHIP"))
                             , GetChk(json1.Value<string>("PRICEIMPACT")), GetChk(json1.Value<string>("PAYPOYALTIES")), json1.Value<string>("STATUS"), json_head1.Value<string>("SUBMITTIME"), json_head1.Value<string>("SUBMITUSERNAME")
                             , json_head1.Value<string>("SUBMITUSERID"), json1.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_head1.Value<string>("CUSTOMAREACODE")
-                            , code1, json1.Value<string>("DECLSTATUS"), json1.Value<string>("INSPSTATUS")
+                            , json_head1.Value<string>("DOCSERVICECODE"), code1, json1.Value<string>("DECLSTATUS"), json1.Value<string>("INSPSTATUS")
                              );
 
                     if (json1.Value<Int32>("STATUS") >= 15)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
@@ -607,7 +606,7 @@ namespace MvcPlatform.Controllers
                             , json2.Value<string>("GOODSGW"), json2.Value<string>("GOODSNW"), json2.Value<string>("RECORDCODE"), json_head1.Value<string>("IETYPE"), GetChk(json2.Value<string>("SPECIALRELATIONSHIP"))
                             , GetChk(json2.Value<string>("PRICEIMPACT")), GetChk(json2.Value<string>("PAYPOYALTIES")), json2.Value<string>("STATUS"), json_head1.Value<string>("SUBMITTIME"), json_head1.Value<string>("SUBMITUSERNAME")
                             , json_head1.Value<string>("SUBMITUSERID"), json2.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_head1.Value<string>("CUSTOMAREACODE")
-                            , code2, json2.Value<string>("DECLSTATUS"), json2.Value<string>("INSPSTATUS")
+                            , json_head1.Value<string>("DOCSERVICECODE"), code2, json2.Value<string>("DECLSTATUS"), json2.Value<string>("INSPSTATUS")
                          );
                     if (json2.Value<Int32>("STATUS") >= 15)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
                     {
@@ -664,7 +663,7 @@ namespace MvcPlatform.Controllers
                             , json3.Value<string>("GOODSGW"), json3.Value<string>("GOODSNW"), json3.Value<string>("RECORDCODE"), json_head2.Value<string>("IETYPE"), GetChk(json3.Value<string>("SPECIALRELATIONSHIP"))
                             , GetChk(json3.Value<string>("PRICEIMPACT")), GetChk(json3.Value<string>("PAYPOYALTIES")), json3.Value<string>("STATUS"), json_head2.Value<string>("SUBMITTIME"), json_head2.Value<string>("SUBMITUSERNAME")
                             , json_head2.Value<string>("SUBMITUSERID"), json3.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_head2.Value<string>("CUSTOMAREACODE")
-                            , code3, json3.Value<string>("DECLSTATUS"), json3.Value<string>("INSPSTATUS")
+                            , json_head1.Value<string>("DOCSERVICECODE"), code3, json3.Value<string>("DECLSTATUS"), json3.Value<string>("INSPSTATUS")
                             );
 
 
@@ -723,7 +722,7 @@ namespace MvcPlatform.Controllers
                             , json4.Value<string>("GOODSGW"), json4.Value<string>("GOODSNW"), json4.Value<string>("RECORDCODE"), json_head2.Value<string>("IETYPE"), GetChk(json4.Value<string>("SPECIALRELATIONSHIP"))
                             , GetChk(json4.Value<string>("PRICEIMPACT")), GetChk(json4.Value<string>("PAYPOYALTIES")), json4.Value<string>("STATUS"), json_head2.Value<string>("SUBMITTIME"), json_head2.Value<string>("SUBMITUSERNAME")
                             , json_head2.Value<string>("SUBMITUSERID"), json4.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_head2.Value<string>("CUSTOMAREACODE")
-                            , code4, json4.Value<string>("DECLSTATUS"), json4.Value<string>("INSPSTATUS")
+                            , json_head1.Value<string>("DOCSERVICECODE"), code4, json4.Value<string>("DECLSTATUS"), json4.Value<string>("INSPSTATUS")
                          );
                     if (json4.Value<Int32>("STATUS") >= 15)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
                     {
