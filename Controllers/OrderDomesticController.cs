@@ -868,15 +868,7 @@ namespace MvcPlatform.Controllers
                     {
                         dt.Rows[0][filedname] = Convert.ToInt32(dt.Rows[0]["RELATEQUAN"]) > 0 ? "进/出口业务" : "仅进口";
                     }
-                    break;
-                case "CUSTOMAREACODE"://申报关区中文匹配
-                    string sql_t = "select NAME from BASE_CUSTOMDISTRICT  where ENABLED=1 and rownum=1 and CODE='" + dt.Rows[0]["CUSTOMAREACODE"] + "'";
-                    DataTable dt_t = DBMgrBase.GetDataTable(sql_t);
-                    if (dt_t.Rows.Count >= 0)
-                    {
-                        dt.Rows[0][filedname] = dt_t.Rows[0]["NAME"];
-                    }
-                    break;
+                    break;              
             }
         }
         //客户通过客户订单编号从ERP导入数据时需要进行判断有无重复,如果有需要确认是否继续导入  梁 2016-5-14
@@ -934,8 +926,7 @@ namespace MvcPlatform.Controllers
                         SwitchField(ds.Tables[0], "REPWAYID"); //对报关方式进行转换 集中C对应本系统的012  逐笔A对应本系统013  转厂B对应本系统015
                         SwitchField(ds.Tables[0], "ENTRUSTTYPE");//根据报关协作体和报检协作体确定委托类型
                         SwitchField(ds.Tables[0], "CHINNAME");
-                        SwitchField(ds.Tables[0], "IETYPE");
-                        SwitchField(ds.Tables[0], "CUSTOMAREACODE");
+                        SwitchField(ds.Tables[0], "IETYPE"); 
                         data1 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
                     }
                     subsql = "(select count(1) from ops_jz_head where operation_id = 'GJIK" + operateid + "')  RELATEQUAN from ops_jz_head d where d.operation_id = 'GJEK" + operateid + "'";
@@ -946,8 +937,7 @@ namespace MvcPlatform.Controllers
                         SwitchField(ds.Tables[0], "REPWAYID"); //对报关方式进行转换 集中C对应本系统的012  逐笔A对应本系统013  转厂B对应本系统015
                         SwitchField(ds.Tables[0], "ENTRUSTTYPE");//根据报关协作体和报检协作体确定委托类型
                         SwitchField(ds.Tables[0], "CHINNAME");
-                        SwitchField(ds.Tables[0], "IETYPE");
-                        SwitchField(ds.Tables[0], "CUSTOMAREACODE");
+                        SwitchField(ds.Tables[0], "IETYPE"); 
                         data2 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
                     }
                 }
@@ -969,8 +959,7 @@ namespace MvcPlatform.Controllers
                         SwitchField(ds.Tables[0], "REPWAYID"); //对报关方式进行转换 集中C对应本系统的012  逐笔A对应本系统013  转厂B对应本系统015 from ops_dj_head d
                         SwitchField(ds.Tables[0], "ENTRUSTTYPE");//根据报关协作体和报检协作体确定委托类型
                         SwitchField(ds.Tables[0], "CHINNAME");
-                        SwitchField(ds.Tables[0], "IETYPE");
-                        SwitchField(ds.Tables[0], "CUSTOMAREACODE");
+                        SwitchField(ds.Tables[0], "IETYPE"); 
                         result = "true";
                         data1 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
                     }
@@ -981,8 +970,7 @@ namespace MvcPlatform.Controllers
                         SwitchField(ds.Tables[0], "REPWAYID");
                         SwitchField(ds.Tables[0], "ENTRUSTTYPE");
                         SwitchField(ds.Tables[0], "CHINNAME");
-                        SwitchField(ds.Tables[0], "IETYPE");
-                        SwitchField(ds.Tables[0], "CUSTOMAREACODE");
+                        SwitchField(ds.Tables[0], "IETYPE"); 
                         result = "true";
                         data2 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
                     }
@@ -993,8 +981,7 @@ namespace MvcPlatform.Controllers
                         SwitchField(ds.Tables[0], "REPWAYID");
                         SwitchField(ds.Tables[0], "ENTRUSTTYPE");
                         SwitchField(ds.Tables[0], "CHINNAME");
-                        SwitchField(ds.Tables[0], "IETYPE");
-                        SwitchField(ds.Tables[0], "CUSTOMAREACODE");
+                        SwitchField(ds.Tables[0], "IETYPE"); 
                         result = "true";
                         data3 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
                     }
@@ -1005,8 +992,7 @@ namespace MvcPlatform.Controllers
                         SwitchField(ds.Tables[0], "REPWAYID");
                         SwitchField(ds.Tables[0], "ENTRUSTTYPE");
                         SwitchField(ds.Tables[0], "CHINNAME");
-                        SwitchField(ds.Tables[0], "IETYPE");
-                        SwitchField(ds.Tables[0], "CUSTOMAREACODE");
+                        SwitchField(ds.Tables[0], "IETYPE"); 
                         result = "true";
                         data4 = JsonConvert.SerializeObject(ds.Tables[0]).TrimStart('[').TrimEnd(']');
                     }
