@@ -685,6 +685,24 @@
         id: 'field_ORIGINALFILEIDS',
         name: 'ORIGINALFILEIDS'
     });
+    //单证服务单位
+    var store_dzfwdw = Ext.create('Ext.data.JsonStore', {
+        fields: ['CODE', 'NAME'],
+        data: common_data_dzfwdw
+    })
+    var combo_dzfwdw = Ext.create('Ext.form.field.ComboBox', {
+        name: 'DOCSERVICECODE',
+        store: store_dzfwdw,
+        hideTrigger: true,
+        fieldLabel: '单证服务单位',
+        displayField: 'NAME',
+        valueField: 'CODE',
+        triggerAction: 'all',
+        editable: false,
+        value: 'GWYKS',
+        queryMode: 'local',
+        labelWidth: 80
+    })
     var bbar_r = '<div class="btn-group" role="group">'
                         + '<button type="button" onclick="orderBack();" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤单</button>'
                         + '<button type="button" onclick="add_new(20)" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;新增</button>'
@@ -777,7 +795,7 @@
         items: [
         { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_CODE, combo_ENTRUSTTYPENAME, combo_REPWAYNAME, combo_CUSTOMDISTRICTNAME, cont_bgsbdw] },
         { layout: 'column', height: 42, border: 0, items: [combo_DECLWAY, field_SUBMITUSERNAME, field_SUBMITTIME, field_STATUS, cont_bjsbdw] },
-        { layout: 'column', height: 42, border: 0, items: [field_CREATEUSERNAME, field_CREATETIME] },
+        { layout: 'column', height: 42, border: 0, items: [field_CREATEUSERNAME, field_CREATETIME, combo_dzfwdw] },
         { layout: 'column', border: 42, border: 0, items: [label_busiinfo, chk_container] },
         { layout: 'column', height: 42, border: 0, items: [field_CUSNO, combo_PORTCODE, field_jydw, field_quanpackage, field_weight] },
         { layout: 'column', height: 42, border: 0, items: [field_contractno, field_ship, field_LADINGBILLNO, field_myfs, field_ARRIVEDNO] },

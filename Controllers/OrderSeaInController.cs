@@ -116,7 +116,7 @@ namespace MvcPlatform.Controllers
                             ,TRADEWAYCODES,GOODSGW,GOODSNW,PACKKIND,BUSIKIND
                             ,ORDERWAY,CLEARUNIT,CLEARUNITNAME,SHIPNAME,FILGHTNO
                             ,GOODSTYPEID,CONTAINERNO,CREATETIME,SUBMITTIME,SPECIALRELATIONSHIP,PRICEIMPACT
-                            ,PAYPOYALTIES,DECLSTATUS,INSPSTATUS
+                            ,PAYPOYALTIES,DECLSTATUS,INSPSTATUS,DOCSERVICECODE
                             ) 
                         VALUES (LIST_ORDER_id.Nextval
                             ,'{0}','{1}','{2}','{3}','{4}','{5}'
@@ -128,7 +128,7 @@ namespace MvcPlatform.Controllers
                             ,'{31}','{32}','{33}','{34}','{35}'
                             ,'{36}','{37}','{38}','{39}','{40}'
                             ,'{41}','{42}',sysdate,{43},'{44}','{45}'
-                            ,'{46}','{47}','{48}'
+                            ,'{46}','{47}','{48}','{49}'
                             )";
 
                 sql = string.Format(sql
@@ -141,7 +141,7 @@ namespace MvcPlatform.Controllers
                     , json.Value<string>("TRADEWAYCODES"), json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW"), json.Value<string>("PACKKIND"), "001"
                     , "1", json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("SHIPNAME"), json.Value<string>("FILGHTNO")
                     , json.Value<string>("GOODSTYPEID"), json.Value<string>("CONTAINERNO"), json.Value<string>("SUBMITTIME"), GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT"))
-                    , GetChk(json.Value<string>("PAYPOYALTIES")), json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS")
+                    , GetChk(json.Value<string>("PAYPOYALTIES")), json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS"),json.Value<string>("DOCSERVICECODE")
                     );
             }
             else//修改
@@ -156,12 +156,12 @@ namespace MvcPlatform.Controllers
                             ,SUBMITUSERNAME='{26}',CUSTOMERCODE='{27}',CUSTOMERNAME='{28}',DECLCARNO='{29}',TRADEWAYCODES='{30}'
                             ,GOODSGW='{31}',GOODSNW='{32}',PACKKIND='{33}',BUSIKIND='{34}',ORDERWAY='{35}'
                             ,CLEARUNIT='{36}',CLEARUNITNAME='{37}',SHIPNAME='{38}',FILGHTNO='{39}',GOODSTYPEID='{40}'
-                            ,CONTAINERNO='{41}',SPECIALRELATIONSHIP='{42}',PRICEIMPACT='{43}',PAYPOYALTIES='{44}' 
+                            ,CONTAINERNO='{41}',SPECIALRELATIONSHIP='{42}',PRICEIMPACT='{43}',PAYPOYALTIES='{44}',DOCSERVICECODE='{45}' 
                         ";
 
                 if (IsSubmitAfterSave == false)//提交之后保存，就不更新报关报检状态；
                 {
-                    sql += @",DECLSTATUS='{45}',INSPSTATUS='{46}'";
+                    sql += @",DECLSTATUS='{46}',INSPSTATUS='{47}'";
                 }
                 sql += @" WHERE CODE = '{0}'";
 
@@ -175,7 +175,7 @@ namespace MvcPlatform.Controllers
                     , json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW"), json.Value<string>("PACKKIND"), "001", "1"
                     , json.Value<string>("CUSTOMERCODE"), json.Value<string>("CUSTOMERNAME"), json.Value<string>("SHIPNAME"), json.Value<string>("FILGHTNO"), json.Value<string>("GOODSTYPEID")
                     , json.Value<string>("CONTAINERNO"),GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT")), GetChk(json.Value<string>("PAYPOYALTIES"))
-                    , json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS")
+                    , json.Value<string>("DOCSERVICECODE"), json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS")
                 );
 
             }

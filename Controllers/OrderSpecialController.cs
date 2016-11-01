@@ -107,7 +107,7 @@ namespace MvcPlatform.Controllers
                             ,CUSTOMERNAME,DECLCARNO,TRADEWAYCODES,GOODSGW,GOODSNW
                             ,PACKKIND,CREATETIME,SUBMITTIME,GOODSTYPEID,CONTAINERNO,ORDERWAY
                             ,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES,BUSIKIND,CLEARUNIT
-                            ,CLEARUNITNAME,DECLSTATUS,INSPSTATUS
+                            ,CLEARUNITNAME,DECLSTATUS,INSPSTATUS,DOCSERVICECODE
                             )
                       VALUES ( LIST_ORDER_id.Nextval,
                             '{0}','{1}','{2}','{3}','{4}','{5}'
@@ -118,7 +118,7 @@ namespace MvcPlatform.Controllers
                             ,'{26}','{27}','{28}','{29}','{30}'
                             ,'{31}',sysdate,{32},'{33}','{34}','{35}'
                             ,'{36}','{37}','{38}','{39}','{40}'
-                            ,'{41}','{42}','{43}'
+                            ,'{41}','{42}','{43}','{44}'
                             )";
                 sql = string.Format(sql
                         , json.Value<string>("BUSITYPE"), ordercode, json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME"), json.Value<string>("CONTRACTNO")
@@ -129,7 +129,7 @@ namespace MvcPlatform.Controllers
                         , json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLCARNO"), json.Value<string>("TRADEWAYCODES"), json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW")
                         , json.Value<string>("PACKKIND"), json.Value<string>("SUBMITTIME"), json.Value<string>("GOODSTYPEID"), json.Value<string>("CONTAINERNO")
                         , "1", GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT")), GetChk(json.Value<string>("PAYPOYALTIES")), "002"
-                        , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS")
+                        , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS"), json.Value<string>("DOCSERVICECODE")
                        );
             }
             else//修改
@@ -143,12 +143,12 @@ namespace MvcPlatform.Controllers
                             ,STATUS='{21}',SUBMITUSERID='{22}',SUBMITUSERNAME='{23}',CUSTOMERCODE='{24}',CUSTOMERNAME='{25}'
                             ,DECLCARNO='{26}',TRADEWAYCODES='{27}',SUBMITTIME={28},GOODSGW='{29}',GOODSNW='{30}'
                             ,PACKKIND='{31}',GOODSTYPEID='{32}',CONTAINERNO='{33}',ORDERWAY='{34}'
-                            ,SPECIALRELATIONSHIP='{35}',PRICEIMPACT='{36}',PAYPOYALTIES='{37}',CLEARUNIT='{38}',CLEARUNITNAME='{39}' 
+                            ,SPECIALRELATIONSHIP='{35}',PRICEIMPACT='{36}',PAYPOYALTIES='{37}',CLEARUNIT='{38}',CLEARUNITNAME='{39}',DOCSERVICECODE='{40}'  
                             ";
 
                 if (IsSubmitAfterSave == false)//提交之后保存，就不更新报关报检状态；
                 {
-                    sql += @",DECLSTATUS='{40}',INSPSTATUS='{41}'";
+                    sql += @",DECLSTATUS='{41}',INSPSTATUS='{42}'";
                 }
                 sql += @" WHERE CODE = '{0}'";
 
@@ -161,7 +161,7 @@ namespace MvcPlatform.Controllers
                         , json.Value<string>("DECLCARNO"), json.Value<string>("TRADEWAYCODES"), json.Value<string>("SUBMITTIME"), json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW")
                         , json.Value<string>("PACKKIND"), json.Value<string>("GOODSTYPEID"), json.Value<string>("CONTAINERNO"), "1"
                         , GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT")), GetChk(json.Value<string>("PAYPOYALTIES")), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
-                        , json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS")
+                        , json.Value<string>("DOCSERVICECODE"), json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS")
                      );
             }
             int result = DBMgr.ExecuteNonQuery(sql);

@@ -112,7 +112,7 @@ namespace MvcPlatform.Controllers
                             ,SUBMITUSERID,SUBMITUSERNAME,CUSTOMERCODE,CUSTOMERNAME,DECLCARNO
                             ,TRADEWAYCODES,GOODSGW,GOODSNW,PACKKIND,BUSIKIND
                             ,ORDERWAY,CLEARUNIT,CLEARUNITNAME,CREATETIME,SPECIALRELATIONSHIP,PRICEIMPACT
-                            ,PAYPOYALTIES,SUBMITTIME,DECLSTATUS,INSPSTATUS                            
+                            ,PAYPOYALTIES,SUBMITTIME,DECLSTATUS,INSPSTATUS,DOCSERVICECODE                        
                         ) VALUES (LIST_ORDER_id.Nextval
                             ,'{0}','{1}','{2}','{3}','{4}','{5}'
                             ,'{6}','{7}','{8}','{9}','{10}'
@@ -122,7 +122,7 @@ namespace MvcPlatform.Controllers
                             ,'{26}','{27}','{28}','{29}','{30}'
                             ,'{31}','{32}','{33}','{34}','{35}'
                             ,'{36}','{37}','{38}',sysdate,'{39}','{40}'
-                            ,'{41}',{42},'{43}','{44}'
+                            ,'{41}',{42},'{43}','{44}','{45}'
                             )";
                 sql = string.Format(sql
                         , "11", ordercode, json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME"),json.Value<string>("CONTRACTNO")
@@ -133,7 +133,7 @@ namespace MvcPlatform.Controllers
                         , json.Value<string>("SUBMITUSERID"), json.Value<string>("SUBMITUSERNAME"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLCARNO")
                         ,json.Value<string>("TRADEWAYCODES"), json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW"),json.Value<string>("PACKKIND"), "001"
                         , "1", json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT"))
-                        , GetChk(json.Value<string>("PAYPOYALTIES")), json.Value<string>("SUBMITTIME"), json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS")
+                        , GetChk(json.Value<string>("PAYPOYALTIES")), json.Value<string>("SUBMITTIME"), json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS"),json.Value<string>("DOCSERVICECODE")
                    );
             }
             else//修改
@@ -147,12 +147,12 @@ namespace MvcPlatform.Controllers
                             ,INSPUNITNAME='{21}',ORDERREQUEST='{22}',STATUS='{23}',SUBMITUSERID='{24}',SUBMITUSERNAME='{25}'
                             ,CUSTOMERCODE='{26}',CUSTOMERNAME='{27}',DECLCARNO='{28}',TRADEWAYCODES='{29}',GOODSGW='{30}'
                             ,GOODSNW='{31}',PACKKIND='{32}',BUSIKIND='{33}',ORDERWAY='{34}',CLEARUNIT='{35}'
-                            ,CLEARUNITNAME='{36}',SPECIALRELATIONSHIP='{37}', PRICEIMPACT='{38}',PAYPOYALTIES='{39}',SUBMITTIME={40}                             
+                            ,CLEARUNITNAME='{36}',SPECIALRELATIONSHIP='{37}', PRICEIMPACT='{38}',PAYPOYALTIES='{39}',SUBMITTIME={40},DOCSERVICECODE='{41}'                             
                         ";
 
                 if (IsSubmitAfterSave == false)//提交之后保存，就不更新报关报检状态；
                 {
-                    sql += @",DECLSTATUS='{41}',INSPSTATUS='{42}'";
+                    sql += @",DECLSTATUS='{42}',INSPSTATUS='{43}'";
                 }
                 sql += @" WHERE CODE = '{0}'";
                      
@@ -165,7 +165,7 @@ namespace MvcPlatform.Controllers
                         , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLCARNO"), json.Value<string>("TRADEWAYCODES"), json.Value<string>("GOODSGW")
                         , json.Value<string>("GOODSNW"), json.Value<string>("PACKKIND"), "001", "1", json_user.Value<string>("CUSTOMERCODE")
                         , json_user.Value<string>("CUSTOMERNAME"), GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT")), GetChk(json.Value<string>("PAYPOYALTIES")), json.Value<string>("SUBMITTIME")
-                        , json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS")
+                        , json.Value<string>("DOCSERVICECODE"),json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS")
                         );
 
             }
