@@ -149,12 +149,12 @@ namespace MvcPlatform.Controllers
                             ,CUSTOMERNAME='{26}',DECLCARNO='{27}',TRADEWAYCODES='{28}',SUBMITTIME={29},GOODSGW='{30}'
                             ,GOODSNW='{31}',PACKKIND='{32}',BUSIKIND='{33}',ORDERWAY='{34}',CLEARUNIT='{35}'
                             ,CLEARUNITNAME='{36}',SHIPNAME='{37}',FILGHTNO='{38}',GOODSTYPEID='{39}',CONTAINERNO='{40}'
-                            ,SPECIALRELATIONSHIP='{41}',PRICEIMPACT='{42}', PAYPOYALTIES='{43}',DOCSERVICECODE='{45}' 
+                            ,SPECIALRELATIONSHIP='{41}',PRICEIMPACT='{42}', PAYPOYALTIES='{43}',DOCSERVICECODE='{44}' 
                             ";
 
                 if (IsSubmitAfterSave == false)//提交之后保存，就不更新报关报检状态；
                 {
-                    sql += @",DECLSTATUS='{46}',INSPSTATUS='{47}'";
+                    sql += @",DECLSTATUS='{45}',INSPSTATUS='{46}'";
                 }
                 sql += @" WHERE CODE = '{0}'";
 
