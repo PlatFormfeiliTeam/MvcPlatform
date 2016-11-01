@@ -138,7 +138,6 @@ namespace MvcPlatform.Controllers
                         code1 = dt.Rows[0]["CODE"] + "";
                         ordercodes += string.IsNullOrEmpty(ordercodes) ? code1 : "," + code1;
                     }
-                    // sql = sql_pre + " where BUSITYPE = '40' and ASSOCIATENO='" + ASSOCIATENO + "' and CORRESPONDNO='" + correspondno + "'";
                     sql = sql_pre + " where BUSITYPE = '40' and  ENTRUSTWAY='出口企业'  and CORRESPONDNO='" + correspondno + "'";
                     dt = DBMgr.GetDataTable(sql);
                     if (dt.Rows.Count > 0)
@@ -147,7 +146,6 @@ namespace MvcPlatform.Controllers
                         code2 = dt.Rows[0]["CODE"] + "";
                         ordercodes += string.IsNullOrEmpty(ordercodes) ? code2 : "," + code2;
                     }
-                    // sql = sql_pre + " where BUSITYPE = '41' and ASSOCIATENO!='" + ASSOCIATENO + "' and CORRESPONDNO='" + correspondno + "'";
                     sql = sql_pre + " where BUSITYPE = '41' and ENTRUSTWAY='HUB仓进' and CORRESPONDNO='" + correspondno + "'";
                     dt = DBMgr.GetDataTable(sql);
                     if (dt.Rows.Count > 0)
@@ -156,7 +154,6 @@ namespace MvcPlatform.Controllers
                         code3 = dt.Rows[0]["CODE"] + "";
                         ordercodes += string.IsNullOrEmpty(ordercodes) ? code3 : "," + code3;
                     }
-                    // sql = sql_pre + " where BUSITYPE = '40' and ASSOCIATENO!='" + ASSOCIATENO + "' and CORRESPONDNO='" + correspondno + "'";
                     sql = sql_pre + " where BUSITYPE = '40' and ENTRUSTWAY='HUB仓出' and CORRESPONDNO='" + correspondno + "'";
                     dt = DBMgr.GetDataTable(sql);
                     if (dt.Rows.Count > 0)
@@ -284,16 +281,28 @@ namespace MvcPlatform.Controllers
                             ,DECLSTATUS=case when DECLSTATUS is null then null else '0' end
                             ,INSPSTATUS=case when INSPSTATUS is null then null else '0' end
                             ,SUBMITTIME=NULL,SUBMITUSERNAME=NULL,SUBMITUSERID=NULL
-                          where CORRESPONDNO='" + dt.Rows[0]["CORRESPONDNO"] + "'";
+                            where CORRESPONDNO='" + dt.Rows[0]["CORRESPONDNO"] + "'";
                 }
-                else if (!string.IsNullOrEmpty(dt.Rows[0]["ASSOCIATENO"] + ""))
+                else
                 {
-                    sql_tmp = "select * from list_order where ASSOCIATENO='" + dt.Rows[0]["ASSOCIATENO"] + "'";
-                    sql = @"update list_order set STATUS=0
+                    if (!string.IsNullOrEmpty(dt.Rows[0]["ASSOCIATENO"] + ""))
+                    {
+                        sql_tmp = "select * from list_order where ASSOCIATENO='" + dt.Rows[0]["ASSOCIATENO"] + "'";
+                        sql = @"update list_order set STATUS=0
                             ,DECLSTATUS=case when DECLSTATUS is null then null else '0' end
                             ,INSPSTATUS=case when INSPSTATUS is null then null else '0' end
                             ,SUBMITTIME=NULL,SUBMITUSERNAME=NULL,SUBMITUSERID=NULL
                           where ASSOCIATENO='" + dt.Rows[0]["ASSOCIATENO"] + "'";
+                    }
+                    else
+                    {
+                        sql_tmp = "select * from list_order where code='" + ordercode + "'";
+                        sql = @"update list_order set STATUS=0
+                            ,DECLSTATUS=case when DECLSTATUS is null then null else '0' end
+                            ,INSPSTATUS=case when INSPSTATUS is null then null else '0' end
+                            ,SUBMITTIME=NULL,SUBMITUSERNAME=NULL,SUBMITUSERID=NULL
+                            where code='" + ordercode + "'";
+                    }
                 }
 
                 DBMgr.ExecuteNonQuery(sql);
@@ -304,7 +313,6 @@ namespace MvcPlatform.Controllers
                 {
                     sql = "delete from list_times where CODE='" + dr["CODE"] + "' AND STATUS=10";
                     DBMgr.ExecuteNonQuery(sql);
-
                 }
                 return "{success:true}";
             }
@@ -426,7 +434,7 @@ namespace MvcPlatform.Controllers
             if (json_head1.Value<string>("IETYPE") == "仅出口")
             {
                 json1 = new JObject();//防止前端切换了进出口类型后，表单并没有销毁，但是数据送到了后台
-                code2 = string.IsNullOrEmpty(json2.Value<string>("CODE")) ? Extension.getOrderCode() : json2.Value<string>("CODE");             
+                code2 = string.IsNullOrEmpty(json2.Value<string>("CODE")) ? Extension.getOrderCode() : json2.Value<string>("CODE");
                 original_codes = original_codes.Replace(code2, "");
             }
             if (json_head2.Value<string>("IETYPE") == "进/出口业务")
