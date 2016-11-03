@@ -1,0 +1,128 @@
+
+body{font-family: "微软雅黑";}
+a:hover,a:visited,a:active,a:focus{text-decoration: none;}
+.font-12{font-size: 12px;line-height: 18px;}
+.font-16{font-size: 16px;line-height: 22px;}
+.font-18{font-size: 18px !important;line-height: 24px;}
+.font-20{font-size: 20px;line-height: 26px;}
+.font-22{font-size: 22px;line-height: 28px;}
+.font-24{font-size: 24px;line-height: 30px;}
+.font-26{font-size: 26px;line-height: 32px;}
+.font-30{font-size: 30px;line-height: 36px;}
+.font-32{font-size: 32px;line-height: 38px;}
+.font-36{font-size: 36px;line-height: 42px;}
+.font-40{font-size: 40px;line-height: 46px;}
+.font-42{font-size: 42px;line-height: 48px;}
+.font-44{font-size: 44px;line-height: 50px;}
+.font-48{font-size: 48px;line-height: 56px;}
+.font-50{font-size: 50px !important;line-height: 56px;}
+.color-333{color: #333 !important;}
+
+.btn-md{
+    padding: 10px 36px !important;
+    font-size: 18px;
+}
+.btn-borders{
+    border-width: 2px;
+}
+.btn-radius{
+    border-radius: 4px;
+}
+.btn-groups-left,.btn-groups-left:focus,.btn-groups-left:active{
+    background-color: #f8b600;
+    color: #fff;
+    padding: 14px 50px;
+    border: 2px solid #f8b600;
+    border-radius: 4px 0 0px 4px;
+}
+.btn-groups-left:hover{
+    background-color: transparent;
+    color: #f8b600;
+    padding: 14px 50px;
+    border: 2px solid #f8b600;
+    border-radius: 4px 0 0 4px;
+    border-right-color: transparent;
+}
+.btn-groups-right,.btn-groups-right:focus,.btn-groups-right:active{
+    background-color: transparent;
+    color: #f8b600;
+    padding: 14px 50px;
+    border: 2px solid #f8b600;
+    border-radius: 0 4px 4px 0;
+}
+.btn-groups-right:hover{
+    background-color: #f8b600;
+    color: #fff;
+    padding: 14px 50px;
+    border: 2px solid #f8b600;
+    border-radius: 0 4px 4px 0;
+    border-left-color: #fff;
+}
+.btn-borders-orange,.btn-borders-orange:focus,.btn-borders-orange:active{
+    border-color: #f8b600;
+    color: #f8b600;
+    background-color: transparent;
+}
+.btn-borders-orange:hover{
+    background: #f8b600;
+    border-color: #f8b600;
+    color: #fff;
+}
+.btn-orange,.btn-orange:focus,.btn-orange:active{
+    background: #f8b600;
+    color: #fff;
+    border: none;
+}
+
+/*首页 手风琴切换*/
+.index-accordion div,.index-accordion img,.index-accordion input,.index-accordion dl,.index-accordion dd,.index-accordion p,.index-accordion form ol,.index-accordion ul {margin:0; padding:0;}
+.index-accordion li { list-style: none;}
+.index-accordion a { text-decoration: none; cursor: pointer;}
+.index-accordion a:hover { text-decoration: none; cursor:pointer;}
+.index-accordion a:focus{outline:none;}
+.index-accordion input { outline: none;}
+.index-accordion img { border: 0 none;}
+.index-accordion select { background: transparent;}
+.index-accordion .fl { float: left;}
+.index-accordion .fr { float: right;}
+.index-accordion .ml30{ margin-left:30px;}
+.index-accordion .mb55{ margin-bottom:55px;}
+.index-accordion .mb5{ margin-bottom:5px;}
+.index-accordion .mb13{margin-bottom:13px;}
+.index-accordion .rd50{ border-radius:50px;}
+.index-accordion .fz48{ font-size:48px;}
+.index-accordion .fz36{ font-size:36px;}
+.index-accordion .fz24{font-size:24px;}
+.index-accordion .fz16{ font-size:16px;}
+.index-accordion .fz14{ font-size:14px;}
+.index-accordion .fz12{ font-size:12px;}
+.index-accordion .clear{ clear:both;}
+.index-accordion .flash4{width:1278px;height:380px;margin:0px auto;position:relative; margin-top:50px; border:1px solid #eee; border-left:0;}
+.index-accordion .flash4 ul li{width:248px;height:358px;position:relative;overflow:hidden;float:left;padding:20px 0 0; padding-left:10px; background:#fff;}
+.index-accordion .flash4 ul li p.p-mid{ width:100%; text-align:center;color:#a6a6a6;}
+.index-accordion .flash4 ul li .imgfl{width:250px; height:225px; text-align:center;}
+.index-accordion .flash4 ul li .imgfr{ display:none;}
+.index-accordion .imgfl h2{ font-size:24px; margin-top:20px; font-weight:normal;}
+.index-accordion .imgfl .icon-img{ width:95px; height:95px; margin:20px auto 30px;}
+.index-accordion .imgfl div.ydh-img{ background:url(http://web-img.qmimg.com/qianmicom/u/cms/qianmi/201603/20132248iqr5.png) no-repeat center center;}
+.index-accordion .imgfl div.ysc-img{ background:url(http://web-img.qmimg.com/qianmicom/u/cms/qianmi/201603/2013225999az.png) no-repeat center center;}
+.index-accordion .imgfl div.bbc-img{ background:url(http://web-img.qmimg.com/qianmicom/u/cms/qianmi/201603/20132310dsi6.png) no-repeat center center;}
+.index-accordion .imgfl div.yxd-img{ background:url(http://web-img.qmimg.com/qianmicom/u/cms/qianmi/201603/201323231evc.png) no-repeat center center;}
+.index-accordion .bor-red{border:1px solid #f8b600;border-bottom:0; border-top:0;}
+.index-accordion .bor-g{border-left:1px solid #eee;}
+.index-accordion .flash4 ul li .imgfl{width:220px; margin-left:10px;}
+.index-accordion .flash4 ul li .imgfr{width:250px; height:225px;border-left:1px solid #eee; padding-left:50px; padding-right:10px; margin-top:20px;position:absolute; top:60px; right:10px;}
+.index-accordion .imgfr h3{ margin-bottom:15px;color:#333; }
+.index-accordion .imgfr h3 a{ display:inline-block;width:80px; height:20px; line-height:20px; text-align:center; border:1px solid #eee; border-radius:50px; font-weight:normal; color:#666; margin-left:25px;}
+.index-accordion .imgfr p{ line-height:18px;padding-left:13px;}
+.index-accordion .imgfr p.p-tit{font-weight:400; color:#444; text-align:left;}
+.index-accordion .imgfr p.mb-txt{ margin-bottom:10px; text-align:left;}
+.index-accordion .btn-sy{ width:400px; margin:0 auto; margin-top:20px; display:none;}
+.index-accordion .btn-ls{ display:block; width:100px;margin:0 auto; height:30px; text-align:center; line-height:30px; border-radius:50px; background-color:#d20010; color:#fff;}
+.index-accordion .flash4 ul li.fast{position:absolute;right:0px;bottom:0px;}
+.by-index .index-title .heading.heading-middle-border:before,.solutions-kuajing .heading.heading-middle-border:before,
+.solutions-shequ .heading.heading-middle-border:before ,.solutions-neigou .heading.heading-middle-border:before,
+.solutions-nongcun .heading.heading-middle-border:before
+{
+    border-top: 2px solid #ddd;
+}

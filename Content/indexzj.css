@@ -1,0 +1,57 @@
+.body {
+	min-width:1200px;
+	background-color:#fff;
+	color:#999;
+	font-family:"Microsoft Yahei","Hiragino Sans GB",tahoma,arial;
+	font-size:14px;
+	line-height:22px;
+	margin:0
+}
+.fa {
+	-moz-osx-font-smoothing:grayscale
+}
+html {
+	-webkit-tap-highlight-color:transparent;
+	font-family:sans-serif;
+	-webkit-text-size-adjust:100%;
+	-ms-text-size-adjust:100%;
+	direction:ltr
+}
+.container {
+	margin-right:auto;
+	margin-left:auto;
+	padding-right:15px;
+	padding-left:15px
+}
+@media (min-width:768px) {
+	.container {
+		width:750px
+	}
+}
+@media (min-width:992px) {
+	.container {
+		width:970px
+	}
+}
+@media (min-width:1200px) {
+	.container {
+		width:1200px
+	}
+}
+@media (max-width:479px) {
+	body {
+		font-size:13px
+	}
+}
+.p-none {
+	padding:0!important
+}
+.p-xlg {
+	padding:30px!important
+}
+.pull-left {
+	float:left!important
+}
+.btn, {
+	vertical-align:middle
+}

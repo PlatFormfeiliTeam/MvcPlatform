@@ -1,0 +1,178 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/OutSite.cshtml";
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#myCarousel").hover(function () {
+            $("#btn_prev,#btn_next").fadeIn()
+        }, function () {
+            $("#btn_prev,#btn_next").fadeOut()
+        });
+    });
+</script>
+
+<div id="myCarousel" class="carousel slide">
+    <div class="carousel-inner">
+        <div class="item active">
+            <img src="~/Images/1.jpg" alt="First slide">
+        </div>
+        <div class="item">
+            <img src="~/Images/2.png" alt="Second slide">
+        </div>
+        <div class="item">
+            <img src="~/Images/3.jpg" alt="Third slide">
+        </div>
+    </div>
+    <a id="btn_prev" class="carousel-control left" href="#myCarousel"
+       data-slide="prev" style="background-image: url(/Images/leftU.png); background-repeat: no-repeat; top: 10%; background-position: right; "></a>
+    <a id="btn_next" class="carousel-control right" href="#myCarousel"
+       data-slide="next" style="background-image: url(/Images/rightU.png); background-repeat: no-repeat; top: 10%; background-position: left"></a>
+</div> 
+
+<link href="~/Content/custom.css" rel="stylesheet" />
+<link href="~/Content/indexzj.css" rel="stylesheet" />
+<link href="~/Content/theme-animate.css" rel="stylesheet" />
+@*中间层*@
+<div class="index-accordion">
+    <div class="index-title center">
+        <p class="font-30 color-444 mb-none">产品在线</p>
+        <div class="heading heading-border heading-middle-border">
+            <div class="divider divider-small">
+                <hr  />@*style="height: 1px; border: none; border-top: 1px solid gray; margin-bottom: 5px !important; margin-top: 5px !important;"*@
+            </div>
+        </div>
+        <p class="font-20 mt-xlg mb-xlg">提升业务效率、扩大品牌效应、匹配规模体量、从先进的产品开始</p>
+    </div>
+    <div class="flash4">
+        <ul id="accordion">
+            <li class="bor-red" id="haokuaiji" style="width: 534px;">
+                <p class="p-mid">新手上路</p>
+                <div class="imgfl">
+                    <h2>云订货</h2>
+                    <a href="#" target="_blank">
+                        <div class="icon-img ydh-img"></div>
+                    </a>
+                    <p>
+                        订货效率更高，渠道拓新更快<br>
+                        客情关系更好
+                    </p>
+                </div>
+                <div class="imgfr appear-animation fadeInDown appear-animation-visible">
+                    <h3 class="fz14">云订货优势功能简介：</h3>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i> 移动订货：</p>
+                    <p class="mb-txt font-12">APP与PC端同步，支持手机随时随地下单，提升订货效率</p>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i> 渠道拓展：</p>
+                    <p class="mb-txt font-12">全网独有的销售员跑网点利器，帮助销售员高效拓客，提升销量</p>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i>支持多种价格方案：</p>
+                    <p class="mb-txt font-12">渠道异价、销售返点、满赠货品…完美贴合各行业批发场景</p>
+                </div>
+                <div id="accountantFunction" class="btn-sy mt-xlg center"> <a href="http://www.qianmi.com/reg?sid=0033&us=%E5%8D%83%E7%B1%B3%E5%AE%98%E7%BD%91-%E4%BA%91%E8%AE%A2%E8%B4%A7" target="_blank" class="btn btn-default btn-orange btn-md btn-radius fz12">免费试用</a> </div>
+            </li>
+            <li class="bor-g" id="haoshengyi" style="width: 248px;">
+                <p class="p-mid">常见问题</p>
+                <div class="imgfl">
+                    <h2>云商城</h2>
+                    <a href="#" target="_blank">
+                        <div class="icon-img ysc-img"></div>
+                    </a>
+                    <p>
+                        线上多屏零售，线下门店管理<br>
+                        玩转O2O
+                    </p>
+                </div>
+                <div class="fr imgfr  appear-animation fadeInDown appear-animation-visible">
+                    <h3 class="fz14">云商城优势功能简介：</h3>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i> 可视化建站：</p>
+                    <p class="mb-txt font-12">行业模版、灵活添加模块、自由配置图片</p>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i> 精准营销：</p>
+                    <p class="mb-txt font-12">满减满赠满折、优惠券、会员营销</p>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i>线上线下融合：</p>
+                    <p class="mb-txt font-12">会员融合、智能分单、门店管理</p>
+                </div>
+                <div class="btn-sy mt-xlg center"> <a href="#" target="_blank" class="btn btn-default btn-orange btn-md btn-radius fz12">免费试用</a> </div>
+            </li>
+            <li class="bor-g" id="workGroup" style="width: 248px;">
+                <p class="p-mid">业务流程</p>
+                <div class="imgfl">
+                    <h2>多用户商城B2B2C</h2>
+                    <a href="#" target="_blank">
+                        <div class="icon-img bbc-img"></div>
+                    </a>
+                    <p>
+                        供应商入驻，智慧商圈<br>
+                        连锁直营
+                    </p>
+                </div>
+                <div class="fr imgfr appear-animation fadeInDown appear-animation-visible">
+                    <h3 class="fz14">B2B2C系统优势功能简介：</h3>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i> 商家对账：</p>
+                    <p class="mb-txt font-12">销售扣点、佣金、各项费用缴纳</p>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i> 店铺街：</p>
+                    <p class="mb-txt font-12">商品推荐位、促销活动、促销单品露出</p>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i> 精准搜索：</p>
+                    <p class="mb-txt font-12">分词和全文索引能力、快速精准匹配</p>
+                </div>
+                <div class="btn-sy mt-xlg center"> <a href="#" target="_blank" class="btn btn-default btn-orange btn-md btn-radius fz12">免费试用</a> </div>
+            </li>
+            <li class="fast bor-g" id="crm" style="width: 248px;">
+                <p class="p-mid">相关下载</p>
+                <div class="imgfl">
+                    <h2>云小店</h2>
+                    <a href="#" target="_blank">
+                        <div class="icon-img yxd-img"></div>
+                    </a>
+                    <p>
+                        门店管理、店员管理<br>
+                        库存管理
+                    </p>
+                </div>
+                <div class="fr imgfr appear-animation fadeInDown appear-animation-visible">
+                    <h3 class="fz14">云小店优势功能简介：</h3>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i>业绩捆绑：</p>
+                    <p class="mb-txt font-12">门店销售业绩、新品销量与店员直接挂钩</p>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i>代客下单：</p>
+                    <p class="mb-txt font-12">
+                        获取新会员、服务老会员更简单<br>
+                    </p>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i>全员分销：</p>
+                    <p class="mb-txt font-12">成为门店的合伙人，让门店销量翻番</p>
+                </div>
+                <div class="btn-sy mt-xlg center"> <a href="#" target="_blank" class="btn btn-default btn-orange btn-md btn-radius fz12">免费试用</a> </div>
+            </li>
+        </ul>
+    </div>
+</div>
+<script src="~/js/bxslider.js"></script>
+<script type="text/javascript">
+    //手风琴切换
+    var $list = $("#accordion li"),
+            isSameLi = function (e, t) {
+                return e.attr("id").indexOf(t.attr("id")) == -1 ? !1 : !0
+            },
+            expandsCommon = function (e) {
+                lastLeaveLi && (isSameLi(e, lastLeaveLi) || hideCommon(lastLeaveLi)), $this = e, $this.stop().animate({
+                    width: "534px"
+                }, 500, function () {
+                    $(".imgfr", e).stop(!0, !0).show(), $(".btn-sy", e).stop(!0, !0).fadeIn()
+                }).removeClass("bor-g").addClass("bor-red"), $("#accordion > li").each(function () {
+                    var t = $(this);
+                    isSameLi(e, t) || hideCommon(t)
+                })
+            },
+            hideCommon = function (e) {
+                $this = e, $this.stop().animate({
+                    width: "248px"
+                }, 1e3).removeClass("bor-red").addClass("bor-g"), $(".imgfr", e).stop(!0, !0).hide(), $(".btn-sy", e).stop(!0, !0).fadeOut()
+            },
+            lastLeaveLi = undefined;
+    $(function () {
+        expandsCommon($("#accordion > li:first")), $("#accordion > li").hover(function () {
+            var e = $(this);
+            expandsCommon(e)
+        }, function () {
+            lastLeaveLi = $(this)
+        })
+    });
+</script>
