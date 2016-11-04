@@ -119,23 +119,23 @@
         items: [combo_filetype1, combo_ietype1, field_fileno1, bbar_l, bbar_r]
     })
     store_file1 = Ext.create('Ext.data.JsonStore', {
-        fields: ['ID', 'FILENAME', 'ORIGINALNAME', 'FILETYPE', 'FILETYPENAME', 'UPLOADTIME', 'SIZES', 'IETYPE'],
-        listeners: {
-            datachanged: function (sf_1, eOpts) {
-                if (sf_1.find('IETYPE', '仅进口') >= 0 && Ext.getCmp('field_status1').getValue() == 1) {
-                    Ext.getCmp('field_status1').setValue(10);
-                }
-                if (sf_1.find('IETYPE', '仅进口') < 0 && Ext.getCmp('field_status1').getValue() == 10) {
-                    Ext.getCmp('field_status1').setValue(1);
-                }
-                if (sf_1.find('IETYPE', '仅出口') >= 0 && Ext.getCmp('field_status2').getValue() == 1) {
-                    Ext.getCmp('field_status2').setValue(10);
-                }
-                if (sf_1.find('IETYPE', '仅出口') < 0 && Ext.getCmp('field_status2').getValue() == 10) {
-                    Ext.getCmp('field_status2').setValue(1);
-                }
-            }
-        }
+        fields: ['ID', 'FILENAME', 'ORIGINALNAME', 'FILETYPE', 'FILETYPENAME', 'UPLOADTIME', 'SIZES', 'IETYPE']
+        //listeners: {
+        //    datachanged: function (sf_1, eOpts) {
+        //        if (sf_1.find('IETYPE', '仅进口') >= 0 && Ext.getCmp('field_status1').getValue() == 0) {
+        //            Ext.getCmp('field_status1').setValue(10);
+        //        }
+        //        if (sf_1.find('IETYPE', '仅进口') < 0 && Ext.getCmp('field_status1').getValue() == 10) {
+        //            Ext.getCmp('field_status1').setValue(0);
+        //        }
+        //        if (sf_1.find('IETYPE', '仅出口') >= 0 && Ext.getCmp('field_status2').getValue() == 0) {
+        //            Ext.getCmp('field_status2').setValue(10);
+        //        }
+        //        if (sf_1.find('IETYPE', '仅出口') < 0 && Ext.getCmp('field_status2').getValue() == 10) {
+        //            Ext.getCmp('field_status2').setValue(0);
+        //        }
+        //    }
+        //}
     })
     var tmp1 = new Ext.XTemplate(
         '<tpl for=".">',

@@ -13,7 +13,7 @@
                 //2016-06-21发现工具栏迁移后IE下面上传控件功能异常 为此需要根据订单状态将上传按钮重新初始化一次
                 //四个订单的状态除了在草稿和文件已上传 后面所有的状态是一致的 所以只需要取原始订单的状态
                 //var status = Ext.getCmp('field_status1') ? Ext.getCmp('field_status1').getValue() : Ext.getCmp('field_status2').getValue();
-                var status = formpanelin.isVisible() ? Ext.getCmp('field_status1').getValue() : Ext.getCmp('field_status2').getValue();
+                var status = (formpanelin.isVisible() ? Ext.getCmp('field_status1').getValue() : Ext.getCmp('field_status2').getValue());
                 button_control(status);
             }
         }
@@ -25,7 +25,7 @@ function loadform() {
     Ext.Ajax.request({
         url: "/OrderDomestic/loadform",
         params: { ordercode: ordercode },
-        success: function (response, opts) {
+        success: function (response, opts) { 
             var data = Ext.decode(response.responseText);
             formpanelhead.getForm().setValues(data.data1.IETYPE ? data.data1 : data.data2);
             Ext.getCmp("field_ordercodes").setValue(data.ORDERCODES);//记录所有已经存在的订单号,方便改变进出口类型时进行比对  
@@ -69,7 +69,7 @@ function loadform() {
                 fileids1 += rec.get("ID") + ",";
             })
 
-            //记录当前的订单状态,方便进行按钮及其他控制 取原始订单某一个订单的状态即可
+            //记录当前的订单状态,方便进行按钮及其他控制 取原始订单某一个订单的状态即可            
             var status = formpanelin.isVisible() ? Ext.getCmp('field_status1').getValue() : Ext.getCmp('field_status2').getValue();
             button_control(status);//按钮的控制
 
@@ -135,7 +135,6 @@ function form_control(formdata, index) {
 function readonly_init(formpanel_tmp, formhead_tmp, index) {
     if (Ext.getCmp('field_status' + index)) {
         var status = Ext.getCmp('field_status' + index).getValue();
-
         Ext.Array.each(formpanel_tmp.getForm().getFields().items, function (item) {
             if (item.value != "" && item.value != null && item.value != undefined && item.id != 'field_ORDERREQUEST' + index && item.id != "field_status" + index && item.id != "tf_bgsbdw" + index && item.id != "tf_bjsbdw" + index) {
                 item.setReadOnly(status >= 10);
@@ -146,10 +145,8 @@ function readonly_init(formpanel_tmp, formhead_tmp, index) {
                 item.setReadOnly(status >= 10);
             }
         });
-
         Ext.getCmp('jydw_btn' + index).setDisabled(status >= 10);
         Ext.getCmp("myfs_btn" + index).setDisabled(status >= 10);
-
         if (Ext.getCmp('tf_bgsbdw' + index)) {
             if (Ext.getCmp('tf_bjsbdw' + index).getValue()) {
                 Ext.getCmp('bgsbdw_btn' + index).setDisabled(status >= 10);
@@ -164,13 +161,14 @@ function readonly_init(formpanel_tmp, formhead_tmp, index) {
 }
 
 function button_control(status) {
-    document.getElementById("pickfiles").disabled = status >= 10;
+    //document.getElementById("pickfiles").disabled = status >= 10;
     if (status >= 10) {
-        Ext.Ajax.request({//上传文件按钮除了基本的控制外，还有一种情形就是当后台开启上传权限的数量，即使提交还是可以上传的16050508667
+        //上传文件按钮除了基本的控制外，还有一种情形就是当后台开启上传权限的数量，即使提交还是可以上传的
+        Ext.Ajax.request({
             url: "/OrderDomestic/AdditionFile",
             params: { ORDERCODE: ordercode },
             success: function (response, option) {
-                var json = Ext.decode(response.responseText);
+                var json = Ext.decode(response.responseText);                
                 if (parseInt(json.result) > 0) {
                     upload_ini();
                     document.getElementById("pickfiles").disabled = false;
@@ -178,20 +176,16 @@ function button_control(status) {
                 else {
                     document.getElementById("pickfiles").disabled = true;
                     if (uploader) {
+                        alert();
                         uploader.destroy();
                     }
                 }
             }
         })
     }
-    if (status < 10) {
-        
+    else {
         upload_ini(); //未提交时才初始化上传控件 
     } 
-    if (status >= 10 && uploader) {
-        uploader.destroy();
-    }
-    //上传按钮---已受理后正常情况下不允许上传文件   
     document.getElementById("deletefile").disabled = status >= 10; //删除按钮  --提交后不允许删除setVisibilityMode
     document.getElementById("btn_cancelsubmit").disabled = status != 10;//撤单按钮  只有在提交后受理前才可以撤单
     document.getElementById("btn_addlinkorder").disabled = status >= 10;//新增关联订单
@@ -516,7 +510,7 @@ function order_cancel_submit() {//撤单,防止页面停留后后台已经受理
                 Ext.MessageBox.alert("提示", "已受理的订单不能执行撤单操作！");
                 return;
             }
-            if (json.STATUS == 10 && json.ORDERWAY == "1") {//线上订单已委托，执行撤单功能    
+            if (json.STATUS == 10) {//线上订单已委托，执行撤单功能  && json.ORDERWAY == "1"   
                 Ext.MessageBox.confirm("提示", "确定要执行撤单操作吗？", function (btn) {
                     if (btn == "yes") {
                         Ext.Ajax.request({

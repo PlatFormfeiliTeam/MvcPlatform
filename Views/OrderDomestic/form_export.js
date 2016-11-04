@@ -397,6 +397,7 @@
         fields: ['CODE', 'NAME'],
         data: orderstatus_js_data
     })
+
     var field_STATUS2 = Ext.create('Ext.form.field.ComboBox', {//业务状态
         id: 'field_status2',
         name: 'STATUS',

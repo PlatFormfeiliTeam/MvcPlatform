@@ -298,7 +298,6 @@
         },
         allowBlank: false,
         blankText: '贸易方式不能为空!'
-        // ,multiSelect: true
     })
     //贸易方式
     var field_myfs = {
