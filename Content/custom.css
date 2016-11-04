@@ -98,7 +98,7 @@ a:hover,a:visited,a:active,a:focus{text-decoration: none;}
 .index-accordion .fz12{ font-size:12px;}
 .index-accordion .clear{ clear:both;}
 .index-accordion .flash4{width:1278px;height:380px;margin:0px auto;position:relative; margin-top:50px; border:1px solid #eee; border-left:0;}
-.index-accordion .flash4 ul li{width:248px;height:358px;position:relative;overflow:hidden;float:left;padding:20px 0 0; padding-left:10px; background:#fff;}
+.index-accordion .flash4 ul li{width:248px;height:378px;position:relative;overflow:hidden;float:left;padding:20px 0 0; padding-left:10px; background:#fff;}
 .index-accordion .flash4 ul li p.p-mid{ width:100%; text-align:center;color:#a6a6a6;}
 .index-accordion .flash4 ul li .imgfl{width:250px; height:225px; text-align:center;}
 .index-accordion .flash4 ul li .imgfr{ display:none;}
