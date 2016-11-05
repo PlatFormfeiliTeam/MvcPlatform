@@ -10,7 +10,7 @@ img{ border:none;}
 .pb10{padding-bottom:10px}
 .mt10{margin-top:10px}
 /*main*/
-.lanrenzhijia{width:1278px;margin:50px auto;background:#fff;padding:15px;box-shadow:0 0 10px #ccc;}
+.lanrenzhijia{width:1278px;margin:50px auto;background:#fff;padding:15px;}/*box-shadow:0 0 10px #ccc;*/
 .lanrenzhijia .title{border-bottom: 3px solid #e7e7e7;padding-bottom:10px;}
 .lanrenzhijia .title h2{ font-size: 20px;font-family: "microsoft yahei"; margin-top: 0px;margin-bottom: 0px;}
 .lanrenzhijia .title-list{ position: relative; top: 6px;}
