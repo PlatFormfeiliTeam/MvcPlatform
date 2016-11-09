@@ -17,7 +17,7 @@ namespace MvcPlatform.Controllers
         }
         public ActionResult About()
         {
-            return View();
+            return View(); 
         }
 
     }
