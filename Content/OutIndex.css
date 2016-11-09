@@ -13,10 +13,18 @@
 
 
 #header {
-	background: linear-gradient(rgb(246, 246, 246), rgb(255, 255, 255)); padding: 8px 0px; clear: both; min-height: 100px;position:fixed;z-index:1000;width:100%;
+    /*background: linear-gradient(rgb(246, 246, 246), rgb(255, 255, 255));*/
+    background-color:rgb(255, 255, 255);
+    padding: 8px 0px;
+    clear: both;
+    min-height: 100px;
+    position: fixed;
+    z-index: 9000;
+    width: 100%;
+    top: 0px;
 }
 #header > .container {
-	height: 100px; margin-bottom: -35px; display: table; 
+	height: 100px; margin-bottom: -35px; display: table;
 }
 #header .header-nav-main {
 	margin: 12px 0px 0px; float: right; min-height: 45px;display: block !important;height: auto !important;
