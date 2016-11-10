@@ -45,6 +45,11 @@ img{max-width:100%;vertical-align:middle}
 .service .overlay-right{position:absolute;right:-2px;bottom:-2px;width:15px;height:189px;background-color:#fff}
 .service .service-icon{position:absolute;left:53px;top:35px;width:100px;height:110px;padding-top:12px;background-color:#fff;z-index:11}
 .service .service-icon .circle{width:80px;height:80px;line-height:80px;background:url(/images/changyong/tip1.png) 0 0 no-repeat;text-align:center; color:#359EFB; font-size:28px;}
+.service .service-icon .circle2{width:80px;height:80px;line-height:80px;background:url(/images/changyong/tip2.png) 0 0 no-repeat;text-align:center; color:#359EFB; font-size:28px;}
+.service .service-icon .circle3{width:80px;height:80px;line-height:80px;background:url(/images/changyong/tip3.png) 0 0 no-repeat;text-align:center; color:#359EFB; font-size:28px;}
+.service .service-icon .circle13{width:80px;height:80px;line-height:80px;background:url(/images/changyong/tip13.png) 0 0 no-repeat;text-align:center; color:#359EFB; font-size:28px;}
+.service .service-icon .circle14{width:80px;height:80px;line-height:80px;background:url(/images/changyong/tip14.png) 0 0 no-repeat;text-align:center; color:#359EFB; font-size:28px;}
+.service .service-icon .circle16{width:80px;height:80px;line-height:80px;background:url(/images/changyong/tip16.png) 0 0 no-repeat;text-align:center; color:#359EFB; font-size:28px;}
 .service .service-icon .iconfont{font-size:32px;color:#00a0ff}
 .service .start-point{position:absolute;right:-8px;bottom:-3px;width:0;height:16px;background-color:#fff;overflow:hidden}
 .service .start-point .circle{float:right;width:16px;height:16px;background:url(/images/changyong/1.png) 0 0 no-repeat}
