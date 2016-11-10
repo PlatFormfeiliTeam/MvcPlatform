@@ -19,10 +19,17 @@ a {
 .topRec_List li div {
 	float: left;
 }
-.topRec_List li div:nth-child(1) {
+/*.topRec_List li div:nth-child(1) {
 	width: 70%;text-align: left; 
 }
 .topRec_List li div:nth-child(2) {
 	width: 30%;text-align: right; 
+}*/
+
+.topRec_List li div:first-child {
+	width: 90%;text-align: left; 
 }
 
+.topRec_List li div:last-child {
+	width: 10%;text-align: right; 
+}
