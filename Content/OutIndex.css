@@ -24,7 +24,7 @@
     top: 0px;
 }
 #header > .container {
-	height: 100px; margin-bottom: -35px; display: table;
+	height: 100px; margin-bottom: -35px; display: table; margin: 0 auto; width: 1200px;
 }
 #header .header-nav-main {
 	margin: 12px 0px 0px; float: right; min-height: 45px;display: block !important;height: auto !important;
