@@ -24,13 +24,13 @@
     top: 0px;
 }
 #header > .container {
-	height: 100px; margin-bottom: -35px; display: table; margin: 0 auto; width: 1200px;
+	height: 100px; margin-bottom: -35px; display: table;  width: 1200px;/*margin: 0 auto;*/
 }
 #header .header-nav-main {
 	margin: 12px 0px 0px; float: right; min-height: 45px;display: block !important;height: auto !important;
 }
 #header .header-nav-main nav > ul > li > a {
-	padding: 10px 13px; border-radius: 4px; text-transform: uppercase; line-height: 20px; font-size: 16px; font-weight: 400;color:#444;display:block;
+	padding: 10px 13px; border-radius: 4px; text-transform: uppercase; line-height: 20px; font-size: 16px; font-weight: 400;color:#444;display:block;height: 55px;
 }
 #header .header-nav-main nav > ul > li > a.dropdown-toggle {
 	padding-right: 23px;
@@ -98,7 +98,8 @@
 	position: static;
 }
 #header .header-nav-main nav > ul > li.dropdown-mega > .dropdown-menu {
-	border-radius: 4px; width: auto;left: 0px;  right: 0px;background-color:rgba(255,255,255,0.8);
+	border-radius: 4px; width: auto;left: 0px;  right: 0px;background-color:rgba(255, 255, 255, 0.80);/*IE9以上rgba(135, 239, 246, 0.80)*/
+    /*background-color:#FFFFFF;filter:alpha(opacity=80); -moz-opacity:0.8;  -khtml-opacity: 0.8;  opacity: 0.8;*/  /*IE8  background-color:#9FF2F8*/
 }
 #header .header-nav-main nav > ul > li.dropdown-mega .dropdown-mega-content {
 	padding: 50px 30px;/*padding: 20px 30px;*/
