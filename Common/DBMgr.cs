@@ -5,8 +5,7 @@ using System.Linq;
 using System.Web;
 using Oracle.ManagedDataAccess.Client;
 using System.Data.Common;
-using System.Data;
-//using log4net;
+using System.Data; 
 using System.Reflection;
 
 namespace MvcPlatform.Common

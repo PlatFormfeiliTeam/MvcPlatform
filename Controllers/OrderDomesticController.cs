@@ -98,6 +98,7 @@ namespace MvcPlatform.Controllers
             DataTable dt;
             string data1 = "{}", data2 = "{}", data3 = "{}", data4 = "{}", ASSOCIATENO = "", filedata1 = "[]", filedata2 = "[]";
             string code1 = "", code2 = "", code3 = "", code4 = "";
+            string[] str_arr;
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             string ordercodes = "";//存储所有的订单号 
@@ -105,62 +106,43 @@ namespace MvcPlatform.Controllers
             {
                 string result = "{STATUS:0}";
                 return "{data1:" + result + ",data2:" + result + ",data3:" + result + ",data4:" + result + ",filedata1:" + filedata1 + ",filedata2:" + filedata2 + "}";
-
             }
             else
             {
-                //                string sql_pre = @"select ID,CODE,BUSITYPE,CUSNO,BUSIUNITCODE,BUSIUNITNAME,CONTRACTNO,CLEARANCENO,LAWFLAG,GOODSNUM,REPWAYID
-                //                      ,CUSTOMAREACODE,PORTCODE,REPUNITNAME||'('||REPUNITCODE||')' REPUNITCODE,INSPUNITNAME||'('||INSPUNITCODE||')' INSPUNITCODE
-                //                      ,CUSTOMERCODE,CREATEUSERID,CREATETIME,SUBMITUSERID,SUBMITTIME,STATUS,ORDERREQUEST, ENTRUSTTYPE,SHIPNAME                      
-                //                      ,FILGHTNO,TRADEWAYCODES,DECLCARNO,DECLWAY,PACKKIND,GOODSGW,GOODSNW,ARRIVEDNO,ISINVALID,FIRSTLADINGBILLNO
-                //                      ,SECONDLADINGBILLNO,GOODSTYPEID,CONTAINERNO,ASSOCIATENO,CORRESPONDNO,REPUNITNAME,INSPUNITNAME
-                //                      ,CUSTOMERNAME,CREATEUSERNAME,SUBMITUSERNAME,RECORDCODE,ASSOCIATEPEDECLNO
-                //                      ,ASSOCIATETRADEWAY,IETYPE,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES  from LIST_ORDER t";
-                //                string sql_pre = @"select ID,CODE,BUSITYPE,CUSNO,BUSIUNITCODE,BUSIUNITNAME,CONTRACTNO,CLEARANCENO,LAWFLAG,GOODSNUM,REPWAYID
-                //                      ,CUSTOMAREACODE,PORTCODE,REPUNITCODE,INSPUNITCODE
-                //                      ,CUSTOMERCODE,CREATEUSERID,CREATETIME,SUBMITUSERID,SUBMITTIME,STATUS,ORDERREQUEST, ENTRUSTTYPE,SHIPNAME                      
-                //                      ,FILGHTNO,TRADEWAYCODES,DECLCARNO,DECLWAY,PACKKIND,GOODSGW,GOODSNW,ARRIVEDNO,ISINVALID,FIRSTLADINGBILLNO
-                //                      ,SECONDLADINGBILLNO,GOODSTYPEID,CONTAINERNO,ASSOCIATENO,CORRESPONDNO,REPUNITNAME,INSPUNITNAME
-                //                      ,CUSTOMERNAME,CREATEUSERNAME,SUBMITUSERNAME,RECORDCODE,ASSOCIATEPEDECLNO
-                //                      ,ASSOCIATETRADEWAY,IETYPE,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES  from LIST_ORDER t";
                 string sql_pre = @"select * from LIST_ORDER t";
                 string sql = sql_pre + " where CODE = '" + ordercode + "'";
                 DataTable dt1 = DBMgr.GetDataTable(sql);
                 if (!string.IsNullOrEmpty(dt1.Rows[0]["CORRESPONDNO"] + ""))//如果存在多单关联号 多单关联号一定在主订单组里面
                 {
                     string correspondno = dt1.Rows[0]["CORRESPONDNO"] + "";
-                    // ASSOCIATENO = correspondno.Replace("GF", "GL");//通过多单关联号，如果两单关联号存在的话，可以通过这种方式计算出来
-                    // sql = sql_pre + " where t.BUSITYPE = '41' and ASSOCIATENO='" + ASSOCIATENO + "' and CORRESPONDNO='" + correspondno + "'";
-                    sql = sql_pre + " where t.BUSITYPE = '41' and ENTRUSTWAY='进口企业'  and CORRESPONDNO='" + correspondno + "'";
+                    sql = sql_pre + " where t.BUSITYPE = '41' and CORRESPONDNO='" + correspondno + "' order by ASSOCIATENO asc ,code asc";
                     dt = DBMgr.GetDataTable(sql);
-                    if (dt.Rows.Count > 0)//有可能主订单组里面只有出没有进，所以要判断一下
+                    str_arr = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']').Split(new string[] { "}," }, StringSplitOptions.RemoveEmptyEntries);
+                    if (dt.Rows.Count > 0)
                     {
-                        data1 = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
+                        data1 = str_arr[0] + "}";
                         code1 = dt.Rows[0]["CODE"] + "";
                         ordercodes += string.IsNullOrEmpty(ordercodes) ? code1 : "," + code1;
                     }
-                    sql = sql_pre + " where BUSITYPE = '40' and  ENTRUSTWAY='出口企业'  and CORRESPONDNO='" + correspondno + "'";
+                    if (dt.Rows.Count == 2)
+                    {
+                        data3 = str_arr[1]  ;
+                        code3 = dt.Rows[1]["CODE"] + "";
+                        ordercodes += string.IsNullOrEmpty(ordercodes) ? code3 : "," + code3;
+                    }
+                    sql = sql_pre + " where BUSITYPE = '40' and CORRESPONDNO='" + correspondno + "' order by ASSOCIATENO asc ,code asc";
                     dt = DBMgr.GetDataTable(sql);
+                    str_arr = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']').Split(new string[] { "}," }, StringSplitOptions.RemoveEmptyEntries);
                     if (dt.Rows.Count > 0)
                     {
-                        data2 = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
+                        data2 = str_arr[0] + "}";
                         code2 = dt.Rows[0]["CODE"] + "";
                         ordercodes += string.IsNullOrEmpty(ordercodes) ? code2 : "," + code2;
                     }
-                    sql = sql_pre + " where BUSITYPE = '41' and ENTRUSTWAY='HUB仓进' and CORRESPONDNO='" + correspondno + "'";
-                    dt = DBMgr.GetDataTable(sql);
-                    if (dt.Rows.Count > 0)
+                    if (dt.Rows.Count == 2)
                     {
-                        data3 = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
-                        code3 = dt.Rows[0]["CODE"] + "";
-                        ordercodes += string.IsNullOrEmpty(ordercodes) ? code3 : "," + code3;
-                    }
-                    sql = sql_pre + " where BUSITYPE = '40' and ENTRUSTWAY='HUB仓出' and CORRESPONDNO='" + correspondno + "'";
-                    dt = DBMgr.GetDataTable(sql);
-                    if (dt.Rows.Count > 0)
-                    {
-                        data4 = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
-                        code4 = dt.Rows[0]["CODE"] + "";
+                        data4 = str_arr[1];
+                        code4 = dt.Rows[1]["CODE"] + "";
                         ordercodes += string.IsNullOrEmpty(ordercodes) ? code4 : "," + code4;
                     }
                 }
@@ -480,7 +462,7 @@ namespace MvcPlatform.Controllers
                                 ,IETYPE,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES,SUBMITUSERNAME
                                 ,SUBMITUSERID,ASSOCIATETRADEWAY,BUSIKIND,ORDERWAY,CLEARUNIT
                                 ,CLEARUNITNAME,CREATETIME,SUBMITTIME,PORTCODE,DECLSTATUS
-                                ,INSPSTATUS,ENTRUSTWAY,DOCSERVICECODE) 
+                                ,INSPSTATUS,DOCSERVICECODE) 
                             VALUES (LIST_ORDER_id.Nextval
                                 ,'{0}','{1}','{2}','{3}','{4}','{5}'
                                 ,'{6}','{7}','{8}','{9}','{10}'
@@ -491,7 +473,7 @@ namespace MvcPlatform.Controllers
                                 ,'{31}','{32}','{33}','{34}','{35}'
                                 ,'{36}','{37}','{38}','{39}','{40}'
                                 ,'{41}',sysdate,{42},'{43}','{44}'
-                                ,'{45}','{46}','{47}'
+                                ,'{45}','{46}'
                                 )";
 
             update_sql = @"update LIST_ORDER  SET ASSOCIATEPEDECLNO='{0}',CUSNO='{1}',BUSIUNITCODE='{2}',BUSIUNITNAME='{3}',CONTRACTNO='{4}',GOODSNUM='{5}'
@@ -539,7 +521,7 @@ namespace MvcPlatform.Controllers
                             , json_head1.Value<string>("IETYPE"), GetChk(json1.Value<string>("SPECIALRELATIONSHIP")), GetChk(json1.Value<string>("PRICEIMPACT")), GetChk(json1.Value<string>("PAYPOYALTIES")), json_head1.Value<string>("SUBMITUSERNAME")
                             , json_head1.Value<string>("SUBMITUSERID"), json1.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_user.Value<string>("CUSTOMERCODE")
                             , json_user.Value<string>("CUSTOMERNAME"), json_head1.Value<string>("SUBMITTIME"), json_head1.Value<string>("CUSTOMAREACODE"), json1.Value<string>("DECLSTATUS")
-                            , json1.Value<string>("INSPSTATUS"), "进口企业", json_head1.Value<string>("DOCSERVICECODE")
+                            , json1.Value<string>("INSPSTATUS"),json_head1.Value<string>("DOCSERVICECODE")
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code1;
@@ -597,7 +579,7 @@ namespace MvcPlatform.Controllers
                             , json_head1.Value<string>("IETYPE"), GetChk(json2.Value<string>("SPECIALRELATIONSHIP")), GetChk(json2.Value<string>("PRICEIMPACT")), GetChk(json2.Value<string>("PAYPOYALTIES")), json_head1.Value<string>("SUBMITUSERNAME")
                             , json_head1.Value<string>("SUBMITUSERID"), json2.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_user.Value<string>("CUSTOMERCODE")
                             , json_user.Value<string>("CUSTOMERNAME"), json_head1.Value<string>("SUBMITTIME"), json_head1.Value<string>("CUSTOMAREACODE"), json2.Value<string>("DECLSTATUS")
-                            , json2.Value<string>("INSPSTATUS"), "出口企业", json_head1.Value<string>("DOCSERVICECODE")
+                            , json2.Value<string>("INSPSTATUS"),json_head1.Value<string>("DOCSERVICECODE")
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code2;
@@ -654,7 +636,7 @@ namespace MvcPlatform.Controllers
                             , json_head2.Value<string>("IETYPE"), GetChk(json3.Value<string>("SPECIALRELATIONSHIP")), GetChk(json3.Value<string>("PRICEIMPACT")), GetChk(json3.Value<string>("PAYPOYALTIES")), json_head2.Value<string>("SUBMITUSERNAME")
                             , json_head2.Value<string>("SUBMITUSERID"), json3.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_user.Value<string>("CUSTOMERCODE")
                             , json_user.Value<string>("CUSTOMERNAME"), json_head2.Value<string>("SUBMITTIME"), json_head2.Value<string>("CUSTOMAREACODE"), json3.Value<string>("DECLSTATUS")
-                            , json3.Value<string>("INSPSTATUS"), "HUB仓进", json_head1.Value<string>("DOCSERVICECODE")
+                            , json3.Value<string>("INSPSTATUS"), json_head1.Value<string>("DOCSERVICECODE")
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code3;
@@ -713,7 +695,7 @@ namespace MvcPlatform.Controllers
                             , json_head2.Value<string>("IETYPE"), GetChk(json4.Value<string>("SPECIALRELATIONSHIP")), GetChk(json4.Value<string>("PRICEIMPACT")), GetChk(json4.Value<string>("PAYPOYALTIES")), json_head2.Value<string>("SUBMITUSERNAME")
                             , json_head2.Value<string>("SUBMITUSERID"), json4.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_user.Value<string>("CUSTOMERCODE")
                             , json_user.Value<string>("CUSTOMERNAME"), json_head2.Value<string>("SUBMITTIME"), json_head2.Value<string>("CUSTOMAREACODE"), json4.Value<string>("DECLSTATUS")
-                            , json4.Value<string>("INSPSTATUS"), "HUB仓出", json_head1.Value<string>("DOCSERVICECODE")
+                            , json4.Value<string>("INSPSTATUS"),json_head1.Value<string>("DOCSERVICECODE")
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code4;
