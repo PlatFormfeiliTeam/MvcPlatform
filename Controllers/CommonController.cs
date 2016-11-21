@@ -1885,6 +1885,21 @@ namespace MvcPlatform.Controllers
                           (select CHINNAME from Crm_Enterprise c where c.enterpriseid=d.Customer_code) CHINNAME
                           from OPS_SEAI_ASN_HEAD d  where d.OPERATION_ID = '{2}'";
                     break;
+                case "30"://陆运
+                    sql = @"select '30' BUSITYPE,d.Custom_code CUSTOMAREACODE ,d.DECLARE_CUSTOME PORTCODE ,'' CUSTOMDISTRICTNAME,
+                          '' BUSIUNITCODE ,'' BUSIUNITNAME,'{0}' CUSTOMERCODE,'{1}' CUSTOMERNAME, 
+                          '{0}' CLEARUNIT,'{1}' CLEARUNITNAME,d.PACK_MODE PACKKIND,d.DECLAREPIECE GOODSNUM,d.WEIGHT GOODSGW,
+                          d.TRACKING_NO CUSNO,(select CHINNAME from Crm_Enterprise c where c.enterpriseid=d.Customer_code) CHINNAME                    
+                          from OPS_LE_HEAD d where d.TRACKING_NO = '{2}'";
+                    break;
+                case "31":
+                    sql = @"select  '31' BUSITYPE,d.Custom_code CUSTOMAREACODE,d.JJ_PORT PORTCODE ,lao.TRUCK_ASSIGN_NO MANIFEST,   
+                        '' CUSTOMDISTRICTNAME,'' BUSIUNITCODE ,'' BUSIUNITNAME ,   
+                        '{0}' CUSTOMERCODE,'{1}' CUSTOMERNAME,'{0}' CLEARUNIT,'{1}' CLEARUNITNAME,'001' BUSIKIND,d.PACK_MODE PACKKIND,  
+                        d.PIECES GOODSNUM,d.WEIGHT GOODSGW,d.TRACKING_NO CUSNO, 
+                        (select CHINNAME from Crm_Enterprise c where c.enterpriseid=d.Customer_code) CHINNAME   
+                        from OPS_LI_HEAD d left join OPS_LI_ASSIGN_OP lao on d.tracking_no=lao.tracking_no where d.TRACKING_NO = '{2}'";
+                    break;
                 case "50":
                 case "51":
                     sql = @"select d.DECLARE_CUSTOM CUSTOMAREACODE,CUSTOM_CODE PORTCODE  ,CONSIGN_CODE BUSIUNITCODE,PIECES GOODSNUM,  
