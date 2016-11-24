@@ -28,7 +28,7 @@
 
     var ID, CODEIN, CODEOUT, field_btn1, field_btn2, field_ID, field_TRADEWAYCODES;
     var tabindex = 1;
-
+    var cur_usr;
     var uploader;
     var topbar, formpanelhead, formpanelin, formpanelout, toolbar1, store_file1, panel_file1, formpanelhead2, formpanelin2, formpanelout2, store_file2, panel_file2, tabpanel, fileids1, fileids2;
     var repunitcode1, inspunitcode1, repunitcode2, inspunitcode2, repunitcode3, inspunitcode3, repunitcode4, inspunitcode4;//当前用户默认的报关报检申报单位
@@ -54,6 +54,7 @@
                 inspunitcode3 = commondata.curuser.INSPUNITNAME + "(" + commondata.curuser.CUSTOMERCIQCODE + ")";//报检申报单位
                 repunitcode4 = commondata.curuser.REPUNITNAME + "(" + commondata.curuser.CUSTOMERHSCODE + ")";//报关申报单位
                 inspunitcode4 = commondata.curuser.INSPUNITNAME + "(" + commondata.curuser.CUSTOMERCIQCODE + ")";//报检申报单位
+                cur_usr = commondata.curuser;
                 form_head_ini();
                 form_import_ini();
                 form_export_ini();

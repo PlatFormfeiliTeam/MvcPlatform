@@ -1628,3 +1628,41 @@ function Views() {
     }
     opencenterwin("/Common/OrderView?OrderId=" + recs[0].get("ID") + "&ordercode=" + recs[0].get("CODE") + "&busitypeid=" + recs[0].get("BUSITYPE"), 1200, 800);
 }
+//打印pdf文件 by panhuaguo 2016-09-02  打印时,在原始随附文件的基础上增加订单号和申报方式的选择
+function printFile(type) {
+    var records = [];
+    if (type != 'gn') {
+        records = Ext.getCmp('w_fileview').getSelectionModel().getSelection();
+    }
+    else {
+        records = Ext.getCmp('fileview1').getSelectionModel().getSelection();
+    }
+    if (records.length == 0) {
+        Ext.MessageBox.alert("提示", "请选择要打印的记录！");
+        return
+    }
+    Ext.Ajax.request({
+        url: '/Common/PdfPrint',
+        params: { ordercode: ordercode, repwayname: Ext.getCmp("combo_REPWAYNAME").getRawValue(), filename: records[0].get("FILENAME"), type: type },
+        success: function (response, options) {
+            //var json = Ext.decode(response.responseText);
+            if (response.responseText == "error") {
+                Ext.MessageBox.alert("提示", "打印文件失败！");
+                return;
+            }
+            var win = Ext.create("Ext.window.Window", {
+                title: "文件预览",
+                width: 1000,
+                height: 700,
+                layout: "fit",
+                modal: true,
+                closeAction: "destroy",
+                items: [{
+                    html: "<div id='pdfPrintDiv' style='height: 100%;width: 100%;'></div>"
+                }]
+            });
+            win.show();
+            document.getElementById('pdfPrintDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="/FileUpload/file/' + response.responseText + '"></embed>';
+        }
+    });
+}

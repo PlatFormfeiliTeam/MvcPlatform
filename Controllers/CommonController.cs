@@ -2240,6 +2240,56 @@ namespace MvcPlatform.Controllers
             return JsonConvert.SerializeObject(dt_cus);
         }
 
+        public string PdfPrint()
+        {
+            try
+            {
+                Uri url = new Uri(ConfigurationManager.AppSettings["AdminUrl"].ToString() + "/file/" + Request["filename"]);
+                string path = ConfigurationManager.AppSettings["WebFilePath"].ToString();
+                PdfReader pdfReader = new PdfReader(url);
+                string newname = Guid.NewGuid().ToString();
+
+                PdfStamper pdfStamper = new PdfStamper(pdfReader, new FileStream(path + newname + ".pdf", FileMode.Create, FileAccess.Write, FileShare.None));
+                BaseFont baseFont = BaseFont.CreateFont("C:\\Windows\\Fonts\\simhei.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);//获取系统的字体  
+                iTextSharp.text.Font font = new iTextSharp.text.Font(baseFont, 12);
+
+                //Phrase p = new Phrase(Request["ordercode"] + "  " + Request["repwayname"], font);
+                Chunk chunk = new Chunk(Request["ordercode"] + "  " + Request["repwayname"], font); chunk.SetBackground(BaseColor.WHITE);
+                Phrase p = new Phrase();
+                p.Add(chunk);
+                //设置块的背景色           
+                PdfContentByte over = pdfStamper.GetOverContent(1);//PdfContentBye类，用来设置图像和文本的绝对位置  
+                ColumnText.ShowTextAligned(over, Element.ALIGN_CENTER, p, pdfReader.GetPageSize(1).Width - 100, pdfReader.GetPageSize(1).Height - 20, 0);
+                pdfStamper.Close();
+                string sql = "";
+                if (Request["type"] + "" != "gn")//如果是非国内订单
+                {
+                    sql = "update list_order set printstatus=1 where code='" + Request["ordercode"] + "'";
+                }
+                else
+                {
+                    sql = "select * from list_order where code='" + Request["ordercode"] + "'";
+                    DataTable dt = DBMgr.GetDataTable(sql);
+                    if (!string.IsNullOrEmpty(dt.Rows[0]["CORRESPONDNO"] + ""))
+                    {
+                        sql = "update list_order set printstatus=1 where CORRESPONDNO='" + dt.Rows[0]["CORRESPONDNO"] + "'";
+                    }
+                    else
+                    {
+                        sql = "update list_order set printstatus=1 where ASSOCIATENO='" + dt.Rows[0]["ASSOCIATENO"] + "'";
+                    }
+                }
+                DBMgr.ExecuteNonQuery(sql);
+                return newname + ".pdf";
+
+            }
+            catch (Exception)
+            {
+                return "error";
+
+            }
+    
+        }
 
 
     }
