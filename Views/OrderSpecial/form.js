@@ -700,21 +700,21 @@
                         + '<button type="button" onclick="copyorder(50)" class="btn btn-primary btn-sm"><i class="fa fa-files-o"></i>&nbsp;复制新增</button>'
                         + '<button type="button" onclick="save(\'save\',50)" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
                         + '<button type="button" onclick="save(\'submit\',50)" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交委托</button></div>'
+    var bbar_l;
     if (cur_usr.NAME == 'flddz001' || cur_usr.NAME == 'flddz002' || cur_usr.NAME == 'flddz003' || cur_usr.NAME == 'flddz004') {
-        var bbar_l = '<div class="btn-group">'
-                    + '<button type="button" class="btn btn-primary btn-sm" id="pickfiles"><i class="fa fa-upload"></i>&nbsp;上传文件</button>'
-                    + '<button type="button" onclick="browsefile()" class="btn btn-primary btn-sm"><i class="fa fa-exchange fa-fw"></i>&nbsp;浏览文件</button>'
-                    + '<button type="button" onclick="removeFile()" class="btn btn-primary btn-sm" id="deletefile"><i class="fa fa-trash-o"></i>&nbsp;删除文件</button>'
-                     + '<button type="button" onclick="printFile()" class="btn btn-primary btn-sm" id="deletefile"><i class="fa fa-print"></i>&nbsp;打印文件</button>'
-                + '</div>';
+        bbar_l = '<div class="btn-group">'
+                  + '<button type="button" class="btn btn-primary btn-sm" id="pickfiles"><i class="fa fa-upload"></i>&nbsp;上传文件</button>'
+                  + '<button type="button" onclick="browsefile()" class="btn btn-primary btn-sm"><i class="fa fa-exchange fa-fw"></i>&nbsp;浏览文件</button>'
+                  + '<button type="button" onclick="removeFile()" class="btn btn-primary btn-sm" id="deletefile"><i class="fa fa-trash-o"></i>&nbsp;删除文件</button>'
+                   + '<button type="button" onclick="printFile()" class="btn btn-primary btn-sm" id="deletefile"><i class="fa fa-print"></i>&nbsp;打印文件</button>'
+              + '</div>';
     }
     else {
-
-        var bbar_l = '<div class="btn-group">'
-                   + '<button type="button" class="btn btn-primary btn-sm" id="pickfiles"><i class="fa fa-upload"></i>&nbsp;上传文件</button>'
-                   + '<button type="button" onclick="browsefile()" class="btn btn-primary btn-sm"><i class="fa fa-exchange fa-fw"></i>&nbsp;浏览文件</button>'
-                   + '<button type="button" onclick="removeFile()" class="btn btn-primary btn-sm" id="deletefile"><i class="fa fa-trash-o"></i>&nbsp;删除文件</button>'
-               + '</div>';
+        bbar_l = '<div class="btn-group">'
+                 + '<button type="button" class="btn btn-primary btn-sm" id="pickfiles"><i class="fa fa-upload"></i>&nbsp;上传文件</button>'
+                 + '<button type="button" onclick="browsefile()" class="btn btn-primary btn-sm"><i class="fa fa-exchange fa-fw"></i>&nbsp;浏览文件</button>'
+                 + '<button type="button" onclick="removeFile()" class="btn btn-primary btn-sm" id="deletefile"><i class="fa fa-trash-o"></i>&nbsp;删除文件</button>'
+             + '</div>';
     }
     var store_filetype = Ext.create('Ext.data.JsonStore', {
         fields: ['FILETYPEID', 'FILETYPENAME'],

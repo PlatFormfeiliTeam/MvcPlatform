@@ -110,8 +110,9 @@
         + '<button type="button" onclick="save()" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
         + '<button type="button" onclick="submit()" class="btn btn-primary btn-sm" id="btn_submitorder"><i class="fa fa-hand-o-up"></i>&nbsp;提交委托</button>'
         + '</div>';
+    var bbar_l;
     if (cur_usr.NAME == 'flddz001' || cur_usr.NAME == 'flddz002' || cur_usr.NAME == 'flddz003' || cur_usr.NAME == 'flddz004') {
-        var bbar_l = '<div class="btn-group">'
+          bbar_l = '<div class="btn-group">'
                     + '<button type="button" class="btn btn-primary btn-sm" id="pickfiles"><i class="fa fa-upload"></i>&nbsp;上传文件</button>'
                     + '<button type="button" onclick="browsefile()" class="btn btn-primary btn-sm"><i class="fa fa-exchange fa-fw"></i>&nbsp;浏览文件</button>'
                     + '<button type="button" onclick="removeFile()" class="btn btn-primary btn-sm" id="deletefile"><i class="fa fa-trash-o"></i>&nbsp;删除文件</button>'
@@ -119,34 +120,17 @@
                 + '</div>';
     }
     else {
-        var bbar_l = '<div class="btn-group">'
+          bbar_l = '<div class="btn-group">'
                     + '<button type="button" class="btn btn-primary btn-sm" id="pickfiles"><i class="fa fa-upload"></i>&nbsp;上传文件</button>'
                     + '<button type="button" onclick="browsefile()" class="btn btn-primary btn-sm"><i class="fa fa-exchange fa-fw"></i>&nbsp;浏览文件</button>'
                     + '<button type="button" onclick="removeFile()" class="btn btn-primary btn-sm" id="deletefile"><i class="fa fa-trash-o"></i>&nbsp;删除文件</button>'
                 + '</div>';
-
     }
     toolbar1 = Ext.create('Ext.toolbar.Toolbar', {
         items: [combo_filetype1, combo_ietype1, field_fileno1, bbar_l, bbar_r]
     })
     store_file1 = Ext.create('Ext.data.JsonStore', {
-        fields: ['ID', 'FILENAME', 'ORIGINALNAME', 'FILETYPE', 'FILETYPENAME', 'UPLOADTIME', 'SIZES', 'IETYPE']
-        //listeners: {
-        //    datachanged: function (sf_1, eOpts) {
-        //        if (sf_1.find('IETYPE', '仅进口') >= 0 && Ext.getCmp('field_status1').getValue() == 0) {
-        //            Ext.getCmp('field_status1').setValue(10);
-        //        }
-        //        if (sf_1.find('IETYPE', '仅进口') < 0 && Ext.getCmp('field_status1').getValue() == 10) {
-        //            Ext.getCmp('field_status1').setValue(0);
-        //        }
-        //        if (sf_1.find('IETYPE', '仅出口') >= 0 && Ext.getCmp('field_status2').getValue() == 0) {
-        //            Ext.getCmp('field_status2').setValue(10);
-        //        }
-        //        if (sf_1.find('IETYPE', '仅出口') < 0 && Ext.getCmp('field_status2').getValue() == 10) {
-        //            Ext.getCmp('field_status2').setValue(0);
-        //        }
-        //    }
-        //}
+        fields: ['ID', 'FILENAME', 'ORIGINALNAME', 'FILETYPE', 'FILETYPENAME', 'UPLOADTIME', 'SIZES', 'IETYPE'] 
     })
     var tmp1 = new Ext.XTemplate(
         '<tpl for=".">',
