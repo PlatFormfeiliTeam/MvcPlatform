@@ -1271,7 +1271,14 @@ function ini_container_truck() {
         minLengthText:'集装箱号长度应为11位！',
         msgTarget: 'under',
         //tabIndex: 1,
-        enforceMaxLength: true
+        enforceMaxLength: true,
+        listeners: {
+            "specialkey": function (field, e) {
+                if (e.keyCode == 13) {
+                    w_eleshut.focus();
+                }
+            }
+        }
 
 
 
@@ -1281,7 +1288,14 @@ function ini_container_truck() {
         margin: '10',
         columnWidth: .33,
         //tabIndex: 2,
-        fieldLabel: '电子关锁号'
+        fieldLabel: '电子关锁号',
+        listeners: {
+            "specialkey": function (field, e) {
+                if (e.keyCode == 13) {
+                    w_weight.focus();
+                }
+            }
+        }
     });
     var w_weight = Ext.create('Ext.form.field.Number', {
         name: 'CONTAINERWEIGHT',
@@ -1289,7 +1303,14 @@ function ini_container_truck() {
         columnWidth: .34,
         fieldLabel: '自重',
        // tabIndex: 3,
-        hideTrigger: true
+        hideTrigger: true,
+        listeners: {
+            "specialkey": function (field, e) {
+                if (e.keyCode == 13) {
+                    w_combo_containertype.focus();
+                }
+            }
+        }
 
     });
     var w_store_containertype = Ext.create("Ext.data.JsonStore", {
@@ -1309,7 +1330,14 @@ function ini_container_truck() {
         displayField: 'MERGENAME',
         valueField: "MERGENAME",
         queryMode: 'local',
-        anyMatch: true
+        anyMatch: true,
+        listeners: {
+            "specialkey": function (field, e) {
+                if (e.keyCode == 13) {
+                    w_combo_containersize.focus();
+                }
+            }
+        }
     });
     var w_store_containersize = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "CONTAINERSIZE", "DECLSIZE", "MERGENAME"],
@@ -1325,7 +1353,14 @@ function ini_container_truck() {
         //tabIndex: 5,
         valueField: "CONTAINERSIZE",//集装箱中文尺寸如50尺 CONTAINERSIZE 对应基础数据的NAME  为了给grid添加记录方便 特更名为CONTAINERSIZE
         queryMode: 'local',
-        anyMatch: true
+        anyMatch: true,
+        listeners: {
+            "specialkey": function (field, e) {
+                if (e.keyCode == 13) {
+                    w_combo_truckno.focus();
+                }
+            }
+        }
     });
     var w_field_declsize = Ext.create('Ext.form.field.Hidden', {
         name: 'CONTAINERSIZEE'//集装箱英文报关尺寸 如S  L
@@ -1346,7 +1381,14 @@ function ini_container_truck() {
         columnWidth: .34,
         hideTrigger: true,
         queryMode: 'local',
-        anyMatch: true
+        anyMatch: true,
+        listeners: {
+            "specialkey": function (field, e) {
+                if (e.keyCode == 13) {
+                    w_ontainerno.focus();
+                }
+            }
+        }
     });
     var w_field_unitno = Ext.create('Ext.form.field.Hidden', {
         name: 'UNITNO'//车队信息
