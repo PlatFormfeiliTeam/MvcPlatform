@@ -13,7 +13,6 @@
 
     var pgbar;
     var common_data_jydw = [], common_data_sbfs = [], common_data_sbgq = [], common_data_bgfs = [], common_data_bzzl = [], common_data_myfs = [];
-
     Ext.onReady(function () {
         Ext.Ajax.request({//对公共基础数据发起一次请求
             url: "/Common/Ini_Base_Data",
@@ -40,7 +39,7 @@
                 });
                 store_Trade = Ext.create('Ext.data.JsonStore', {
                     fields: ['ID', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE', 'ISINVALID',
-                    'BUSIUNITCODE', 'BUSIUNITNAME', 'CONTRACTNO', 'REPWAYID', 'GOODSNUM',
+                    'BUSIUNITCODE', 'BUSIUNITNAME', 'CONTRACTNO', 'REPWAYID', 'GOODSNUM', 'PRINTSTATUS',
                     'GOODSGW', 'CUSTOMAREACODE', 'LAWFLAG', 'ASSOCIATENO', 'BUSITYPE', 'CORRESPONDNO', 'SUBMITTIME'],
                     pageSize: 20,
                     proxy: {
@@ -92,6 +91,7 @@
                     { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 180, locked: true },
                     { header: '合同发票号', dataIndex: 'CONTRACTNO', width: 130, locked: true },
                     { header: '件数/重量', dataIndex: 'GOODSNUM', width: 80, locked: true },//该字段需要拼接
+                    { header: '打印状态', dataIndex: 'PRINTSTATUS', width: 70, renderer: renderOrder, locked: true },
                     { header: '申报关区', dataIndex: 'CUSTOMAREACODE', width: 70 },//需要显示编码
                     { header: '申报方式', dataIndex: 'REPWAYID', width: 110, renderer: renderOrder },
                     { header: '法检', dataIndex: 'LAWFLAG', width: 40, renderer: renderOrder },
@@ -196,6 +196,7 @@
         }
     }
 
+   
 </script>
 
 <div class="container">

@@ -1601,6 +1601,9 @@ function renderOrder(value, cellmeta, record, rowIndex, columnIndex, store) {
                 rtn = rec.get("NAME");
             }
             break;
+        case "PRINTSTATUS":
+            rtn = value == "1" ? '<i class="fa fa-check" style="color:blue" aria-hidden="true"></i>' : '<i class="fa fa-times" style="color:red" aria-hidden="true"></i>';
+            break;
     }
     return rtn;
 }
