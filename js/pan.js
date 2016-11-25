@@ -1268,8 +1268,9 @@ function ini_container_truck() {
         fieldLabel: '集装箱号',
         maxLength: 11,
         minLength: 11,
+        minLengthText:'集装箱号长度应为11位！',
         msgTarget: 'under',
-        tabIndex: 1,
+        //tabIndex: 1,
         enforceMaxLength: true
 
 
@@ -1279,7 +1280,7 @@ function ini_container_truck() {
         name: 'ELESHUT',
         margin: '10',
         columnWidth: .33,
-        tabIndex: 2,
+        //tabIndex: 2,
         fieldLabel: '电子关锁号'
     });
     var w_weight = Ext.create('Ext.form.field.Number', {
@@ -1287,7 +1288,7 @@ function ini_container_truck() {
         margin: '10',
         columnWidth: .34,
         fieldLabel: '自重',
-        tabIndex: 3,
+       // tabIndex: 3,
         hideTrigger: true
 
     });
@@ -1301,7 +1302,7 @@ function ini_container_truck() {
         name: "CONTAINERTYPE",
         fieldLabel: "集装箱类别",
         margin: '10',
-        tabIndex: 4,
+        //tabIndex: 4,
         forceSelection: true,
         store: w_store_containertype,
         columnWidth: .33,
@@ -1321,7 +1322,7 @@ function ini_container_truck() {
         store: w_store_containersize,
         columnWidth: .33,
         displayField: 'MERGENAME',
-        tabIndex: 5,
+        //tabIndex: 5,
         valueField: "CONTAINERSIZE",//集装箱中文尺寸如50尺 CONTAINERSIZE 对应基础数据的NAME  为了给grid添加记录方便 特更名为CONTAINERSIZE
         queryMode: 'local',
         anyMatch: true
@@ -1341,7 +1342,7 @@ function ini_container_truck() {
         fieldLabel: "报关车号",
         displayField: 'MERGENAME',
         valueField: 'LICENSE',
-        tabIndex: 6,
+       // tabIndex: 6,
         columnWidth: .34,
         hideTrigger: true,
         queryMode: 'local',
