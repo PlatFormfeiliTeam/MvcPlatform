@@ -147,8 +147,8 @@ function readonly_init(formpanel_tmp, formhead_tmp, index) {
         });
         Ext.getCmp('jydw_btn' + index).setDisabled(status >= 10);
         Ext.getCmp("myfs_btn" + index).setDisabled(status >= 10);
-        if (Ext.getCmp('tf_bgsbdw' + index)) {
-            if (Ext.getCmp('tf_bjsbdw' + index).getValue()) {
+        if (Ext.getCmp('tf_bgsbdw' + index)) { 
+            if (Ext.getCmp('tf_bgsbdw' + index).getValue()) {
                 Ext.getCmp('bgsbdw_btn' + index).setDisabled(status >= 10);
             }
         }
