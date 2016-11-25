@@ -137,6 +137,24 @@ function form_head2_ini() {
         fieldLabel: '维护时间',
         readOnly: true
     });
+    //单证服务单位
+    var store_dzfwdw2 = Ext.create('Ext.data.JsonStore', {
+        fields: ['CODE', 'NAME'],
+        data: common_data_dzfwdw
+    })
+    var combo_dzfwdw2 = Ext.create('Ext.form.field.ComboBox', {
+        name: 'DOCSERVICECODE',
+        store: store_dzfwdw2,
+        hideTrigger: true,
+        fieldLabel: '单证服务单位',
+        displayField: 'NAME',
+        valueField: 'CODE',
+        triggerAction: 'all',
+        editable: false,
+        value: 'GWYKS',
+        queryMode: 'local',
+        labelWidth: 80
+    })
     formpanelhead2 = Ext.create('Ext.form.Panel', {
         border: 0,
         fieldDefaults: {
@@ -151,7 +169,7 @@ function form_head2_ini() {
         },
         items: [
                 { layout: 'column', height: 42, border: 0, margin: '5 0 0 0', items: [combo_BUSITYPE2, combo_REPWAYNAME2, combo_CUSTOMDISTRICTNAME2, field_SUBMITTIME2, field_SUBMITUSERNAME2] },
-                { layout: 'column', height: 42, border: 0, items: [field_CREATEUSERNAME2, field_CREATETIME2] },
+                { layout: 'column', height: 42, border: 0, items: [field_CREATEUSERNAME2, field_CREATETIME2, combo_dzfwdw2] },
         field_CUSTOMDISTRICTNAME2]
     })
 }

@@ -175,8 +175,7 @@ function button_control(status) {
                 }
                 else {
                     document.getElementById("pickfiles").disabled = true;
-                    if (uploader) {
-                        alert();
+                    if (uploader) { 
                         uploader.destroy();
                     }
                 }
