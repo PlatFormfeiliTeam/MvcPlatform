@@ -24,6 +24,10 @@ namespace MvcPlatform.Controllers
             ViewBag.ReturnUrl = returnUrl;
             return View();
         }
+        public ActionResult OutLogin()
+        {
+            return View();
+        }
         [HttpPost]
         public ActionResult Login(Models.User u)
         {

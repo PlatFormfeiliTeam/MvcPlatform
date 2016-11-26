@@ -1,8 +1,13 @@
-﻿<!DOCTYPE html>
-<html lang="zh">
+﻿@model MvcPlatform.Models.User
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
     <title>关务云单证处理平台</title>
     <script src="~/js/jquery-1.8.2.min.js"></script>
     <link href="~/Content/bootstrap32/css/bootstrap.min.css" rel="stylesheet" />
@@ -10,16 +15,15 @@
     <link href="~/Content/outindex/OutIndex.css" rel="stylesheet" />
     <link href="~/css/iconfont/iconfont.css" rel="stylesheet" />
     <!--[if lt IE 9]>
-    <script src="~/js/OutJs/html5shiv.min.js"></script>
-    <script src="~/js/OutJs/respond.min.js"></script>
-        <style>
-        #header .header-nav-main nav > ul > li.dropdown-mega > .dropdown-menu {
-	border-radius: 4px; width: auto;left: 0px;  right: 0px;/*background-color:rgba(255, 255, 255, 0.80);*/
-    background-color:#FFFFFF;filter:alpha(opacity=80); -moz-opacity:0.8;  -khtml-opacity: 0.8;  opacity: 0.8;  
-}
-        </style>
-    <![endif]-->    
- 
+        <script src="~/js/OutJs/html5shiv.min.js"></script>
+        <script src="~/js/OutJs/respond.min.js"></script>
+            <style>
+            #header .header-nav-main nav > ul > li.dropdown-mega > .dropdown-menu {
+        border-radius: 4px; width: auto;left: 0px;  right: 0px;/*background-color:rgba(255, 255, 255, 0.80);*/
+        background-color:#FFFFFF;filter:alpha(opacity=80); -moz-opacity:0.8;  -khtml-opacity: 0.8;  opacity: 0.8;
+    }
+            </style>
+        <![endif]-->
     
 </head>
 <body>
@@ -230,7 +234,7 @@
                                         </div>
                                     </li>
                                 </ul>
-                            </li>  
+                            </li>
                             <li class="dropdown dropdown-mega ">
                                 <a class="dropdown-toggle" href="/solutions/">
                                     常用信息<i class="iconfont" style="font-family: FontAwesome; font-size: 16px; position: absolute; ">&#xe604;</i>
@@ -287,53 +291,57 @@
                                         </div>
                                     </li>
                                 </ul>
-                            </li>                               
-                            <li><a href="/OutHome/About"><span>关于我们</span></a></li>                            
+                            </li>
+                            <li><a href="/OutHome/About"><span>关于我们</span></a></li>
                             <li>
                                 <a href="" target="_blank" style="    border: 1px solid;    border-radius: 4px;    margin: 8px 0px 0px;    padding-top: 2px;    padding-bottom: 2px;    border-color: rgb(248, 180, 0);
                                                     background-color: rgb(248, 180, 0);    color: rgb(255,255,255); height:30px;">
                                     <i class="iconfont" style="font-size: 16px;">&#xe70a;</i> 注册
                                 </a>
                             </li>
-                            <li>
+                            @*<li>
                                 <a href="/Account/OutLogin" target="_blank" style=" border: 1px solid; border-radius: 4px; margin: 8px 0px 0px; padding-top: 2px; padding-bottom: 2px; border-color: rgb(248, 180, 0); background-color: rgb(255,255,255); color: rgb(248,180,0); height: 30px;">
                                     <i class="iconfont" style="font-size: 16px;">&#xe61d;</i> 登录
                                 </a>
-                            </li>
+                            </li>*@
                         </ul>
                     </nav>
                 </div>
             </div>
         </div>
-    </div>    
-    <div style="min-height: 700px;margin-top:100px">
-        @RenderSection("featured", required: false)
-        <section class="content-wrapper main-content clear-fix">
-            @RenderBody()
-        </section>
     </div>
-    <div id="footer">
-        <div class="container">
-            <div class="col-md-5">
-                <p style="font-size: 45px;">一站式单证处理平台</p>
-                <p style="font-size: 42px;"><i class="iconfont" style="font-size: 50px;">&#xe601;</i>0512-57313261</p>
-                <p style="margin-top:30px;">
-                    <a href="" target="_blank">用户协议</a> |
-                    <a href="" target="_blank">网站地图</a> |
-                    <a href="" target="_blank">帮助中心</a> |
-                    <a href="" target="_blank">法律声明</a> |
-                    <a href="" target="_blank">意见反馈</a>
-                </p>
-                <p>公司地址：江苏昆山经济技术开发区玫瑰路999号</p>
-            </div>
-            <div class="col-md-4 col-md-offset-3">
-                <p><span style="border: 1px solid; padding: 8px; border-radius: 0px 4px 4px;"><i class="iconfont">&#xe612;</i>关注关务云单证平台&nbsp;</span></p>
-                <img src="~/Images/saoma.png" alt="二维码" style="border:solid; background-color:#FFFFFF; width:182px; height:182px;" />
-            </div>
-            <div class="col-md-12" style="text-align:center; margin-top:50px;">
+
+    <div style="min-height: 700px; margin-top: 100px; background-image: url('/Images/loginbg.png')">
+        <div style="border: 1px solid #363c64; float: right; width: 350px; padding: 50px 50px 42px 50px;margin:175px 400px 30px 40px">
+            <form action="/Account/OutLogin?ReturnUrl=@ViewBag.ReturnUrl" method="post">
+                <label for="user_name">登录名</label>
+                <div class="input-group" style="margin-bottom: 20px">
+                    <span class="input-group-addon icon iconfont">&#xe605;</span>
+                    @Html.TextBoxFor(u => u.NAME, new { @class = "form-control" })
+                </div>
+                <label for="password">登录密码</label>
+                <div class="input-group">
+                    <span class="input-group-addon icon iconfont">&#xe608;</span>
+                    @Html.PasswordFor(u => u.PASSWORD, new { @class = "form-control" })
+                </div>
+                <div style="line-height:35px">
+                    <label style="color:red" id="validate">
+                        @Html.ValidationMessageFor(u => u.NAME)
+                        @Html.ValidationMessageFor(u => u.PASSWORD)
+                        @Html.ValidationMessage("ERROR")
+                    </label>
+                </div>
+                <button type="submit" id='btn_login' class="btn btn-primary btn-group-justified">登录</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="f">
+        
+            <div style="text-align:center;">
                 <p>&copy; Copyright 2015 - 2016. 江苏飞力达国际物流股份有限公司 版权所有 | 苏ICP备05048421号</p>
             </div>
-        </div>
+   
     </div>
 </body>
 </html>

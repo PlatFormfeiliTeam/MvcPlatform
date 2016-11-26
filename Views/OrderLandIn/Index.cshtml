@@ -90,7 +90,7 @@
                     { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 100, sortable: true, locked: true },
                     { header: '合同号', dataIndex: 'CONTRACTNO', width: 100, locked: true },
                     { header: '分单号', dataIndex: 'DIVIDENO', width: 110, locked: true },
-                    { header: '件数/重量', dataIndex: 'GOODSNUM', width: 90 },//该字段需要拼接
+                    { header: '件数/重量', dataIndex: 'GOODSNUM', width: 90, renderer: renderOrder },//该字段需要拼接
                     { header: '申报关区', dataIndex: 'CUSTOMAREACODE', width: 70 },//需要显示编码
                     { header: '进/出口岸', dataIndex: 'PORTCODE', width: 70 },//需要显示编码
                     { header: '申报方式', dataIndex: 'REPWAYID', width: 100, renderer: renderOrder },
