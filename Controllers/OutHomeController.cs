@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using MvcPlatform.Common;
+using Newtonsoft.Json.Linq;
 
 namespace MvcPlatform.Controllers
 {
@@ -19,6 +21,16 @@ namespace MvcPlatform.Controllers
         {
             return View(); 
         }
+        public string CurrentUser()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            if (json_user!=null)
+            {
+            return json_user.GetValue("REALNAME") + "";
+            }
+            return "sginOut";
+        }
+
 
     }
 }
