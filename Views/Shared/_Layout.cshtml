@@ -19,15 +19,22 @@
     <div class="container">
         <div style="margin:10px 0px">
             <img src="~/Images/fld_logo.png" />
-            <div class="fr" style="font-size:12px">
-                <i class="icon iconfont">&#xe605;</i>
-                <span>当前用户：@Html.Action("CurrentUser", "Common")</span>&nbsp;&nbsp;
-                <a style="cursor:pointer" href="/Account/SignOut"><i class="icon iconfont">&#xe609;</i><span>退出</span></a>
+            <div class="fr" style="font-size:12px">            
+                @if (ViewBag.IfLogin)
+                {
+                    <i class="icon iconfont">&#xe605;</i><span>当前用户：Html.Action("CurrentUser", "Common")</span>
+                    <a style="cursor:pointer" href="/Account/SignOut"><i class="icon iconfont">&#xe609;</i><span>退出</span></a>
+                }
+                else
+                {
+                    <a style="cursor:pointer" href="/Account/SignOut"><i class="icon iconfont">&#xe646;</i><span>登录</span></a>
+                }
+
             </div>
         </div>
         <div style="height: 36px; background-color: #363c64; width: 100%">
             <ul class="sf-menu" id="na_menu" style="font-size:14px">
-                @Html.Action("Header", "Common")
+                @Html.Action("Header", "Home")
             </ul>
         </div>
         <div style="width: 100%; text-align: right; margin-top: 3px; margin-bottom: 3px; font-size: 12px; color: #357ebd">@ViewBag.navigator</div>
