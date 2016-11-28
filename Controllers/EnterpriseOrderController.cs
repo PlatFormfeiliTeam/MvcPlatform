@@ -21,18 +21,21 @@ namespace MvcPlatform.Controllers
         public ActionResult EntOrderList()  //文件委托
         {
             ViewBag.navigator = "企业服务>>委托任务";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
 
         public ActionResult EnterpriseHome()//企业服务
         {
             ViewBag.navigator = "企业服务>>委托中心";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
 
         public ActionResult ProcessOrder()//委托任务
         {
             ViewBag.navigator = "客户服务>>委托任务";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
         public string GetCode(string combin)

@@ -118,6 +118,8 @@ namespace MvcPlatform.Controllers
         public ActionResult ChildAccount()
         {
             ViewBag.navigator = "账号管理>>账号信息";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+
             return View();
         }
         public ActionResult ChildEdit()
@@ -127,6 +129,7 @@ namespace MvcPlatform.Controllers
         public ActionResult Authorization()
         {
             ViewBag.navigator = "账号管理>>权限管理";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
         public string LoadCurrentUser()

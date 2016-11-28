@@ -17,12 +17,14 @@ namespace MvcPlatform.Controllers
         public ActionResult Index()
         {
             ViewBag.navigator= "订单中心>>海运进口";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
 
         public ActionResult Create()
         {
             ViewBag.navigator = "订单中心>>海运进口";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
 

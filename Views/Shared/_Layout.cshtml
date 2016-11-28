@@ -22,12 +22,12 @@
             <div class="fr" style="font-size:12px">            
                 @if (ViewBag.IfLogin)
                 {
-                    <i class="icon iconfont">&#xe605;</i><span>当前用户：Html.Action("CurrentUser", "Common")</span>
+                    <i class="icon iconfont">&#xe605;</i><span>当前用户：@Html.Action("CurrentUser", "Common")</span>
                     <a style="cursor:pointer" href="/Account/SignOut"><i class="icon iconfont">&#xe609;</i><span>退出</span></a>
                 }
                 else
                 {
-                    <a style="cursor:pointer" href="/Account/SignOut"><i class="icon iconfont">&#xe646;</i><span>登录</span></a>
+                    <a style="cursor:pointer" href="/Account/Login"><i class="icon iconfont">&#xe646;</i><span>登录</span></a>
                 }
 
             </div>

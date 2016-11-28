@@ -1,20 +1,439 @@
-﻿<div class="container">
-    <div class="carousel slide" id="carousel-595514" data-ride="carousel">
-        <ol class="carousel-indicators">
-            <li class="active" data-slide-to="0" data-target="#carousel-595514"></li>
-            <li data-slide-to="1" data-target="#carousel-595514"></li>
-            <li data-slide-to="2" data-target="#carousel-595514"></li>
-        </ol>
-        <div class="carousel-inner">
-            <div class="item active">
-                <img src="/Images/1473762432571.jpg" alt="" />
+﻿<script type="text/javascript">
+    $(document).ready(function () {
+        $("#myCarousel").hover(function () {
+            $("#btn_prev,#btn_next").fadeIn()
+        }, function () {
+            $("#btn_prev,#btn_next").fadeOut()
+        });
+    });
+</script>
+
+<div id="myCarousel" class="carousel slide">
+    <div class="carousel-inner">
+        <div class="item active">
+            <img src="~/Images/1.jpg" alt="First slide">
+        </div>
+        <div class="item">
+            <img src="~/Images/2.png" alt="Second slide">
+        </div>
+        <div class="item">
+            <img src="~/Images/3.jpg" alt="Third slide">
+        </div>
+    </div>
+    <a id="btn_prev" class="carousel-control left" href="#myCarousel"
+       data-slide="prev" style="background-image: url(/Images/leftU.png); background-repeat: no-repeat; top: 10%; background-position: right; "></a>
+    <a id="btn_next" class="carousel-control right" href="#myCarousel"
+       data-slide="next" style="background-image: url(/Images/rightU.png); background-repeat: no-repeat; top: 10%; background-position: left"></a>
+</div>
+
+<link href="~/Content/outindex/zhongjian.css" rel="stylesheet" />
+<link href="~/Content/outindex/zhongjian2.css" rel="stylesheet" />
+<link href="~/Content/outindex/zhongjian3.css" rel="stylesheet" />
+<link href="~/Content/outindex/zhongjian4.css" rel="stylesheet" />
+<script src="~/js/OutJs/zxdt.js"></script>
+@*中间层*@
+<div class="index-accordion">
+
+    <p class="font-30" style="text-align:center;">服务赢得尊重</p>
+    <p class="font-30" style="text-align: center; color: #ff6600;">
+        <i class="iconfont" style="font-size: 24px;">&#xe616;</i>
+        <i class="iconfont" style="font-size: 24px; ">&#xe616;</i>
+        <i class="iconfont" style="font-size: 24px; ">&#xe616;</i>
+        <i class="iconfont" style="font-size: 24px; ">&#xe616;</i>
+        <i class="iconfont" style="font-size: 24px; ">&#xe616;</i>
+    </p>
+
+    <div class="flash4">
+        <ul id="accordion">
+            <li class="bor-red" id="haokuaiji" style="width: 534px;">
+                @*<p class="p-mid">新手上路</p>*@
+                <div class="imgfl">
+                    <h2 style="color:red;">新手上路</h2>
+                    <a href="#" target="_blank">
+                        <div class="icon-img ydh-img"></div>
+                    </a>
+                    <p>各系统演示，以简单易懂的方式展示具体功能模块，解决初次操作的困扰</p>
+                </div>
+                <div class="imgfr appear-animation fadeInDown appear-animation-visible">
+                    <h3 class="fz14">新手上路常用步骤：</h3>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i> 登录账号：</p>
+                    <p class="mb-txt font-12">公司及个人账号，支持主次账号切换使用，提高系统效能</p>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i> 订单中心：</p>
+                    <p class="mb-txt font-12">全网独有的业务类型分类，帮助下单者高效录入，提升工作效率</p>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i>报关展示：</p>
+                    <p class="mb-txt font-12">订单数据、报关信息、文件打印…完美贴合需要</p>
+                </div>
+                <div id="accountantFunction" class="btn-sy mt-xlg center">
+                    <a href="" target="_blank" class="btn btn-default btn-orange btn-md btn-radius fz12">更多详情</a>
+                </div>
+            </li>
+            <li class="bor-g" id="haoshengyi" style="width: 248px;">
+                @*<p class="p-mid">常见问题</p>*@
+                <div class="imgfl">
+                    <h2 style="color:red;">常见问题</h2>
+                    <a href="#" target="_blank">
+                        <div class="icon-img ysc-img"></div>
+                    </a>
+                    <p>
+                        针对性解决进出遇到的问题
+                    </p>
+                </div>
+                <div class="fr imgfr  appear-animation fadeInDown appear-animation-visible">
+                    <h3 class="fz14">常见问题简要介绍：</h3>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i> 忘记密码：</p>
+                    <p class="mb-txt font-12">在主账号的账号管理中，子账号选项卡初始化密码为登录账号</p>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i> 订单维护：</p>
+                    <p class="mb-txt font-12">委托类型、经营单位、客户编号必须输入</p>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i>订单委托：</p>
+                    <p class="mb-txt font-12">订单委托时，需要上传随附文件</p>
+                </div>
+                <div class="btn-sy mt-xlg center"> <a href="#" target="_blank" class="btn btn-default btn-orange btn-md btn-radius fz12">更多详情</a> </div>
+            </li>
+            <li class="bor-g" id="workGroup" style="width: 248px;">
+                @*<p class="p-mid">业务流程</p>*@
+                <div class="imgfl">
+                    <h2 style="color:red;">业务流程</h2>
+                    <a href="#" target="_blank">
+                        <div class="icon-img bbc-img"></div>
+                    </a>
+                    <p>
+                        委托流程、异常流程等
+                    </p>
+                </div>
+                <div class="fr imgfr appear-animation fadeInDown appear-animation-visible">
+                    <h3 class="fz14">业务流程简要介绍：</h3>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i> 委托信息流程：</p>
+                    <p class="mb-txt font-12">订单还未委托，可以随时修改；委托后，只能修改为空的项目</p>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i> 撤单流程：</p>
+                    <p class="mb-txt font-12">订单委托后，若订单状态任在已委托，则可以撤单，否则需要联系客服人员</p>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i> 复制新增流程：</p>
+                    <p class="mb-txt font-12">复制新增会自动带出主要项目，其他项目还需手动维护</p>
+                </div>
+                <div class="btn-sy mt-xlg center"> <a href="#" target="_blank" class="btn btn-default btn-orange btn-md btn-radius fz12">更多详情</a> </div>
+            </li>
+            <li class="fast bor-g" id="crm" style="width: 248px;">
+                @*<p class="p-mid">预约培训</p>*@
+                <div class="imgfl">
+                    <h2 style="color:red;">预约培训</h2>
+                    <a href="#" target="_blank">
+                        <div class="icon-img yxd-img"></div>
+                    </a>
+                    <p>
+                        系统培训预约
+                    </p>
+                </div>
+                <div class="fr imgfr appear-animation fadeInDown appear-animation-visible">
+                    <h3 class="fz14">系统培训预约简介：</h3>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i>订单委托：</p>
+                    <p class="mb-txt font-12">订单委托项目说明</p>
+                    <p class="p-tit"><i class="iconfont" style="font-size: 16px;">&#xe607;</i>报关报检：</p>
+                    <p class="mb-txt font-12">
+                        文件查看、单笔或多笔打印文件<br>
+                    </p>
+                </div>
+                <div class="btn-sy mt-xlg center"> <a href="#" target="_blank" class="btn btn-default btn-orange btn-md btn-radius fz12">更多详情</a> </div>
+            </li>
+        </ul>
+    </div>
+</div>
+<script src="~/js/OutJs/bxslider.js"></script>
+<script type="text/javascript">
+    //手风琴切换
+    var $list = $("#accordion li"),
+            isSameLi = function (e, t) {
+                return e.attr("id").indexOf(t.attr("id")) == -1 ? !1 : !0
+            },
+            expandsCommon = function (e) {
+                lastLeaveLi && (isSameLi(e, lastLeaveLi) || hideCommon(lastLeaveLi)), $this = e, $this.stop().animate({
+                    width: "534px"
+                }, 500, function () {
+                    $(".imgfr", e).stop(!0, !0).show(), $(".btn-sy", e).stop(!0, !0).fadeIn()
+                }).removeClass("bor-g").addClass("bor-red"), $("#accordion > li").each(function () {
+                    var t = $(this);
+                    isSameLi(e, t) || hideCommon(t)
+                })
+            },
+            hideCommon = function (e) {
+                $this = e, $this.stop().animate({
+                    width: "248px"
+                }, 1e3).removeClass("bor-red").addClass("bor-g"), $(".imgfr", e).stop(!0, !0).hide(), $(".btn-sy", e).stop(!0, !0).fadeOut()
+            },
+            lastLeaveLi = undefined;
+    $(function () {
+        expandsCommon($("#accordion > li:first")), $("#accordion > li").hover(function () {
+            var e = $(this);
+            expandsCommon(e)
+        }, function () {
+            lastLeaveLi = $(this)
+        })
+    });
+</script>
+
+<!---TAB-->
+<link href="~/Content/outindex/zxdt.css" rel="stylesheet" />
+<div class="lanrenzhijia">
+    <div class="title cf">
+        <h2 class="fl">资讯动态</h2>
+        <ul class="title-list fr cf ">
+            <li class="on">公司新闻</li>
+            <li>政策法规</li>
+            <li>行业动态</li>
+            <p><b></b></p>
+        </ul>
+    </div>
+    <div class="product-wrap">
+        <!--案例1-->
+        <div class="product showfirst">
+            <div class="topRec_List">
+                <div class="maquee">
+                    <ul>
+                        <li>
+                            <div>关务云单证处理平台于2016年5月上线</div>
+                            <div>2014/12/30 14:20</div>
+                        </li>
+                        <li>
+                            <div>飞力达：德州仪器万里挑一赞“义缘”</div>
+                            <div>2014/12/30 14:20</div>
+                        </li>
+                        <li>
+                            <div>江苏省货代协会会长至飞力达参观指导</div>
+                            <div>2014/12/30 14:20</div>
+                        </li>
+                        <li>
+                            <div>飞力达被南京海关纳入AA类管理企业</div>
+                            <div>2014/12/30 14:20</div>
+                        </li>
+                        <li>
+                            <div>飞仓第三届全员健身运动会暨第二届“飞英杯”篮球邀请赛圆满落幕</div>
+                            <div>2014/12/30 14:20</div>
+                        </li>
+                        <li>
+                            <div>中国国际物流科技博览会在昆召开</div>
+                            <div>2014/12/30 14:20</div>
+                        </li>
+                        <li>
+                            <div>恭祝江苏飞力达首届技能大赛圆满成功</div>
+                            <div>2014/12/30 14:20</div>
+                        </li>
+                        <li>
+                            <div>江苏省货代协会会长至飞力达参观指导</div>
+                            <div>2014/12/30 14:20</div>
+                        </li>
+
+                    </ul>
+                </div>
             </div>
-            <div class="item">
-                <img src="/Images/1473762741528.jpg" alt="" />
+        </div>
+        <!--案例2-->
+        <div class="product">
+            <div class="topRec_List">
+                <div class="maquee">
+                    <ul>
+                        <li>
+                            <div>海关总署2016年第56号公告（海关总署关于《商务部 海关总署2016年第45号公告》执行有关问题的公告</div>
+                            <div>2014/12/30 14:20</div>
+                        </li>
+                        <li>
+                            <div>海关总署公告2016年第57号（关于跨境电子商务进口统一版信息化系统企业接入事宜的公告）</div>
+                            <div>2014/12/30 14:20</div>
+                        </li>
+                        <li>
+                            <div>海关总署公告2016年第53号（关于海关特殊监管区域（保税监管场所）原产地管理系统上线运行事宜的公告</div>
+                            <div>2014/12/30 14:20</div>
+                        </li>
+                        <li>
+                            <div>海关总署公告2016年第52号（关于各优惠贸易安排项下经港澳中转进口货物单证提交事宜的公告）</div>
+                            <div>2014/12/30 14:20</div>
+                        </li>
+                        <li>
+                            <div>完善海关稽查制度 优化海关监管与服务</div>
+                            <div>2014/12/30 14:20</div>
+                        </li>
+
+                    </ul>
+                </div>
             </div>
-            <div class="item">
-                <img src="/Images/1473762489802.jpg" alt="" />
+        </div>
+        <!--案例3-->
+        <div class="product">
+            <div class="topRec_List">
+                <div class="maquee">
+                    <ul>
+                        <li>
+                            <div>企业可任选海关现场申报纳税</div>
+                            <div>2014/12/30 14:20</div>
+                        </li>
+                        <li>
+                            <div>第三批自贸区总体方案近期将获批</div>
+                            <div>2014/12/30 14:20</div>
+                        </li>
+                        <li>
+                            <div>河南省人民政府办公厅关于加快建设国际贸易“单一窗口”的意见</div>
+                            <div>2014/12/30 14:20</div>
+                        </li>
+                        <li>
+                            <div>企业内购电商</div>
+                            <div>2014/12/30 14:20</div>
+                        </li>
+                        <li>
+                            <div>完善海关稽查制度 优化海关监管与服务</div>
+                            <div>2014/12/30 14:20</div>
+                        </li>
+
+                    </ul>
+                </div>
             </div>
+        </div>
+
+
+    </div>
+</div>
+<script type="text/javascript">
+    function autoScroll(obj) {
+        $(obj).find("ul").animate({
+            marginTop: "-39px"
+        }, 500, function () {
+            $(this).css({ marginTop: "0px" }).find("li:first").appendTo(this);
+        })
+    }
+    $(function () {
+        setInterval('autoScroll(".maquee")', 3000);
+        setInterval('autoScroll(".apple")', 2000);
+
+    })
+
+</script>
+
+
+@*常用信息*@
+<link rel="stylesheet" href="~/Content/outindex/changyong.css" />
+
+<!--[if lt IE 9]>
+<style>
+.service a:hover .overlay-bottom{display:none}
+.service a:hover .overlay-left{display:none}
+.service a:hover .overlay-top{display:none}
+.service a:hover .overlay-right{display:none}
+.service a:hover .start-point{overflow:visible}
+</style>
+<![endif]-->
+<div id="chang">
+    <div class="hovertreeinfo">
+        <p style="font-size: 20px; font-weight: 800; color: rgb(52,152,219); ">常用信息</p>
+        <p></p>
+    </div>
+    <div class="service">
+        <div class="service-list">
+            <ul class="clearfix" id="J_service_container">
+                <li>
+                    <a href="#">
+                        <div class="item-box">
+                            <h3>海关代码</h3>
+                            <h4>Web前端，HTML5，Java等</h4>
+                            <h4>考试，面试复习</h4>
+                            <div class="overlay-start"></div>
+                            <div class="overlay-bottom"></div>
+                            <div class="overlay-left"></div>
+                            <div class="overlay-top"></div>
+                            <div class="overlay-right"></div>
+                            <div class="start-point"> <i class="circle"></i> </div>
+                        </div>
+                        <div class="service-icon">
+                            <div class="circle"></div>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <div class="item-box">
+                            <h3>国检代码</h3>
+                            <h4>用电脑键盘弹电子琴</h4>
+                            <h4>学习音乐好工具</h4>
+                            <div class="overlay-start"></div>
+                            <div class="overlay-bottom"></div>
+                            <div class="overlay-left"></div>
+                            <div class="overlay-top"></div>
+                            <div class="overlay-right"></div>
+                            <div class="start-point"> <i class="circle"></i> </div>
+                        </div>
+                        <div class="service-icon">
+                            <div class="circle2"></div>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <div class="item-box">
+                            <h3>空运代码</h3>
+                            <h4>谜语是中华民族历史悠久的文化</h4>
+                            <h4>锻炼思维</h4>
+                            <div class="overlay-start"></div>
+                            <div class="overlay-bottom"></div>
+                            <div class="overlay-left"></div>
+                            <div class="overlay-top"></div>
+                            <div class="overlay-right"></div>
+                            <div class="start-point"> <i class="circle"></i> </div>
+                        </div>
+                        <div class="service-icon">
+                            <div class="circle3"></div>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <div class="item-box">
+                            <h3>常用下载</h3>
+                            <h4>推荐使用浏览器</h4>
+                            <h4>PDF打印、预览工具</h4>
+                            <div class="overlay-start"></div>
+                            <div class="overlay-bottom"></div>
+                            <div class="overlay-left"></div>
+                            <div class="overlay-top"></div>
+                            <div class="overlay-right"></div>
+                            <div class="start-point"> <i class="circle"></i> </div>
+                        </div>
+                        <div class="service-icon">
+                            <div class="circle13"></div>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <div class="item-box">
+                            <h3>汇率转换</h3>
+                            <h4>木可柯</h4>
+                            <h4>乐意为您服务</h4>
+                            <div class="overlay-start"></div>
+                            <div class="overlay-bottom"></div>
+                            <div class="overlay-left"></div>
+                            <div class="overlay-top"></div>
+                            <div class="overlay-right"></div>
+                            <div class="start-point"> <i class="circle"></i> </div>
+                        </div>
+                        <div class="service-icon">
+                            <div class="circle14"></div>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <div class="item-box">
+                            <h3>单位转换</h3>
+                            <h4>C#.NET Sql Server</h4>
+                            <h4>何问起收藏夹</h4>
+                            <div class="overlay-start"></div>
+                            <div class="overlay-bottom"></div>
+                            <div class="overlay-left"></div>
+                            <div class="overlay-top"></div>
+                            <div class="overlay-right"></div>
+                            <div class="start-point"> <i class="circle"></i> </div>
+                        </div>
+                        <div class="service-icon">
+                            <div class="circle16"></div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 </div>

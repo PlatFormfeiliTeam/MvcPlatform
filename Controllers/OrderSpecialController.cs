@@ -14,11 +14,13 @@ namespace MvcPlatform.Controllers
         public ActionResult Index()
         {
             ViewBag.navigator = "订单中心>>特殊区域订单";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
         public ActionResult Create()
         {
             ViewBag.navigator = "订单中心>>特殊区域订单";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
         public string GetName(string combin)

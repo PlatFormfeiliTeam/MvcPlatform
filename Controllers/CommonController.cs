@@ -55,7 +55,7 @@ namespace MvcPlatform.Controllers
                 default:
                     break;
             }
-
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
         public ActionResult FileConsult()//文件调阅
