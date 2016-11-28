@@ -25,7 +25,7 @@ function loadform() {
     Ext.Ajax.request({
         url: "/OrderDomestic/loadform",
         params: { ordercode: ordercode },
-        success: function (response, opts) { 
+        success: function (response, opts) {
             var data = Ext.decode(response.responseText);
             formpanelhead.getForm().setValues(data.data1.IETYPE ? data.data1 : data.data2);
             Ext.getCmp("field_ordercodes").setValue(data.ORDERCODES);//记录所有已经存在的订单号,方便改变进出口类型时进行比对  
@@ -79,7 +79,19 @@ function loadform() {
                     form2_import_ini();
                     form2_export_ini();
                     panel_file2_ini();
-                    tabpanel.add({ title: '关联订单', closable: true, items: [formpanelhead2, formpanelin2, formpanelout2, panel_file2] });
+                    tabpanel.add({
+                        title: '关联订单', closable: true, items: [formpanelhead2, formpanelin2, formpanelout2, panel_file2], listeners: {
+                            beforeclose: function (tab, options) {
+                                var confirm = false;
+                                Ext.MessageBox.confirm('提示', '确定要删除关联订单吗？', function (btn) {
+                                    if (btn == "yes") {
+                                        tabpanel.remove(tab);
+                                    }
+                                })
+                                return confirm
+                            }
+                        }
+                    });
                     var task = new Ext.util.DelayedTask(function () {  //---------延时操作-------------   //doSomething,如：隐藏loading效果
 
                         formpanelhead2.getForm().setValues(data.data3.IETYPE ? data.data3 : data.data4);
@@ -147,7 +159,7 @@ function readonly_init(formpanel_tmp, formhead_tmp, index) {
         });
         Ext.getCmp('jydw_btn' + index).setDisabled(status >= 10);
         Ext.getCmp("myfs_btn" + index).setDisabled(status >= 10);
-        if (Ext.getCmp('tf_bgsbdw' + index)) { 
+        if (Ext.getCmp('tf_bgsbdw' + index)) {
             if (Ext.getCmp('tf_bgsbdw' + index).getValue()) {
                 Ext.getCmp('bgsbdw_btn' + index).setDisabled(status >= 10);
             }
@@ -168,14 +180,14 @@ function button_control(status) {
             url: "/OrderDomestic/AdditionFile",
             params: { ORDERCODE: ordercode },
             success: function (response, option) {
-                var json = Ext.decode(response.responseText);                
+                var json = Ext.decode(response.responseText);
                 if (parseInt(json.result) > 0) {
                     upload_ini();
                     document.getElementById("pickfiles").disabled = false;
                 }
                 else {
                     document.getElementById("pickfiles").disabled = true;
-                    if (uploader) { 
+                    if (uploader) {
                         uploader.destroy();
                     }
                 }
@@ -184,7 +196,7 @@ function button_control(status) {
     }
     else {
         upload_ini(); //未提交时才初始化上传控件 
-    } 
+    }
     document.getElementById("deletefile").disabled = status >= 10; //删除按钮  --提交后不允许删除setVisibilityMode
     document.getElementById("btn_cancelsubmit").disabled = status != 10;//撤单按钮  只有在提交后受理前才可以撤单
     document.getElementById("btn_addlinkorder").disabled = status >= 10;//新增关联订单
@@ -466,7 +478,19 @@ function addGlyw() {
         form2_import_ini();
         form2_export_ini();
         panel_file2_ini();
-        tabpanel.add({ title: '关联订单', closable: true, closeAction: 'destroy', items: [formpanelhead2, formpanelin2, formpanelout2, panel_file2] });
+        tabpanel.add({
+            title: '关联订单', closable: true, closeAction: 'destroy', items: [formpanelhead2, formpanelin2, formpanelout2, panel_file2], listeners: {
+                beforeclose: function (tab, opt) {
+                    var confirm = false;
+                    Ext.MessageBox.confirm('提示', '确定要删除关联订单吗？', function (btn) {
+                        if (btn == "yes") {
+                            tabpanel.remove(tab);
+                        }
+                    })
+                    return confirm;
+                }
+            }
+        });
         Ext.Ajax.request({
             url: "/OrderDomestic/loadform",
             success: function (response, option) {
