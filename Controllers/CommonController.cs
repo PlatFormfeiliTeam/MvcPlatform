@@ -119,7 +119,7 @@ namespace MvcPlatform.Controllers
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string sql = @"select MODULEID,NAME,PARENTID,URL,SORTINDEX,IsLeaf from sysmodule t 
-            where t.parentid='91a0657f-1939-4528-80aa-91b202a593ab' and t.MODULEID IN (select MODULEID FROM sys_moduleuser where userid='{0}')
+            where t.parentid is null and t.MODULEID IN (select MODULEID FROM sys_moduleuser where userid='{0}')
             order by sortindex";
             sql = string.Format(sql, json_user.GetValue("ID"));
             DataTable dt1 = DBMgr.GetDataTable(sql);
