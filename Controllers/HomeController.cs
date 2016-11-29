@@ -20,7 +20,7 @@ namespace MvcPlatform.Controllers
         }
         public string Header()
         {
-            string result = "<li><a href=\"/Home/Index\">首页</a></li>";
+            string result = "<li><a href=\"/Home/Index\"><i class=\"icon iconfont\">&#xe66c;</i>&nbsp;&nbsp;首页</a></li>";
             if (string.IsNullOrEmpty(HttpContext.User.Identity.Name))
             {
 

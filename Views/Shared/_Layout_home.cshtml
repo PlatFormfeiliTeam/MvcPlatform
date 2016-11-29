@@ -33,15 +33,15 @@
             </div>
         </div>
     </div>
-    <div style="background-color: #363c64; width: 100%">
+    <div style=" background-color: #363c64; width: 100%">
         <div class="container">
             <ul class="sf-menu" id="na_menu" style="font-size:14px">
                 @Html.Action("Header", "Home")
             </ul>
-            <div style="width: 100%; text-align: right; margin-top:7px; font-size: 14px; color: #fff">@ViewBag.navigator</div>
         </div>
+        @*<div style="width: 100%; text-align: right; margin-top: 3px; margin-bottom: 3px; font-size: 12px; color: #357ebd">@ViewBag.navigator</div>*@
     </div>
-    <div class="container" style="min-height: 600px;margin-top:1px">
+    <div>
         @RenderSection("featured", required: false)
         <section class="content-wrapper main-content clear-fix">
             @RenderBody()

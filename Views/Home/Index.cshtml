@@ -1,30 +1,53 @@
-﻿<script type="text/javascript">
-    $(document).ready(function () {
-        $("#myCarousel").hover(function () {
-            $("#btn_prev,#btn_next").fadeIn()
-        }, function () {
-            $("#btn_prev,#btn_next").fadeOut()
+﻿@{
+    Layout = "~/Views/Shared/_Layout_home.cshtml";
+}
+@*<script type="text/javascript">
+        $(document).ready(function () {
+            $("#myCarousel").hover(function () {
+                $("#btn_prev,#btn_next").fadeIn()
+            }, function () {
+                $("#btn_prev,#btn_next").fadeOut()
+            });
         });
-    });
-</script>
-
-<div id="myCarousel" class="carousel slide">
+    </script>*@
+<div class="carousel slide" id="carousel-595514" data-ride="carousel">
+    <ol class="carousel-indicators">
+        <li class="active" data-slide-to="0" data-target="#carousel-595514">
+        </li>
+        <li data-slide-to="1" data-target="#carousel-595514">
+        </li>
+        <li data-slide-to="2" data-target="#carousel-595514">
+        </li>
+    </ol>
     <div class="carousel-inner">
         <div class="item active">
-            <img src="~/Images/1.jpg" alt="First slide">
+            <img src="/Images/1.jpg" alt="" />
         </div>
         <div class="item">
-            <img src="~/Images/2.png" alt="Second slide">
+            <img src="/Images/2.png" alt="" />
         </div>
         <div class="item">
-            <img src="~/Images/3.jpg" alt="Third slide">
+            <img src="/Images/3.jpg" alt="" />
         </div>
     </div>
-    <a id="btn_prev" class="carousel-control left" href="#myCarousel"
-       data-slide="prev" style="background-image: url(/Images/leftU.png); background-repeat: no-repeat; top: 10%; background-position: right; "></a>
-    <a id="btn_next" class="carousel-control right" href="#myCarousel"
-       data-slide="next" style="background-image: url(/Images/rightU.png); background-repeat: no-repeat; top: 10%; background-position: left"></a>
 </div>
+@*<div id="myCarousel" class="carousel slide">
+        <div class="carousel-inner">
+            <div class="item active">
+                <img src="~/Images/1.jpg" alt="First slide">
+            </div>
+            <div class="item">
+                <img src="~/Images/2.png" alt="Second slide">
+            </div>
+            <div class="item">
+                <img src="~/Images/3.jpg" alt="Third slide">
+            </div>
+        </div>
+        <a id="btn_prev" class="carousel-control left" href="#myCarousel"
+           data-slide="prev" style="background-image: url(/Images/leftU.png); background-repeat: no-repeat; top: 10%; background-position: right; "></a>
+        <a id="btn_next" class="carousel-control right" href="#myCarousel"
+           data-slide="next" style="background-image: url(/Images/rightU.png); background-repeat: no-repeat; top: 10%; background-position: left"></a>
+    </div>*@
 
 <link href="~/Content/outindex/zhongjian.css" rel="stylesheet" />
 <link href="~/Content/outindex/zhongjian2.css" rel="stylesheet" />
