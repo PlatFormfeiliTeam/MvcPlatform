@@ -191,6 +191,20 @@ namespace MvcPlatform.Controllers
         {
 
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string where = QueryCondition();           
+
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+            string sql = @"select * from LIST_ORDER where instr('" + Request["busitypeid"] + "',BUSITYPE)>0 and customercode='" + json_user.Value<string>("CUSTOMERCODE") + "' " + where;
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "createtime", "desc"));
+            var json = JsonConvert.SerializeObject(dt, iso);
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
+        public string QueryCondition()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
 
             string where = "";
             if (!string.IsNullOrEmpty(Request["seniorsearch"] + ""))
@@ -446,14 +460,7 @@ namespace MvcPlatform.Controllers
             }
 
             where += " and ISINVALID=0 ";
-
-            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
-            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-
-            string sql = @"select * from LIST_ORDER where instr('" + Request["busitypeid"] + "',BUSITYPE)>0 and customercode='" + json_user.Value<string>("CUSTOMERCODE") + "' " + where;
-            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "createtime", "desc"));
-            var json = JsonConvert.SerializeObject(dt, iso);
-            return "{rows:" + json + ",total:" + totalProperty + "}";
+            return where;
         }
 
         //基础资料 by heguiqin 2016-08-25
@@ -2297,6 +2304,82 @@ namespace MvcPlatform.Controllers
     
         }
 
+
+        public FileResult ExportList()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string where = QueryCondition();            
+            string dec_insp_status = Request["dec_insp_status"];
+
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+            string sql = "select a.*,b.REPWAYNAME from LIST_ORDER a "
+                    + " left join (select CODE,NAME||'('||CODE||')' REPWAYNAME from cusdoc.SYS_REPWAY where Enabled=1 and instr(busitype,'" + Request["busitypeid"] + "')>0) b on a.REPWAYID=b.CODE "
+                    + " where instr('" + Request["busitypeid"] + "',a.BUSITYPE)>0 and a.customercode='" + json_user.Value<string>("CUSTOMERCODE") + "' " + where;
+            DataTable dt = DBMgr.GetDataTable(sql);
+
+            //创建Excel文件的对象
+            NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();
+
+            //添加一个导出成功sheet
+            NPOI.SS.UserModel.ISheet sheet_S = book.CreateSheet("订单信息");
+
+            //给sheet1添加第一行的头部标题
+            NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
+            row1.CreateCell(0).SetCellValue("报关状态"); row1.CreateCell(1).SetCellValue("报检状态"); row1.CreateCell(2).SetCellValue("订单编号"); row1.CreateCell(3).SetCellValue("客户编号");
+            row1.CreateCell(4).SetCellValue("经营单位"); row1.CreateCell(5).SetCellValue("合同号"); row1.CreateCell(6).SetCellValue("国检提单号"); row1.CreateCell(7).SetCellValue("海关提单号");
+            row1.CreateCell(8).SetCellValue("件数/重量"); row1.CreateCell(9).SetCellValue("申报关区"); row1.CreateCell(10).SetCellValue("进/出口岸"); row1.CreateCell(11).SetCellValue("申报方式");
+            row1.CreateCell(12).SetCellValue("转关预录号"); row1.CreateCell(13).SetCellValue("法检"); row1.CreateCell(14).SetCellValue("委托时间");
+
+
+            //将数据逐步写入sheet_S各个行
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                rowtemp.CreateCell(0).SetCellValue(getStatusName(dt.Rows[i]["DECLSTATUS"].ToString(), dec_insp_status));
+                rowtemp.CreateCell(1).SetCellValue(getStatusName(dt.Rows[i]["INSPSTATUS"].ToString(), dec_insp_status));
+                rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["CODE"].ToString());
+                rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+                rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
+                rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["FIRSTLADINGBILLNO"].ToString());
+                rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["SECONDLADINGBILLNO"].ToString());
+                if (dt.Rows[i]["GOODSNUM"].ToString() != "")
+                {
+                    rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString() + "/" + dt.Rows[i]["GOODSGW"].ToString());
+                }
+                else
+                {
+                    rowtemp.CreateCell(8).SetCellValue("");
+                }
+                
+                rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["CUSTOMAREACODE"].ToString());
+                rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
+                rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());//REPWAYID
+                rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["TURNPRENO"].ToString());
+                rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
+                rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
+            }
+
+
+            // 写入到客户端 
+            System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            book.Write(ms);
+            ms.Seek(0, SeekOrigin.Begin);
+            return File(ms, "application/vnd.ms-excel", "订单文件.xls");
+        }
+
+        public string getStatusName(string curstatus,string dec_insp_status)
+        {
+            string statusname="";
+            JArray jarray = JArray.Parse(dec_insp_status);
+            foreach (JObject json in jarray)
+            {
+                if (json.Value<string>("CODE") == curstatus) { statusname = json.Value<string>("NAME"); break; }
+            }
+            return statusname;
+        }
 
     }
 }
