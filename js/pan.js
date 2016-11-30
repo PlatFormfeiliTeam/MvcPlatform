@@ -1713,7 +1713,7 @@ function printFile(type) {
     });
 }
 
-function Export() {
+function Export(busitypeid) {
     //var map = { busitypeid: "21", age: "年龄" };
     //$("#exportform").submit(function () {
     //    alert(1);
@@ -1733,7 +1733,6 @@ function Export() {
     //    CONDITION8: Ext.getCmp('CONDITION8').getValue(), VALUE8_1: Ext.Date.format(Ext.getCmp("CONDITION8_1").getValue(), 'Y-m-d H:i:s'), VALUE8_2: Ext.Date.format(Ext.getCmp("CONDITION8_2").getValue(), 'Y-m-d H:i:s')
     //};
 
-    var busitypeid = 21;
     var OnlySelf = Ext.get('OnlySelfi').el.dom.className;
     var CONDITION1 = Ext.getCmp('CONDITION1').getValue(); var VALUE1 = Ext.getCmp("CONDITION1_1").getValue(); VALUE1 = VALUE1 == null ? "" : VALUE1;
     var CONDITION2 = Ext.getCmp('CONDITION2').getValue(); var VALUE2 = Ext.getCmp("CONDITION2_1").getValue();
