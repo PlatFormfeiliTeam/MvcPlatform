@@ -162,7 +162,7 @@ function initSearch() {
     var condition4 = {
         xtype: 'fieldcontainer',
         layout: 'hbox',
-        columnWidth: .34,
+        columnWidth: .28,
         items: [combo_4, date_4_1, date_4_2]
     }
     var store_5 = Ext.create("Ext.data.JsonStore", {
@@ -325,14 +325,14 @@ function initSearch() {
     var condition8 = {
         xtype: 'fieldcontainer',
         layout: 'hbox',
-        columnWidth: .34,
+        columnWidth: .28,
         items: [combo_8, date_8_1, date_8_2]
     }
     formpanel = Ext.create('Ext.form.Panel', {
         renderTo: 'div_form',
         fieldDefaults: {
             margin: '5',
-            columnWidth: 0.22
+            columnWidth: 0.24
         },
         items: [
         { layout: 'column', border: 0, items: [condition1, condition2, condition3, condition4] },
