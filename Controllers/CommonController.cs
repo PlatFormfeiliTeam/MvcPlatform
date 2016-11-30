@@ -358,6 +358,9 @@ namespace MvcPlatform.Controllers
                     case "MANIFEST"://载货清单号
                         where += " and instr(MANIFEST,'" + Request["VALUE6"].Trim() + "')>0  ";
                         break;
+                    case "SECONDLADINGBILLNO"://海关提运单号
+                        where += " and instr(SECONDLADINGBILLNO,'" + Request["VALUE6"].Trim() + "')>0  ";
+                        break;
                 }
             }
             if (!string.IsNullOrEmpty(Request["VALUE7"]))//判断查询条件1是否有值

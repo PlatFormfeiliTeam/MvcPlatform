@@ -21,7 +21,7 @@ var declarationsearch_js_condition4_data = [{ "NAME": "订单委托日期", "COD
 //查询区域 查询条件1 /Common/loadcondition1
 var search_js_condition1_data = [{ "NAME": "经营单位", "CODE": "BUSIUNITCODE" }, { "NAME": "申报关区", "CODE": "CUSTOMDISTRICTCODE" }, { "NAME": "进口口岸", "CODE": "PORTCODE" }, { "NAME": "申报方式", "CODE": "REPWAYID" }];
 //查询区域 查询条件2 /Common/loadcondition2
-var search_js_condition2_data = [{ "NAME": "订单编号", "CODE": "CODE" }, { "NAME": "客户编号", "CODE": "CUSNO" }, { "NAME": "分单号", "CODE": "DIVIDENO" }, { "NAME": "合同发票号", "CODE": "CONTRACTNO" }, { "NAME": "载货清单号", "CODE": "MANIFEST" }];
+var search_js_condition2_data = [{ "NAME": "订单编号", "CODE": "CODE" }, { "NAME": "客户编号", "CODE": "CUSNO" }, { "NAME": "分单号", "CODE": "DIVIDENO" }, { "NAME": "合同发票号", "CODE": "CONTRACTNO" }, { "NAME": "载货清单号", "CODE": "MANIFEST" }, { "NAME": "海关提运单号", "CODE": "SECONDLADINGBILLNO" }];
 //查询区域 查询条件3 /Common/loadcondition3
 var search_js_condition3_data = [{ "NAME": "报关状态", "CODE": "bgzt" }, { "NAME": "报检状态", "CODE": "bjzt" }];
 //查询区域 查询条件4 /Common/loadcondition4
