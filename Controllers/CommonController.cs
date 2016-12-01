@@ -1028,6 +1028,9 @@ namespace MvcPlatform.Controllers
                     case "CONTRACTNO"://合同协议号
                         where += " and instr(det.CONTRACTNO,'" + Request["VALUE2"] + "')>0 ";
                         break;
+                    case "CONTRACTNOORDER"://合同发票号
+                        where += " and instr(ort.CONTRACTNO,'" + Request["VALUE2"] + "')>0 ";
+                        break;
                 }
             }
             if (!string.IsNullOrEmpty(Request["VALUE3"]))//判断查询条件3是否有值

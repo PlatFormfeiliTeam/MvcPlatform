@@ -40,7 +40,7 @@
     }
     var declarationsearch_js_condition2_data = [{ "NAME": "客户编号", "CODE": "CUSNO" }, { "NAME": "提运单号", "CODE": "BLNO" }
             , { "NAME": "订单编号", "CODE": "ORDERCODE" }, { "NAME": "报关单号", "CODE": "DECLNO" }
-            , { "NAME": "合同协议号", "CODE": "CONTRACTNO" }, { "NAME": "运输工具名称", "CODE": "TRANSNAME" }]; 
+            , { "NAME": "合同协议号", "CODE": "CONTRACTNO" }, { "NAME": "运输工具名称", "CODE": "TRANSNAME" }, { "NAME": "合同发票号", "CODE": "CONTRACTNOORDER" }];
     if (busitypeid == 10 || busitypeid == 30) {  //如果是空运出口，或者是陆运出口
         declarationsearch_js_condition2_data.push({ "NAME": "报关车号", "CODE": "DECLCARNO" });
     }
