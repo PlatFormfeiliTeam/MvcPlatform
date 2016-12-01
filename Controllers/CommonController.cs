@@ -2287,9 +2287,13 @@ namespace MvcPlatform.Controllers
                     {
                         sql = "update list_order set printstatus=1 where CORRESPONDNO='" + dt.Rows[0]["CORRESPONDNO"] + "'";
                     }
-                    else
+                    else if (!string.IsNullOrEmpty(dt.Rows[0]["ASSOCIATENO"] + ""))
                     {
                         sql = "update list_order set printstatus=1 where ASSOCIATENO='" + dt.Rows[0]["ASSOCIATENO"] + "'";
+                    }
+                    else
+                    {
+                        sql = "update list_order set printstatus=1 where code='" + Request["ordercode"] + "'";
                     }
                 }
                 DBMgr.ExecuteNonQuery(sql);
