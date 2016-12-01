@@ -1681,7 +1681,9 @@ function printFile(type) {
         records = Ext.getCmp('w_fileview').getSelectionModel().getSelection();
     }
     else {
-        records = Ext.getCmp('fileview1').getSelectionModel().getSelection();
+        var tab = tabpanel.getActiveTab();
+        var fileview = tab.title == "原始订单" ? Ext.getCmp('fileview1') : Ext.getCmp('fileview2');
+        records = fileview.getSelectionModel().getSelection();
     }
     if (records.length == 0) {
         Ext.MessageBox.alert("提示", "请选择要打印的记录！");
