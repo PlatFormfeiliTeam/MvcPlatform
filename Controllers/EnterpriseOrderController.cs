@@ -14,6 +14,7 @@ using System.Web.Mvc;
 
 namespace MvcPlatform.Controllers
 {
+    [Authorize]
     public class EnterpriseOrderController : Controller
     {
         int totalProperty = 0;

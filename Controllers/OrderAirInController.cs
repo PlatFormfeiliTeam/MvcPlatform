@@ -9,11 +9,12 @@ using System.Web.Mvc;
 
 namespace MvcPlatform.Controllers
 {
+    [Authorize]
     public class OrderAirInController : Controller
     {
         //
         // GET: /OrderAirIn/
-
+        
         public ActionResult Index()
         {
             ViewBag.navigator = "订单中心>>空运进口";

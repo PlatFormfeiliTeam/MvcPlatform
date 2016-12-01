@@ -9,6 +9,7 @@ using System.Web.Mvc;
 
 namespace MvcPlatform.Controllers
 {
+    [Authorize]
     public class OrderSpecialController : Controller
     {
         public ActionResult Index()

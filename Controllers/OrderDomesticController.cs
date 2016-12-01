@@ -13,6 +13,7 @@ using System.Web.Mvc;
 
 namespace MvcPlatform.Controllers
 {
+    [Authorize]
     public class OrderDomesticController : Controller
     {
         //

@@ -17,6 +17,7 @@ using MvcPlatform.Models;
 using System.IO;
 namespace MvcPlatform.Controllers
 {
+    [Authorize]
     public class AccountController : Controller
     {
         public ActionResult OutLogin()
