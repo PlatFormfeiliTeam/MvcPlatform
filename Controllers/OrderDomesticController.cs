@@ -122,7 +122,10 @@ namespace MvcPlatform.Controllers
                     str_arr = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']').Split(new string[] { "}," }, StringSplitOptions.RemoveEmptyEntries);
                     if (dt.Rows.Count > 0)
                     {
-                        data1 = str_arr[0] + "}";
+                        //data1 = str_arr[0] + "}";
+                        data1 = str_arr[0];
+                        if (dt.Rows.Count > 1) { data1 = data1 + "}"; }//两笔记录分割数组的是，前面一个不会有“}”，需要加上；后面一个有，不需要加上
+
                         code1 = dt.Rows[0]["CODE"] + "";
                         ordercodes += string.IsNullOrEmpty(ordercodes) ? code1 : "," + code1;
                     }
@@ -137,7 +140,10 @@ namespace MvcPlatform.Controllers
                     str_arr = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']').Split(new string[] { "}," }, StringSplitOptions.RemoveEmptyEntries);
                     if (dt.Rows.Count > 0)
                     {
-                        data2 = str_arr[0] + "}";
+                        //data2 = str_arr[0] + "}";
+                        data2 = str_arr[0];
+                        if (dt.Rows.Count > 1) { data2 = data2 + "}"; }//两笔记录分割数组的是，前面一个不会有“}”，需要加上；后面一个有，不需要加上
+
                         code2 = dt.Rows[0]["CODE"] + "";
                         ordercodes += string.IsNullOrEmpty(ordercodes) ? code2 : "," + code2;
                     }
