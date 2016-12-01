@@ -17,7 +17,8 @@ using MvcPlatform.Models;
 using System.IO;
 namespace MvcPlatform.Controllers
 {
-    [Authorize]
+ 
+
     public class AccountController : Controller
     {
         public ActionResult OutLogin()
@@ -116,6 +117,7 @@ namespace MvcPlatform.Controllers
         #region 转移AccountManagementController
 
         int totalProperty = 0;
+        [Authorize]
         public ActionResult ChildAccount()
         {
             ViewBag.navigator = "账号管理>>账号信息";
@@ -123,10 +125,12 @@ namespace MvcPlatform.Controllers
 
             return View();
         }
+          [Authorize]
         public ActionResult ChildEdit()
         {
             return View();
         }
+          [Authorize]
         public ActionResult Authorization()
         {
             ViewBag.navigator = "账号管理>>权限管理";
