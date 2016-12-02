@@ -14,6 +14,7 @@
     var OrderId = getQueryString("OrderId");
     var copyordercode = getQueryString("copyordercode");
     var busitype = 20;
+    var cur_usr;
     var common_data_jydw = [], common_data_sbfs = [], common_data_sbgq = [],
         common_data_bgfs = [], common_data_bzzl = [], common_data_myfs = [],
         common_data_containertype = [], common_data_containersize = [], common_data_truckno = [], common_data_relacontainer = [], common_data_adminurl = "",common_data_dzfwdw = [];
@@ -41,6 +42,7 @@
                 common_data_dzfwdw = commondata.dzfwdw;//单证服务单位
                 repunitcode = commondata.curuser.REPUNITNAME + "(" + commondata.curuser.CUSTOMERHSCODE + ")";//报关申报单位
                 inspunitcode = commondata.curuser.INSPUNITNAME + "(" + commondata.curuser.CUSTOMERCIQCODE + ")";//报检申报单位 
+                cur_usr = commondata.curuser;
                 form_ini();//表单初始化
                 panel_file_ini();//随附文件初始化
                 loadform(); //初始化表单信息,无论是新增还是修改
