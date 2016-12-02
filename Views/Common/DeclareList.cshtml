@@ -72,7 +72,7 @@
                 var store = Ext.create('Ext.data.JsonStore', {
                     fields: ['ID', 'PREDECLCODE', 'DECLARATIONCODE', 'CUSTOMSSTATUS', 'ISPRINT', 'CODE', 'REPFINISHTIME', 'TRANSNAME', 'BUSIUNITCODE', 'CUSTOMERNAME', 'IETYPE',
                              'BUSIUNITNAME', 'PORTCODE', 'BLNO', 'REPWAYID', 'REPWAYNAME', 'DECLWAY', 'DECLWAYNAME', 'TRADEWAYCODES', 'CONTRACTNO', 'GOODSNUM',
-                             'GOODSNW', 'SHEETNUM', 'ORDERCODE', 'CUSNO', 'ASSOCIATENO', 'CORRESPONDNO', 'BUSITYPE', 'DECL_TRANSNAME', 'DECLTYPE'],
+                             'GOODSNW', 'SHEETNUM', 'ORDERCODE', 'CUSNO', 'ASSOCIATENO', 'CORRESPONDNO', 'BUSITYPE', 'DECL_TRANSNAME', 'DECLTYPE', 'CONTRACTNOORDER'],
                     pageSize: 22,
                     proxy: {
                         type: 'ajax',
@@ -112,9 +112,10 @@
                     { xtype: 'rownumberer', width: 35 },
                     { header: 'ID', dataIndex: 'ID', sortable: true, hidden: true },
                     { header: '海关状态', dataIndex: 'CUSTOMSSTATUS', width: 90, locked: true, renderer: render },
+                    { header: '合同发票号', dataIndex: 'CONTRACTNOORDER', width: 140 },
                     { header: '打印标志', dataIndex: 'ISPRINT', width: 70, renderer: render },
                     { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 140, locked: true, renderer: render },
-                    { header: '委托单位', dataIndex: 'CUSTOMERNAME', width: 100, locked: role == 'supplier', hidden: role == 'customer' },
+                    { header: '委托单位', dataIndex: 'CUSTOMERNAME', width: 100, locked: role == 'supplier', hidden: role == 'customer' },          
                     { header: '申报完成时间', dataIndex: 'REPFINISHTIME', width: 140 },
                     { header: '进/出', dataIndex: 'IETYPE', width: 80, hidden: busitypeid != '40-41' },
                     { header: '对应号', dataIndex: 'ASSOCIATENO', width: 110, hidden: busitypeid != '40-41' },//两单关联号

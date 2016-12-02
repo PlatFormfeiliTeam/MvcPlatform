@@ -1099,7 +1099,7 @@ namespace MvcPlatform.Controllers
                          det.TRANSNAME,det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
                          ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
                          ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE, 
-                         cus.SCENEDECLAREID                                                                          
+                         cus.SCENEDECLAREID，ort.CONTRACTNO CONTRACTNOORDER                                                                       
                          from list_declaration det 
                               left join list_order ort on det.ordercode = ort.code 
                               left join cusdoc.sys_customer cus on ort.customercode = cus.code 
