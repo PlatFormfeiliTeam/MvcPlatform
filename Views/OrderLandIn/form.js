@@ -74,6 +74,7 @@
         data: common_data_sbfs
     })
     var combo_REPWAYNAME = Ext.create('Ext.form.field.ComboBox', {//申报方式
+        id: 'combo_REPWAYNAME',
         name: 'REPWAYID',
         store: store_REPWAYNAME,
         hideTrigger: true,

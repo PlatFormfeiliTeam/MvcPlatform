@@ -79,6 +79,7 @@
         data: common_data_sbfs
     })
     var combo_REPWAYNAME = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_REPWAYNAME',
         name: 'REPWAYID',
         store: store_REPWAYNAME,
         hideTrigger: true,
