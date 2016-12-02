@@ -33,7 +33,7 @@
                 store_Trade = Ext.create('Ext.data.JsonStore', {
                     fields: ['ID', 'ENTRUSTTYPE', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE',
                        'TURNPRENO', 'SUBMITTIME', 'GOODSGW','BUSIUNITCODE', 'BUSIUNITNAME', 'CONTRACTNO', 'REPWAYID', 'GOODSNUM',
-                       'GOODSGW', 'CUSTOMAREACODE', 'LAWFLAG', 'LADINGBILLNO', 'ARRIVEDNO', 'ISINVALID', 'BUSITYPE'],
+                       'GOODSGW', 'CUSTOMAREACODE', 'LAWFLAG', 'LADINGBILLNO', 'ARRIVEDNO', 'ISINVALID', 'BUSITYPE', 'PRINTSTATUS'],
                     pageSize: 20,
                     proxy: {
                         type: 'ajax',
@@ -85,6 +85,7 @@
                     { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 180, sortable: true, locked: true },
                     { header: '合同号', dataIndex: 'CONTRACTNO', width: 140, locked: true },
                     { header: '提单号', dataIndex: 'LADINGBILLNO', width: 110, locked: true },
+                    { header: '打印状态', dataIndex: 'PRINTSTATUS', width: 70, locked: true, renderer: renderOrder },
                     { header: '运抵编号', dataIndex: 'ARRIVEDNO', width: 150 },
                     { header: '件数/重量', dataIndex: 'GOODSNUM', width: 90, renderer: renderOrder},//该字段需要拼接
                     { header: '毛重', dataIndex: 'GOODSGW', width: 60 },
