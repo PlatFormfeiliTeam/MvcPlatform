@@ -33,7 +33,7 @@
                 Ext.regModel('TRADE', {
                     fields: ['ID', 'ENTRUSTTYPE', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE','TURNPRENO',
                         'SUBMITTIME', 'BUSIUNITCODE', 'BUSIUNITNAME', 'CONTRACTNO', 'TOTALNO', 'DIVIDENO', 'REPWAYID',
-                         'GOODSNUM', 'GOODSGW', 'CUSTOMAREACODE', 'LAWFLAG', 'ARRIVEDNO', 'ISINVALID', 'BUSITYPE']
+                         'GOODSNUM', 'GOODSGW', 'CUSTOMAREACODE', 'LAWFLAG', 'ARRIVEDNO', 'ISINVALID', 'BUSITYPE', 'PRINTSTATUS']
                         
                 })
                 store_Trade = Ext.create('Ext.data.JsonStore', {
@@ -90,6 +90,7 @@
                     { header: '合同发票号', dataIndex: 'CONTRACTNO', width: 100, locked: true },
                     { header: '总单号', dataIndex: 'TOTALNO', width: 90, locked: true },//需要确定具体字段
                     { header: '分单号', dataIndex: 'DIVIDENO', width: 110, locked: true },//需要确定具体字段
+                    { header: '打印状态', dataIndex: 'PRINTSTATUS', width: 70, locked: true, renderer: renderOrder },
                     { header: '件数/重量', dataIndex: 'GOODSNUM', width: 90, renderer: renderOrder },
                     { header: '申报关区', dataIndex: 'CUSTOMDISTRICTCODE', width: 70 },//需要显示编码
                     { header: '进/出口岸', dataIndex: 'PORTCODE', width: 70 },//需要显示编码
