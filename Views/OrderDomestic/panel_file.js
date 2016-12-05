@@ -7,13 +7,13 @@
     var combo_filetype1 = Ext.create('Ext.form.field.ComboBox', {//文件类型
         name: 'FILETYPEID',
         store: store_filetype1,
-        fieldLabel: '文件类型',
+        //fieldLabel: '文件类型',
         displayField: 'FILETYPENAME',
         valueField: 'FILETYPEID',
         queryMode: 'local',
-        labelWidth: 50,
+        //labelWidth: 50,
         labelAlign: 'right',
-        width: 130,
+        width: 85,
         value: '44',
         editable: false
     })
@@ -25,13 +25,13 @@
         id: 'combo_ietype1',
         store: store_ietype1,
         labelAlign: 'right',
-        fieldLabel: '进出口类型',
+        //fieldLabel: '进出口类型',
         displayField: 'NAME',
         valueField: 'CODE',
         queryMode: 'local',
         editable: false,
-        labelWidth: 60,
-        width: 162,
+        //labelWidth: 60,
+        width: 90,
         value: '进/出口业务'
     })
     var field_fileno1 = Ext.create('Ext.form.field.Text', {
@@ -128,7 +128,7 @@
                 + '</div>';
     }
     toolbar1 = Ext.create('Ext.toolbar.Toolbar', {
-        items: [combo_filetype1, combo_ietype1, field_fileno1, bbar_l, bbar_r]
+        items: [combo_filetype1, combo_ietype1, field_fileno1, bbar_l,'->', bbar_r]
     })
     store_file1 = Ext.create('Ext.data.JsonStore', {
         fields: ['ID', 'FILENAME', 'ORIGINALNAME', 'FILETYPE', 'FILETYPENAME', 'UPLOADTIME', 'SIZES', 'IETYPE'] 
