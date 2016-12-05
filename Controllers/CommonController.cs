@@ -106,6 +106,7 @@ namespace MvcPlatform.Controllers
                 default:
                     break;
             }
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
 
