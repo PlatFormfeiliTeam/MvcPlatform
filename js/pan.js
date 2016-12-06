@@ -929,14 +929,14 @@ function loadform() {
         success: function (response, opts) {
             var data = Ext.decode(response.responseText);
             formpanel.getForm().setValues(data.formdata);
-            file_store.loadData(data.filedata);  
+            file_store.loadData(data.filedata);
             //如果是修改时申报单位取先前保存的值,如无则取默认值2016-10-19 by panhuaguo  
             if (data.formdata.REPUNITNAME) {
                 repunitcode = data.formdata.REPUNITNAME + '(' + data.formdata.REPUNITCODE + ')';
             }
             if (data.formdata.INSPUNITNAME) {
                 inspunitcode = data.formdata.INSPUNITNAME + '(' + data.formdata.INSPUNITCODE + ')';
-            } 
+            }
             //如果是修改需要将随附文件的ID拼接成字符串 赋值到
             var fileids = "";
             Ext.each(file_store.getRange(), function (rec) {
@@ -1268,7 +1268,7 @@ function ini_container_truck() {
         fieldLabel: '集装箱号',
         maxLength: 11,
         minLength: 11,
-        minLengthText:'集装箱号长度应为11位！',
+        minLengthText: '集装箱号长度应为11位！',
         msgTarget: 'under',
         //tabIndex: 1,
         enforceMaxLength: true,
@@ -1302,7 +1302,7 @@ function ini_container_truck() {
         margin: '10',
         columnWidth: .34,
         fieldLabel: '自重',
-       // tabIndex: 3,
+        // tabIndex: 3,
         hideTrigger: true,
         listeners: {
             "specialkey": function (field, e) {
@@ -1377,7 +1377,7 @@ function ini_container_truck() {
         fieldLabel: "报关车号",
         displayField: 'MERGENAME',
         valueField: 'LICENSE',
-       // tabIndex: 6,
+        // tabIndex: 6,
         columnWidth: .34,
         hideTrigger: true,
         queryMode: 'local',
@@ -1691,7 +1691,7 @@ function printFile(type) {
     }
     Ext.Ajax.request({
         url: '/Common/PdfPrint',
-        params: { ordercode: ordercode, repwayname: Ext.getCmp("combo_REPWAYNAME").getRawValue(), filename: records[0].get("FILENAME"), type: type },
+        params: { ordercode: ordercode, repwayname: Ext.getCmp("combo_REPWAYNAME").getRawValue(), createtime: Ext.getCmp('field_CREATETIME1').getValue(), filename: records[0].get("FILENAME"), type: type },
         success: function (response, options) {
             //var json = Ext.decode(response.responseText);
             if (response.responseText == "error") {

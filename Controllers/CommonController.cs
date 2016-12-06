@@ -192,7 +192,7 @@ namespace MvcPlatform.Controllers
         {
 
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            string where = QueryCondition();           
+            string where = QueryCondition();
 
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
@@ -2271,12 +2271,12 @@ namespace MvcPlatform.Controllers
                 iTextSharp.text.Font font = new iTextSharp.text.Font(baseFont, 12);
 
                 //Phrase p = new Phrase(Request["ordercode"] + "  " + Request["repwayname"], font);
-                Chunk chunk = new Chunk(Request["ordercode"] + "  " + Request["repwayname"], font); chunk.SetBackground(BaseColor.WHITE);
+                Chunk chunk = new Chunk(Request["ordercode"] + " " + Request["repwayname"] + " " + Request["createtime"], font); chunk.SetBackground(BaseColor.WHITE);
                 Phrase p = new Phrase();
                 p.Add(chunk);
                 //设置块的背景色           
                 PdfContentByte over = pdfStamper.GetOverContent(1);//PdfContentBye类，用来设置图像和文本的绝对位置  
-                ColumnText.ShowTextAligned(over, Element.ALIGN_CENTER, p, pdfReader.GetPageSize(1).Width - 100, pdfReader.GetPageSize(1).Height - 20, 0);
+                ColumnText.ShowTextAligned(over, Element.ALIGN_CENTER, p, pdfReader.GetPageSize(1).Width - 150, pdfReader.GetPageSize(1).Height - 20, 0);
                 pdfStamper.Close();
                 string sql = "";
                 if (Request["type"] + "" != "gn")//如果是非国内订单
@@ -2309,14 +2309,14 @@ namespace MvcPlatform.Controllers
                 return "error";
 
             }
-    
+
         }
 
 
         public FileResult ExportList()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            string where = QueryCondition();            
+            string where = QueryCondition();
             string dec_insp_status = Request["dec_insp_status"];
 
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
@@ -2361,7 +2361,7 @@ namespace MvcPlatform.Controllers
                 {
                     rowtemp.CreateCell(8).SetCellValue("");
                 }
-                
+
                 rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["CUSTOMAREACODE"].ToString());
                 rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
                 rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());//REPWAYID
@@ -2378,9 +2378,9 @@ namespace MvcPlatform.Controllers
             return File(ms, "application/vnd.ms-excel", "订单文件.xls");
         }
 
-        public string getStatusName(string curstatus,string dec_insp_status)
+        public string getStatusName(string curstatus, string dec_insp_status)
         {
-            string statusname="";
+            string statusname = "";
             JArray jarray = JArray.Parse(dec_insp_status);
             foreach (JObject json in jarray)
             {

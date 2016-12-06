@@ -140,6 +140,7 @@
     });
     //维护时间
     var field_CREATETIME = Ext.create('Ext.form.field.Text', {
+        id:'field_CREATETIME1',
         name: 'CREATETIME',
         fieldLabel: '维护时间',
         readOnly: true

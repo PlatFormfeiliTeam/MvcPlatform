@@ -41,8 +41,7 @@
         xtype: 'fieldcontainer',
         layout: 'hbox',
         items: [relation_confirm_chk1, price_confirm_chk1, fee_confirm_chk1]
-    }
-    //根据"双单关联号"可以查出四单关联的另两单的信息，用“BUSITYPE”区分，加载
+    } 
     //------------------------------------------------订单编号，委托类型，客户编号，经营单位，报关方式-----------------------------------------------------------------
     //订单编号
     var field_CODE = Ext.create('Ext.form.field.Text', {
