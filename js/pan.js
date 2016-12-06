@@ -1691,7 +1691,7 @@ function printFile(type) {
     }
     Ext.Ajax.request({
         url: '/Common/PdfPrint',
-        params: { ordercode: ordercode, repwayname: Ext.getCmp("combo_REPWAYNAME").getRawValue(), createtime: Ext.getCmp('field_CREATETIME1').getValue(), filename: records[0].get("FILENAME"), type: type },
+        params: { ordercode: ordercode, repwayname: Ext.getCmp("combo_REPWAYNAME").getRawValue(), createtime: Ext.getCmp('field_CREATETIME').getValue(), filename: records[0].get("FILENAME"), type: type },
         success: function (response, options) {
             //var json = Ext.decode(response.responseText);
             if (response.responseText == "error") {
