@@ -69,9 +69,17 @@ namespace MvcPlatform.Controllers
         public string Delete()
         {
             //删除订单
-            string result = "";
+            string result = "{success:false}";
             string sql = "select * from LIST_ORDER where code='" + Request["ordercode"] + "'";
             DataTable dt = DBMgr.GetDataTable(sql);
+
+            bool bf = false;
+            if ((dt.Rows[0]["STATUS"] + "") != "0" || (dt.Rows[0]["DECLSTATUS"] + "") != "0" || (dt.Rows[0]["INSPSTATUS"] + "") != "0")
+            {
+                bf = true;
+            }
+            if (bf) { return result; }
+
             if (!string.IsNullOrEmpty(dt.Rows[0]["CORRESPONDNO"] + ""))//如果四单
             {
                 sql = "select * from LIST_ORDER where CORRESPONDNO='" + dt.Rows[0]["CORRESPONDNO"] + "'";
@@ -81,7 +89,7 @@ namespace MvcPlatform.Controllers
                     result = Extension.deleteorder(dr_t["CODE"] + "");
                 }
             }
-            else
+            else if (!string.IsNullOrEmpty(dt.Rows[0]["ASSOCIATENO"] + ""))
             {
                 sql = "select * from LIST_ORDER where ASSOCIATENO='" + dt.Rows[0]["ASSOCIATENO"] + "'";
                 dt = DBMgr.GetDataTable(sql);
@@ -89,6 +97,10 @@ namespace MvcPlatform.Controllers
                 {
                     result = Extension.deleteorder(dr_t["CODE"] + "");
                 }
+            }
+            else
+            {
+                result = Extension.deleteorder(Request["ordercode"] + "");
             }
             return result;
         }

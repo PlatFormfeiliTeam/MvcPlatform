@@ -818,7 +818,17 @@ namespace MvcPlatform.Controllers
         //删除报关单及其对应文件信息 by heguiqin 2016-08-26
         public string Delete()
         {
-            string result = "";
+            string result = "{success:false}";
+            string sql = "select * from LIST_ORDER where code='" + Request["ordercode"] + "'";
+            DataTable dt = DBMgr.GetDataTable(sql);
+
+            bool bf = false;
+            if ((dt.Rows[0]["STATUS"] + "") != "0" || (dt.Rows[0]["DECLSTATUS"] + "") != "0" || (dt.Rows[0]["INSPSTATUS"] + "") != "0")
+            {
+                bf = true;
+            }
+            if (bf) { return result; }
+
             result = Extension.deleteorder(Request["ordercode"] + "");
             return result;
         }
