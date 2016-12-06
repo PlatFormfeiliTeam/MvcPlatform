@@ -823,9 +823,26 @@ namespace MvcPlatform.Controllers
             DataTable dt = DBMgr.GetDataTable(sql);
 
             bool bf = false;
-            if ((dt.Rows[0]["STATUS"] + "") != "0" || (dt.Rows[0]["DECLSTATUS"] + "") != "0" || (dt.Rows[0]["INSPSTATUS"] + "") != "0")
+            if ((dt.Rows[0]["ENTRUSTTYPE"] + "") == "01")
             {
-                bf = true;
+                if ((dt.Rows[0]["STATUS"] + "") != "0" || (dt.Rows[0]["DECLSTATUS"] + "") != "0")
+                {
+                    bf = true;
+                }
+            }
+            if ((dt.Rows[0]["ENTRUSTTYPE"] + "") == "02")
+            {
+                if ((dt.Rows[0]["INSPSTATUS"] + "") != "0" || (dt.Rows[0]["DECLSTATUS"] + "") != "0")
+                {
+                    bf = true;
+                }
+            }
+            if ((dt.Rows[0]["ENTRUSTTYPE"] + "") == "03")
+            {
+                if ((dt.Rows[0]["STATUS"] + "") != "0" || (dt.Rows[0]["DECLSTATUS"] + "") != "0" || (dt.Rows[0]["INSPSTATUS"] + "") != "0")
+                {
+                    bf = true;
+                }
             }
             if (bf) { return result; }
 
