@@ -373,14 +373,25 @@ namespace MvcPlatform.Common
             string UserName = ConfigurationManager.AppSettings["FTPUserName"];
             string Password = ConfigurationManager.AppSettings["FTPPassword"];
             FtpHelper ftp = new FtpHelper(Uri, UserName, Password);
-            string sql = "select * from list_attachment where ordercode='" + ordercode + "'";
+
+            string sql = "select * from list_attachmentdetail where ordercode='" + ordercode + "'";
             DataTable dt = DBMgr.GetDataTable(sql);
+            foreach (DataRow dr in dt.Rows)
+            {
+                ftp.DeleteFile(@"/" + dr["SOURCEFILENAME"] + "");
+            }
+            sql = "delete from list_attachmentdetail where ordercode='" + ordercode + "'";
+            DBMgr.ExecuteNonQuery(sql);
+
+            sql = "select * from list_attachment where ordercode='" + ordercode + "'";
+            dt = DBMgr.GetDataTable(sql);
             foreach (DataRow dr in dt.Rows)
             {
                 ftp.DeleteFile(dr["FILENAME"] + "");
             }
             sql = "delete from list_attachment where ordercode='" + ordercode + "'";
             DBMgr.ExecuteNonQuery(sql);
+
             //删除list_times信息
             sql = "delete from list_times where code='" + ordercode + "'";
             DBMgr.ExecuteNonQuery(sql);
