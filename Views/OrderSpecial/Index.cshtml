@@ -33,7 +33,7 @@
                 Ext.regModel('TRADE', {
                     fields: ['ID', 'ENTRUSTTYPE', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE', 'TURNPRENO', 'SUBMITTIME'
                         , 'BUSIUNITNAME', 'PRINTSTATUS', 'BUSIUNITCODE', 'CUSTOMERNAME', 'CONTRACTNO', 'GOODSNUM', 'GOODSGW', 'CUSTOMAREACODE', 'LAWFLAG'
-                        , 'ISINVALID', 'BUSITYPE', 'REPWAYID']
+                        , 'ISINVALID', 'BUSITYPE', 'REPWAYID', 'STATUS']
                 })
                 store_Trade = Ext.create('Ext.data.JsonStore', {
                     model: 'TRADE',

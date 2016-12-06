@@ -1569,13 +1569,13 @@ function DeleteNotGuoNei() {
 
     var bf = false;
     if (recs[0].data.ENTRUSTTYPE == "01") {
-        if (recs[0].data.DECLSTATUS != '0') { bf = true; }
+        if (recs[0].data.DECLSTATUS != '0' || recs[0].data.STATUS) { bf = true; }
     }
     if (recs[0].data.ENTRUSTTYPE == "02") {
-        if (recs[0].data.INSPSTATUS != '0') { bf = true; }
+        if (recs[0].data.INSPSTATUS != '0' || recs[0].data.STATUS) { bf = true; }
     }
     if (recs[0].data.ENTRUSTTYPE == "03") {
-        if (recs[0].data.DECLSTATUS != '0' || recs[0].data.INSPSTATUS != '0') { bf = true; }
+        if (recs[0].data.DECLSTATUS != '0' || recs[0].data.INSPSTATUS != '0' || recs[0].data.STATUS) { bf = true; }
     }
 
     if (bf) {
