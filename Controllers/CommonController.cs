@@ -1094,7 +1094,7 @@ namespace MvcPlatform.Controllers
                          left join list_predeclaration prt  on det.predeclcode = prt.predeclcode 
                          left join list_order ort on prt.ordercode = ort.code 
                          where (ort.DECLPDF =1 or ort.PREPDF=1) and det.isinvalid=0 and instr('" + busitypeid + "',det.busitype)>0 " + where;*/
-            string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
+            /*string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
                          det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
                          det.TRANSNAME DECL_TRANSNAME, det.ISPRINT,
                          det.TRANSNAME,det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
@@ -1105,6 +1105,24 @@ namespace MvcPlatform.Controllers
                               left join list_order ort on det.ordercode = ort.code 
                               left join cusdoc.sys_customer cus on ort.customercode = cus.code 
                          where (DECLSTATUS=130 or DECLSTATUS=110) and det.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where;//(ort.DECLPDF =1 or ort.PREPDF=1) 
+             */
+            string sql = @"select * 
+                        from (
+                            select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
+                             det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
+                             det.TRANSNAME DECL_TRANSNAME, det.ISPRINT,
+                             det.TRANSNAME,det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
+                             ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
+                             ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE, 
+                             cus.SCENEDECLAREID，ort.CONTRACTNO CONTRACTNOORDER                                                                       
+                             from list_declaration det 
+                                  left join list_order ort on det.ordercode = ort.code 
+                                  left join cusdoc.sys_customer cus on ort.customercode = cus.code 
+                             where (DECLSTATUS=130 or DECLSTATUS=110) and det.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where
+                        + ") temp where not exists("
+                        +"select * from list_order l where temp.ASSOCIATENO is not null and temp.ASSOCIATENO=l.ASSOCIATENO and ((DECLSTATUS is not null and(DECLSTATUS!=130 and DECLSTATUS!=110)) or DECLSTATUS is null)"
+                        +")";
+
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
