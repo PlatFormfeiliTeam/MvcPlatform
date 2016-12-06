@@ -1568,15 +1568,11 @@ function DeleteNotGuoNei() {
     }
 
     var bf = false;
-    if (recs[0].data.ENTRUSTTYPE == "01") {
-        if (recs[0].data.DECLSTATUS != '0' || recs[0].data.STATUS != '0') { bf = true; }
-    }
-    if (recs[0].data.ENTRUSTTYPE == "02") {
-        if (recs[0].data.INSPSTATUS != '0' || recs[0].data.STATUS != '0') { bf = true; }
-    }
-    if (recs[0].data.ENTRUSTTYPE == "03") {
-        if (recs[0].data.DECLSTATUS != '0' || recs[0].data.INSPSTATUS != '0' || recs[0].data.STATUS != '0') { bf = true; }
-    }
+    var status = recs[0].data.STATUS == null ? "0" : recs[0].data.STATUS;
+    var declstatus = recs[0].data.DECLSTATUS == null ? "0" : recs[0].data.DECLSTATUS;
+    var inspstatus = recs[0].data.INSPSTATUS == null ? "0" : recs[0].data.INSPSTATUS;
+
+    if (status != "0" || declstatus != "0" || inspstatus != "0") { bf = true; }
 
     if (bf) {
         Ext.MessageBox.alert('提示', '已委托的订单不能删除！');

@@ -74,28 +74,14 @@ namespace MvcPlatform.Controllers
             DataTable dt = DBMgr.GetDataTable(sql);
 
             bool bf = false;
-            if ((dt.Rows[0]["ENTRUSTTYPE"] + "") == "01")
+            string status = dt.Rows[0]["STATUS"] + "" == "" ? "0" : dt.Rows[0]["STATUS"] + "";
+            string declstatus = dt.Rows[0]["DECLSTATUS"] + "" == "" ? "0" : dt.Rows[0]["DECLSTATUS"] + "";
+            string inspstatus = dt.Rows[0]["INSPSTATUS"] + "" == "" ? "0" : dt.Rows[0]["INSPSTATUS"] + "";
+
+            if (status != "0" || declstatus != "0" || inspstatus != "0")
             {
-                if ((dt.Rows[0]["STATUS"] + "") != "0" || (dt.Rows[0]["DECLSTATUS"] + "") != "0")
-                {
-                    bf = true;
-                }
+                bf = true;
             }
-            if ((dt.Rows[0]["ENTRUSTTYPE"] + "") == "02")
-            {
-                if ((dt.Rows[0]["INSPSTATUS"] + "") != "0" || (dt.Rows[0]["DECLSTATUS"] + "") != "0")
-                {
-                    bf = true;
-                }
-            }
-            if ((dt.Rows[0]["ENTRUSTTYPE"] + "") == "03")
-            {
-                if ((dt.Rows[0]["STATUS"] + "") != "0" || (dt.Rows[0]["DECLSTATUS"] + "") != "0" || (dt.Rows[0]["INSPSTATUS"] + "") != "0")
-                {
-                    bf = true;
-                }
-            }
-            
             if (bf) { return result; }
 
             if (!string.IsNullOrEmpty(dt.Rows[0]["CORRESPONDNO"] + ""))//如果四单
