@@ -257,7 +257,7 @@
     }
     
 
-    function Export() {
+    function ExportDecl() {
         var CONDITION1 = Ext.getCmp('CONDITION1').getValue(); var VALUE1 = Ext.getCmp("CONDITION1_1").getValue(); VALUE1 = VALUE1 == null ? "" : VALUE1;
         var CONDITION2 = Ext.getCmp('CONDITION2').getValue(); var VALUE2 = Ext.getCmp("CONDITION2_1").getValue();
         var CONDITION3 = Ext.getCmp('CONDITION3').getValue(); var VALUE3 = Ext.getCmp("CONDITION3_1").getValue(); VALUE3 = VALUE3 == null ? "" : VALUE3;
@@ -282,7 +282,7 @@
             <button onclick="Select()" class="btn btn-primary btn-sm"><i class="fa fa-search"></i>&nbsp;查询</button>
             <button onclick="Reset()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-refresh"></i>&nbsp;重置</button>
             <form id="exportform" name="form" enctype="multipart/form-data" method="post" style="display:inline-block">
-                <button type="button" id="btn_Export" class="btn btn-primary btn-sm" onclick="Export()"><i class="fa fa-level-down"></i>&nbsp;导出</button>
+                <button type="button" id="btn_Export" class="btn btn-primary btn-sm" onclick="ExportDecl()"><i class="fa fa-level-down"></i>&nbsp;导出</button>
             </form>
         </div>
     </div>
