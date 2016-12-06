@@ -256,6 +256,19 @@
         win_customs_status.show();
     }
     
+
+    function Export() {
+        var CONDITION1 = Ext.getCmp('CONDITION1').getValue(); var VALUE1 = Ext.getCmp("CONDITION1_1").getValue(); VALUE1 = VALUE1 == null ? "" : VALUE1;
+        var CONDITION2 = Ext.getCmp('CONDITION2').getValue(); var VALUE2 = Ext.getCmp("CONDITION2_1").getValue();
+        var CONDITION3 = Ext.getCmp('CONDITION3').getValue(); var VALUE3 = Ext.getCmp("CONDITION3_1").getValue(); VALUE3 = VALUE3 == null ? "" : VALUE3;
+        var CONDITION4 = Ext.getCmp('CONDITION4').getValue(); var VALUE4_1 = Ext.Date.format(Ext.getCmp("CONDITION4_1").getValue(), 'Y-m-d H:i:s'); var VALUE4_2 = Ext.Date.format(Ext.getCmp("CONDITION4_2").getValue(), 'Y-m-d H:i:s');
+
+        var common_data_busitype_json = JSON.stringify(common_data_busitype);
+        var path = '/Common/ExportDeclList?busitypeid=' + busitypeid + '&role=' + role + '&CONDITION1=' + CONDITION1 + '&VALUE1=' + VALUE1
+            + '&CONDITION2=' + CONDITION2 + '&VALUE2=' + VALUE2 + '&CONDITION3=' + CONDITION3 + '&VALUE3=' + VALUE3
+            + '&CONDITION4=' + CONDITION4 + '&VALUE4_1=' + VALUE4_1 + '&VALUE4_2=' + VALUE4_2 + "&common_data_busitype=" + common_data_busitype_json;
+        $('#exportform').attr("action", path).submit();
+    }
 </script>
 
 <div class="container">
@@ -268,6 +281,9 @@
         <div class="btn-group fr" role="group">
             <button onclick="Select()" class="btn btn-primary btn-sm"><i class="fa fa-search"></i>&nbsp;查询</button>
             <button onclick="Reset()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-refresh"></i>&nbsp;重置</button>
+            <form id="exportform" name="form" enctype="multipart/form-data" method="post" style="display:inline-block">
+                <button type="button" id="btn_Export" class="btn btn-primary btn-sm" onclick="Export()"><i class="fa fa-level-down"></i>&nbsp;导出</button>
+            </form>
         </div>
     </div>
     <div id="appConId" style="width:100%;"></div>
