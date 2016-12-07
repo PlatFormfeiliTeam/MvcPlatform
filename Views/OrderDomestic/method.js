@@ -27,8 +27,8 @@ function loadform() {
         params: { ordercode: ordercode },
         success: function (response, opts) {
             var data = Ext.decode(response.responseText);
-            formpanelhead.getForm().setValues(data.data1.IETYPE ? data.data1 : data.data2);
             Ext.getCmp("field_ordercodes").setValue(data.ORDERCODES);//记录所有已经存在的订单号,方便改变进出口类型时进行比对  
+            //拼接报关报检申报单位
             if (data.data1.REPUNITNAME) {
                 repunitcode1 = data.data1.REPUNITNAME + '(' + data.data1.REPUNITCODE + ')';
             }
@@ -53,15 +53,32 @@ function loadform() {
             if (data.data4.INSPUNITNAME) {
                 inspunitcode4 = data.data4.INSPUNITNAME + '(' + data.data4.INSPUNITCODE + ')';
             }
-
-            formpanelin.getForm().setValues(data.data1);
-            form_control(data.data1, 1);
-            readonly_init(formpanelin, formpanelhead, 1);
-
-            formpanelout.getForm().setValues(data.data2);
-            form_control(data.data2, 2);
-            readonly_init(formpanelout, formpanelhead, 2);//设置控件只读
-
+            var ietype;//根据进出口类型给表单赋值
+            if (data.data1.IETYPE) {
+                ietype = data.data1.IETYPE;
+                formpanelhead.getForm().setValues(data.data1)
+            }
+            else {
+                ietype = data.data2.IETYPE;
+                formpanelhead.getForm().setValues(data.data2)
+            }
+            if (ietype == "仅进口" || ietype == "进/出口业务") {
+                formpanelin.getForm().setValues(data.data1);
+                form_control(data.data1, 1);
+                readonly_init(formpanelin, formpanelhead, 1);
+            }
+            if (ietype == "仅出口" || ietype == "进/出口业务") {
+                formpanelout.getForm().setValues(data.data2);
+                form_control(data.data2, 2);
+                readonly_init(formpanelout, formpanelhead, 2);//设置控件只读
+            }
+            if (ietype == "仅进口") {
+                formpanelout.getForm().reset();
+            }
+            if (ietype == "仅出口") {
+                formpanelin.getForm().reset();
+            }
+            //  formpanelhead.getForm().setValues(data.data1.IETYPE ? data.data1 : data.data2);      
             store_file1.loadData(data.filedata1);//加载附件列表数据 
             //记录原始文件ID 
             fileids1 = "";
@@ -72,8 +89,39 @@ function loadform() {
             //记录当前的订单状态,方便进行按钮及其他控制 取原始订单某一个订单的状态即可            
             var status = formpanelin.isVisible() ? Ext.getCmp('field_status1').getValue() : Ext.getCmp('field_status2').getValue();
             button_control(status);//按钮的控制
-
             if (data.data1.CORRESPONDNO || data.data2.CORRESPONDNO) {//如果存在多单关联号
+                if (tabpanel.items.length == 2) {//如果已经初始化了  
+                    var ietype;//根据进出口类型给表单赋值
+                    if (data.data3.IETYPE) {
+                        ietype = data.data3.IETYPE;
+                        formpanelhead2.getForm().setValues(data.data3)
+                    }
+                    else {
+                        ietype = data.data4.IETYPE;
+                        formpanelhead2.getForm().setValues(data.data4)
+                    }
+                    if (ietype == "仅进口" || ietype == "进/出口业务") {
+                        formpanelin2.getForm().setValues(data.data3);
+                        form_control(data.data3, 3);
+                        readonly_init(formpanelin2, formpanelhead2, 3);//设置控件只读
+                    }
+                    if (ietype == "仅出口" || ietype == "进/出口业务") {
+                        formpanelout2.getForm().setValues(data.data4);
+                        form_control(data.data4, 4);
+                        readonly_init(formpanelout2, formpanelhead2, 4);//设置控件只读
+                    }
+                    if (ietype == "仅进口") {
+                        formpanelout2.getForm().reset();
+                    }
+                    if (ietype == "仅出口") {
+                        formpanelin2.getForm().reset();
+                    }
+                    store_file2.loadData(data.filedata2);//加载附件列表数据 
+                    fileids2 = "";
+                    Ext.each(store_file2.data.items, function (rec) {
+                        fileids2 += rec.get("ID") + ",";
+                    })
+                }
                 if (tabpanel.items.length == 1) {//如果没有初始化关联订单的界面 先进行初始化 
                     form_head2_ini();
                     form2_import_ini();
@@ -93,44 +141,39 @@ function loadform() {
                         }
                     });
                     var task = new Ext.util.DelayedTask(function () {  //---------延时操作-------------   //doSomething,如：隐藏loading效果
-
-                        formpanelhead2.getForm().setValues(data.data3.IETYPE ? data.data3 : data.data4);
-
-                        formpanelin2.getForm().setValues(data.data3);
-                        form_control(data.data3, 3);
-                        readonly_init(formpanelin2, formpanelhead2, 3);//设置控件只读
-
-                        formpanelout2.getForm().setValues(data.data4);
-                        form_control(data.data4, 4);
-                        readonly_init(formpanelout2, formpanelhead2, 4);//设置控件只读
-
+                        var ietype;
+                        if (data.data3.IETYPE) {
+                            ietype = data.data3.IETYPE;
+                            formpanelhead2.getForm().setValues(data.data3)
+                        }
+                        else {
+                            ietype = data.data4.IETYPE;
+                            formpanelhead2.getForm().setValues(data.data4)
+                        }
+                        if (ietype == "仅进口" || ietype == "进/出口业务") {
+                            formpanelin2.getForm().setValues(data.data3);
+                            form_control(data.data3, 3);
+                            readonly_init(formpanelin2, formpanelhead2, 3);//设置控件只读
+                        }
+                        if (ietype == "仅出口" || ietype == "进/出口业务") {
+                            formpanelout2.getForm().setValues(data.data4);
+                            form_control(data.data4, 4);
+                            readonly_init(formpanelout2, formpanelhead2, 4);//设置控件只读
+                        }
+                        if (ietype == "仅进口") {
+                            formpanelout2.getForm().reset();
+                        }
+                        if (ietype == "仅出口") {
+                            formpanelin2.getForm().reset();
+                        } 
                         store_file2.loadData(data.filedata2);//加载附件列表数据 
-
                         button_control(status);//按钮的控制
-
                         fileids2 = "";
                         Ext.each(store_file2.data.items, function (rec) {
                             fileids2 += rec.get("ID") + ",";
                         })
                     });
                     task.delay(1000); //因为经营单位选项数据加载 需延时1秒
-                }
-                if (tabpanel.items.length == 2) {//如果已经初始化了 
-                    data.data3.IETYPE ? formpanelhead2.getForm().setValues(data.data3) : formpanelhead2.getForm().setValues(data.data4);
-
-                    formpanelin2.getForm().setValues(data.data3);
-                    form_control(data.data3, 3);
-                    readonly_init(formpanelin2, formpanelhead2, 3);//设置控件只读
-
-                    formpanelout2.getForm().setValues(data.data4);
-                    form_control(data.data4, 4);
-                    readonly_init(formpanelout2, formpanelhead2, 4);//设置控件只读
-
-                    store_file2.loadData(data.filedata2);//加载附件列表数据 
-                    fileids2 = "";
-                    Ext.each(store_file2.data.items, function (rec) {
-                        fileids2 += rec.get("ID") + ",";
-                    })
                 }
             }
         }
@@ -211,6 +254,7 @@ function bg_bj_sbdw_control(cb, index) {
     if (cb.getValue() == '01')//仅报关 repunitcode, inspunitcode
     {
         bgsbdw_input.enable();
+        bgsbdw_input.clearInvalid();
         bgsbdw_input.setValue(eval('repunitcode' + index));
         bgsbdw_container.enable();
         bjsbdw_input.setValue('');
@@ -219,6 +263,7 @@ function bg_bj_sbdw_control(cb, index) {
     }
     if (cb.getValue() == '02') {
         bjsbdw_input.enable();
+        bjsbdw_input.clearInvalid();
         bjsbdw_input.setValue(eval('inspunitcode' + index));
         bjsbdw_container.enable();
         bgsbdw_input.setValue('');
@@ -227,9 +272,11 @@ function bg_bj_sbdw_control(cb, index) {
     }
     if (cb.getValue() == '03') {
         bgsbdw_input.enable();
+        bgsbdw_input.clearInvalid();
         bgsbdw_input.setValue(eval('repunitcode' + index));
         bgsbdw_container.enable();
         bjsbdw_input.enable();
+        bjsbdw_input.clearInvalid();
         bjsbdw_input.setValue(eval('inspunitcode' + index));
         bjsbdw_container.enable();
     }

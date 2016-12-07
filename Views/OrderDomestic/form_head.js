@@ -6,6 +6,7 @@
     var combo_BUSITYPE = Ext.create('Ext.form.field.ComboBox', {
         id: 'IETYPE1',
         name: 'IETYPE',
+        editable: false,
         store: store_BUSITYPE,
         hideTrigger: true,
         fieldLabel: '进出口类型',

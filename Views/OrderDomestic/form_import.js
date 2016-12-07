@@ -210,12 +210,15 @@
         items: [
             {
                 id: 'GOODSNUM1', name: 'GOODSNUM', xtype: 'numberfield', flex: .5, margin: 0, hideTrigger: true, anyMatch: true, tabIndex: 9,
-                spinUpEnabled: false, spinDownEnabled: false,
+                spinUpEnabled: false, spinDownEnabled: false,allowBlank: false, blankText: '不能为空!',
                 listeners: {
                     change: function (nf, newValue, oldValue, eOpts) {
                         if (Ext.getCmp("GOODSNUM2")) {
                             Ext.getCmp("GOODSNUM2").setValue(newValue);
                         }
+                    },
+                    focus: function (nf) {
+                        nf.clearInvalid();
                     }
                 }
             }, combo_PACKKINDNAME]

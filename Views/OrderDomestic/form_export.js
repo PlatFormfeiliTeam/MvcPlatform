@@ -45,6 +45,7 @@
     }
     //------------------------------------------------订单编号，委托类型，客户编号，经营单位，报关方式-----------------------------------------------
     var field_CODE2 = Ext.create('Ext.form.field.Text', {//订单编号
+        id: 'code2',
         name: 'CODE',
         fieldLabel: '订单编号',
         emptyText: '订单号自动生成',
@@ -218,6 +219,9 @@
                     if (Ext.getCmp("GOODSNUM1")) {
                         Ext.getCmp("GOODSNUM1").setValue(newValue);
                     }
+                },
+                focus: function (nf) {
+                    nf.clearInvalid();
                 }
             }
         }, combo_PACKKINDNAME2]

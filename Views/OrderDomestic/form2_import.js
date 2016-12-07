@@ -46,6 +46,7 @@
     //------------------------------------------------订单编号，委托类型，客户编号，经营单位，报关方式-----------------------------------------------------------------
     //订单编号
     var field_CODE3 = Ext.create('Ext.form.field.Text', {
+        id: 'code3',
         name: 'CODE',
         fieldLabel: '订单编号',
         emptyText: '订单号自动生成',
@@ -210,12 +211,15 @@
         layout: 'hbox',
         items: [{
             id: 'GOODSNUM3', name: 'GOODSNUM', xtype: 'numberfield', flex: .5, margin: 0, hideTrigger: true, anyMatch: true, tabIndex: 47,
-            spinUpEnabled: false, spinDownEnabled: false,
+            spinUpEnabled: false, spinDownEnabled: false, allowBlank: false, blankText: '不能为空!',
             listeners: {
                 change: function (nf, newValue, oldValue, eOpts) {
                     if (Ext.getCmp("GOODSNUM4")) {
                         Ext.getCmp("GOODSNUM4").setValue(newValue);
                     }
+                },
+                focus: function (nf) {
+                    nf.clearInvalid();
                 }
             }
         }, combo_PACKKINDNAME3]

@@ -8,6 +8,7 @@ function form_head2_ini() {
     var combo_BUSITYPE2 = Ext.create('Ext.form.field.ComboBox', {
         id: 'IETYPE2',
         name: 'IETYPE',
+        editable: false,
         store: store_BUSITYPE2,
         hideTrigger: true,
         fieldLabel: '进出口类型',
@@ -22,8 +23,8 @@ function form_head2_ini() {
                     cb.store.clearFilter();
                     cb.expand();
                 }
-            },
-            select: function (cb, records, opition) {
+            }, 
+            change: function (cb, newValue, oldValue, eOpts) {
                 if (cb.getValue() == "仅进口") {
                     formpanelin2.setVisible(true);
                     formpanelout2.setVisible(false);
@@ -57,7 +58,7 @@ function form_head2_ini() {
         valueField: 'CODE',
         triggerAction: 'all',
         forceSelection: true,
-        tabIndex:40,
+        tabIndex: 40,
         queryMode: 'local',
         anyMatch: true,
         listeners: {
