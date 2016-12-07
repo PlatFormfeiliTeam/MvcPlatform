@@ -1561,38 +1561,42 @@ function ini_container_truck() {
 
 //非国内业务 列表页删除功能
 function DeleteNotGuoNei() {
-    //var recs = gridpanel.getSelectionModel().getSelection();
-    //if (recs.length == 0) {
-    //    Ext.MessageBox.alert('提示', '请选择需要删除的记录！');
-    //    return;
-    //}   
-    //var bf = false;
-    //var status = recs[0].data.STATUS == null ? "0" : recs[0].data.STATUS;
-    //var declstatus = recs[0].data.DECLSTATUS == null ? "0" : recs[0].data.DECLSTATUS;
-    //var inspstatus = recs[0].data.INSPSTATUS == null ? "0" : recs[0].data.INSPSTATUS;
-    //if (status != "0" || declstatus != "0" || inspstatus != "0") { bf = true; }
-    //if (bf) {
-    //    Ext.MessageBox.alert('提示', '已委托的订单不能删除！');
-    //    return;
-    //}
-    //Ext.MessageBox.confirm("提示", "确定要删除所选择的记录吗？", function (btn) {
-    //    if (btn == 'yes') {
-    //        Ext.Ajax.request({
-    //            url: '/Common/Delete',
-    //            params: { ordercode: recs[0].get("CODE") },
-    //            success: function (response, success, option) {
-    //                var res = Ext.decode(response.responseText);
-    //                if (res.success) {
-    //                    Ext.MessageBox.alert('提示', '删除成功！');
-    //                    store_Trade.load();
-    //                }
-    //                else {
-    //                    Ext.MessageBox.alert('提示', '删除失败！');
-    //                }
-    //            }
-    //        });
-    //    }
-    //});
+    var recs = gridpanel.getSelectionModel().getSelection();
+    if (recs.length == 0) {
+        Ext.MessageBox.alert('提示', '请选择需要删除的记录！');
+        return;
+    }
+
+    var bf = false;
+    var status = recs[0].data.STATUS == null ? "0" : recs[0].data.STATUS;
+    var declstatus = recs[0].data.DECLSTATUS == null ? "0" : recs[0].data.DECLSTATUS;
+    var inspstatus = recs[0].data.INSPSTATUS == null ? "0" : recs[0].data.INSPSTATUS;
+
+    if (status != "0" || declstatus != "0" || inspstatus != "0") { bf = true; }
+
+    if (bf) {
+        Ext.MessageBox.alert('提示', '已委托的订单不能删除！');
+        return;
+    }
+
+    Ext.MessageBox.confirm("提示", "确定要删除所选择的记录吗？", function (btn) {
+        if (btn == 'yes') {
+            Ext.Ajax.request({
+                url: '/Common/Delete',
+                params: { ordercode: recs[0].get("CODE") },
+                success: function (response, success, option) {
+                    var res = Ext.decode(response.responseText);
+                    if (res.success) {
+                        Ext.MessageBox.alert('提示', '删除成功！');
+                        store_Trade.load();
+                    }
+                    else {
+                        Ext.MessageBox.alert('提示', '删除失败！');
+                    }
+                }
+            });
+        }
+    });
 }
 
 
