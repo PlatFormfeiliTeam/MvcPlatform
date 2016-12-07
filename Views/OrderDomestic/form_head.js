@@ -127,6 +127,10 @@
         fieldLabel: '委托时间',
         readOnly: true
     });
+    //委托人员id
+    var field_SUBMITUSERID = Ext.create('Ext.form.field.Hidden', {
+        name: 'SUBMITUSERID'
+    });
     //委托人员
     var field_SUBMITUSERNAME = Ext.create('Ext.form.field.Text', {
         name: 'SUBMITUSERNAME',
@@ -217,7 +221,7 @@
                       field_CREATEUSERNAME, field_CREATETIME, combo_dzfwdw
                     ]
                 },
-        field_CUSTOMDISTRICTNAME, field_ordercodes, file_addition
+        field_CUSTOMDISTRICTNAME, field_ordercodes, file_addition, field_SUBMITUSERID
         ]
     })
 }

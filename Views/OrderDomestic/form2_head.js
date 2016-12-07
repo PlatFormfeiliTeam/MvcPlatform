@@ -120,6 +120,10 @@ function form_head2_ini() {
         fieldLabel: '委托时间',
         readOnly: true
     });
+    //委托人员id
+    var field_SUBMITUSERID2 = Ext.create('Ext.form.field.Hidden', {
+        name: 'SUBMITUSERID'
+    });
     //委托人员
     var field_SUBMITUSERNAME2 = Ext.create('Ext.form.field.Text', {
         name: 'SUBMITUSERNAME',
@@ -171,6 +175,6 @@ function form_head2_ini() {
         items: [
                 { layout: 'column', height: 42, border: 0, margin: '5 0 0 0', items: [combo_BUSITYPE2, combo_REPWAYNAME2, combo_CUSTOMDISTRICTNAME2, field_SUBMITTIME2, field_SUBMITUSERNAME2] },
                 { layout: 'column', height: 42, border: 0, items: [field_CREATEUSERNAME2, field_CREATETIME2, combo_dzfwdw2] },
-        field_CUSTOMDISTRICTNAME2]
+        field_CUSTOMDISTRICTNAME2, field_SUBMITUSERID2]
     })
 }
