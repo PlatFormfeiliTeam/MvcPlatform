@@ -1518,12 +1518,12 @@ namespace MvcPlatform.Controllers
             Image img = null;
             if (busitype == "11" || busitype == "21" || busitype == "31" || busitype == "41" || busitype == "51")
             {
-                if (decltype == "11" || decltype == "17")
-                {
-                    img = Image.GetInstance(Server.MapPath("/FileUpload/进境备案清单简化.jpg"));
-                }
-                else
-                {
+                //if (decltype == "11" || decltype == "17")
+                //{
+                //    img = Image.GetInstance(Server.MapPath("/FileUpload/进境备案清单简化.jpg"));
+                //}
+                //else
+                //{
                     if (printtmp == "海关作业联")
                     {
                         img = Image.GetInstance(Server.MapPath("/FileUpload/进口-海关作业联.png"));
@@ -1536,16 +1536,16 @@ namespace MvcPlatform.Controllers
                     {
                         img = Image.GetInstance(Server.MapPath("/FileUpload/进口-海关核销联.png"));
                     }
-                }
+                //}
             }
             else
             {
-                if (decltype == "12" || decltype == "18")
-                {
-                    img = Image.GetInstance(Server.MapPath("/FileUpload/出境备案清单简化.jpg"));
-                }
-                else
-                {
+                //if (decltype == "12" || decltype == "18")
+                //{
+                //    img = Image.GetInstance(Server.MapPath("/FileUpload/出境备案清单简化.jpg"));
+                //}
+                //else
+                //{
                     if (printtmp == "海关作业联")
                     {
                         img = Image.GetInstance(Server.MapPath("/FileUpload/出口-海关作业联.png"));
@@ -1558,7 +1558,7 @@ namespace MvcPlatform.Controllers
                     {
                         img = Image.GetInstance(Server.MapPath("/FileUpload/出口-海关核销联.png"));
                     }
-                }
+                //}
             }
             string destFile = Server.MapPath("~/Declare/") + outname + ".pdf";
             FileStream stream = new FileStream(destFile, FileMode.Create, FileAccess.ReadWrite);
@@ -1578,14 +1578,14 @@ namespace MvcPlatform.Controllers
             }
             img.ScaleToFit(imgWidth, imgHeight);
             img.Alignment = Image.UNDERLYING;
-            if (decltype == "11" || decltype == "12" || decltype == "17" || decltype == "18")
-            {
-                img.SetAbsolutePosition(-10, -6);
-            }
-            else
-            {
+            //if (decltype == "11" || decltype == "12" || decltype == "17" || decltype == "18")
+            //{
+            //    img.SetAbsolutePosition(-10, -6);
+            //}
+            //else
+            //{
                 img.SetAbsolutePosition(0, 0);
-            }
+            //}
             int totalPage = reader.NumberOfPages;
             for (int current = 1; current <= totalPage; current++)
             {
