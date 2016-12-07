@@ -129,39 +129,39 @@ namespace MvcPlatform.Controllers
                             ,'{41}',{42},'{43}','{44}','{45}'
                             )";
                 sql = string.Format(sql
-                        , "11", ordercode, json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME"),json.Value<string>("CONTRACTNO")
-                        , json.Value<string>("TOTALNO"), json.Value<string>("DIVIDENO"), json.Value<string>("TURNPRENO"),json.Value<string>("GOODSNUM"), json.Value<string>("WOODPACKINGID")
-                        , json.Value<string>("CLEARANCENO"),GetChk(json.Value<string>("LAWFLAG")), json.Value<string>("ENTRUSTTYPE"), json.Value<string>("REPWAYID"), json.Value<string>("CUSTOMAREACODE")
+                        , "11", ordercode, json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME"), json.Value<string>("CONTRACTNO")
+                        , json.Value<string>("TOTALNO"), json.Value<string>("DIVIDENO"), json.Value<string>("TURNPRENO"), json.Value<string>("GOODSNUM"), json.Value<string>("WOODPACKINGID")
+                        , json.Value<string>("CLEARANCENO"), GetChk(json.Value<string>("LAWFLAG")), json.Value<string>("ENTRUSTTYPE"), json.Value<string>("REPWAYID"), json.Value<string>("CUSTOMAREACODE")
                         , GetCode(json.Value<string>("REPUNITCODE")), GetName(json.Value<string>("REPUNITCODE")), json.Value<string>("DECLWAY"), json.Value<string>("PORTCODE"), GetCode(json.Value<string>("INSPUNITCODE"))
                         , GetName(json.Value<string>("INSPUNITCODE")), json.Value<string>("ORDERREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"), json.Value<string>("STATUS")
                         , json.Value<string>("SUBMITUSERID"), json.Value<string>("SUBMITUSERNAME"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLCARNO")
-                        ,json.Value<string>("TRADEWAYCODES"), json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW"),json.Value<string>("PACKKIND"), "001"
+                        , json.Value<string>("TRADEWAYCODES"), json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW"), json.Value<string>("PACKKIND"), "001"
                         , "1", json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT"))
-                        , GetChk(json.Value<string>("PAYPOYALTIES")), json.Value<string>("SUBMITTIME"), json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS"),json.Value<string>("DOCSERVICECODE")
+                        , GetChk(json.Value<string>("PAYPOYALTIES")), json.Value<string>("SUBMITTIME"), json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS"), json.Value<string>("DOCSERVICECODE")
                    );
             }
             else//修改
             {
                 ordercode = json.Value<string>("CODE");
-                 /* sql = @"UPDATE LIST_ORDER 
-                        SET BUSITYPE='{1}',CUSNO='{2}',BUSIUNITCODE='{3}',BUSIUNITNAME='{4}',CONTRACTNO='{5}'
-                            ,TOTALNO='{6}',DIVIDENO='{7}',TURNPRENO='{8}',GOODSNUM='{9}',WOODPACKINGID='{10}'
-                            ,CLEARANCENO='{11}',LAWFLAG='{12}',ENTRUSTTYPE='{13}',REPWAYID='{14}',CUSTOMAREACODE='{15}'
-                            ,REPUNITCODE='{16}',REPUNITNAME='{17}',DECLWAY='{18}',PORTCODE='{19}',INSPUNITCODE='{20}'
-                            ,INSPUNITNAME='{21}',ORDERREQUEST='{22}',STATUS='{23}',SUBMITUSERID='{24}',SUBMITUSERNAME='{25}'
-                            ,CUSTOMERCODE='{26}',CUSTOMERNAME='{27}',DECLCARNO='{28}',TRADEWAYCODES='{29}',GOODSGW='{30}'
-                            ,GOODSNW='{31}',PACKKIND='{32}',BUSIKIND='{33}',ORDERWAY='{34}',CLEARUNIT='{35}'
-                            ,CLEARUNITNAME='{36}',SPECIALRELATIONSHIP='{37}', PRICEIMPACT='{38}',PAYPOYALTIES='{39}',SUBMITTIME={40},DOCSERVICECODE='{41}'                             
-                        ";
+                /* sql = @"UPDATE LIST_ORDER 
+                       SET BUSITYPE='{1}',CUSNO='{2}',BUSIUNITCODE='{3}',BUSIUNITNAME='{4}',CONTRACTNO='{5}'
+                           ,TOTALNO='{6}',DIVIDENO='{7}',TURNPRENO='{8}',GOODSNUM='{9}',WOODPACKINGID='{10}'
+                           ,CLEARANCENO='{11}',LAWFLAG='{12}',ENTRUSTTYPE='{13}',REPWAYID='{14}',CUSTOMAREACODE='{15}'
+                           ,REPUNITCODE='{16}',REPUNITNAME='{17}',DECLWAY='{18}',PORTCODE='{19}',INSPUNITCODE='{20}'
+                           ,INSPUNITNAME='{21}',ORDERREQUEST='{22}',STATUS='{23}',SUBMITUSERID='{24}',SUBMITUSERNAME='{25}'
+                           ,CUSTOMERCODE='{26}',CUSTOMERNAME='{27}',DECLCARNO='{28}',TRADEWAYCODES='{29}',GOODSGW='{30}'
+                           ,GOODSNW='{31}',PACKKIND='{32}',BUSIKIND='{33}',ORDERWAY='{34}',CLEARUNIT='{35}'
+                           ,CLEARUNITNAME='{36}',SPECIALRELATIONSHIP='{37}', PRICEIMPACT='{38}',PAYPOYALTIES='{39}',SUBMITTIME={40},DOCSERVICECODE='{41}'                             
+                       ";
 
-                if (IsSubmitAfterSave == false)//提交之后保存，就不更新报关报检状态；
-                {
-                    sql += @",DECLSTATUS='{42}',INSPSTATUS='{43}'";
-                }
-                sql += @" WHERE CODE = '{0}'";
-             */
+               if (IsSubmitAfterSave == false)//提交之后保存，就不更新报关报检状态；
+               {
+                   sql += @",DECLSTATUS='{42}',INSPSTATUS='{43}'";
+               }
+               sql += @" WHERE CODE = '{0}'";
+            */
 
-                string sql_list = @"SELECT CODE
+                string allcol = @"CODE
                             ,BUSITYPE,CUSNO,BUSIUNITCODE,BUSIUNITNAME,CONTRACTNO 
                             ,TOTALNO,DIVIDENO,TURNPRENO,GOODSNUM,WOODPACKINGID 
                             ,CLEARANCENO,LAWFLAG,ENTRUSTTYPE,REPWAYID,CUSTOMAREACODE 
@@ -171,42 +171,10 @@ namespace MvcPlatform.Controllers
                             ,GOODSNW,PACKKIND,BUSIKIND,ORDERWAY,CLEARUNIT 
                             ,CLEARUNITNAME,SPECIALRELATIONSHIP, PRICEIMPACT,PAYPOYALTIES,SUBMITTIME
                             ,DOCSERVICECODE,DECLSTATUS,INSPSTATUS
-                        FROM LIST_ORDER WHERE CODE = '" + ordercode + "'";
-
-                DataTable dt_list = DBMgr.GetDataTable(sql_list);
-                if (dt_list.Rows.Count == 1)
+                            ";
+                sql = Extension.getUpdateSql(allcol, ordercode, IsSubmitAfterSave, json);
+                if (sql != "")
                 {
-                    string colname;
-                    for (int i = 1; i < dt_list.Columns.Count; i++)
-                    {
-                        colname = ""; colname = dt_list.Columns[i].ColumnName;
-
-                        if (colname == "SUBMITTIME")
-                        {
-                            sql += colname + "={" + i + "},";
-                        }
-                        else if (colname == "ORDERREQUEST")//需求备注一直可以修改，不参与判断
-                        {
-                            sql += colname + "='{" + i + "}',";
-                        }
-                        else if (colname == "STATUS" || colname == "DECLSTATUS" || colname == "INSPSTATUS")
-                        {
-                            if (IsSubmitAfterSave == false)//委托之前保存，需更新状态；委托后保存，就不更新状态
-                            {
-                                sql += colname + "='{" + i + "}',";
-                            }
-                        }
-                        else
-                        {
-                            if ((dt_list.Rows[0][i] + "") == "" && json.Value<string>(colname) != "")
-                            {
-                                sql += colname + "='{" + i + "}',";
-                            }
-                        }
-                    }
-                    sql = sql.Substring(0, sql.Length - 1); //去掉末尾逗号
-                    sql = @"UPDATE LIST_ORDER SET " + sql + " WHERE CODE = '{0}'";
-
                     sql = string.Format(sql
                             , ordercode, "11", json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME"), json.Value<string>("CONTRACTNO")
                             , json.Value<string>("TOTALNO"), json.Value<string>("DIVIDENO"), json.Value<string>("TURNPRENO"), json.Value<string>("GOODSNUM"), json.Value<string>("WOODPACKINGID")

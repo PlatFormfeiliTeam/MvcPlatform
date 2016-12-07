@@ -428,5 +428,48 @@ namespace MvcPlatform.Common
             }
             document.Close();
         }
+
+        public static string getUpdateSql(string allcol, string ordercode, bool IsSubmitAfterSave, JObject json)
+        {
+            string sql = "";
+            string sql_list = @"SELECT " + allcol + " FROM LIST_ORDER WHERE CODE = '" + ordercode + "'";
+
+            DataTable dt_list = DBMgr.GetDataTable(sql_list);
+            if (dt_list.Rows.Count == 1)
+            {
+                string colname;
+                for (int i = 1; i < dt_list.Columns.Count; i++)
+                {
+                    colname = ""; colname = dt_list.Columns[i].ColumnName;
+
+                    if (colname == "SUBMITTIME")
+                    {
+                        sql += colname + "={" + i + "},";
+                    }
+                    else if (colname == "ORDERREQUEST")//需求备注一直可以修改，不参与判断
+                    {
+                        sql += colname + "='{" + i + "}',";
+                    }
+                    else if (colname == "STATUS" || colname == "DECLSTATUS" || colname == "INSPSTATUS")
+                    {
+                        if (IsSubmitAfterSave == false)//委托之前保存，需更新状态；委托后保存，就不更新状态
+                        {
+                            sql += colname + "='{" + i + "}',";
+                        }
+                    }
+                    else
+                    {
+                        if ((dt_list.Rows[0][i] + "") == "" && json.Value<string>(colname) != "")
+                        {
+                            sql += colname + "='{" + i + "}',";
+                        }
+                    }
+                }
+                sql = sql.Substring(0, sql.Length - 1); //去掉末尾逗号
+                sql = @"UPDATE LIST_ORDER SET " + sql + " WHERE CODE = '{0}'";
+            }
+            return sql;
+        }
+
     }
 }

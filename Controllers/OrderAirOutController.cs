@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -141,13 +142,13 @@ namespace MvcPlatform.Controllers
                             , json.Value<string>("TRADEWAYCODES"), json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW"), json.Value<string>("PACKKIND"), "001"
                             , "1", json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("SUBMITTIME"), GetChk(json.Value<string>("SPECIALRELATIONSHIP"))
                             , GetChk(json.Value<string>("PRICEIMPACT")), GetChk(json.Value<string>("PAYPOYALTIES")), GetChk(json.Value<string>("WEIGHTCHECK")), GetChk(json.Value<string>("ISWEIGHTCHECK")), json.Value<string>("DECLSTATUS")
-                            , json.Value<string>("INSPSTATUS"),json.Value<string>("DOCSERVICECODE")
+                            , json.Value<string>("INSPSTATUS"), json.Value<string>("DOCSERVICECODE")
                         );
             }
             else//修改
             {
                 ordercode = json.Value<string>("CODE");
-                sql = @"UPDATE LIST_ORDER 
+                /*sql = @"UPDATE LIST_ORDER 
                         SET BUSITYPE='{1}',CUSNO='{2}',BUSIUNITCODE='{3}',BUSIUNITNAME='{4}',CONTRACTNO='{5}'
                             ,TOTALNO='{6}',DIVIDENO='{7}',TURNPRENO='{8}',GOODSNUM='{9}',ARRIVEDNO='{10}'
                             ,CLEARANCENO='{11}',LAWFLAG='{12}',ENTRUSTTYPE='{13}',REPWAYID='{14}',CUSTOMAREACODE='{15}'
@@ -164,41 +165,64 @@ namespace MvcPlatform.Controllers
                     sql += @",DECLSTATUS='{44}',INSPSTATUS='{45}'";
                 }
                 sql += @" WHERE CODE = '{0}'";
-
-                sql = string.Format(sql, ordercode
-                            , "10", json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME"), json.Value<string>("CONTRACTNO")
-                            , json.Value<string>("TOTALNO"), json.Value<string>("DIVIDENO"), json.Value<string>("TURNPRENO"), json.Value<string>("GOODSNUM"), json.Value<string>("ARRIVEDNO")
-                            , json.Value<string>("CLEARANCENO"), GetChk(json.Value<string>("LAWFLAG")), json.Value<string>("ENTRUSTTYPE"), json.Value<string>("REPWAYID"), json.Value<string>("CUSTOMAREACODE")
-                            , GetCode(json.Value<string>("REPUNITCODE")), GetName(json.Value<string>("REPUNITCODE")), json.Value<string>("DECLWAY"), json.Value<string>("PORTCODE"), GetCode(json.Value<string>("INSPUNITCODE"))
-                            , GetName(json.Value<string>("INSPUNITCODE")), json.Value<string>("ORDERREQUEST"), json.Value<string>("STATUS"), json.Value<string>("SUBMITUSERID"), json.Value<string>("SUBMITUSERNAME")
-                            , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLCARNO"), json.Value<string>("TRADEWAYCODES"), json.Value<string>("SUBMITTIME")
-                            , json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW"), json.Value<string>("PACKKIND"), "001", "1"
-                            , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT")), GetChk(json.Value<string>("PAYPOYALTIES"))
-                            , GetChk(json.Value<string>("WEIGHTCHECK")), GetChk(json.Value<string>("ISWEIGHTCHECK"))
-                            , json.Value<string>("DOCSERVICECODE"), json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS")
-                      );
-            }
-            int result = DBMgr.ExecuteNonQuery(sql);
-            if (result == 1)
-            {
-                //集装箱及报关车号列表更新
-                Extension.predeclcontainer_update(ordercode, json.Value<string>("CONTAINERTRUCK"));
-
-                //更新随附文件 
-                Extension.Update_Attachment(ordercode, filedata, json.Value<string>("ORIGINALFILEIDS"), json_user);
-
-                //插入订单状态变更日志
-                Extension.add_list_time(json.Value<Int32>("STATUS"), ordercode, json_user);
-                if (json.Value<Int32>("STATUS") > 10)
+                */
+                string allcol = @"CODE
+                            ,BUSITYPE,CUSNO,BUSIUNITCODE,BUSIUNITNAME,CONTRACTNO
+                            ,TOTALNO,DIVIDENO,TURNPRENO,GOODSNUM,ARRIVEDNO
+                            ,CLEARANCENO,LAWFLAG,ENTRUSTTYPE,REPWAYID,CUSTOMAREACODE
+                            ,REPUNITCODE,REPUNITNAME,DECLWAY,PORTCODE,INSPUNITCODE
+                            ,INSPUNITNAME,ORDERREQUEST,STATUS,SUBMITUSERID,SUBMITUSERNAME
+                            ,CUSTOMERCODE,CUSTOMERNAME,DECLCARNO,TRADEWAYCODES,SUBMITTIME
+                            ,GOODSGW,GOODSNW,PACKKIND,BUSIKIND,ORDERWAY
+                            ,CLEARUNIT,CLEARUNITNAME,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES
+                            ,WEIGHTCHECK,ISWEIGHTCHECK,DOCSERVICECODE,DECLSTATUS,INSPSTATUS
+                            ";
+                sql = Extension.getUpdateSql(allcol, ordercode, IsSubmitAfterSave, json);
+                if (sql != "")
                 {
-                    Extension.Insert_FieldUpdate_History(ordercode, json, json_user, "10");
+                    sql = string.Format(sql, ordercode
+                               , "10", json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME"), json.Value<string>("CONTRACTNO")
+                               , json.Value<string>("TOTALNO"), json.Value<string>("DIVIDENO"), json.Value<string>("TURNPRENO"), json.Value<string>("GOODSNUM"), json.Value<string>("ARRIVEDNO")
+                               , json.Value<string>("CLEARANCENO"), GetChk(json.Value<string>("LAWFLAG")), json.Value<string>("ENTRUSTTYPE"), json.Value<string>("REPWAYID"), json.Value<string>("CUSTOMAREACODE")
+                               , GetCode(json.Value<string>("REPUNITCODE")), GetName(json.Value<string>("REPUNITCODE")), json.Value<string>("DECLWAY"), json.Value<string>("PORTCODE"), GetCode(json.Value<string>("INSPUNITCODE"))
+                               , GetName(json.Value<string>("INSPUNITCODE")), json.Value<string>("ORDERREQUEST"), json.Value<string>("STATUS"), json.Value<string>("SUBMITUSERID"), json.Value<string>("SUBMITUSERNAME")
+                               , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLCARNO"), json.Value<string>("TRADEWAYCODES"), json.Value<string>("SUBMITTIME")
+                               , json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW"), json.Value<string>("PACKKIND"), "001", "1"
+                               , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT")), GetChk(json.Value<string>("PAYPOYALTIES"))
+                               , GetChk(json.Value<string>("WEIGHTCHECK")), GetChk(json.Value<string>("ISWEIGHTCHECK"))
+                               , json.Value<string>("DOCSERVICECODE"), json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS")
+                         );
+                }               
+            }
+            if (sql != "")
+            {
+                int result = DBMgr.ExecuteNonQuery(sql);
+                if (result == 1)
+                {
+                    //集装箱及报关车号列表更新
+                    Extension.predeclcontainer_update(ordercode, json.Value<string>("CONTAINERTRUCK"));
+
+                    //更新随附文件 
+                    Extension.Update_Attachment(ordercode, filedata, json.Value<string>("ORIGINALFILEIDS"), json_user);
+
+                    //插入订单状态变更日志
+                    Extension.add_list_time(json.Value<Int32>("STATUS"), ordercode, json_user);
+                    if (json.Value<Int32>("STATUS") > 10)
+                    {
+                        Extension.Insert_FieldUpdate_History(ordercode, json, json_user, "10");
+                    }
+                    return "{success:true,ordercode:'" + ordercode + "'}";
                 }
-                return "{success:true,ordercode:'" + ordercode + "'}";
+                else
+                {
+                    return "{success:false}";
+                }
             }
             else
             {
                 return "{success:false}";
             }
+            
         }  
 
 
