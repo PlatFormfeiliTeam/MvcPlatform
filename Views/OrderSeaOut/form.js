@@ -201,7 +201,12 @@
                 return '<div>{NAME}</div>';
             }
         }
-    })
+    });
+    //委托人员id
+    var field_SUBMITUSERID = Ext.create('Ext.form.field.Hidden', {
+        id: 'field_SUBMITUSERID',
+        name: 'SUBMITUSERID'
+    });
     //委托人员
     var field_SUBMITUSERNAME = Ext.create('Ext.form.field.Text', {
         name: 'SUBMITUSERNAME',
@@ -813,7 +818,7 @@
         { layout: 'column', height: 42, border: 0, items: [field_contractno, field_ship, field_LADINGBILLNO, field_myfs, field_ARRIVEDNO] },
         { layout: 'column', height: 42, border: 0, items: [combo_GOODSTYPEID, chk_CHKLAWCONDITION, field_CLEARANCENO, container_box, container_bgch] },
         { layout: 'column', height: 42, border: 0, items: [field_TURNPRENO, field_ORDERREQUEST] },
-        field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_ID, field_CONTAINERTRUCK, field_ORIGINALFILEIDS
+        field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_ID, field_CONTAINERTRUCK, field_ORIGINALFILEIDS, field_SUBMITUSERID
         ]
     });
 }

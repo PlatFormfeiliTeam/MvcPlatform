@@ -196,7 +196,12 @@
         },
         allowBlank: false,
         blankText: '报关方式不能为空!'
-    })
+    });
+    //委托人员id
+    var field_SUBMITUSERID = Ext.create('Ext.form.field.Hidden', {
+        id: 'field_SUBMITUSERID',
+        name: 'SUBMITUSERID'
+    });
     //委托人员
     var field_SUBMITUSERNAME = Ext.create('Ext.form.field.Text', {
         name: 'SUBMITUSERNAME',
@@ -622,10 +627,11 @@
     })
     //需求备注
     var field_ORDERREQUEST = Ext.create('Ext.form.field.Text', {
+        id: 'field_ORDERREQUEST',
         tabIndex: 20,
         fieldLabel: '需求备注',
         name: 'ORDERREQUEST',
-        id: 'ORDERREQUEST'
+        //id: 'ORDERREQUEST'
     })
     //集装箱号
     var combo_containerno = Ext.create('Ext.form.field.Text', {
@@ -802,7 +808,7 @@
         { layout: 'column', height: 42, border: 0, items: [field_CUSNO, combo_PORTCODE, field_jydw, field_quanpackage, field_weight] },
         { layout: 'column', height: 42, border: 0, items: [field_contractno, field_myfs, field_TURNPRENO, chk_CHKLAWCONDITION, field_CLEARANCENO] },
         { layout: 'column', height: 42, border: 0, items: [combo_GOODSTYPENAME, field_containerno, container_bgch, field_ORDERREQUEST, combo_busitype] },
-        field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_ID, field_CONTAINERTRUCK, field_ORIGINALFILEIDS
+        field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_ID, field_CONTAINERTRUCK, field_ORIGINALFILEIDS, field_SUBMITUSERID
         ]
     });
 }

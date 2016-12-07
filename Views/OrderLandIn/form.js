@@ -185,6 +185,12 @@
         allowBlank: false,
         blankText: '报关方式不能为空!'
     })
+    //委托人员id
+    var field_SUBMITUSERID = Ext.create('Ext.form.field.Hidden', {
+        id: 'field_SUBMITUSERID',
+        name: 'SUBMITUSERID'
+    });
+
     var field_SUBMITUSERNAME = Ext.create('Ext.form.field.Text', {//委托人员
         name: 'SUBMITUSERNAME',
         fieldLabel: '委托人员',
@@ -626,6 +632,7 @@
 
     //需求备注
     var field_ORDERREQUEST = Ext.create('Ext.form.field.Text', {
+        id: 'field_ORDERREQUEST',
         tabIndex: 26,
         fieldLabel: '需求备注',
         name: 'ORDERREQUEST'
@@ -774,7 +781,7 @@
     { layout: 'column', height: 42, border: 0, items: [field_quanpackage, field_weight, field_contractno, field_myfs, field_MANIFEST] },
     { layout: 'column', height: 42, border: 0, items: [combo_mzbz, field_CLEARANCENO, chk_CHKLAWCONDITION, field_containerno, container_bgch] },
     { layout: 'column', height: 42, border: 0, items: [field_ORDERREQUEST] },
-    field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_ID, field_ContainerJson, field_ORIGINALFILEIDS, field_CONTAINERTRUCK
+    field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_ID, field_ContainerJson, field_ORIGINALFILEIDS, field_CONTAINERTRUCK, field_SUBMITUSERID
         ]
     });
 }

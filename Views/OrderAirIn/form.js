@@ -209,6 +209,12 @@
             }
         }
     })
+
+    //委托人员id
+    var field_SUBMITUSERID = Ext.create('Ext.form.field.Hidden', {
+        id: 'field_SUBMITUSERID',
+        name: 'SUBMITUSERID'
+    });
     //委托人员
     var field_SUBMITUSERNAME = Ext.create('Ext.form.field.Text', {
         name: 'SUBMITUSERNAME',
@@ -217,7 +223,7 @@
     });
     //委托时间
     var field_SUBMITTIME = Ext.create('Ext.form.field.Text', {
-        name: 'SUBMITTIME1',
+        name: 'SUBMITTIME',
         fieldLabel: '委托时间',
         readOnly: true
     });
@@ -607,6 +613,7 @@
     })
     //需求备注
     var field_ORDERREQUEST = Ext.create('Ext.form.field.Text', {
+        id: 'field_ORDERREQUEST',
         tabIndex: 23,
         fieldLabel: '需求备注',
         name: 'ORDERREQUEST'
@@ -649,7 +656,7 @@
                         + '<button type="button" onclick="orderBack();" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤单</button>'
                         + '<button type="button" onclick="add_new(11)" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;新增</button>'
                         + '<button type="button" onclick="copyorder(11)" class="btn btn-primary btn-sm"><i class="fa fa-files-o"></i>&nbsp;复制新增</button>'
-                        + '<button type="button" onclick="save(\'save\',11)" class="btn btn-primary btn-sm" disabled><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
+                        + '<button type="button" onclick="save(\'save\',11)" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
                         + '<button type="button" onclick="save(\'submit\',11)" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交委托</button></div>'
 
     var bbar_l;
@@ -753,7 +760,7 @@
         { layout: 'column', height: 42, border: 0, items: [field_CUSNO, combo_PORTCODE, field_jydw, field_TOTALNO, field_DIVIDENO] },
         { layout: 'column', height: 42, border: 0, items: [field_quanpackage, field_weight, field_contractno, field_myfs, field_TURNPRENO] },
         { layout: 'column', height: 42, border: 0, items: [combo_mzbz, field_CLEARANCENO, container_bgch, field_ORDERREQUEST, chk_CHKLAWCONDITION] },
-        field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_ID, field_CONTAINERTRUCK, field_ORIGINALFILEIDS
+        field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_ID, field_CONTAINERTRUCK, field_ORIGINALFILEIDS, field_SUBMITUSERID
         ]
     });
 }

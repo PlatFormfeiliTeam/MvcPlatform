@@ -197,6 +197,12 @@
             }
         }
     })
+    //委托人员id
+    var field_SUBMITUSERID = Ext.create('Ext.form.field.Hidden', {
+        id: 'field_SUBMITUSERID',
+        name: 'SUBMITUSERID'
+    });
+
     //委托人员
     var field_SUBMITUSERNAME = Ext.create('Ext.form.field.Text', {
         name: 'SUBMITUSERNAME',
@@ -715,6 +721,7 @@
 
     //需求备注
     var field_ORDERREQUEST = Ext.create('Ext.form.field.Text', {
+        id: 'field_ORDERREQUEST',
         tabIndex: 28,
         fieldLabel: '需求备注',
         name: 'ORDERREQUEST'
@@ -855,7 +862,7 @@
         { layout: 'column', height: 42, border: 0, items: [field_ship, field_contractno, field_FIRSTLADINGBILLNO, , field_SECONDLADINGBILLNO, field_myfs] },
         { layout: 'column', height: 42, border: 0, items: [field_TURNPRENO, combo_mzbz, field_CLEARANCENO, combo_GOODSTYPEID, chk_CHKLAWCONDITION] },
         { layout: 'column', height: 42, border: 0, items: [field_CONTAINERNO, container_bgch, field_ORDERREQUEST] },
-        field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_ID, field_CONTAINERTRUCK, field_ORIGINALFILEIDS
+        field_CUSTOMDISTRICTNAME, field_PORTNAME, field_BUSIUNITNAME, field_ID, field_CONTAINERTRUCK, field_ORIGINALFILEIDS, field_SUBMITUSERID
         ]
     });
 }
