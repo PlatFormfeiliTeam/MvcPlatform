@@ -116,46 +116,46 @@
     })
 
     function Delete() {
-        var recs = gridpanel.getSelectionModel().getSelection();
-        if (recs.length == 0) {
-            Ext.MessageBox.alert('提示', '请选择需要删除的记录！');
-            return;
-        }
+        //var recs = gridpanel.getSelectionModel().getSelection();
+        //if (recs.length == 0) {
+        //    Ext.MessageBox.alert('提示', '请选择需要删除的记录！');
+        //    return;
+        //}
 
-        var bf = false;
-        if (recs[0].data.ENTRUSTTYPE == "01") {
-            if (recs[0].data.DECLSTATUS != '0') { bf = true; }
-        }
-        if (recs[0].data.ENTRUSTTYPE == "02") {
-            if (recs[0].data.INSPSTATUS != '0') { bf = true; }
-        }
-        if (recs[0].data.ENTRUSTTYPE == "03") {
-            if (recs[0].data.DECLSTATUS != '0' || recs[0].data.INSPSTATUS != '0') { bf = true; }
-        }
+        //var bf = false;
+        //if (recs[0].data.ENTRUSTTYPE == "01") {
+        //    if (recs[0].data.DECLSTATUS != '0') { bf = true; }
+        //}
+        //if (recs[0].data.ENTRUSTTYPE == "02") {
+        //    if (recs[0].data.INSPSTATUS != '0') { bf = true; }
+        //}
+        //if (recs[0].data.ENTRUSTTYPE == "03") {
+        //    if (recs[0].data.DECLSTATUS != '0' || recs[0].data.INSPSTATUS != '0') { bf = true; }
+        //}
 
-        if (bf) {
-            Ext.MessageBox.alert('提示', '已委托的订单不能删除！');
-            return;
-        }
+        //if (bf) {
+        //    Ext.MessageBox.alert('提示', '已委托的订单不能删除！');
+        //    return;
+        //}
 
-        Ext.MessageBox.confirm("提示", "确定要删除所选择的记录吗？", function (btn) {
-            if (btn == 'yes') {
-                Ext.Ajax.request({
-                    url: '/OrderDomestic/Delete',
-                    params: { ordercode: recs[0].get("CODE") },
-                    success: function (response, success, option) {
-                        var res = Ext.decode(response.responseText);
-                        if (res.success) {
-                            Ext.MessageBox.alert('提示', '删除成功！');
-                            store_Trade.load();
-                        }
-                        else {
-                            Ext.MessageBox.alert('提示', '删除失败！');
-                        }
-                    }
-                });
-            }
-        });
+        //Ext.MessageBox.confirm("提示", "确定要删除所选择的记录吗？", function (btn) {
+        //    if (btn == 'yes') {
+        //        Ext.Ajax.request({
+        //            url: '/OrderDomestic/Delete',
+        //            params: { ordercode: recs[0].get("CODE") },
+        //            success: function (response, success, option) {
+        //                var res = Ext.decode(response.responseText);
+        //                if (res.success) {
+        //                    Ext.MessageBox.alert('提示', '删除成功！');
+        //                    store_Trade.load();
+        //                }
+        //                else {
+        //                    Ext.MessageBox.alert('提示', '删除失败！');
+        //                }
+        //            }
+        //        });
+        //    }
+        //});
     }
 
     function Update() {
@@ -196,7 +196,7 @@
         }
     }
 
-   
+
 </script>
 
 <div class="container">
