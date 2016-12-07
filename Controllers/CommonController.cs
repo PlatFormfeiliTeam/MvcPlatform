@@ -1578,14 +1578,14 @@ namespace MvcPlatform.Controllers
             }
             img.ScaleToFit(imgWidth, imgHeight);
             img.Alignment = Image.UNDERLYING;
-            if (decltype == "11" || decltype == "12" || decltype == "17" || decltype == "18")
-            {
-                img.SetAbsolutePosition(-10, -6);
-            }
-            else
-            {
+            //if (decltype == "11" || decltype == "12" || decltype == "17" || decltype == "18")
+            //{
+            //    img.SetAbsolutePosition(-10, -6);
+            //}
+            //else
+            //{
                 img.SetAbsolutePosition(0, 0);
-            }
+            //}
             int totalPage = reader.NumberOfPages;
             for (int current = 1; current <= totalPage; current++)
             {
