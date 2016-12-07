@@ -158,7 +158,14 @@ namespace MvcPlatform.Controllers
                     sql += @",DECLSTATUS='{42}',INSPSTATUS='{43}'";
                 }
                 sql += @" WHERE CODE = '{0}'";
-                     
+    /*           
+                sql = @"UPDATE LIST_ORDER 
+                        SET (BUSITYPE,CUSNO,BUSIUNITCODE,BUSIUNITNAME,CONTRACTNO)
+                            =(SELECT CASE WHEN BUSITYPE IS NULL THEN '{1}' ELSE  to_char(orderrequest) END AS BUSITYPE, 
+                              FROM LIST_ORDER WHERE CODE= '{0}')";
+
+                sql += @" WHERE CODE = '{0}'";
+ */
                 sql = string.Format(sql
                         , json.Value<string>("CODE"), "11", json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"),json.Value<string>("BUSIUNITNAME"), json.Value<string>("CONTRACTNO")
                         , json.Value<string>("TOTALNO"), json.Value<string>("DIVIDENO"), json.Value<string>("TURNPRENO"), json.Value<string>("GOODSNUM"), json.Value<string>("WOODPACKINGID")
