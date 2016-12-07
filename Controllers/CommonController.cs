@@ -818,7 +818,22 @@ namespace MvcPlatform.Controllers
         //删除报关单及其对应文件信息 by heguiqin 2016-08-26
         public string Delete()
         {
-            string result = "";
+            string result = "{success:false}";
+            string sql = "select * from LIST_ORDER where code='" + Request["ordercode"] + "'";
+            DataTable dt = DBMgr.GetDataTable(sql);
+
+            bool bf = false;
+            string status = dt.Rows[0]["STATUS"] + "" == "" ? "0" : dt.Rows[0]["STATUS"] + "";
+            string declstatus = dt.Rows[0]["DECLSTATUS"] + "" == "" ? "0" : dt.Rows[0]["DECLSTATUS"] + "";
+            string inspstatus = dt.Rows[0]["INSPSTATUS"] + "" == "" ? "0" : dt.Rows[0]["INSPSTATUS"] + "";
+
+            if (status != "0" || declstatus != "0" || inspstatus != "0")
+            {
+                bf = true;
+            }
+
+            if (bf) { return result; }
+
             result = Extension.deleteorder(Request["ordercode"] + "");
             return result;
         }
@@ -990,11 +1005,62 @@ namespace MvcPlatform.Controllers
         /*报关单管理 列表页展示*/
         public string LoadDeclarationList()
         {
+                string busitypeid = Request["busitypeid"];
+                string where = QueryConditionDecl();
+         
+            //2016-6-24 更新报关单列表显示逻辑 根据报关单对应的订单【DECLPDF】即报关单是否已关联好PDF文件，作为显示的条件 国内业务不需要去判断关联订单，因为打这两个标志的时候已经判断了           
+            //DECL_TRANSNAME 预制报关单的运输工具名称
+            //运输工具名称的显示需要更改为一下逻辑：根据草单中的申报库别 如果是13或者17 运输工具名称取预制报关单里面的。否则取草单的运输工具名称
+            /*string sql = @"select det.ID,det.PREDECLCODE,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPFINISHTIME, det.CUSTOMSSTATUS ,   
+                         det.ISPRINT,det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.STARTTIME CREATEDATE,
+                         det.BUSITYPE BUSITYPE,det.TRANSNAME DECL_TRANSNAME,
+                         prt.TRANSNAME,prt.BUSIUNITCODE, prt.PORTCODE, prt.BLNO, prt.DECLTYPE, 
+                         ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
+                         ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME                                                                          
+                         from list_declaration det 
+                         left join list_predeclaration prt  on det.predeclcode = prt.predeclcode 
+                         left join list_order ort on prt.ordercode = ort.code 
+                         where (ort.DECLPDF =1 or ort.PREPDF=1) and det.isinvalid=0 and instr('" + busitypeid + "',det.busitype)>0 " + where;*/
+            /*string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
+                         det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
+                         det.TRANSNAME DECL_TRANSNAME, det.ISPRINT,
+                         det.TRANSNAME,det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
+                         ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
+                         ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE, 
+                         cus.SCENEDECLAREID，ort.CONTRACTNO CONTRACTNOORDER                                                                       
+                         from list_declaration det 
+                              left join list_order ort on det.ordercode = ort.code 
+                              left join cusdoc.sys_customer cus on ort.customercode = cus.code 
+                         where (DECLSTATUS=130 or DECLSTATUS=110) and det.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where;//(ort.DECLPDF =1 or ort.PREPDF=1) 
+             */
+            string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
+                            det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
+                            det.TRANSNAME DECL_TRANSNAME, det.ISPRINT,
+                            det.TRANSNAME,det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
+                            ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
+                            ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE, 
+                            cus.SCENEDECLAREID，ort.CONTRACTNO CONTRACTNOORDER ,ort.CREATETIME                                                                      
+                            from list_declaration det 
+                                 left join list_order ort on det.ordercode = ort.code 
+                                 left join cusdoc.sys_customer cus on ort.customercode = cus.code 
+                            where (DECLSTATUS=130 or DECLSTATUS=110) and det.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where
+                       + " and not exists("
+                       + "select * from list_order l where ort.ASSOCIATENO is not null and ort.ASSOCIATENO=l.ASSOCIATENO and ((l.DECLSTATUS!=130 and l.DECLSTATUS!=110) or l.DECLSTATUS is null)"
+                       +")";
+          
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            var json = JsonConvert.SerializeObject(dt, iso);
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+       
+        public string QueryConditionDecl()
+        {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
 
             string where = "";
             string role = Request["role"];
-            string busitypeid = Request["busitypeid"];
             if (!string.IsNullOrEmpty(Request["VALUE1"]))//判断查询条件1是否有值
             {
                 switch (Request["CONDITION1"])
@@ -1080,36 +1146,8 @@ namespace MvcPlatform.Controllers
             {
                 where += @" and ort.customercode ='" + json_user.Value<string>("CUSTOMERCODE") + "' ";
             }
-
-            //2016-6-24 更新报关单列表显示逻辑 根据报关单对应的订单【DECLPDF】即报关单是否已关联好PDF文件，作为显示的条件 国内业务不需要去判断关联订单，因为打这两个标志的时候已经判断了           
-            //DECL_TRANSNAME 预制报关单的运输工具名称
-            //运输工具名称的显示需要更改为一下逻辑：根据草单中的申报库别 如果是13或者17 运输工具名称取预制报关单里面的。否则取草单的运输工具名称
-            /*string sql = @"select det.ID,det.PREDECLCODE,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPFINISHTIME, det.CUSTOMSSTATUS ,   
-                         det.ISPRINT,det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.STARTTIME CREATEDATE,
-                         det.BUSITYPE BUSITYPE,det.TRANSNAME DECL_TRANSNAME,
-                         prt.TRANSNAME,prt.BUSIUNITCODE, prt.PORTCODE, prt.BLNO, prt.DECLTYPE, 
-                         ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
-                         ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME                                                                          
-                         from list_declaration det 
-                         left join list_predeclaration prt  on det.predeclcode = prt.predeclcode 
-                         left join list_order ort on prt.ordercode = ort.code 
-                         where (ort.DECLPDF =1 or ort.PREPDF=1) and det.isinvalid=0 and instr('" + busitypeid + "',det.busitype)>0 " + where;*/
-            string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
-                         det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
-                         det.TRANSNAME DECL_TRANSNAME, det.ISPRINT,
-                         det.TRANSNAME,det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
-                         ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
-                         ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE, 
-                         cus.SCENEDECLAREID，ort.CONTRACTNO CONTRACTNOORDER                                                                       
-                         from list_declaration det 
-                              left join list_order ort on det.ordercode = ort.code 
-                              left join cusdoc.sys_customer cus on ort.customercode = cus.code 
-                         where (DECLSTATUS=130 or DECLSTATUS=110) and det.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where;//(ort.DECLPDF =1 or ort.PREPDF=1) 
-            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
-            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
-            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-            var json = JsonConvert.SerializeObject(dt, iso);
-            return "{rows:" + json + ",total:" + totalProperty + "}";
+            return where;
+        
         }
 
         /*通过查询条件获取具体的报关单海关状态数据 list_receiptstatus 这个表是预制报关单海关状态回执表
@@ -2387,6 +2425,94 @@ namespace MvcPlatform.Controllers
                 if (json.Value<string>("CODE") == curstatus) { statusname = json.Value<string>("NAME"); break; }
             }
             return statusname;
+        }
+
+        public FileResult ExportDeclList()
+        {
+            string busitypeid = Request["busitypeid"];
+            string where = QueryConditionDecl();
+            string common_data_busitype = Request["common_data_busitype"];
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+            string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
+                            det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
+                            det.TRANSNAME DECL_TRANSNAME, det.ISPRINT,
+                            det.TRANSNAME,det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
+                            ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
+                            ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE, 
+                            cus.SCENEDECLAREID，ort.CONTRACTNO CONTRACTNOORDER ,ort.CREATETIME                                                                      
+                            from list_declaration det 
+                                 left join list_order ort on det.ordercode = ort.code 
+                                 left join cusdoc.sys_customer cus on ort.customercode = cus.code 
+                            where (DECLSTATUS=130 or DECLSTATUS=110) and det.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where
+                      + " and not exists("
+                      + "select * from list_order l where ort.ASSOCIATENO is not null and ort.ASSOCIATENO=l.ASSOCIATENO and ((l.DECLSTATUS!=130 and l.DECLSTATUS!=110) or l.DECLSTATUS is null)"
+                      + ")";
+            DataTable dt = DBMgr.GetDataTable(sql);
+
+            //创建Excel文件的对象
+            NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();
+
+            //添加一个导出成功sheet
+            NPOI.SS.UserModel.ISheet sheet_S = book.CreateSheet("报关单信息");
+
+            //给sheet1添加第一行的头部标题
+            NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
+            row1.CreateCell(0).SetCellValue("海关状态"); row1.CreateCell(1).SetCellValue("合同发票号"); row1.CreateCell(2).SetCellValue("报关单号"); row1.CreateCell(3).SetCellValue("委托单位");
+            row1.CreateCell(4).SetCellValue("申报完成时间"); row1.CreateCell(5).SetCellValue("进/出"); row1.CreateCell(6).SetCellValue("对应号"); row1.CreateCell(7).SetCellValue("运输工具名称");
+            row1.CreateCell(8).SetCellValue("业务类型"); row1.CreateCell(9).SetCellValue("出口口岸"); row1.CreateCell(10).SetCellValue("提运单号"); row1.CreateCell(11).SetCellValue("申报方式");
+            row1.CreateCell(12).SetCellValue("报关方式"); row1.CreateCell(13).SetCellValue("贸易方式"); row1.CreateCell(14).SetCellValue("合同协议号"); row1.CreateCell(15).SetCellValue("件数");
+            row1.CreateCell(16).SetCellValue("重量"); row1.CreateCell(17).SetCellValue("张数"); row1.CreateCell(18).SetCellValue("多单关联号"); row1.CreateCell(19).SetCellValue("订单编号");
+            row1.CreateCell(20).SetCellValue("经营单位"); row1.CreateCell(21).SetCellValue("客户编号");
+
+
+
+            //将数据逐步写入sheet_S各个行
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["CUSTOMSSTATUS"].ToString());
+                rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["CONTRACTNOORDER"].ToString());
+                rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["DECLARATIONCODE"].ToString());
+                rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CUSTOMERNAME"].ToString());
+                rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["REPFINISHTIME"].ToString());
+                rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["IETYPE"].ToString());
+                rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["ASSOCIATENO"].ToString());
+                if (dt.Rows[i]["DECLTYPE"].ToString() == "17" || dt.Rows[i]["DECLTYPE"].ToString()=="13")
+                {
+                    rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["DECL_TRANSNAME"].ToString());
+
+                }
+                else
+                {
+                    rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["TRANSNAME"].ToString());
+                
+                }
+
+                rowtemp.CreateCell(8).SetCellValue(getStatusName(dt.Rows[i]["BUSITYPE"].ToString(), common_data_busitype));
+                rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
+                rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["BLNO"].ToString());//REPWAYID
+                rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());
+                rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["DECLWAYNAME"].ToString());
+                rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["TRADEWAYCODES"].ToString());
+                rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
+                rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
+                rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
+                rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["CORRESPONDNO"].ToString());
+                rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
+                rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
+                rowtemp.CreateCell(21).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+                
+            }
+
+
+            // 写入到客户端 
+            System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            book.Write(ms);
+            ms.Seek(0, SeekOrigin.Begin);
+            return File(ms, "application/vnd.ms-excel", "报关单文件.xls");
         }
 
     }
