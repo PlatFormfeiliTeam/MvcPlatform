@@ -465,6 +465,13 @@ namespace MvcPlatform.Common
                             {
                                 sql += colname + "='{" + i + "}',";
                             }
+                        }
+                        else
+                        {
+                            if (json.Value<string>(colname) != "")
+                            {
+                                sql += colname + "='{" + i + "}',";
+                            }                            
                         }                        
                     }
                 }
