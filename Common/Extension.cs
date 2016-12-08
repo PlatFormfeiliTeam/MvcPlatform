@@ -429,7 +429,6 @@ namespace MvcPlatform.Common
             document.Close();
         }
 
-        
         public static string getUpdateSql(string allcol, string ordercode, bool IsSubmitAfterSave)
         {
             string sql = "";
@@ -462,10 +461,22 @@ namespace MvcPlatform.Common
                     {
                         if (IsSubmitAfterSave)//委托之后
                         {
-                            if ((dt_list.Rows[0][i] + "") == "")
+                            if (colname == "SPECIALRELATIONSHIP" || colname == "PRICEIMPACT" || colname == "PAYPOYALTIES" || colname == "SPECIALRELATIONSHIP"
+                                || colname == "LAWFLAG" || colname == "WEIGHTCHECK" || colname == "ISWEIGHTCHECK")//checkbox不勾选的时候，会赋默认值0
                             {
-                                sql += colname + "='{" + i + "}',";
+                                if ((dt_list.Rows[0][i] + "") == "" || (dt_list.Rows[0][i] + "") == "0")
+                                {
+                                    sql += colname + "='{" + i + "}',";
+                                }
                             }
+                            else
+                            {
+                                if ((dt_list.Rows[0][i] + "") == "")
+                                {
+                                    sql += colname + "='{" + i + "}',";
+                                }
+                            }
+                           
                         }
                         else
                         {
