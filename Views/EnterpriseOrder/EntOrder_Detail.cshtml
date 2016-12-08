@@ -80,13 +80,12 @@
                     fieldLabel: '备注',
                     readOnly: true
                 });
-                var title1 = '<div class="btn-group" role="group"><button  type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;委托信息</button></div>';
                 var formpane_delegate = Ext.create('Ext.form.Panel', {
                     title: '<span style="color:white;">委托信息</span>',
-                    height: 150,
+                    height: 135,
                     region: 'north',
                     fieldDefaults: {
-                        margin: '5 5 10 0',
+                        margin: '4 5 10 0',
                         labelWidth: 80,
                         columnWidth: .25,
                         labelSeparator: '',
@@ -100,6 +99,41 @@
                             { layout: 'column', border: 0, items: [field_FILEDECLAREUNITNAME, field_BUSITYPEID, field_REPWAYID, field_CUSTOMDISTRICTNAME] },
                             { layout: 'column', border: 0, items: [field_CODE, field_ISREADPDF, field_REMARK] }
                     ]
+                })
+                var tmp = new Ext.XTemplate(
+      '<tpl for=".">',
+      '<div class="panel panel-default thumb-wrap fl" style="margin-top:5px;margin-left:5px;width:240px">',
+      '<div class="panel-heading" style="padding-left:5px;padding-right:5px">{[values.ORIGINALNAME.substr(0,23)]}<div class="fr"><a href="/EnterpriseOrder/DownFile?filename={[values.FILENAME]}&ID={[values.ID]}" style="cursor:pointer"><span class="glyphicon glyphicon-download-alt"></span></a></div></div>',
+      '<div class="panel-body" style="padding-left:5px;">',
+      '<tpl>{[values.SIZES/1024 > 1024?Math.round(values.SIZES/(1024*1024))+"M":Math.round(values.SIZES/1024)+"K"]}</tpl>',
+      '|{[values.UPLOADTIME]}</div></div>',
+      '</tpl>'
+      );
+                var storefile = Ext.create('Ext.data.JsonStore', {
+                    fields: ['ID', 'FILENAME', 'NEWNAME', 'ORIGINALNAME', 'UPLOADTIME', 'SIZES'],
+                    data: data.file_data
+                });
+                var fileview = Ext.create('Ext.view.View', {
+                    title: '随附文件',
+                    id: 'fileview1',
+                    store: storefile,                  
+                    tpl: tmp,
+                    itemSelector: 'div.thumb-wrap',
+                    multiSelect: true
+                })
+                var panel_file = Ext.create('Ext.panel.Panel', {
+                    title: '<span style="color:white;">随附文件</span>',
+                    border: 0,
+                    region: 'center',
+                    minHeight: 80,   
+                    items: [ fileview]
+                })
+                var panel_delegate = Ext.create('Ext.panel.Panel', {
+                    border: 0,
+                    height: 260,
+                    region: 'north',
+                    layout: 'border',
+                    items: [formpane_delegate, panel_file]
                 })
                 //申报数据
                 var field_PORTNAME = Ext.create('Ext.form.field.Text', {
@@ -230,7 +264,7 @@
                 });
                 var formpane_declare = Ext.create('Ext.form.Panel', {
                     region: 'north',
-                    height: 250,
+                    height: 230,
                     fieldDefaults: {
                         margin: '5 5 10 0',
                         labelWidth: 80,
@@ -241,8 +275,7 @@
                         validateOnBlur: false,
                         validateOnChange: false
                     },
-                    items: [
-                        //{ layout: 'column', border: 0, items: [label2] },
+                    items: [ 
                             { layout: 'column', border: 0, items: [field_PORTNAME, field_RECORDCODE, field_INOUTDATE, field_REPDATE] },
                             { layout: 'column', border: 0, items: [field_TRANSMODEL, field_TRANSNAME, field_BLNO, field_BUSIUNITNAME] },
                             { layout: 'column', border: 0, items: [field_TRADENAME, field_EXEMPTIONNAME, field_LICENSENO, field_SECOUNTRYNAME] },
@@ -284,7 +317,7 @@
                 });
                 var viewport = new Ext.container.Viewport({
                     layout: 'border',
-                    items: [formpane_delegate, panel]
+                    items: [panel_delegate, panel]
                 })
                 formpane_delegate.getForm().setValues(data.data);
                 if (data.decl_data.length > 0) {

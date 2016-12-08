@@ -304,12 +304,8 @@
         if (recs.length == 0) {
             Ext.MessageBox.alert('提示', '请选择需要查看的记录！');
             return;
-        }
-        var ids = "";
-        for (var i = 0; i < recs.length; i++) {
-            ids += recs[i].data.ID + ',';
-        }
-        opencenterwin("/EnterpriseOrder/EntOrder_Detail?ID=" + recs[0].data.ID, 1200, 600);
+        } 
+        opencenterwin("/EnterpriseOrder/EntOrder_Detail?ID=" + recs[0].data.ID, 1300, 700);
     }
 </script>
 

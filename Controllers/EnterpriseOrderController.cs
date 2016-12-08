@@ -400,7 +400,6 @@ namespace MvcPlatform.Controllers
             string ID = Request["ID"]; //string busitype = Request["busitype"];
             DataTable dt;
             string data = "{}";
-            // string filedata = "[]";
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             string sql = "select a.* from ENT_ORDER a where a.ID = '" + ID + "'";
@@ -409,6 +408,7 @@ namespace MvcPlatform.Controllers
             //申报数据
             string decl_data = "[]";
             string product_data = "[]";
+            string file_data = "[]";
             if (dt.Rows.Count > 0)
             {
                 sql = "select * from LIST_CUSDATA_FL where cusno='" + dt.Rows[0]["CODE"] + "'";
@@ -420,10 +420,10 @@ namespace MvcPlatform.Controllers
                     DataTable dt3 = DBMgr.GetDataTable(sql);
                     product_data = JsonConvert.SerializeObject(dt3, iso);
                 }
+                sql = "select * from list_attachment t where t.entid='" + ID + "'";
+                file_data = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso);
             }
-            //sql = "select * from list_attachment t where t.entid='" + ID + "'";
-            //DataTable dt_detail = DBMgr.GetDataTable(sql);
-            result = "{data:" + data + ",decl_data:" + decl_data + ",product_data:" + product_data + "}";
+            result = "{data:" + data + ",decl_data:" + decl_data + ",product_data:" + product_data + ",file_data:" + file_data + "}";
             return result;
 
         }
