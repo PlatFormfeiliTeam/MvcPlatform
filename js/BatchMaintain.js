@@ -422,7 +422,7 @@ function loadbatchform() {
 
         if (a > 0) { Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(true); }//申报关区
         if (b > 0) { Ext.getCmp('declcarno_btn').setDisabled(true); }//报关车号
-        if (c > 0) { Ext.getCmp('field_ORDERREQUEST').setDisabled(true); }//备注
+        //if (c > 0) { Ext.getCmp('field_ORDERREQUEST').setDisabled(true); }//备注
         if (d > 0) { Ext.getCmp('field_TOTALNO').setDisabled(true); }//总单号
         if (e > 0) { Ext.getCmp('field_TURNPRENO').setDisabled(true); }//转关预录号
         if (f > 0) { Ext.getCmp('combo_mzbz').setDisabled(true); }//木质包装
@@ -452,7 +452,7 @@ function loadbatchform() {
 
         if (a > 0) { Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(true); }//申报关区
         if (b > 0) { Ext.getCmp('declcarno_btn').setDisabled(true); }//报关车号
-        if (c > 0) { Ext.getCmp('field_ORDERREQUEST').setDisabled(true); }//备注
+        //if (c > 0) { Ext.getCmp('field_ORDERREQUEST').setDisabled(true); }//备注
         if (d > 0) { Ext.getCmp('field_TOTALNO').setDisabled(true); }//总单号
         if (e > 0) { Ext.getCmp('combo_PORTCODE').setDisabled(true); }//进出口岸
     }
@@ -482,7 +482,7 @@ function loadbatchform() {
 
         if (a > 0) { Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(true); }//申报关区
         if (b > 0) { Ext.getCmp('declcarno_btn').setDisabled(true); }//报关车号
-        if (c > 0) { Ext.getCmp('field_ORDERREQUEST').setDisabled(true); }//备注
+        //if (c > 0) { Ext.getCmp('field_ORDERREQUEST').setDisabled(true); }//备注
         if (d > 0) { Ext.getCmp('field_TURNPRENO').setDisabled(true); }//转关预录号
         if (e > 0) { Ext.getCmp('combo_mzbz').setDisabled(true); }//木质包装
         if (f > 0) { Ext.getCmp('combo_PORTCODE').setDisabled(true); }//进出口岸
@@ -516,7 +516,7 @@ function loadbatchform() {
 
         if (a > 0) { Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(true); }//申报关区
         if (b > 0) { Ext.getCmp('declcarno_btn').setDisabled(true); }//报关车号
-        if (c > 0) { Ext.getCmp('field_ORDERREQUEST').setDisabled(true); }//备注
+        //if (c > 0) { Ext.getCmp('field_ORDERREQUEST').setDisabled(true); }//备注
         if (d > 0) { Ext.getCmp('combo_PORTCODE').setDisabled(true); }//进出口岸
         if (e > 0) { Ext.getCmp('field_SHIPNAME').setDisabled(true); }//船名
         if (f > 0) { Ext.getCmp('field_FILGHTNO').setDisabled(true); }//航次
@@ -549,7 +549,7 @@ function loadbatchform() {
 
         if (a > 0) { Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(true); }//申报关区
         if (b > 0) { Ext.getCmp('declcarno_btn').setDisabled(true); }//报关车号
-        if (c > 0) { Ext.getCmp('field_ORDERREQUEST').setDisabled(true); }//备注
+        //if (c > 0) { Ext.getCmp('field_ORDERREQUEST').setDisabled(true); }//备注
         if (d > 0) { Ext.getCmp('combo_mzbz').setDisabled(true); }//木质包装
         if (e > 0) { Ext.getCmp('field_LADINGBILLNO').setDisabled(true); }//提单号
         if (f > 0) { Ext.getCmp('field_MANIFEST').setDisabled(true); }//载货清单号
@@ -579,7 +579,7 @@ function loadbatchform() {
 
         if (a > 0) { Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(true); }//申报关区
         if (b > 0) { Ext.getCmp('declcarno_btn').setDisabled(true); }//报关车号
-        if (c > 0) { Ext.getCmp('field_ORDERREQUEST').setDisabled(true); }//备注
+        //if (c > 0) { Ext.getCmp('field_ORDERREQUEST').setDisabled(true); }//备注
         if (d > 0) { Ext.getCmp('combo_PORTCODE').setDisabled(true); }//进出口岸
         if (e > 0) { Ext.getCmp('field_ARRIVEDNO').setDisabled(true); }//运抵编号
     }
@@ -607,7 +607,7 @@ function loadbatchform() {
 
         if (a > 0) { Ext.getCmp('combo_CUSTOMDISTRICTNAME').setDisabled(true); }//申报关区
         if (b > 0) { Ext.getCmp('declcarno_btn').setDisabled(true); }//报关车号
-        if (c > 0) { Ext.getCmp('field_ORDERREQUEST').setDisabled(true); }//备注
+        //if (c > 0) { Ext.getCmp('field_ORDERREQUEST').setDisabled(true); }//备注
         if (d > 0) { Ext.getCmp('field_TURNPRENO_TWO').setDisabled(true); }//对方转关号
     }
    
