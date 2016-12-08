@@ -527,11 +527,11 @@ namespace MvcPlatform.Controllers
                             ,SUBMITUSERNAME,SUBMITUSERID,ASSOCIATETRADEWAY,BUSIKIND,ORDERWAY
                             ,PORTCODE,DOCSERVICECODE,DECLSTATUS,INSPSTATUS
                             ";
-            update_sql = Extension.getUpdateSql(allcol, ordercode, IsSubmitAfterSave);
+            //update_sql在里面赋值，因为需要传code
 
 
             string exe_desc = "";//订单保存时记录各订单的执行情况
-            int order_res = 1;
+            int order_res = 0;
             if (!string.IsNullOrEmpty(code1))//如果code1不为空 
             {
                 if (json1.Value<string>("ENTRUSTTYPE") == "01")
@@ -566,27 +566,35 @@ namespace MvcPlatform.Controllers
                 }
                 else
                 {
-                    sql = string.Format(update_sql, code1
-                            , json1.Value<string>("ASSOCIATEPEDECLNO"), json1.Value<string>("CUSNO"), json1.Value<string>("BUSIUNITCODE"), json1.Value<string>("BUSIUNITNAME"), json1.Value<string>("CONTRACTNO")
-                            , json1.Value<string>("GOODSNUM"), json1.Value<string>("CLEARANCENO"), GetChk(json1.Value<string>("LAWFLAG")), json1.Value<string>("ENTRUSTTYPE"), json_head1.Value<string>("REPWAYID")
-                            , json_head1.Value<string>("CUSTOMAREACODE"), GetCode(json1.Value<string>("REPUNITCODE")), GetName(json1.Value<string>("REPUNITCODE")), json1.Value<string>("DECLWAY"), GetCode(json1.Value<string>("INSPUNITCODE"))
-                            , GetName(json1.Value<string>("INSPUNITCODE")), json1.Value<string>("ORDERREQUEST"), json1.Value<string>("TRADEWAYCODES"), AssociateNo, CorrespondNo
-                            , json1.Value<string>("PACKKIND"), json1.Value<string>("GOODSGW"), json1.Value<string>("GOODSNW"), json1.Value<string>("RECORDCODE"), json_head1.Value<string>("IETYPE")
-                            , GetChk(json1.Value<string>("SPECIALRELATIONSHIP")), GetChk(json1.Value<string>("PRICEIMPACT")), GetChk(json1.Value<string>("PAYPOYALTIES")), json1.Value<string>("STATUS"), json_head1.Value<string>("SUBMITTIME")
-                            , json_head1.Value<string>("SUBMITUSERNAME"), json_head1.Value<string>("SUBMITUSERID"), json1.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
-                            , json_head1.Value<string>("CUSTOMAREACODE"), json_head1.Value<string>("DOCSERVICECODE"), json1.Value<string>("DECLSTATUS"), json1.Value<string>("INSPSTATUS")                            
-                             );
+                    update_sql = Extension.getUpdateSql(allcol, code1, IsSubmitAfterSave);
 
+                    if (update_sql != "")
+                    {
+                        sql = string.Format(update_sql, code1
+                                , json1.Value<string>("ASSOCIATEPEDECLNO"), json1.Value<string>("CUSNO"), json1.Value<string>("BUSIUNITCODE"), json1.Value<string>("BUSIUNITNAME"), json1.Value<string>("CONTRACTNO")
+                                , json1.Value<string>("GOODSNUM"), json1.Value<string>("CLEARANCENO"), GetChk(json1.Value<string>("LAWFLAG")), json1.Value<string>("ENTRUSTTYPE"), json_head1.Value<string>("REPWAYID")
+                                , json_head1.Value<string>("CUSTOMAREACODE"), GetCode(json1.Value<string>("REPUNITCODE")), GetName(json1.Value<string>("REPUNITCODE")), json1.Value<string>("DECLWAY"), GetCode(json1.Value<string>("INSPUNITCODE"))
+                                , GetName(json1.Value<string>("INSPUNITCODE")), json1.Value<string>("ORDERREQUEST"), json1.Value<string>("TRADEWAYCODES"), AssociateNo, CorrespondNo
+                                , json1.Value<string>("PACKKIND"), json1.Value<string>("GOODSGW"), json1.Value<string>("GOODSNW"), json1.Value<string>("RECORDCODE"), json_head1.Value<string>("IETYPE")
+                                , GetChk(json1.Value<string>("SPECIALRELATIONSHIP")), GetChk(json1.Value<string>("PRICEIMPACT")), GetChk(json1.Value<string>("PAYPOYALTIES")), json1.Value<string>("STATUS"), json_head1.Value<string>("SUBMITTIME")
+                                , json_head1.Value<string>("SUBMITUSERNAME"), json_head1.Value<string>("SUBMITUSERID"), json1.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
+                                , json_head1.Value<string>("CUSTOMAREACODE"), json_head1.Value<string>("DOCSERVICECODE"), json1.Value<string>("DECLSTATUS"), json1.Value<string>("INSPSTATUS")
+                                 );
+                    }
                     if (json1.Value<Int32>("STATUS") >= 15)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
                     {
                         Extension.Insert_FieldUpdate_History(code1, json1, json_user, "41");
                     }
-                    order_res = DBMgr.ExecuteNonQuery(sql);
+                    if (sql != "")
+                    {
+                        order_res = DBMgr.ExecuteNonQuery(sql);
+                    }
+                    
                     ordercode = code1;
                 }
                 if (order_res == 0)
                 {
-                    exe_desc = "订单：" + code1 + "保存失败!<br />";
+                    exe_desc += "订单：" + code1 + "保存失败!<br />";
                 }
 
                 Extension.add_list_time(json1.Value<Int32>("STATUS"), code1, json_user);
@@ -625,26 +633,35 @@ namespace MvcPlatform.Controllers
                 }
                 else
                 {
-                    sql = string.Format(update_sql, code2
-                            , json2.Value<string>("ASSOCIATEPEDECLNO"), json2.Value<string>("CUSNO"), json2.Value<string>("BUSIUNITCODE"), json2.Value<string>("BUSIUNITNAME"), json2.Value<string>("CONTRACTNO")
-                            , json2.Value<string>("GOODSNUM"), json2.Value<string>("CLEARANCENO"), GetChk(json2.Value<string>("LAWFLAG")), json2.Value<string>("ENTRUSTTYPE"), json_head1.Value<string>("REPWAYID")
-                            , json_head1.Value<string>("CUSTOMAREACODE"), GetCode(json2.Value<string>("REPUNITCODE")), GetName(json2.Value<string>("REPUNITCODE")), json2.Value<string>("DECLWAY"), GetCode(json2.Value<string>("INSPUNITCODE"))
-                            , GetName(json2.Value<string>("INSPUNITCODE")), json2.Value<string>("ORDERREQUEST"), json2.Value<string>("TRADEWAYCODES"), AssociateNo, CorrespondNo
-                            , json2.Value<string>("PACKKIND"), json2.Value<string>("GOODSGW"), json2.Value<string>("GOODSNW"), json2.Value<string>("RECORDCODE"), json_head1.Value<string>("IETYPE")
-                            , GetChk(json2.Value<string>("SPECIALRELATIONSHIP")), GetChk(json2.Value<string>("PRICEIMPACT")), GetChk(json2.Value<string>("PAYPOYALTIES")), json2.Value<string>("STATUS"), json_head1.Value<string>("SUBMITTIME")
-                            , json_head1.Value<string>("SUBMITUSERNAME"), json_head1.Value<string>("SUBMITUSERID"), json2.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
-                            , json_head1.Value<string>("CUSTOMAREACODE"), json_head1.Value<string>("DOCSERVICECODE"), json2.Value<string>("DECLSTATUS"), json2.Value<string>("INSPSTATUS")                            
-                         );
+                    update_sql = Extension.getUpdateSql(allcol, code2, IsSubmitAfterSave);
+
+                    if (update_sql != "")
+                    {
+                        sql = string.Format(update_sql, code2
+                                , json2.Value<string>("ASSOCIATEPEDECLNO"), json2.Value<string>("CUSNO"), json2.Value<string>("BUSIUNITCODE"), json2.Value<string>("BUSIUNITNAME"), json2.Value<string>("CONTRACTNO")
+                                , json2.Value<string>("GOODSNUM"), json2.Value<string>("CLEARANCENO"), GetChk(json2.Value<string>("LAWFLAG")), json2.Value<string>("ENTRUSTTYPE"), json_head1.Value<string>("REPWAYID")
+                                , json_head1.Value<string>("CUSTOMAREACODE"), GetCode(json2.Value<string>("REPUNITCODE")), GetName(json2.Value<string>("REPUNITCODE")), json2.Value<string>("DECLWAY"), GetCode(json2.Value<string>("INSPUNITCODE"))
+                                , GetName(json2.Value<string>("INSPUNITCODE")), json2.Value<string>("ORDERREQUEST"), json2.Value<string>("TRADEWAYCODES"), AssociateNo, CorrespondNo
+                                , json2.Value<string>("PACKKIND"), json2.Value<string>("GOODSGW"), json2.Value<string>("GOODSNW"), json2.Value<string>("RECORDCODE"), json_head1.Value<string>("IETYPE")
+                                , GetChk(json2.Value<string>("SPECIALRELATIONSHIP")), GetChk(json2.Value<string>("PRICEIMPACT")), GetChk(json2.Value<string>("PAYPOYALTIES")), json2.Value<string>("STATUS"), json_head1.Value<string>("SUBMITTIME")
+                                , json_head1.Value<string>("SUBMITUSERNAME"), json_head1.Value<string>("SUBMITUSERID"), json2.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
+                                , json_head1.Value<string>("CUSTOMAREACODE"), json_head1.Value<string>("DOCSERVICECODE"), json2.Value<string>("DECLSTATUS"), json2.Value<string>("INSPSTATUS")
+                             );
+                    }
                     if (json2.Value<Int32>("STATUS") >= 15)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
                     {
                         Extension.Insert_FieldUpdate_History(code2, json2, json_user, "40");
                     }
-                    order_res = DBMgr.ExecuteNonQuery(sql);
+
+                    if (sql != "")
+                    {
+                        order_res = DBMgr.ExecuteNonQuery(sql);
+                    }
                     ordercode = code2;
                 }
                 if (order_res == 0)
                 {
-                    exe_desc = "订单：" + code2 + "保存失败!<br />";
+                    exe_desc += "订单：" + code2 + "保存失败!<br />";
                 }
 
                 Extension.add_list_time(json2.Value<Int32>("STATUS"), code2, json_user);
@@ -683,27 +700,34 @@ namespace MvcPlatform.Controllers
                 }
                 else
                 {
-                    sql = string.Format(update_sql, code3
-                            , json3.Value<string>("ASSOCIATEPEDECLNO"), json3.Value<string>("CUSNO"), json3.Value<string>("BUSIUNITCODE"), json3.Value<string>("BUSIUNITNAME"), json3.Value<string>("CONTRACTNO")
-                            , json3.Value<string>("GOODSNUM"), json3.Value<string>("CLEARANCENO"), GetChk(json3.Value<string>("LAWFLAG")), json3.Value<string>("ENTRUSTTYPE"), json_head2.Value<string>("REPWAYID")
-                            , json_head2.Value<string>("CUSTOMAREACODE"), GetCode(json3.Value<string>("REPUNITCODE")), GetName(json3.Value<string>("REPUNITCODE")), json3.Value<string>("DECLWAY"), GetCode(json3.Value<string>("INSPUNITCODE"))
-                            , GetName(json3.Value<string>("INSPUNITCODE")), json3.Value<string>("ORDERREQUEST"), json3.Value<string>("TRADEWAYCODES"), AssociateNo2, CorrespondNo
-                            , json3.Value<string>("PACKKIND"), json3.Value<string>("GOODSGW"), json3.Value<string>("GOODSNW"), json3.Value<string>("RECORDCODE"), json_head2.Value<string>("IETYPE")
-                            , GetChk(json3.Value<string>("SPECIALRELATIONSHIP")), GetChk(json3.Value<string>("PRICEIMPACT")), GetChk(json3.Value<string>("PAYPOYALTIES")), json3.Value<string>("STATUS"), json_head2.Value<string>("SUBMITTIME")
-                            , json_head2.Value<string>("SUBMITUSERNAME"), json_head2.Value<string>("SUBMITUSERID"), json3.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
-                            , json_head2.Value<string>("CUSTOMAREACODE"), json_head1.Value<string>("DOCSERVICECODE"), json3.Value<string>("DECLSTATUS"), json3.Value<string>("INSPSTATUS")                            
-                            );
+                    update_sql = Extension.getUpdateSql(allcol, code3, IsSubmitAfterSave);
 
+                    if (update_sql != "")
+                    {
+                        sql = string.Format(update_sql, code3
+                                , json3.Value<string>("ASSOCIATEPEDECLNO"), json3.Value<string>("CUSNO"), json3.Value<string>("BUSIUNITCODE"), json3.Value<string>("BUSIUNITNAME"), json3.Value<string>("CONTRACTNO")
+                                , json3.Value<string>("GOODSNUM"), json3.Value<string>("CLEARANCENO"), GetChk(json3.Value<string>("LAWFLAG")), json3.Value<string>("ENTRUSTTYPE"), json_head2.Value<string>("REPWAYID")
+                                , json_head2.Value<string>("CUSTOMAREACODE"), GetCode(json3.Value<string>("REPUNITCODE")), GetName(json3.Value<string>("REPUNITCODE")), json3.Value<string>("DECLWAY"), GetCode(json3.Value<string>("INSPUNITCODE"))
+                                , GetName(json3.Value<string>("INSPUNITCODE")), json3.Value<string>("ORDERREQUEST"), json3.Value<string>("TRADEWAYCODES"), AssociateNo2, CorrespondNo
+                                , json3.Value<string>("PACKKIND"), json3.Value<string>("GOODSGW"), json3.Value<string>("GOODSNW"), json3.Value<string>("RECORDCODE"), json_head2.Value<string>("IETYPE")
+                                , GetChk(json3.Value<string>("SPECIALRELATIONSHIP")), GetChk(json3.Value<string>("PRICEIMPACT")), GetChk(json3.Value<string>("PAYPOYALTIES")), json3.Value<string>("STATUS"), json_head2.Value<string>("SUBMITTIME")
+                                , json_head2.Value<string>("SUBMITUSERNAME"), json_head2.Value<string>("SUBMITUSERID"), json3.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
+                                , json_head2.Value<string>("CUSTOMAREACODE"), json_head1.Value<string>("DOCSERVICECODE"), json3.Value<string>("DECLSTATUS"), json3.Value<string>("INSPSTATUS")
+                                );
+                    }
                     if (json3.Value<Int32>("STATUS") >= 15)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
                     {
                         Extension.Insert_FieldUpdate_History(code3, json3, json_user, "41");
                     }
-                    order_res = DBMgr.ExecuteNonQuery(sql);
+                    if (sql != "")
+                    {
+                        order_res = DBMgr.ExecuteNonQuery(sql);
+                    }
                     ordercode = code3;
                 }
                 if (order_res == 0)
                 {
-                    exe_desc = "订单：" + code3 + "保存失败!<br />";
+                    exe_desc += "订单：" + code3 + "保存失败!<br />";
                 }
 
                 Extension.add_list_time(json3.Value<Int32>("STATUS"), code3, json_user);
@@ -742,26 +766,34 @@ namespace MvcPlatform.Controllers
                 }
                 else
                 {
-                    sql = string.Format(update_sql, code4
-                            , json4.Value<string>("ASSOCIATEPEDECLNO"), json4.Value<string>("CUSNO"), json4.Value<string>("BUSIUNITCODE"), json4.Value<string>("BUSIUNITNAME"), json4.Value<string>("CONTRACTNO")
-                            , json4.Value<string>("GOODSNUM"), json4.Value<string>("CLEARANCENO"), GetChk(json4.Value<string>("LAWFLAG")), json4.Value<string>("ENTRUSTTYPE"), json_head2.Value<string>("REPWAYID")
-                            , json_head2.Value<string>("CUSTOMAREACODE"), GetCode(json4.Value<string>("REPUNITCODE")), GetName(json4.Value<string>("REPUNITCODE")), json4.Value<string>("DECLWAY"), GetCode(json4.Value<string>("INSPUNITCODE"))
-                            , GetName(json4.Value<string>("INSPUNITCODE")), json4.Value<string>("ORDERREQUEST"), json4.Value<string>("TRADEWAYCODES"), AssociateNo2, CorrespondNo
-                            , json4.Value<string>("PACKKIND"), json4.Value<string>("GOODSGW"), json4.Value<string>("GOODSNW"), json4.Value<string>("RECORDCODE"), json_head2.Value<string>("IETYPE")
-                            , GetChk(json4.Value<string>("SPECIALRELATIONSHIP")), GetChk(json4.Value<string>("PRICEIMPACT")), GetChk(json4.Value<string>("PAYPOYALTIES")), json4.Value<string>("STATUS"), json_head2.Value<string>("SUBMITTIME")
-                            , json_head2.Value<string>("SUBMITUSERNAME"), json_head2.Value<string>("SUBMITUSERID"), json4.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
-                            , json_head2.Value<string>("CUSTOMAREACODE"), json_head1.Value<string>("DOCSERVICECODE"), json4.Value<string>("DECLSTATUS"), json4.Value<string>("INSPSTATUS")                            
-                         );
+                    update_sql = Extension.getUpdateSql(allcol, code4, IsSubmitAfterSave);
+
+                    if (update_sql != "")
+                    {
+                        sql = string.Format(update_sql, code4
+                                , json4.Value<string>("ASSOCIATEPEDECLNO"), json4.Value<string>("CUSNO"), json4.Value<string>("BUSIUNITCODE"), json4.Value<string>("BUSIUNITNAME"), json4.Value<string>("CONTRACTNO")
+                                , json4.Value<string>("GOODSNUM"), json4.Value<string>("CLEARANCENO"), GetChk(json4.Value<string>("LAWFLAG")), json4.Value<string>("ENTRUSTTYPE"), json_head2.Value<string>("REPWAYID")
+                                , json_head2.Value<string>("CUSTOMAREACODE"), GetCode(json4.Value<string>("REPUNITCODE")), GetName(json4.Value<string>("REPUNITCODE")), json4.Value<string>("DECLWAY"), GetCode(json4.Value<string>("INSPUNITCODE"))
+                                , GetName(json4.Value<string>("INSPUNITCODE")), json4.Value<string>("ORDERREQUEST"), json4.Value<string>("TRADEWAYCODES"), AssociateNo2, CorrespondNo
+                                , json4.Value<string>("PACKKIND"), json4.Value<string>("GOODSGW"), json4.Value<string>("GOODSNW"), json4.Value<string>("RECORDCODE"), json_head2.Value<string>("IETYPE")
+                                , GetChk(json4.Value<string>("SPECIALRELATIONSHIP")), GetChk(json4.Value<string>("PRICEIMPACT")), GetChk(json4.Value<string>("PAYPOYALTIES")), json4.Value<string>("STATUS"), json_head2.Value<string>("SUBMITTIME")
+                                , json_head2.Value<string>("SUBMITUSERNAME"), json_head2.Value<string>("SUBMITUSERID"), json4.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
+                                , json_head2.Value<string>("CUSTOMAREACODE"), json_head1.Value<string>("DOCSERVICECODE"), json4.Value<string>("DECLSTATUS"), json4.Value<string>("INSPSTATUS")
+                             );
+                    }
                     if (json4.Value<Int32>("STATUS") >= 15)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
                     {
                         Extension.Insert_FieldUpdate_History(code4, json4, json_user, "40");
                     }
-                    order_res = DBMgr.ExecuteNonQuery(sql);
+                    if (sql != "")
+                    {
+                        order_res = DBMgr.ExecuteNonQuery(sql);
+                    }
                     ordercode = code4;
                 }
                 if (order_res == 0)
                 {
-                    exe_desc = "订单：" + code4 + "保存失败!<br />";
+                    exe_desc += "订单：" + code4 + "保存失败!<br />";
                 }
 
                 Extension.add_list_time(json4.Value<Int32>("STATUS"), code4, json_user);
