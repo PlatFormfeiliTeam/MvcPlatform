@@ -137,7 +137,7 @@
                 })
                 //申报数据
                 var field_PORTNAME = Ext.create('Ext.form.field.Text', {
-                    name: 'PORTNAME',
+                    name: 'PORTCODE',
                     fieldLabel: '进/出口口岸',
                     readOnly: true
                 });
@@ -177,12 +177,12 @@
                     readOnly: true
                 });
                 var field_TRADENAME = Ext.create('Ext.form.field.Text', {
-                    name: 'TRADENAME',
+                    name: 'TRADECODE',
                     fieldLabel: '贸易方式',
                     readOnly: true
                 });
                 var field_EXEMPTIONNAME = Ext.create('Ext.form.field.Text', {
-                    name: 'EXEMPTIONNAME',
+                    name: 'EXEMPTIONCODE',
                     fieldLabel: '征免性质',
                     readOnly: true
                 });
@@ -202,12 +202,12 @@
                     readOnly: true
                 });
                 var field_SEPORTNAME = Ext.create('Ext.form.field.Text', {
-                    name: 'SEPORTNAME',
+                    name: 'SEPORTCODE',
                     fieldLabel: '装货港/指运港',
                     readOnly: true
                 });
                 var field_SEPLACENAME = Ext.create('Ext.form.field.Text', {
-                    name: 'SEPLACENAME',
+                    name: 'SEPLACECODE',
                     fieldLabel: '目的地/货源地',
                     readOnly: true
                 });
@@ -243,7 +243,7 @@
                     readOnly: true
                 });
                 var field_PACKAGENAME = Ext.create('Ext.form.field.Text', {
-                    name: 'PACKAGENAME',
+                    name: 'PACKAGECODE',
                     fieldLabel: '包装种类',
                     readOnly: true
                 });
@@ -297,7 +297,7 @@
                     { xtype: 'rownumberer', width: 35 },
                     { header: '项号', dataIndex: 'ITEMNO', width: 80 },
                     { header: '商品编号', dataIndex: 'COMMODITYNO', width: 110 },
-                    { header: '中文品名', dataIndex: 'COMMODITYCHNAME', width: 150 },
+                    { header: '中文品名', dataIndex: 'COMMODITYCHNAME', width: 200 },
                     { header: '规格型号', dataIndex: 'SPECIFICATIONSMODEL', width: 130 },
                     { header: '成交数量', dataIndex: 'CADQUANTITY', width: 80 },
                     { header: '成交单位', dataIndex: 'CADUNITNAME', width: 60 },
