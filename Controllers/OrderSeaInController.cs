@@ -180,7 +180,7 @@ namespace MvcPlatform.Controllers
                                 ,CONTAINERNO,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES,DOCSERVICECODE 
                                 ,DECLSTATUS,INSPSTATUS 
                             ";
-                sql = Extension.getUpdateSql(allcol, ordercode, IsSubmitAfterSave, json);
+                sql = Extension.getUpdateSql(allcol, ordercode, IsSubmitAfterSave);
                 if (sql != "")
                 {
                     sql = string.Format(sql, ordercode

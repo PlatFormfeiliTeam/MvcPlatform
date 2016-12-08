@@ -173,7 +173,7 @@ namespace MvcPlatform.Controllers
                                 ,SPECIALRELATIONSHIP,PRICEIMPACT, PAYPOYALTIES,DOCSERVICECODE,DECLSTATUS 
                                 ,INSPSTATUS
                                 ";
-                sql = Extension.getUpdateSql(allcol, ordercode, IsSubmitAfterSave, json);
+                sql = Extension.getUpdateSql(allcol, ordercode, IsSubmitAfterSave);
                 if (sql != "")
                 {
                     sql = string.Format(sql, json.Value<string>("CODE"), "20", json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME"), json.Value<string>("CONTRACTNO")

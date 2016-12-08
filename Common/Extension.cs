@@ -429,7 +429,8 @@ namespace MvcPlatform.Common
             document.Close();
         }
 
-        public static string getUpdateSql(string allcol, string ordercode, bool IsSubmitAfterSave, JObject json)
+        
+        public static string getUpdateSql(string allcol, string ordercode, bool IsSubmitAfterSave)
         {
             string sql = "";
             string sql_list = @"SELECT " + allcol + " FROM LIST_ORDER WHERE CODE = '" + ordercode + "'";
@@ -461,18 +462,15 @@ namespace MvcPlatform.Common
                     {
                         if (IsSubmitAfterSave)//委托之后
                         {
-                            if ((dt_list.Rows[0][i] + "") == "" && json.Value<string>(colname) != "")
+                            if ((dt_list.Rows[0][i] + "") == "")
                             {
                                 sql += colname + "='{" + i + "}',";
                             }
                         }
                         else
                         {
-                            if (json.Value<string>(colname) != "")
-                            {
-                                sql += colname + "='{" + i + "}',";
-                            }                            
-                        }                        
+                            sql += colname + "='{" + i + "}',";
+                        }                       
                     }
                 }
                 sql = sql.Substring(0, sql.Length - 1); //去掉末尾逗号
