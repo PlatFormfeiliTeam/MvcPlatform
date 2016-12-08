@@ -1,0 +1,307 @@
+﻿@{
+    ViewBag.Title = "EntOrder_Detail";
+    Layout = "~/Views/Shared/Empty.cshtml";
+}
+<link href="/js/Extjs42/resources/css/ext-all-gray.css" rel="stylesheet" type="text/css" />
+<script src="/js/Extjs42/bootstrap.js" type="text/javascript"></script>
+<link href="~/Content/common.css" rel="stylesheet" />
+<script src="/js/pan.js" type="text/javascript"></script>
+<style type="text/css">
+    .x-panel-header-default {
+        background-color: #363c64 !important;
+        background-image: none !important;
+        /*background-image: -webkit-gradient(linear,50% 0,50% 100%,color-stop(0%,#f0f0f0),color-stop(100%,#d7d7d7));
+        background-image: -webkit-linear-gradient(top,#f0f0f0,#d7d7d7);*/
+    }
+</style>
+<script type="text/javascript">
+    var id = getQueryString("ID");
+    Ext.onReady(function () {
+        Ext.Ajax.request({
+            url: "/EnterpriseOrder/load_entorder_detail",
+            params: {
+                ID: id
+            },
+            success: function (response, opts) {
+                var data = Ext.decode(response.responseText);
+                var field_UNITCODE = Ext.create('Ext.form.field.Text', {
+                    name: 'UNITCODE',
+                    fieldLabel: '委托编号',
+                    readOnly: true
+                });
+                var field_ENTERPRISENAME = Ext.create('Ext.form.field.Text', {
+                    name: 'ENTERPRISENAME',
+                    fieldLabel: '委托单位',
+                    readOnly: true
+                });
+                var field_SUBMITTIME = Ext.create('Ext.form.field.Text', {
+                    name: 'SUBMITTIME',
+                    fieldLabel: '委托时间',
+                    readOnly: true
+                });
+                var field_FILERECEVIEUNITNAME = Ext.create('Ext.form.field.Text', {
+                    name: 'FILERECEVIEUNITNAME',
+                    fieldLabel: '文件接收单位',
+                    readOnly: true
+                });
+                var field_FILEDECLAREUNITNAME = Ext.create('Ext.form.field.Text', {
+                    name: 'FILEDECLAREUNITNAME',
+                    fieldLabel: '文件申报单位',
+                    readOnly: true
+                });
+
+                var field_BUSITYPEID = Ext.create('Ext.form.field.Text', {
+                    name: 'BUSITYPEID',
+                    fieldLabel: '业务类型',
+                    readOnly: true
+                });
+                var field_REPWAYID = Ext.create('Ext.form.field.Text', {
+                    name: 'REPWAYID',
+                    fieldLabel: '申报方式',
+                    readOnly: true
+                });
+                var field_CUSTOMDISTRICTNAME = Ext.create('Ext.form.field.Text', {
+                    name: 'CUSTOMDISTRICTNAME',
+                    fieldLabel: '申报关区',
+                    readOnly: true
+                });
+                var field_CODE = Ext.create('Ext.form.field.Text', {
+                    name: 'CODE',
+                    fieldLabel: '企业编号',
+                    readOnly: true
+                });
+                var field_ISREADPDF = Ext.create('Ext.form.field.Text', {
+                    name: 'ISREADPDF',
+                    fieldLabel: '解析标志',
+                    readOnly: true
+                });
+                var field_REMARK = Ext.create('Ext.form.field.Text', {
+                    name: 'REMARK',
+                    fieldLabel: '备注',
+                    readOnly: true
+                });
+                var title1 = '<div class="btn-group" role="group"><button  type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;委托信息</button></div>';
+                var formpane_delegate = Ext.create('Ext.form.Panel', {
+                    title: '<span style="color:white;">委托信息</span>',
+                    height: 150,
+                    region: 'north',
+                    fieldDefaults: {
+                        margin: '5 5 10 0',
+                        labelWidth: 80,
+                        columnWidth: .25,
+                        labelSeparator: '',
+                        msgTarget: 'under',
+                        labelAlign: 'right',
+                        validateOnBlur: false,
+                        validateOnChange: false
+                    },
+                    items: [
+                            { layout: 'column', border: 0, items: [field_UNITCODE, field_ENTERPRISENAME, field_SUBMITTIME, field_FILERECEVIEUNITNAME] },
+                            { layout: 'column', border: 0, items: [field_FILEDECLAREUNITNAME, field_BUSITYPEID, field_REPWAYID, field_CUSTOMDISTRICTNAME] },
+                            { layout: 'column', border: 0, items: [field_CODE, field_ISREADPDF, field_REMARK] }
+                    ]
+                })
+                //申报数据
+                var field_PORTNAME = Ext.create('Ext.form.field.Text', {
+                    name: 'PORTNAME',
+                    fieldLabel: '进/出口口岸',
+                    readOnly: true
+                });
+                var field_RECORDCODE = Ext.create('Ext.form.field.Text', {
+                    name: 'RECORDCODE',
+                    fieldLabel: '备案号',
+                    readOnly: true
+                });
+                var field_INOUTDATE = Ext.create('Ext.form.field.Text', {
+                    name: 'INOUTDATE',
+                    fieldLabel: '进/出口日期',
+                    readOnly: true
+                });
+                var field_REPDATE = Ext.create('Ext.form.field.Text', {
+                    name: 'REPDATE',
+                    fieldLabel: '申报日期',
+                    readOnly: true
+                });
+                var field_TRANSMODEL = Ext.create('Ext.form.field.Text', {
+                    name: 'TRANSMODEL',
+                    fieldLabel: '运输方式',
+                    readOnly: true
+                });
+                var field_TRANSNAME = Ext.create('Ext.form.field.Text', {
+                    name: 'TRANSNAME',
+                    fieldLabel: '运输工具名称',
+                    readOnly: true
+                });
+                var field_BLNO = Ext.create('Ext.form.field.Text', {
+                    name: 'BLNO',
+                    fieldLabel: '提运单号',
+                    readOnly: true
+                });
+                var field_BUSIUNITNAME = Ext.create('Ext.form.field.Text', {
+                    name: 'BUSIUNITNAME',
+                    fieldLabel: '收/发货单位',
+                    readOnly: true
+                });
+                var field_TRADENAME = Ext.create('Ext.form.field.Text', {
+                    name: 'TRADENAME',
+                    fieldLabel: '贸易方式',
+                    readOnly: true
+                });
+                var field_EXEMPTIONNAME = Ext.create('Ext.form.field.Text', {
+                    name: 'EXEMPTIONNAME',
+                    fieldLabel: '征免性质',
+                    readOnly: true
+                });
+                //var field_TRADETERMSNAME = Ext.create('Ext.form.field.Text', {
+                //    name: 'TRADETERMSNAME',
+                //    fieldLabel: '成交方式',
+                //    readOnly: true
+                //});
+                var field_LICENSENO = Ext.create('Ext.form.field.Text', {
+                    name: 'LICENSENO',
+                    fieldLabel: '许可证号',
+                    readOnly: true
+                });
+                var field_SECOUNTRYNAME = Ext.create('Ext.form.field.Text', {
+                    name: 'SECOUNTRYNAME',
+                    fieldLabel: '起运国/运抵国',
+                    readOnly: true
+                });
+                var field_SEPORTNAME = Ext.create('Ext.form.field.Text', {
+                    name: 'SEPORTNAME',
+                    fieldLabel: '装货港/指运港',
+                    readOnly: true
+                });
+                var field_SEPLACENAME = Ext.create('Ext.form.field.Text', {
+                    name: 'SEPLACENAME',
+                    fieldLabel: '目的地/货源地',
+                    readOnly: true
+                });
+                var field_APPROVALNO = Ext.create('Ext.form.field.Text', {
+                    name: 'APPROVALNO',
+                    fieldLabel: '批准文号',
+                    readOnly: true
+                });
+
+                var field_TRADETERMSNAME = Ext.create('Ext.form.field.Text', {
+                    name: 'TRADETERMSNAME',
+                    fieldLabel: '成交方式',
+                    readOnly: true
+                });
+                var field_FREIGHT = Ext.create('Ext.form.field.Text', {
+                    name: 'FREIGHT',
+                    fieldLabel: '运费',
+                    readOnly: true
+                });
+                var field_INSURANCEPREMIUM = Ext.create('Ext.form.field.Text', {
+                    name: 'INSURANCEPREMIUM',
+                    fieldLabel: '保费',
+                    readOnly: true
+                });
+                var field_CONTRACTNO = Ext.create('Ext.form.field.Text', {
+                    name: 'CONTRACTNO',
+                    fieldLabel: '合同协议号',
+                    readOnly: true
+                });
+                var field_GOODSNUM = Ext.create('Ext.form.field.Text', {
+                    name: 'GOODSNUM',
+                    fieldLabel: '件数',
+                    readOnly: true
+                });
+                var field_PACKAGENAME = Ext.create('Ext.form.field.Text', {
+                    name: 'PACKAGENAME',
+                    fieldLabel: '包装种类',
+                    readOnly: true
+                });
+                var field_GOODSGW = Ext.create('Ext.form.field.Text', {
+                    name: 'GOODSGW',
+                    fieldLabel: '毛重',
+                    readOnly: true
+                });
+                var field_GOODSNW = Ext.create('Ext.form.field.Text', {
+                    name: 'GOODSNW',
+                    fieldLabel: '净重',
+                    readOnly: true
+                });
+                var field_CONSHIPPERNAME = Ext.create('Ext.form.field.Text', {
+                    name: 'CONSHIPPERNAME',
+                    fieldLabel: '生产消费单位',
+                    readOnly: true
+                });
+                var formpane_declare = Ext.create('Ext.form.Panel', {
+                    region: 'north',
+                    height: 250,
+                    fieldDefaults: {
+                        margin: '5 5 10 0',
+                        labelWidth: 80,
+                        columnWidth: .25,
+                        labelSeparator: '',
+                        msgTarget: 'under',
+                        labelAlign: 'right',
+                        validateOnBlur: false,
+                        validateOnChange: false
+                    },
+                    items: [
+                        //{ layout: 'column', border: 0, items: [label2] },
+                            { layout: 'column', border: 0, items: [field_PORTNAME, field_RECORDCODE, field_INOUTDATE, field_REPDATE] },
+                            { layout: 'column', border: 0, items: [field_TRANSMODEL, field_TRANSNAME, field_BLNO, field_BUSIUNITNAME] },
+                            { layout: 'column', border: 0, items: [field_TRADENAME, field_EXEMPTIONNAME, field_LICENSENO, field_SECOUNTRYNAME] },
+                            { layout: 'column', border: 0, items: [field_SEPLACENAME, field_APPROVALNO, field_TRADETERMSNAME, field_FREIGHT] },
+                            { layout: 'column', border: 0, items: [field_INSURANCEPREMIUM, field_CONTRACTNO, field_GOODSNUM, field_PACKAGENAME] },
+                            { layout: 'column', border: 0, items: [field_GOODSGW, field_GOODSNW, field_CONSHIPPERNAME] }
+                    ]
+                })
+                var store = Ext.create('Ext.data.JsonStore', {
+                    fields: ['ITEMNO', 'COMMODITYNO', 'COMMODITYCHNAME', 'SPECIFICATIONSMODEL', 'CADQUANTITY', 'CADUNITNAME',
+                    'UNITPRICE', 'TOTALPRICE', 'CURRENCYNAME', 'GOODSNW'],
+                    data: data.product_data
+                })
+                var grid = Ext.create('Ext.grid.Panel', {
+                    store: store,
+                    enableColumnHide: false,
+                    region: 'center',
+                    columns: [
+                    { xtype: 'rownumberer', width: 35 },
+                    { header: '项号', dataIndex: 'ITEMNO', width: 80 },
+                    { header: '商品编号', dataIndex: 'COMMODITYNO', width: 110 },
+                    { header: '中文品名', dataIndex: 'COMMODITYCHNAME', width: 150 },
+                    { header: '规格型号', dataIndex: 'SPECIFICATIONSMODEL', width: 130 },
+                    { header: '成交数量', dataIndex: 'CADQUANTITY', width: 80 },
+                    { header: '成交单位', dataIndex: 'CADUNITNAME', width: 60 },
+                    { header: '单价', dataIndex: 'UNITPRICE', width: 100 },
+                    { header: '总价', dataIndex: 'TOTALPRICE', width: 100 },
+                    { header: '币种', dataIndex: 'CURRENCYNAME', width: 100 },
+                    { header: '净重', dataIndex: 'GOODSNW', width: 100 }
+                    ]
+                });
+
+                var panel = Ext.create('Ext.panel.Panel', {
+                    title: '<span style="color:white;">申报信息</span>',
+                    border: 0,
+                    layout: 'border',
+                    region: 'center',
+                    items: [formpane_declare, grid]
+                });
+                var viewport = new Ext.container.Viewport({
+                    layout: 'border',
+                    items: [formpane_delegate, panel]
+                })
+                formpane_delegate.getForm().setValues(data.data);
+                if (data.decl_data.length > 0) {
+                    formpane_declare.getForm().setValues(data.decl_data[0]);
+                }
+            }
+        });
+    });
+</script>
+@*<div class="btn-group" role="group"><button type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;委托信息</button></div>;
+    <div id="div1"></div>*@
+@*<ul class="nav nav-tabs">
+        <li class="active"><a href="#">Home</a></li>
+        <li><a href="#">SVN</a></li>
+        <li><a href="#">iOS</a></li>
+        <li><a href="#">VB.Net</a></li>
+        <li><a href="#">Java</a></li>
+        <li><a href="#">PHP</a></li>
+    </ul>*@
+

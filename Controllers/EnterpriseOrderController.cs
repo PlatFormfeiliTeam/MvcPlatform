@@ -25,7 +25,12 @@ namespace MvcPlatform.Controllers
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
-
+        public ActionResult EntOrder_Detail()  //文件委托
+        {
+            //ViewBag.navigator = "企业服务>>委托任务";
+            //ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
         public ActionResult EnterpriseHome()//企业服务
         {
             ViewBag.navigator = "企业服务>>委托中心";
@@ -312,7 +317,7 @@ namespace MvcPlatform.Controllers
             }
             if (!string.IsNullOrEmpty(Request["PRINTSTATUS"]))//判断查询条件是否有值
             {
-                where += " and  t.PRINTSTATUS='" + Request["PRINTSTATUS"]+"'";
+                where += " and  t.PRINTSTATUS='" + Request["PRINTSTATUS"] + "'";
             }
             if (!string.IsNullOrEmpty(Request["STARTDATE"]))//如果开始时间有值
             {
@@ -363,7 +368,7 @@ namespace MvcPlatform.Controllers
                 }
                 sql = "update ent_order set printstatus=1 where id='" + entid + "'";
                 DBMgr.ExecuteNonQuery(sql);
-            }            
+            }
             Extension.MergePDFFiles(filelist, Server.MapPath("~/Declare/") + output + ".pdf");
             return "/Declare/" + output + ".pdf";
         }
@@ -389,6 +394,38 @@ namespace MvcPlatform.Controllers
             MemoryStream ms = new MemoryStream(bytes);
             return File(ms, "application/octet-stream", Path.GetFileName(filename));
         }
+        public string load_entorder_detail()
+        {
+            string result = string.Empty;
+            string ID = Request["ID"]; //string busitype = Request["busitype"];
+            DataTable dt;
+            string data = "{}";
+            // string filedata = "[]";
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            string sql = "select a.* from ENT_ORDER a where a.ID = '" + ID + "'";
+            dt = DBMgr.GetDataTable(sql);
+            data = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
+            //申报数据
+            string decl_data = "[]";
+            string product_data = "[]";
+            if (dt.Rows.Count > 0)
+            {
+                sql = "select * from LIST_CUSDATA_FL where cusno='" + dt.Rows[0]["CODE"] + "'";
+                DataTable dt2 = DBMgr.GetDataTable(sql);
+                decl_data = JsonConvert.SerializeObject(dt2, iso);
+                if (dt2.Rows.Count > 0)
+                {
+                    sql = "select * from LIST_CUSDATA_SUB_FL where PCODE='" + dt2.Rows[0]["CUSNO"] + "'";
+                    DataTable dt3 = DBMgr.GetDataTable(sql);
+                    product_data = JsonConvert.SerializeObject(dt3, iso);
+                }
+            }
+            //sql = "select * from list_attachment t where t.entid='" + ID + "'";
+            //DataTable dt_detail = DBMgr.GetDataTable(sql);
+            result = "{data:" + data + ",decl_data:" + decl_data + ",product_data:" + product_data + "}";
+            return result;
 
+        }
     }
 }
