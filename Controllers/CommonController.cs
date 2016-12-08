@@ -2119,11 +2119,26 @@ namespace MvcPlatform.Controllers
 
                 string sql = ""; bool IsCONTAINERTRUCK = false; string[] ordercodelist = ordercodes.Split(',');
 
+                bool bf = true;
+                string sql_search = "select * from list_order where code in ('" + ordercodes.Replace(",", "','") + "')";
+                DataTable dt_search = DBMgr.GetDataTable(sql_search);
+
                 foreach (JProperty jp in (JToken)json)
                 {
                     if (jp.Name != "CONTAINERTRUCK" && jp.Value.ToString() != "")
                     {
-                        sql += jp.Name + "='" + jp.Value.ToString() + "',";
+                        if (jp.Name != "ORDERREQUEST")//备注可以修改
+                        {
+                            foreach (DataRow dr in dt_search.Rows)
+                            {
+                                if ((dr[jp.Name] + "") != "") { bf = false; break; }//只要有一个单号的值不为空，就不拼sql
+                            }
+                        }
+                        
+                        if (bf)
+                        {
+                            sql += jp.Name + "='" + jp.Value.ToString() + "',";
+                        }                        
                     }
                     if (jp.Name == "CONTAINERTRUCK" && jp.Value.ToString() != "")
                     {

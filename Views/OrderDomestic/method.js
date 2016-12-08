@@ -72,10 +72,10 @@ function loadform() {
                 form_control(data.data2, 2);
                 readonly_init(formpanelout, formpanelhead, 2);//设置控件只读
             }
-            if (ietype == "仅进口") {
+            if (ietype == "仅进口" && Ext.getCmp('code2').getValue()) {
                 formpanelout.getForm().reset();
             }
-            if (ietype == "仅出口") {
+            if (ietype == "仅出口" && Ext.getCmp('code1').getValue()) {
                 formpanelin.getForm().reset();
             }
             //  formpanelhead.getForm().setValues(data.data1.IETYPE ? data.data1 : data.data2);      
@@ -110,10 +110,10 @@ function loadform() {
                         form_control(data.data4, 4);
                         readonly_init(formpanelout2, formpanelhead2, 4);//设置控件只读
                     }
-                    if (ietype == "仅进口") {
+                    if (ietype == "仅进口" && Ext.getCmp('code4').getValue()) {
                         formpanelout2.getForm().reset();
                     }
-                    if (ietype == "仅出口") {
+                    if (ietype == "仅出口" && Ext.getCmp('code3').getValue()) {
                         formpanelin2.getForm().reset();
                     }
                     store_file2.loadData(data.filedata2);//加载附件列表数据 
@@ -160,12 +160,12 @@ function loadform() {
                             form_control(data.data4, 4);
                             readonly_init(formpanelout2, formpanelhead2, 4);//设置控件只读
                         }
-                        if (ietype == "仅进口") {
+                        if (ietype == "仅进口" && Ext.getCmp('code4').getValue()) {
                             formpanelout2.getForm().reset();
                         }
-                        if (ietype == "仅出口") {
+                        if (ietype == "仅出口" && Ext.getCmp('code3').getValue()) {
                             formpanelin2.getForm().reset();
-                        } 
+                        }
                         store_file2.loadData(data.filedata2);//加载附件列表数据 
                         button_control(status);//按钮的控制
                         fileids2 = "";

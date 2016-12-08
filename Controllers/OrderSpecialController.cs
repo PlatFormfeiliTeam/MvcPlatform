@@ -166,7 +166,7 @@ namespace MvcPlatform.Controllers
                                 ,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES,CLEARUNIT,CLEARUNITNAME,DOCSERVICECODE 
                                 ,DECLSTATUS,INSPSTATUS
                                 ";
-                sql = Extension.getUpdateSql(allcol, ordercode, IsSubmitAfterSave, json);
+                sql = Extension.getUpdateSql(allcol, ordercode, IsSubmitAfterSave);
                 if (sql != "")
                 {
                     sql = string.Format(sql

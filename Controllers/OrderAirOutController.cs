@@ -177,7 +177,7 @@ namespace MvcPlatform.Controllers
                             ,CLEARUNIT,CLEARUNITNAME,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES
                             ,WEIGHTCHECK,ISWEIGHTCHECK,DOCSERVICECODE,DECLSTATUS,INSPSTATUS
                             ";
-                sql = Extension.getUpdateSql(allcol, ordercode, IsSubmitAfterSave, json);
+                sql = Extension.getUpdateSql(allcol, ordercode, IsSubmitAfterSave);
                 if (sql != "")
                 {
                     sql = string.Format(sql, ordercode
