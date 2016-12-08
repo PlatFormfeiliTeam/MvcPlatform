@@ -459,10 +459,13 @@ namespace MvcPlatform.Common
                     }
                     else
                     {
-                        if ((dt_list.Rows[0][i] + "") == "" && json.Value<string>(colname) != "")
+                        if (IsSubmitAfterSave)//委托之后
                         {
-                            sql += colname + "='{" + i + "}',";
-                        }
+                            if ((dt_list.Rows[0][i] + "") == "" && json.Value<string>(colname) != "")
+                            {
+                                sql += colname + "='{" + i + "}',";
+                            }
+                        }                        
                     }
                 }
                 sql = sql.Substring(0, sql.Length - 1); //去掉末尾逗号
