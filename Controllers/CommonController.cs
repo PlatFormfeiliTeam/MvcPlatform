@@ -983,8 +983,13 @@ namespace MvcPlatform.Controllers
             //1先判断订单的状态有没有发生变化，比如是否受理
             string sql = "select * from list_order where code='" + ordercode + "'";
             DataTable dt = DBMgr.GetDataTable(sql);
+            int status = dt.Rows[0]["STATUS"] + "" == "" ? 0 : Convert.ToInt32(dt.Rows[0]["STATUS"] + "");
+            int declstatus = dt.Rows[0]["DECLSTATUS"] + "" == "" ? 0 : Convert.ToInt32(dt.Rows[0]["DECLSTATUS"] + "");
+            int inspstatus = dt.Rows[0]["INSPSTATUS"] + "" == "" ? 0 : Convert.ToInt32(dt.Rows[0]["INSPSTATUS"] + "");
+
             string result = "";
-            if (dt.Rows[0]["STATUS"] + "" != "10")
+
+            if (status != 10 || (status == 10 && (declstatus > 10 || inspstatus > 10)))//if (dt.Rows[0]["STATUS"] + "" != "10")
             {
                 result = "{success:false}";
             }
