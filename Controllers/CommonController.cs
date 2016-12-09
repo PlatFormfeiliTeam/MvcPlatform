@@ -1038,20 +1038,19 @@ namespace MvcPlatform.Controllers
                               left join cusdoc.sys_customer cus on ort.customercode = cus.code 
                          where (DECLSTATUS=130 or DECLSTATUS=110) and det.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where;//(ort.DECLPDF =1 or ort.PREPDF=1) 
              */
-            string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
+                string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
                             det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
                             det.TRANSNAME DECL_TRANSNAME, det.ISPRINT,
                             det.TRANSNAME,det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
                             ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
                             ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE, 
-                            cus.SCENEDECLAREID，ort.CONTRACTNO CONTRACTNOORDER ,ort.CREATETIME                                                                      
+                            cus.SCENEDECLAREID,ort.CONTRACTNO CONTRACTNOORDER ,ort.CREATETIME                                                                      
                             from list_declaration det 
                                  left join list_order ort on det.ordercode = ort.code 
                                  left join cusdoc.sys_customer cus on ort.customercode = cus.code 
+                                 left join (select * from list_order l where l.ASSOCIATENO is not null and (l.DECLSTATUS!=130 and l.DECLSTATUS!=110)) a on ort.ASSOCIATENO=a.ASSOCIATENO 
                             where (DECLSTATUS=130 or DECLSTATUS=110) and det.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where
-                       + " and not exists("
-                       + "select * from list_order l where ort.ASSOCIATENO is not null and ort.ASSOCIATENO=l.ASSOCIATENO and ((l.DECLSTATUS!=130 and l.DECLSTATUS!=110) or l.DECLSTATUS is null)"
-                       +")";
+                           + " and a.ASSOCIATENO is null";
           
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
