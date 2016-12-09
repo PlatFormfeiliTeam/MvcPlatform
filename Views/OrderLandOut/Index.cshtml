@@ -8,7 +8,7 @@
 
 <script type="text/javascript">
     var store_Trade; var store_sbfs;
-    var formpanel, gridpanel;   
+    var formpanel, gridpanel;
     var common_data_jydw = [], common_data_sbfs = [], common_data_sbgq = [], common_data_bgfs = [], common_data_bzzl = [], common_data_myfs = [];
 
     Ext.onReady(function () {
@@ -31,10 +31,10 @@
                     data: common_data_sbfs
                 });
                 Ext.regModel('TRADE', {
-                    fields: ['ID', 'ENTRUSTTYPE', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE','TURNPRENO',
+                    fields: ['ID', 'ENTRUSTTYPE', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE', 'TURNPRENO',
                         'SUBMITTIME', 'BUSIUNITCODE', 'BUSIUNITNAME', 'CONTRACTNO', 'TOTALNO', 'DIVIDENO', 'REPWAYID',
                          'GOODSNUM', 'GOODSGW', 'CUSTOMAREACODE', 'LAWFLAG', 'ARRIVEDNO', 'ISINVALID', 'BUSITYPE', 'PRINTSTATUS', 'STATUS']
-                        
+
                 })
                 store_Trade = Ext.create('Ext.data.JsonStore', {
                     model: 'TRADE',
@@ -86,9 +86,9 @@
                     { header: '报检状态', dataIndex: 'INSPSTATUS', width: 90, locked: true, renderer: renderOrder },
                     { header: '订单编号', dataIndex: 'CODE', width: 100, locked: true },
                     { header: '客户编号', dataIndex: 'CUSNO', width: 130, locked: true },
-                    { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 100, sortable: true, locked: true },
+                    { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 180, sortable: true, locked: true },
                     { header: '合同发票号', dataIndex: 'CONTRACTNO', width: 100, locked: true },
-                    { header: '总单号', dataIndex: 'TOTALNO', width: 90, locked: true },//需要确定具体字段
+                    { header: '总单号', dataIndex: 'TOTALNO', width: 90 },//需要确定具体字段
                     { header: '分单号', dataIndex: 'DIVIDENO', width: 110, locked: true },//需要确定具体字段
                     { header: '打印状态', dataIndex: 'PRINTSTATUS', width: 70, locked: true, renderer: renderOrder },
                     { header: '件数/重量', dataIndex: 'GOODSNUM', width: 90, renderer: renderOrder },
@@ -139,12 +139,12 @@
 
 
 <div class="container">
-    <div id="div_form" style="width:100%;"></div>
+    <div id="div_form" style="width:100%;height:70px"></div>
     <div>
         <div class="btn-group" role="group">
             <button onclick="Open()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;添加</button>
-            <button onclick="DeleteNotGuoNei()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-trash-o"></i>&nbsp;删除</button>            
-            <button type="button" class="btn btn-primary btn-sm dropdown-toggle" onclick="openwin('LYCK')"><i class="fa fa-pencil-square-o fa-fw"></i>&nbsp;批量维护</button>            
+            <button onclick="DeleteNotGuoNei()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-trash-o"></i>&nbsp;删除</button>
+            <button type="button" class="btn btn-primary btn-sm dropdown-toggle" onclick="openwin('LYCK')"><i class="fa fa-pencil-square-o fa-fw"></i>&nbsp;批量维护</button>
             <button onclick="View()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-file-text-o"></i>&nbsp;详细</button>
         </div>
         <div class="btn-group fr" role="group">
