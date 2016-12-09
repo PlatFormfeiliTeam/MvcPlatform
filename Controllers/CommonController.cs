@@ -1049,7 +1049,7 @@ namespace MvcPlatform.Controllers
                                  left join list_order ort on det.ordercode = ort.code 
                                  left join cusdoc.sys_customer cus on ort.customercode = cus.code 
                                  left join (select * from list_order l where l.ASSOCIATENO is not null and (l.DECLSTATUS!=130 and l.DECLSTATUS!=110)) a on ort.ASSOCIATENO=a.ASSOCIATENO 
-                            where (DECLSTATUS=130 or DECLSTATUS=110) and det.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where
+                            where (ort.DECLSTATUS=130 or ort.DECLSTATUS=110) and det.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where
                            + " and a.ASSOCIATENO is null";
           
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
