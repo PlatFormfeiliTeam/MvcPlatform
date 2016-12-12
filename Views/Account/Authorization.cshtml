@@ -1,11 +1,10 @@
 ﻿<link href="/js/Extjs42/resources/css/ext-all-gray.css" rel="stylesheet" type="text/css" />
 <script src="/js/Extjs42/bootstrap.js" type="text/javascript"></script>
-<link href="/css/comme.css" rel="stylesheet" />
+<link href="~/css/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
 <script type="text/javascript">
-    var gridUser, store_user, treeModel, treeModelstore, gridStation, store_Station;
+    var gridUser, store_user, treeModel, treeModelstore;
     var userid = '';
     Ext.onReady(function () {
-    
         Ext.regModel('User', { fields: ['ID', 'NAME', 'REALNAME'] })
         store_user = Ext.create('Ext.data.JsonStore', {
             model: 'User',
@@ -49,7 +48,7 @@
         var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "数据加载中，请稍等..." });
 
         //系统模块
-        Ext.regModel("SysModelAuth", { fields: ["id", "name", "leaf", "url", "ParentID"] });
+        Ext.regModel("SysModelAuth", { fields: ["MODULEID", "NAME", "leaf", "URL", "PARENTID", "checked"] });
         treeModelstore = new Ext.data.TreeStore({
             model: 'SysModelAuth',
             nodeParam: 'id',
@@ -81,24 +80,18 @@
             width: 900,
             store: treeModelstore,
             columns: [
-            { text: 'id', dataIndex: 'id', width: 500, hidden: true },
-            { text: 'leaf', dataIndex: 'leaf', width: 100, hidden: true },
-            { header: '模块名称', xtype: 'treecolumn', text: 'name', dataIndex: 'name', flex: 1 },
-            { text: 'ParentID', dataIndex: 'ParentID', width: 100, hidden: true }
+            { dataIndex: 'MODULEID', width: 500, hidden: true },
+            { dataIndex: 'leaf', width: 100, hidden: true },
+            { header: '模块名称', xtype: 'treecolumn', dataIndex: 'NAME', flex: 1 },
+            { text: 'ParentID', dataIndex: 'PARENTID', hidden: true }
             ],
             listeners: {
-                itemclick: function (view, rec, node) {
+                checkchange: function (node, checked) {
+                    setChildChecked(node, checked);
+                    setParentChecked(node, checked);
                 }
             }
         });
-        var label_baseinfo = {
-            xtype: 'label',
-            html: '<h4 style="margin-top:0px;margin-bottom:0px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;权限管理</span></h4>'
-        }
-        var tbar = Ext.create('Ext.toolbar.Toolbar', {
-            renderTo: 'toolbar',
-            items: [label_baseinfo, '->', '<button onclick="SaveAuthorization()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>']
-        })
         //======================联动选择==========================
         /*向上遍历父结点*/
         var nodep = function (node) {
@@ -130,16 +123,7 @@
                 });
             }
         };
-        /*treeModel*/
-
-        treeModel.on('checkchange', function (node, checked) {
-            setChildChecked(node, checked);
-            setParentChecked(node, checked);
-        }, treeModel);
-        //================================================
-
     });
-
     //选择子节点
     function setChildChecked(node, checked) {
         node.expand();
@@ -174,12 +158,12 @@
         }
     }
 
-    function SaveAuthorization() {
+    function SaveAuthorization() { 
         if (userid) {
             var moduleids = "";
             var recs = treeModel.getChecked();
             for (var i = 0; i < recs.length; i++) {
-                moduleids += recs[i].data.id + ',';
+                moduleids += recs[i].data.MODULEID + ',';
             }
             var mask = new Ext.LoadMask(Ext.getBody(), { msg: "数据保存中，请稍等..." });
             mask.show();
@@ -204,7 +188,9 @@
 
 <div class="container">
     <div id="appConId" style="width:100%"></div>
-    <div id="toolbar"></div>
+    <div class="btn-group" role="group">
+        <button type="button" onclick="SaveAuthorization()" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;保存</button>
+    </div>
     <div>
         <div id="div_west" class="fl">
         </div>

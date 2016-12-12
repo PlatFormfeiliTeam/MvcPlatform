@@ -17,58 +17,14 @@ using MvcPlatform.Models;
 using System.IO;
 namespace MvcPlatform.Controllers
 {
- 
-
     public class AccountController : Controller
-    {
-        public ActionResult OutLogin()
-        {
-            return View();
-        }
-        [HttpPost]
-        public ActionResult OutLogin(Models.User u)
-        {
-            string returnUrl = Request["ReturnUrl"] + "";
-            if (ModelState.IsValid)
-            {
-                string sql = "select * from sys_user where name = '" + u.NAME + "' and password = '" + Extension.ToSHA1(u.PASSWORD) + "'";
-                DataTable dt = DBMgr.GetDataTable(sql);
-                if (dt.Rows.Count > 0)
-                {
-                    if (dt.Rows[0]["TYPE"] + "" == "4")
-                    {
-                        ModelState.AddModelError("ERROR", "内部账号不允许登录！");
-                        return View(u);
-                    }
-                    if (dt.Rows[0]["ENABLED"] + "" != "1")
-                    {
-                        ModelState.AddModelError("ERROR", "账号已停用！");
-                        return View(u);
-                    }
-                    FormsAuthentication.SetAuthCookie(u.NAME, false);
-                    if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
-                    {
-                        Response.Redirect(returnUrl);
-                    }
-                    else
-                    {
-                        Response.Redirect("/Home/Index");
-                    }
-                }
-                else
-                {
-                    ModelState.AddModelError("ERROR", "账号/密码错误！");
-                    return View(u);
-                }
-            }
-            return View(u);
-        }
+    {     
         public ActionResult Login(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
             return View();
         }
-        
+
         [HttpPost]
         public ActionResult Login(Models.User u)
         {
@@ -125,12 +81,12 @@ namespace MvcPlatform.Controllers
 
             return View();
         }
-          [Authorize]
+        [Authorize]
         public ActionResult ChildEdit()
         {
             return View();
         }
-          [Authorize]
+        [Authorize]
         public ActionResult Authorization()
         {
             ViewBag.navigator = "账号管理>>权限管理";
@@ -186,7 +142,7 @@ namespace MvcPlatform.Controllers
             {
                 JObject json = (JObject)JsonConvert.DeserializeObject(data);
                 string sql = @"update sys_customer set WEIGHTCHECK='{0}',BUSITYPES='{1}' where id='{2}'";
-                sql = string.Format(sql,json.Value<string>("WEIGHTCHECK") == "on" ? 1 : 0, Request["busitypes"], json.Value<string>("CUSTOMERID"));
+                sql = string.Format(sql, json.Value<string>("WEIGHTCHECK") == "on" ? 1 : 0, Request["busitypes"], json.Value<string>("CUSTOMERID"));
                 int result = DBMgrBase.ExecuteNonQuery(sql);
                 return "{result:'" + result + "'}";
             }
@@ -315,89 +271,60 @@ namespace MvcPlatform.Controllers
         {
             string userid = Request["userid"];
             string sql = "";
-            string json = "";
+            string result = "[";
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            //RedisClient redisClient = new RedisClient(AppUtil.RedisIp, Int32.Parse(AppUtil.RedisPort));//redis服务IP和端口
-            //if (redisClient.Exists("Authority_" + userid) == 1)//判断REDIS是否存在某一个KEY值，如果存在返回1 不存在返回0
-            //{
-            //    json = redisClient.Get<string>("Authority_" + userid);
-            //}
-            //// redisClient.Set("WebSite_" + userid, result);
-            //else
-            //{
-
             if (!string.IsNullOrEmpty(userid))//当选择了人员后，显示该人员的权限
-            {
-                sql = @"select a.MODULEID,a.NAME,a.ISLEAF,a.URL,a.PARENTID,a.SORTINDEX,
-                                                          (select  b.ModuleId  from SYS_MODULEUSER b where a.MODULEID=b.MODULEID AND B.USERID='{0}' and rownum=1) as CHECKED from sysmodule a                             
-                                                          where PARENTID ='{1}' order by SORTINDEX";
-                sql = string.Format(sql, userid, Request["id"]);
-                DataTable ents = DBMgr.GetDataTable(sql);
-
-                DataTable moduleIdDt;
-
-                string moduleIdSql = "select MODULEID from SYS_MODULEUSER where userid = " + json_user.GetValue("ID");
-                moduleIdDt = DBMgr.GetDataTable(moduleIdSql);
-
-                Sysmodule obj = new Sysmodule();
-                obj.id = "91a0657f-1939-4528-80aa-91b202a593ab";
-                obj = GetTree(obj, moduleIdDt);
-                json = JsonConvert.SerializeObject(obj.children, Formatting.None);
-                json = json.Replace("check", "checked");
-
-
-            }
-            // }
-            return json;
-        }
-
-
-        private Sysmodule GetTree(Sysmodule obj, DataTable moduleIdDt)
-        {
-            try
-            {
-                string strSQL = @"select a.MODULEID as id,a.NAME,a.ISLEAF,a.URL,a.PARENTID,a.SORTINDEX,
-                                      (select  b.ModuleId  from SYS_MODULEUSER b where a.MODULEID=b.MODULEID AND B.USERID='" + Request["userid"] + "' and rownum=1) as CHECKED from sysmodule a  " +
-                                      "where PARENTID ='" + obj.id + "' order by SORTINDEX";
-                DataTable dtNext = DBMgr.GetDataTable(strSQL);
-                obj.children = new List<Sysmodule>();
-
-                foreach (DataRow dr in dtNext.Rows)
+            {    
+                //取当前账号所属主账号的权限
+                sql = @"select a.*,c.AUTHORITY from SysModule a  left join (select MODULEID AUTHORITY from SYS_MODULEUSER  where USERID='{1}') c
+                on a.ModuleId=c.AUTHORITY where a.MODULEID in (select MODULEID FROM SYS_MODULEUSER b where b.USERID='{0}')
+                and Parentid='91a0657f-1939-4528-80aa-91b202a593ab' order by SORTINDEX asc";
+                sql = string.Format(sql, json_user.GetValue("ID"), userid);
+                DataTable dt1 = DBMgr.GetDataTable(sql);
+                int i = 0;
+                foreach (DataRow dr1 in dt1.Rows)
                 {
-                    //过滤掉主账号没有的ModuleId
-                    int count = 0;
-                    foreach (DataRow mdr in moduleIdDt.Rows)
+                    string children = string.Empty;
+                    children = getchildren(dr1["MODULEID"].ToString(), userid, json_user);
+                    if (i != dt1.Rows.Count - 1)
                     {
-                        if (mdr["MODULEID"].ToString() == dr["id"].ToString())
-                        {
-                            count += 1;
-                        }
+                        result += "{MODULEID:'" + dr1["MODULEID"] + "',NAME:'" + dr1["NAME"] + "',SORTINDEX:'" + dr1["SORTINDEX"] + "',PARENTID:'" + dr1["PARENTID"] + "',leaf:'" + dr1["ISLEAF"] + "',URL:'" + dr1["URL"] + "',checked:" + (string.IsNullOrEmpty(dr1["AUTHORITY"] + "") ? "false" : "true") + ",children:" + children + "},";
                     }
-                    if (count == 0)
+                    else
                     {
-                        continue;
+                        result += "{MODULEID:'" + dr1["MODULEID"] + "',NAME:'" + dr1["NAME"] + "',SORTINDEX:'" + dr1["SORTINDEX"] + "',PARENTID:'" + dr1["PARENTID"] + "',leaf:'" + dr1["ISLEAF"] + "',URL:'" + dr1["URL"] + "',checked:" + (string.IsNullOrEmpty(dr1["AUTHORITY"] + "") ? "false" : "true") + ",children:" + children + "}";
                     }
-
-                    Sysmodule st = new Sysmodule();
-                    st.id = dr["id"].ToString();
-                    st.name = dr["name"].ToString();
-                    st.ParentID = dr["PARENTID"].ToString();
-                    st.check = string.IsNullOrEmpty(dr["CHECKED"].ToString()) ? false : true;
-                    // 递归调用
-                    st = this.GetTree(st, moduleIdDt);
-                    st.leaf = dr["ISLEAF"] + "";
-                    obj.children.Add(st);
+                    i++;
                 }
-                return obj;
-            }
-            catch (Exception e)
-            {
-                //log.Error(e.Message + e.StackTrace);
-                return obj;
-            }
+                result += "]"; 
+            } 
+            return result;
         }
-
-
+        public string getchildren(string moduleid, string userid, JObject json_user)
+        {
+            string children = "[";
+            string sql = @"select t.*,u.AUTHORITY from sysmodule t 
+            left join (select MODULEID AUTHORITY from sys_moduleuser where userid='{0}') u on t.MODULEID=u.AUTHORITY
+            where t.ParentId ='{1}' and t.MODULEID in (select MODULEID FROM SYS_MODULEUSER b where b.USERID='{2}') order by t.SortIndex";
+            sql = string.Format(sql, userid, moduleid, json_user.Value<string>("ID"));
+            DataTable dt = DBMgr.GetDataTable(sql);
+            int i = 0;
+            foreach (DataRow smEnt in dt.Rows)
+            {
+                string children_c = getchildren(smEnt["MODULEID"] + "", userid, json_user);
+                if (i != dt.Rows.Count - 1)
+                {
+                    children += "{MODULEID:'" + smEnt["MODULEID"] + "',NAME:'" + smEnt["NAME"] + "',SORTINDEX:'" + smEnt["SORTINDEX"] + "',PARENTID:'" + smEnt["PARENTID"] + "',leaf:'" + smEnt["ISLEAF"] + "',URL:'" + smEnt["URL"] + "',checked:" + (string.IsNullOrEmpty(smEnt["AUTHORITY"] + "") ? "false" : "true") + ",children:" + children_c + "},";
+                }
+                else
+                {
+                    children += "{MODULEID:'" + smEnt["MODULEID"] + "',NAME:'" + smEnt["NAME"] + "',SORTINDEX:'" + smEnt["SORTINDEX"] + "',PARENTID:'" + smEnt["PARENTID"] + "',leaf:'" + smEnt["ISLEAF"] + "',URL:'" + smEnt["URL"] + "',checked:" + (string.IsNullOrEmpty(smEnt["AUTHORITY"] + "") ? "false" : "true") + ",children:" + children_c + "}";
+                }
+                i++;
+            }
+            children += "]";
+            return children;
+        }
         public string AuthorizationSave()
         {
             string moduleids = Request["moduleids"];
