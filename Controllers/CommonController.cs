@@ -1010,9 +1010,9 @@ namespace MvcPlatform.Controllers
         /*报关单管理 列表页展示*/
         public string LoadDeclarationList()
         {
-                string busitypeid = Request["busitypeid"];
-                string where = QueryConditionDecl();
-         
+            string busitypeid = Request["busitypeid"];
+            string where = QueryConditionDecl();
+
             //2016-6-24 更新报关单列表显示逻辑 根据报关单对应的订单【DECLPDF】即报关单是否已关联好PDF文件，作为显示的条件 国内业务不需要去判断关联订单，因为打这两个标志的时候已经判断了           
             //DECL_TRANSNAME 预制报关单的运输工具名称
             //运输工具名称的显示需要更改为一下逻辑：根据草单中的申报库别 如果是13或者17 运输工具名称取预制报关单里面的。否则取草单的运输工具名称
@@ -1038,7 +1038,7 @@ namespace MvcPlatform.Controllers
                               left join cusdoc.sys_customer cus on ort.customercode = cus.code 
                          where (DECLSTATUS=130 or DECLSTATUS=110) and det.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where;//(ort.DECLPDF =1 or ort.PREPDF=1) 
              */
-                string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
+            string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
                             det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
                             det.TRANSNAME DECL_TRANSNAME, det.ISPRINT,
                             det.TRANSNAME,det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
@@ -1050,15 +1050,15 @@ namespace MvcPlatform.Controllers
                                  left join cusdoc.sys_customer cus on ort.customercode = cus.code 
                                  left join (select * from list_order l where l.ASSOCIATENO is not null and (l.DECLSTATUS!=130 and l.DECLSTATUS!=110)) a on ort.ASSOCIATENO=a.ASSOCIATENO 
                             where (ort.DECLSTATUS=130 or ort.DECLSTATUS=110) and det.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where
-                           + " and a.ASSOCIATENO is null";
-          
+                       + " and a.ASSOCIATENO is null";
+
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             var json = JsonConvert.SerializeObject(dt, iso);
             return "{rows:" + json + ",total:" + totalProperty + "}";
         }
-       
+
         public string QueryConditionDecl()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
@@ -1151,7 +1151,7 @@ namespace MvcPlatform.Controllers
                 where += @" and ort.customercode ='" + json_user.Value<string>("CUSTOMERCODE") + "' ";
             }
             return where;
-        
+
         }
 
         /*通过查询条件获取具体的报关单海关状态数据 list_receiptstatus 这个表是预制报关单海关状态回执表
@@ -1509,15 +1509,15 @@ namespace MvcPlatform.Controllers
                 UpdatePrintInfo("list_declaration", dt.Rows[0]["DECLCODE"] + "");
             }
             string result = string.Empty;
-            if (filelist.Count > 1)
-            {
-                MergePDFFiles(filelist, Server.MapPath("~/Declare/") + output + ".pdf");
-                result = "/Declare/" + output + ".pdf";
-            }
-            else
-            {
-                result = AdminUrl + "/file/" + dt.Rows[0]["FILENAME"];
-            }
+            //if (filelist.Count > 1)
+            //{
+            MergePDFFiles(filelist, Server.MapPath("~/Declare/") + output + ".pdf");
+            result = "/Declare/" + output + ".pdf";
+            //}
+            //else
+            //{
+            //    result = AdminUrl + "/file/" + dt.Rows[0]["FILENAME"];
+            //}
             return result;
         }
 
@@ -1537,18 +1537,18 @@ namespace MvcPlatform.Controllers
                 //}
                 //else
                 //{
-                    if (printtmp == "海关作业联")
-                    {
-                        img = Image.GetInstance(Server.MapPath("/FileUpload/进口-海关作业联.png"));
-                    }
-                    if (printtmp == "企业留存联")
-                    {
-                        img = Image.GetInstance(Server.MapPath("/FileUpload/进口-企业留存联.png"));
-                    }
-                    if (printtmp == "海关核销联")
-                    {
-                        img = Image.GetInstance(Server.MapPath("/FileUpload/进口-海关核销联.png"));
-                    }
+                if (printtmp == "海关作业联")
+                {
+                    img = Image.GetInstance(Server.MapPath("/FileUpload/进口-海关作业联.png"));
+                }
+                if (printtmp == "企业留存联")
+                {
+                    img = Image.GetInstance(Server.MapPath("/FileUpload/进口-企业留存联.png"));
+                }
+                if (printtmp == "海关核销联")
+                {
+                    img = Image.GetInstance(Server.MapPath("/FileUpload/进口-海关核销联.png"));
+                }
                 //}
             }
             else
@@ -1559,18 +1559,18 @@ namespace MvcPlatform.Controllers
                 //}
                 //else
                 //{
-                    if (printtmp == "海关作业联")
-                    {
-                        img = Image.GetInstance(Server.MapPath("/FileUpload/出口-海关作业联.png"));
-                    }
-                    if (printtmp == "企业留存联")
-                    {
-                        img = Image.GetInstance(Server.MapPath("/FileUpload/出口-企业留存联.png"));
-                    }
-                    if (printtmp == "海关核销联")
-                    {
-                        img = Image.GetInstance(Server.MapPath("/FileUpload/出口-海关核销联.png"));
-                    }
+                if (printtmp == "海关作业联")
+                {
+                    img = Image.GetInstance(Server.MapPath("/FileUpload/出口-海关作业联.png"));
+                }
+                if (printtmp == "企业留存联")
+                {
+                    img = Image.GetInstance(Server.MapPath("/FileUpload/出口-企业留存联.png"));
+                }
+                if (printtmp == "海关核销联")
+                {
+                    img = Image.GetInstance(Server.MapPath("/FileUpload/出口-海关核销联.png"));
+                }
                 //}
             }
             string destFile = Server.MapPath("~/Declare/") + outname + ".pdf";
@@ -1597,7 +1597,7 @@ namespace MvcPlatform.Controllers
             //}
             //else
             //{
-                img.SetAbsolutePosition(0, 0);
+            img.SetAbsolutePosition(0, 0);
             //}
             int totalPage = reader.NumberOfPages;
             for (int current = 1; current <= totalPage; current++)
@@ -2147,11 +2147,11 @@ namespace MvcPlatform.Controllers
                                 if ((dr[jp.Name] + "") != "") { bf = false; break; }//只要有一个单号的值不为空，就不拼sql
                             }
                         }
-                        
+
                         if (bf)
                         {
                             sql += jp.Name + "='" + jp.Value.ToString() + "',";
-                        }                        
+                        }
                     }
                     if (jp.Name == "CONTAINERTRUCK" && jp.Value.ToString() != "")
                     {
@@ -2507,7 +2507,7 @@ namespace MvcPlatform.Controllers
                 rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["REPFINISHTIME"].ToString());
                 rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["IETYPE"].ToString());
                 rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["ASSOCIATENO"].ToString());
-                if (dt.Rows[i]["DECLTYPE"].ToString() == "17" || dt.Rows[i]["DECLTYPE"].ToString()=="13")
+                if (dt.Rows[i]["DECLTYPE"].ToString() == "17" || dt.Rows[i]["DECLTYPE"].ToString() == "13")
                 {
                     rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["DECL_TRANSNAME"].ToString());
 
@@ -2515,7 +2515,7 @@ namespace MvcPlatform.Controllers
                 else
                 {
                     rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["TRANSNAME"].ToString());
-                
+
                 }
 
                 rowtemp.CreateCell(8).SetCellValue(getStatusName(dt.Rows[i]["BUSITYPE"].ToString(), common_data_busitype));
@@ -2532,7 +2532,7 @@ namespace MvcPlatform.Controllers
                 rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
                 rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
                 rowtemp.CreateCell(21).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
-                
+
             }
 
 
