@@ -70,7 +70,7 @@ namespace MvcPlatform.Controllers
         }
 
 
-        #region 转移AccountManagementController
+        #region 
 
         int totalProperty = 0;
         [Authorize]

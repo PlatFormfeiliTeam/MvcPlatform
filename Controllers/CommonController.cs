@@ -1508,8 +1508,17 @@ namespace MvcPlatform.Controllers
                 filelist.Add(AdminUrl + "/file/" + dt.Rows[0]["FILENAME"]);
                 UpdatePrintInfo("list_declaration", dt.Rows[0]["DECLCODE"] + "");
             }
-            MergePDFFiles(filelist, Server.MapPath("~/Declare/") + output + ".pdf");
-            return "/Declare/" + output + ".pdf";
+            string result = string.Empty;
+            if (filelist.Count > 1)
+            {
+                MergePDFFiles(filelist, Server.MapPath("~/Declare/") + output + ".pdf");
+                result = "/Declare/" + output + ".pdf";
+            }
+            else
+            {
+                result = AdminUrl + "/file/" + dt.Rows[0]["FILENAME"];
+            }
+            return result;
         }
 
         //给报关单文件增加背景图片 by panhuaguo 2016-04-19  
