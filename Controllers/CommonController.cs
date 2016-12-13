@@ -1479,20 +1479,16 @@ namespace MvcPlatform.Controllers
             IList<string> filelist = new List<string>();
             if (printtype == "standardprint")//如果是标准打印
             {
-                string predeclcode = (dt.Rows[0]["DECLCODE"] + "");
-                //predeclcode = predeclcode.Substring(0, predeclcode.Length - 3);
-
                 /*sql = "select t.*, t.rowid from list_predeclaration t where t.predeclcode='" + predeclcode + "'";*/
-                sql = "select t.*, t.rowid from list_declaration t where t.code='" + predeclcode + "'";
-
-                DataTable dt_pre = DBMgr.GetDataTable(sql);
-                //报关单标准打印的时候用户必须在前端选择多个打印模板
+                //sql = "select t.*, t.rowid from list_declaration t where t.code='" + predeclcode + "'";
+                //DataTable dt_pre = DBMgr.GetDataTable(sql);
+                //报关单标准打印的时候用户必须在前端选择多个打印模板 单证二期已经删除了草单表,报关单标准打印已经摒弃了申报库别的判断 by panhuaguo2016-12-13
                 string[] tmp_array = printtmp.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
                 if (tmp_array.Length > 0)
                 {
                     foreach (string tmpname in tmp_array)
                     {
-                        string outpath = AddBackground(dt.Rows[0]["FILENAME"] + "", tmpname, busitype, dt_pre.Rows[0]["DECLTYPE"] + "");
+                        string outpath = AddBackground(dt.Rows[0]["FILENAME"] + "", tmpname, busitype, "");
                         filelist.Add(outpath);
                     }
                     UpdatePrintInfo("list_declaration", dt.Rows[0]["DECLCODE"] + "");
@@ -1503,21 +1499,22 @@ namespace MvcPlatform.Controllers
                     UpdatePrintInfo("list_declaration", dt.Rows[0]["DECLCODE"] + "");
                 }
             }
-            else
+            else//套打打印
             {
                 filelist.Add(AdminUrl + "/file/" + dt.Rows[0]["FILENAME"]);
                 UpdatePrintInfo("list_declaration", dt.Rows[0]["DECLCODE"] + "");
             }
             string result = string.Empty;
-            //if (filelist.Count > 1)
-            //{
-            MergePDFFiles(filelist, Server.MapPath("~/Declare/") + output + ".pdf");
-            result = "/Declare/" + output + ".pdf";
-            //}
-            //else
-            //{
-            //    result = AdminUrl + "/file/" + dt.Rows[0]["FILENAME"];
-            //}
+            if (filelist.Count > 1)
+            {
+                MergePDFFiles(filelist, Server.MapPath("~/Declare/") + output + ".pdf");
+                result = "/Declare/" + output + ".pdf";
+            }
+            else
+            {
+                // result = AdminUrl + "/file/" + dt.Rows[0]["FILENAME"];
+                result = filelist[0];
+            }
             return result;
         }
 
