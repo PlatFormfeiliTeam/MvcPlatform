@@ -13,7 +13,7 @@
         queryMode: 'local',
         //labelWidth: 50,
         labelAlign: 'right',
-        width: 85,
+        width: 75,
         value: '44',
         editable: false
     })
@@ -36,9 +36,9 @@
     })
     var field_fileno1 = Ext.create('Ext.form.field.Text', {
         id: 'field_fileno1',
-        labelWidth: 50,
+        labelWidth: 55,
         fieldLabel: '统一编号',
-        width: 168,
+        width: 158,
         listeners: {
             specialkey: function (field, e) {
                 // e.HOME, e.END, e.PAGE_UP, e.PAGE_DOWN,e.TAB, e.ESC, arrow keys: e.LEFT, e.RIGHT, e.UP, e.DOWN 
