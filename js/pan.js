@@ -1002,7 +1002,12 @@ function formcontrol() {
     }
 
     if (status < 10) {
-        upload_ini();
+        if (uploader==null)
+        {
+            upload_ini();
+        }
+        
+        
     }
     //2016-10-18增加判断,因为提交表单后页面并没有刷新,虽然上传按钮禁用了,但uploader对象并没有销毁,还是能上传 10表示已委托 
     if (status >= 10 && uploader) {

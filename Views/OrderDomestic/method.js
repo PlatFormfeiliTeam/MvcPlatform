@@ -238,7 +238,9 @@ function button_control(status) {
         })
     }
     else {
-        upload_ini(); //未提交时才初始化上传控件 
+        if (uploader == null) {
+            upload_ini(); //未提交时才初始化上传控件 
+        }
     }
     document.getElementById("deletefile").disabled = status >= 10; //删除按钮  --提交后不允许删除setVisibilityMode
     document.getElementById("btn_cancelsubmit").disabled = status != 10;//撤单按钮  只有在提交后受理前才可以撤单
