@@ -83,49 +83,6 @@ namespace MvcPlatform.Controllers
             return "{sbfs:" + json_sbfs + "}";
         }
 
-        public string LoadList()
-        {
-            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            string where = "";
-            if (!string.IsNullOrEmpty(Request["busitype"]))//判断查询条件是否有值
-            {
-                where += " and t.BUSITYPEID='" + Request["busitype"].ToString() + "'";
-            }
-            if (!string.IsNullOrEmpty(Request["FILERECEVIEUNIT"]))//判断查询条件是否有值
-            {
-                string FILERECEVIEUNIT = Request["FILERECEVIEUNIT"].ToString();
-                where += " and t.FILERECEVIEUNITCODE='" + GetCode(FILERECEVIEUNIT) + "' and FILERECEVIEUNITNAME='" + GetName(FILERECEVIEUNIT) + "' ";
-            }
-            if (!string.IsNullOrEmpty(Request["FILEDECLAREUNIT"]))//判断查询条件是否有值
-            {
-                string FILEDECLAREUNIT = Request["FILEDECLAREUNIT"].ToString();
-                where += " and t.FILEDECLAREUNITCODE='" + GetCode(FILEDECLAREUNIT) + "' and FILEDECLAREUNITNAME='" + GetName(FILEDECLAREUNIT) + "' ";
-            }
-            if (!string.IsNullOrEmpty(Request["CODE"]))//判断查询条件是否有值
-            {
-                string CODE = Request["CODE"].ToString().Trim();
-                where += " and instr(t.CODE,'" + CODE + "')>0 ";
-            }
-
-            if (!string.IsNullOrEmpty(Request["STARTDATE"]))//如果开始时间有值
-            {
-                where += " and t.CREATETIME>=to_date('" + Request["STARTDATE"] + "','yyyy-mm-dd hh24:mi:ss') ";
-            }
-            if (!string.IsNullOrEmpty(Request["ENDDATE"]))//如果结束时间有值
-            {
-                where += " and t.CREATETIME<=to_date('" + Request["ENDDATE"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
-            }
-
-            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
-            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-
-            string sql = @"select t.*  from ENT_ORDER t                
-                         where t.ENTERPRISECODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "' " + where;
-            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
-            var json = JsonConvert.SerializeObject(dt, iso);
-            return "{rows:" + json + ",total:" + totalProperty + "}";
-        }
-
         public string loadform()
         {
             Object json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
