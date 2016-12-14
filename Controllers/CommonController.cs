@@ -1513,7 +1513,8 @@ namespace MvcPlatform.Controllers
             else
             {
                 // result = AdminUrl + "/file/" + dt.Rows[0]["FILENAME"];
-                result = filelist[0];
+                result = ConvertPDFToPDF(filelist[0], true);
+                //  result = filelist[0];
             }
             return result;
         }
@@ -1640,6 +1641,32 @@ namespace MvcPlatform.Controllers
         }
 
         #endregion
+        //自动打印
+        private string ConvertPDFToPDF(string filePath, bool print)
+        {
+            string result = Guid.NewGuid().ToString();
+            PdfReader reader = new PdfReader(filePath);
+            Document document = new Document(reader.GetPageSizeWithRotation(1));
+            int n = reader.NumberOfPages;
+            FileStream baos = new FileStream(ConfigurationManager.AppSettings["WebFilePath"] + result + ".pdf", FileMode.Create, FileAccess.Write);
+            PdfCopy copy = new PdfCopy(document, baos);
+            copy.ViewerPreferences = PdfWriter.HideToolbar | PdfWriter.HideMenubar;
+            //往pdf中写入内容     
+            document.Open();
+            for (int i = 1; i <= n; i++)
+            {
+                PdfImportedPage page = copy.GetImportedPage(reader, i);
+                copy.AddPage(page);
+            }
+            if (print)
+            {
+                // PdfAction.JavaScript("myOnMessage();", copy);
+                //copy.AddJavaScript("this.print(true);function myOnMessage(aMessage) {app.alert('Test',2);} var msgHandlerObject = new Object();doc.onWillPrint = myOnMessage;this.hostContainer.messageHandler = msgHandlerObject;");
+                copy.AddJavaScript("this.print(true);");
+            }
+            document.Close();
+            return "/Declare/" + result + ".pdf";
+        }
 
         #region MutiPrint 批量打印
 
