@@ -14,6 +14,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Diagnostics;
 
 namespace MvcPlatform.Controllers
 {
@@ -1648,7 +1649,7 @@ namespace MvcPlatform.Controllers
             PdfReader reader = new PdfReader(filePath);
             Document document = new Document(reader.GetPageSizeWithRotation(1));
             int n = reader.NumberOfPages;
-            FileStream baos = new FileStream(ConfigurationManager.AppSettings["WebFilePath"] + result + ".pdf", FileMode.Create, FileAccess.Write);
+            FileStream baos = new FileStream(ConfigurationManager.AppSettings["DeclareFile"] + result + ".pdf", FileMode.Create, FileAccess.Write);
             PdfCopy copy = new PdfCopy(document, baos);
             copy.ViewerPreferences = PdfWriter.HideToolbar | PdfWriter.HideMenubar;
             //往pdf中写入内容     
@@ -1665,7 +1666,8 @@ namespace MvcPlatform.Controllers
                 copy.AddJavaScript("this.print(true);");
             }
             document.Close();
-            return "/Declare/" + result + ".pdf";
+            return @"http://192.168.252.8:8012/Declare/" + result + ".pdf";
+           
         }
 
         #region MutiPrint 批量打印
