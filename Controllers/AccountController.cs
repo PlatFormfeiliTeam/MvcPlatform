@@ -295,9 +295,9 @@ namespace MvcPlatform.Controllers
                         result += "{MODULEID:'" + dr1["MODULEID"] + "',NAME:'" + dr1["NAME"] + "',SORTINDEX:'" + dr1["SORTINDEX"] + "',PARENTID:'" + dr1["PARENTID"] + "',leaf:'" + dr1["ISLEAF"] + "',URL:'" + dr1["URL"] + "',checked:" + (string.IsNullOrEmpty(dr1["AUTHORITY"] + "") ? "false" : "true") + ",children:" + children + "}";
                     }
                     i++;
-                }
-                result += "]"; 
-            } 
+                }                
+            }
+            result += "]"; 
             return result;
         }
         public string getchildren(string moduleid, string userid, JObject json_user)
