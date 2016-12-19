@@ -1479,10 +1479,7 @@ namespace MvcPlatform.Controllers
             string output = Guid.NewGuid() + "";
             IList<string> filelist = new List<string>();
             if (printtype == "standardprint")//如果是标准打印
-            {
-                /*sql = "select t.*, t.rowid from list_predeclaration t where t.predeclcode='" + predeclcode + "'";*/
-                //sql = "select t.*, t.rowid from list_declaration t where t.code='" + predeclcode + "'";
-                //DataTable dt_pre = DBMgr.GetDataTable(sql);
+            { 
                 //报关单标准打印的时候用户必须在前端选择多个打印模板 单证二期已经删除了草单表,报关单标准打印已经摒弃了申报库别的判断 by panhuaguo2016-12-13
                 string[] tmp_array = printtmp.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
                 if (tmp_array.Length > 0)
@@ -1513,9 +1510,16 @@ namespace MvcPlatform.Controllers
             }
             else
             {
-                // result = AdminUrl + "/file/" + dt.Rows[0]["FILENAME"]; 
                 result = filelist[0];
+                System.Uri Uri = new Uri("ftp://" + ConfigurationManager.AppSettings["FTPServer"] + ":" + ConfigurationManager.AppSettings["FTPPortNO"]);
+                string UserName = ConfigurationManager.AppSettings["FTPUserName"];
+                string Password = ConfigurationManager.AppSettings["FTPPassword"];
+                FtpHelper ftp = new FtpHelper(Uri, UserName, Password);
+                bool file = ftp.DownloadFile("/" + dt.Rows[0]["FILENAME"] + "", ConfigurationManager.AppSettings["DeclareFile"] + output + ".pdf");
             }
+            //将报关单打印任务推送至缓存
+            IDatabase db = SeRedis.redis.GetDatabase(); 
+            db.ListLeftPush("fileprint", "{user:'" + HttpContext.User.Identity.Name + "',filename:'" + output + ".pdf'}");
             return result;
         }
 
