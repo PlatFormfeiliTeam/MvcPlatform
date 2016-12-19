@@ -216,7 +216,7 @@ function readonly_init(formpanel_tmp, formhead_tmp, index) {
 }
 
 function button_control(status) {
-    //document.getElementById("pickfiles").disabled = status >= 10;
+    document.getElementById("pickfiles").disabled = status >= 10;
     if (status >= 10) {
         //上传文件按钮除了基本的控制外，还有一种情形就是当后台开启上传权限的数量，即使提交还是可以上传的
         Ext.Ajax.request({
