@@ -149,7 +149,7 @@
             rtn = value == "0" ? "未打印" : "已打印";
         }
         if (dataindex == "INSPECTIONCODE" && value) {
-            rtn = "<div style='cursor:pointer; text-decoration:underline;' onclick='showwinwj(\"" + record.get("ID") + "\",\"" + record.get("ORDERCODE") + "\",\"" + record.get("CODE") + "\",TYPE=61)'>" + value + "</div>";
+            rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='showwinwj(\"" + record.get("ID") + "\",\"" + record.get("ORDERCODE") + "\",\"" + record.get("CODE") + "\",TYPE=61)'>" + value + "</div>";
         }
         if (dataindex == "BUSITYPE" && value) {
             var rec = store_busitype.findRecord('CODE', value);

@@ -1886,13 +1886,24 @@ namespace MvcPlatform.Controllers
 ,li.REPFINISHTIME,li.ISFORCELAW
 ,lp.UPCNNAME,lp.INSPTYPE,lp.ENTRYPORT,lp.TRANSTOOL,lp.LADINGNO,lp.TOTALNO,lp.TRADE,lp.CONTRACTNO,lp.FOBPORT,lp.FOBPORTNAME,lp.PACKAGETYPE,lp.DECLTYPE 
 */
-            string sql = @"SELECT li.ID,li.CODE,li.ORDERCODE,li.INSPSTATUS,li.ISPRINT, li.APPROVALCODE,li.INSPECTIONCODE
+            /*string sql = @"SELECT li.ID,li.CODE,li.ORDERCODE,li.INSPSTATUS,li.ISPRINT, li.APPROVALCODE,li.INSPECTIONCODE
                               ,lo.WOODPACKINGID,lo.INSPUNITNAME,lo.BUSITYPE,lo.GOODSNUM,lo.CUSNO
                               ,cus.SCENEINSPECTID    
                             FROM list_inspection li 
                                  LEFT JOIN list_order lo ON li.ordercode = lo.code 
                                  left join cusdoc.sys_customer cus on lo.customercode=cus.code 
-                            WHERE li.STATUS >=103  and INSTR('" + busitypeid + "',lo.busitype)>0 " + where;
+                            WHERE li.STATUS >=103  and INSTR('" + busitypeid + "',lo.busitype)>0 " + where;*/
+
+            string sql = @"SELECT li.ID,li.CODE,li.ORDERCODE,li.INSPSTATUS,li.ISPRINT, li.APPROVALCODE,li.INSPECTIONCODE
+                              ,lo.WOODPACKINGID,lo.INSPUNITNAME,lo.BUSITYPE,lo.GOODSNUM,lo.CUSNO,lo.CREATETIME       
+                              ,cus.SCENEINSPECTID    
+                            FROM list_inspection li 
+                                 LEFT JOIN list_order lo ON li.ordercode = lo.code 
+                                 left join cusdoc.sys_customer cus on lo.customercode=cus.code 
+                                 left join (select * from list_order l where l.ASSOCIATENO is not null and l.INSPSTATUS!=130) a on lo.ASSOCIATENO=a.ASSOCIATENO 
+                            WHERE lo.INSPSTATUS=130 and li.isinvalid=0 and INSTR('" + busitypeid + "',lo.busitype)>0 " + where
+                        + " and a.ASSOCIATENO is null";
+
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "DESC"));//DBMgr.GetDataTable(GetPageSql(sql, "REPFINISHTIME", "DESC"));    //排序字段修改
