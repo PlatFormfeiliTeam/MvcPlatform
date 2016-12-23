@@ -1381,7 +1381,7 @@ namespace MvcPlatform.Controllers
             if (id == "62")
             {
                 int i = 0;
-                sql = @"select CODE,INSPECTIONCODE from list_inspection t where t.ordercode='" + ordercode + "' and t.INSPECTIONCODE is not null order by starttime";
+                sql = @"select CODE,INSPECTIONCODE from list_inspection t where t.ordercode='" + ordercode + "' and t.INSPECTIONCODE is not null order by COSTARTTIME"; //starttime
                 dt = DBMgr.GetDataTable(sql);
                 result += "[";
                 foreach (DataRow dr in dt.Rows)

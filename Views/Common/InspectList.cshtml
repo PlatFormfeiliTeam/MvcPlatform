@@ -149,7 +149,8 @@
             rtn = value == "0" ? "未打印" : "已打印";
         }
         if (dataindex == "INSPECTIONCODE" && value) {
-            rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='showwinwj(\"" + record.get("ID") + "\",\"" + record.get("ORDERCODE") + "\",\"" + record.get("CODE") + "\",TYPE=61)'>" + value + "</div>";
+            //rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='showwinwj(\"" + record.get("ID") + "\",\"" + record.get("ORDERCODE") + "\",\"" + record.get("CODE") + "\",TYPE=61)'>" + value + "</div>";
+            rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='showwinwj(\"" + record.get("ORDERCODE") + "\",\"" + escape(record.get("BUSITYPE")) + "\",\"" + record.get("CODE") + "\")'>" + value + "</div>";
         }
         if (dataindex == "BUSITYPE" && value) {
             var rec = store_busitype.findRecord('CODE', value);
@@ -193,8 +194,9 @@
     }
 
     //打开调阅信息
-    function showwinwj(ID, ORDERCODE, DECLCODE, TYPE) {
-        opencenterwin("/Common/FileConsult?ID=" + ID + "&ORDERCODE=" + ORDERCODE + "&DECLCODE=" + DECLCODE + "&TYPE=" + TYPE, 1000, 900);
+    function showwinwj(ORDERCODE, BUSITYPE, PREINSPCODE) {
+        //opencenterwin("/Common/FileConsult?ID=" + ID + "&ORDERCODE=" + ORDERCODE + "&DECLCODE=" + DECLCODE + "&TYPE=" + TYPE, 1200, 900);
+        opencenterwin("/Common/FileConsult?source=inspect&ORDERCODE=" + ORDERCODE + "&BUSITYPE=" + BUSITYPE + "&PREINSPCODE=" + PREINSPCODE, 1200, 900);
     }
 
     //打开调阅信息
