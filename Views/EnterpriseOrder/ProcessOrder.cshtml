@@ -24,7 +24,7 @@
             fields: ['ID', 'FILERECEVIEUNITCODE', 'FILERECEVIEUNITNAME', 'FILEDECLAREUNITCODE', 'FILEDECLAREUNITNAME', 'BUSITYPEID',
                 'CUSTOMDISTRICTCODE', 'CUSTOMDISTRICTNAME', 'REPWAYID', 'STATUS', 'CODE', 'CREATEID', 'CREATENAME', 'CREATETIME',
                 'ASSOCIATENO', 'ORDERCODE', 'ENTERPRISECODE', 'ENTERPRISENAME', 'ACCEPTID', 'ACCEPTNAME', 'SUBMITTIME', 'ACCEPTTIME',
-                 'REMARK', 'PRINTSTATUS', 'UNITCODE', 'FILENUM'],
+                 'REMARK', 'PRINTSTATUS', 'UNITCODE', 'FILENUM', 'ISREADPDF'],
             pageSize: 20,
             proxy: {
                 type: 'ajax',
@@ -74,6 +74,7 @@
             { header: '申报方式', dataIndex: 'REPWAYID', width: 100 },
             { header: '申报关区', dataIndex: 'CUSTOMDISTRICTNAME', width: 100 },
             { header: '打印状态', dataIndex: 'PRINTSTATUS', width: 70, renderer: render, locked: true },
+            { header: '解析状态', dataIndex: 'ISREADPDF', width: 70, renderer: render, locked: true },
             { header: '备注', dataIndex: 'REMARK', width: 150 }
             ],
             listeners:
@@ -201,6 +202,9 @@
             case "PRINTSTATUS":
                 rtn = value == "1" ? '<i class="fa fa-check" style="color:blue" aria-hidden="true"></i>' : '<i class="fa fa-times" style="color:red" aria-hidden="true"></i>';
                 break;
+            case "ISREADPDF":
+                rtn = value == "1" ? "已解析" : "未解析";
+                break
         }
         return rtn;
     }

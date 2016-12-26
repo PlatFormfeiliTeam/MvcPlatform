@@ -114,7 +114,7 @@
                     fields: ['ID', 'FILENAME', 'NEWNAME', 'ORIGINALNAME', 'UPLOADTIME', 'SIZES'],
                     data: data.file_data
                 });
-                var fileview = Ext.create('Ext.view.View', { 
+                var fileview = Ext.create('Ext.view.View', {
                     id: 'fileview1',
                     store: storefile,
                     tpl: tmp,
@@ -133,7 +133,7 @@
                                     html: "<div id='fileViewDiv' style='height: 100%;width: 100%;'></div>"
                                 }]
                             });
-                            win.show(); 
+                            win.show();
                             document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="http://192.168.252.5:8012/file/' + record.get("FILENAME") + '"></embed>';
                         }
                     }
@@ -163,16 +163,16 @@
                     fieldLabel: '备案号',
                     readOnly: true
                 });
-                var field_INOUTDATE = Ext.create('Ext.form.field.Text', {
-                    name: 'INOUTDATE',
-                    fieldLabel: '进/出口日期',
-                    readOnly: true
-                });
-                var field_REPDATE = Ext.create('Ext.form.field.Text', {
-                    name: 'REPDATE',
-                    fieldLabel: '申报日期',
-                    readOnly: true
-                });
+                //var field_INOUTDATE = Ext.create('Ext.form.field.Text', {
+                //    name: 'INOUTDATE',
+                //    fieldLabel: '进/出口日期',
+                //    readOnly: true
+                //});
+                //var field_REPDATE = Ext.create('Ext.form.field.Text', {
+                //    name: 'REPDATE',
+                //    fieldLabel: '申报日期',
+                //    readOnly: true
+                //});
                 var field_TRANSMODEL = Ext.create('Ext.form.field.Text', {
                     name: 'TRANSMODEL',
                     fieldLabel: '运输方式',
@@ -293,12 +293,12 @@
                         validateOnChange: false
                     },
                     items: [
-                            { layout: 'column', border: 0, items: [field_PORTNAME, field_RECORDCODE, field_INOUTDATE, field_REPDATE] },
-                            { layout: 'column', border: 0, items: [field_TRANSMODEL, field_TRANSNAME, field_BLNO, field_BUSIUNITNAME] },
-                            { layout: 'column', border: 0, items: [field_TRADENAME, field_EXEMPTIONNAME, field_LICENSENO, field_SECOUNTRYNAME] },
-                            { layout: 'column', border: 0, items: [field_SEPLACENAME, field_APPROVALNO, field_TRADETERMSNAME, field_FREIGHT] },
-                            { layout: 'column', border: 0, items: [field_INSURANCEPREMIUM, field_CONTRACTNO, field_GOODSNUM, field_PACKAGENAME] },
-                            { layout: 'column', border: 0, items: [field_GOODSGW, field_GOODSNW, field_CONSHIPPERNAME] }
+                            { layout: 'column', border: 0, items: [field_PORTNAME, field_RECORDCODE, field_TRANSMODEL, field_TRANSNAME] },
+                            { layout: 'column', border: 0, items: [field_BLNO, field_BUSIUNITNAME, field_TRADENAME, field_EXEMPTIONNAME] },
+                            { layout: 'column', border: 0, items: [field_LICENSENO, field_SECOUNTRYNAME, field_SEPLACENAME, field_APPROVALNO] },
+                            { layout: 'column', border: 0, items: [field_TRADETERMSNAME, field_FREIGHT, field_INSURANCEPREMIUM, field_CONTRACTNO] },
+                            { layout: 'column', border: 0, items: [field_GOODSNUM, field_PACKAGENAME, field_GOODSGW, field_GOODSNW] },
+                            { layout: 'column', border: 0, items: [field_CONSHIPPERNAME] }
                     ]
                 })
                 var store = Ext.create('Ext.data.JsonStore', {
@@ -342,6 +342,6 @@
                 }
             }
         });
-    }); 
+    });
 </script>
 
