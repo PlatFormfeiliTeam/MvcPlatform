@@ -1071,7 +1071,7 @@ namespace MvcPlatform.Controllers
                 switch (Request["CONDITION1"])
                 {
                     case "BUSIUNITCODE"://经营单位
-                        where += " and ort.BUSIUNITNAME='" + Request["VALUE1"] + "' ";
+                        where += " and ort.BUSIUNITCODE='" + Request["VALUE1"] + "' ";
                         break;
                 }
             }
