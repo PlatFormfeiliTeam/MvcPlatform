@@ -14,9 +14,19 @@ namespace MvcPlatform.Controllers
         [AllowAnonymous]
         public ActionResult Index()
         {
+            Dictionary<string, DataTable> dic = new Dictionary<string, DataTable>();//新建字典
+            DataTable dt_type = new DataTable();
+            DataTable dt_notice = new DataTable();
+
+            dt_type = DBMgr.GetDataTable("select distinct type from web_notice where isinvalid=0 order by type");
+            dt_notice = DBMgr.GetDataTable("select * from web_notice where isinvalid=0 order by type");           
+            
+            dic.Add("dt_type", dt_type);
+            dic.Add("dt_notice", dt_notice);
+
             //ViewBag.navigator = "关务云>>首页";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
-            return View();
+            return View(dic);
         }
         public string Header()
         {
