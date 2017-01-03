@@ -19,7 +19,7 @@ namespace MvcPlatform.Controllers
             DataTable dt_notice = new DataTable();
 
             dt_type = DBMgr.GetDataTable("select distinct type from web_notice where isinvalid=0 order by type");
-            dt_notice = DBMgr.GetDataTable("select * from web_notice where isinvalid=0 order by type");           
+            dt_notice = DBMgr.GetDataTable("select type,title,to_char(updatetime,'yyyy/mm/dd hh24:mi:ss') as updatetime from web_notice where isinvalid=0 order by type");           
             
             dic.Add("dt_type", dt_type);
             dic.Add("dt_notice", dt_notice);

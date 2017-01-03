@@ -1014,19 +1014,10 @@ namespace MvcPlatform.Controllers
             string busitypeid = Request["busitypeid"];
             string where = QueryConditionDecl();
 
+            #region 注释
             //2016-6-24 更新报关单列表显示逻辑 根据报关单对应的订单【DECLPDF】即报关单是否已关联好PDF文件，作为显示的条件 国内业务不需要去判断关联订单，因为打这两个标志的时候已经判断了           
             //DECL_TRANSNAME 预制报关单的运输工具名称
             //运输工具名称的显示需要更改为一下逻辑：根据草单中的申报库别 如果是13或者17 运输工具名称取预制报关单里面的。否则取草单的运输工具名称
-            /*string sql = @"select det.ID,det.PREDECLCODE,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPFINISHTIME, det.CUSTOMSSTATUS ,   
-                         det.ISPRINT,det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.STARTTIME CREATEDATE,
-                         det.BUSITYPE BUSITYPE,det.TRANSNAME DECL_TRANSNAME,
-                         prt.TRANSNAME,prt.BUSIUNITCODE, prt.PORTCODE, prt.BLNO, prt.DECLTYPE, 
-                         ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
-                         ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME                                                                          
-                         from list_declaration det 
-                         left join list_predeclaration prt  on det.predeclcode = prt.predeclcode 
-                         left join list_order ort on prt.ordercode = ort.code 
-                         where (ort.DECLPDF =1 or ort.PREPDF=1) and det.isinvalid=0 and instr('" + busitypeid + "',det.busitype)>0 " + where;*/
             /*string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
                          det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
                          det.TRANSNAME DECL_TRANSNAME, det.ISPRINT,
@@ -1039,19 +1030,40 @@ namespace MvcPlatform.Controllers
                               left join cusdoc.sys_customer cus on ort.customercode = cus.code 
                          where (DECLSTATUS=130 or DECLSTATUS=110) and det.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where;//(ort.DECLPDF =1 or ort.PREPDF=1) 
              */
+            /*2017/1/3
+           string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
+                           det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
+                           det.TRANSNAME DECL_TRANSNAME, det.ISPRINT,
+                           det.TRANSNAME,det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
+                           ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
+                           ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE, 
+                           cus.SCENEDECLAREID,ort.CONTRACTNO CONTRACTNOORDER ,ort.CREATETIME                                                                      
+                           from list_declaration det 
+                                left join list_order ort on det.ordercode = ort.code 
+                                left join cusdoc.sys_customer cus on ort.customercode = cus.code 
+                                left join (select ASSOCIATENO from list_order l where l.ASSOCIATENO is not null and isinvalid=0 and (l.DECLSTATUS!=130 and l.DECLSTATUS!=110)) a on ort.ASSOCIATENO=a.ASSOCIATENO 
+                           where (ort.DECLSTATUS=130 or ort.DECLSTATUS=110) and det.isinvalid=0 and ort.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where
+                      + " and a.ASSOCIATENO is null";
+           */
+            #endregion
+
             string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
-                            det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
-                            det.TRANSNAME DECL_TRANSNAME, det.ISPRINT,
-                            det.TRANSNAME,det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
-                            ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
-                            ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE, 
-                            cus.SCENEDECLAREID,ort.CONTRACTNO CONTRACTNOORDER ,ort.CREATETIME                                                                      
-                            from list_declaration det 
-                                 left join list_order ort on det.ordercode = ort.code 
-                                 left join cusdoc.sys_customer cus on ort.customercode = cus.code 
-                                 left join (select * from list_order l where l.ASSOCIATENO is not null and isinvalid=0 and (l.DECLSTATUS!=130 and l.DECLSTATUS!=110)) a on ort.ASSOCIATENO=a.ASSOCIATENO 
-                            where (ort.DECLSTATUS=130 or ort.DECLSTATUS=110) and det.isinvalid=0 and ort.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where
-                       + " and a.ASSOCIATENO is null";
+                           det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
+                           det.TRANSNAME DECL_TRANSNAME, det.ISPRINT,
+                           det.TRANSNAME,det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
+                           ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
+                           ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE, 
+                           cus.SCENEDECLAREID,ort.CONTRACTNO CONTRACTNOORDER ,ort.CREATETIME                                                                      
+                           from list_declaration det 
+                                left join list_order ort on det.ordercode = ort.code 
+                                left join cusdoc.sys_customer cus on ort.customercode = cus.code 
+                                left join (
+                                      select ASSOCIATENO from list_order l inner join list_declaration i on l.code=i.ordercode 
+                                      where l.ASSOCIATENO is not null and l.isinvalid=0 and i.isinvalid=0 and (i.STATUS!=130 and i.STATUS!=110)          
+                                      ) a on ort.ASSOCIATENO=a.ASSOCIATENO 
+                                left join (select ordercode from list_declaration ld where ld.isinvalid=0 and ld.STATUS!=130 and ld.STATUS!=110) b on det.ordercode=b.ordercode
+                           where (det.STATUS=130 or det.STATUS=110) and det.isinvalid=0 and ort.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where
+                      + " and a.ASSOCIATENO is null and b.ordercode is  null ";
 
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
@@ -1866,31 +1878,11 @@ namespace MvcPlatform.Controllers
             {
                 where += @" and lo.customercode ='" + json_user.Value<string>("CUSTOMERCODE") + "' ";
             }
-            //申报库别基础表sys_REPORTLIBRARY
-            /*string sql = @"SELECT li.ID,li.CODE,li.PREINSPCODE, li.APPROVALCODE,li.INSPECTIONCODE,li.REPFINISHTIME
-                            ,li.BUSITYPE,li.ORDERCODE,lo.CUSNO,li.ISPRINT,li.ISFORCELAW,li.GOODSNUM,li.CUSTOMSSTATUS
-                            ,lp.UPCNNAME,lp.INSPTYPE,lp.ENTRYPORT,lp.TRANSTOOL,lp.LADINGNO,lp.TOTALNO,lp.TRADE,lp.CONTRACTNO,lp.FOBPORT,lp.FOBPORTNAME
-                            ,lo.WOODPACKINGID,lo.INSPUNITNAME
-                            ,bi.NAME PACKAGETYPENAME,sr.NAME DECLTYPENAME,cus.SCENEINSPECTID    
-                         FROM list_inspection li 
-                         LEFT JOIN list_preinspection lp ON li.preinspcode = lp.preinspcode
-                         LEFT JOIN list_order lo ON li.ordercode = lo.code 
-                         left join cusdoc.sys_customer cus on ort.customercode=cus.code 
-                         left join base_insppackage bi on lp.packagetype=bi.code
-                         left join sys_REPORTLIBRARY sr on sr.code=lp.DECLTYPE 
-                         WHERE li.STATUS >=103 and INSTR('" + busitypeid + "',li.busitype)>0 " + where;*/
 
             /* 报检单 暂时没新增的字段
 ,li.REPFINISHTIME,li.ISFORCELAW
 ,lp.UPCNNAME,lp.INSPTYPE,lp.ENTRYPORT,lp.TRANSTOOL,lp.LADINGNO,lp.TOTALNO,lp.TRADE,lp.CONTRACTNO,lp.FOBPORT,lp.FOBPORTNAME,lp.PACKAGETYPE,lp.DECLTYPE 
 */
-            /*string sql = @"SELECT li.ID,li.CODE,li.ORDERCODE,li.INSPSTATUS,li.ISPRINT, li.APPROVALCODE,li.INSPECTIONCODE
-                              ,lo.WOODPACKINGID,lo.INSPUNITNAME,lo.BUSITYPE,lo.GOODSNUM,lo.CUSNO
-                              ,cus.SCENEINSPECTID    
-                            FROM list_inspection li 
-                                 LEFT JOIN list_order lo ON li.ordercode = lo.code 
-                                 left join cusdoc.sys_customer cus on lo.customercode=cus.code 
-                            WHERE li.STATUS >=103  and INSTR('" + busitypeid + "',lo.busitype)>0 " + where;*/
 
             string sql = @"SELECT li.ID,li.CODE,li.ORDERCODE,li.INSPSTATUS,li.ISPRINT, li.APPROVALCODE,li.INSPECTIONCODE
                               ,lo.WOODPACKINGID,lo.INSPUNITNAME,lo.BUSITYPE,lo.GOODSNUM,lo.CUSNO,lo.CREATETIME       
@@ -1898,9 +1890,13 @@ namespace MvcPlatform.Controllers
                             FROM list_inspection li 
                                  LEFT JOIN list_order lo ON li.ordercode = lo.code 
                                  left join cusdoc.sys_customer cus on lo.customercode=cus.code 
-                                 left join (select * from list_order l where l.ASSOCIATENO is not null and l.INSPSTATUS!=130) a on lo.ASSOCIATENO=a.ASSOCIATENO 
-                            WHERE lo.INSPSTATUS=130 and li.isinvalid=0 and INSTR('" + busitypeid + "',lo.busitype)>0 " + where
-                        + " and a.ASSOCIATENO is null";
+                                left join (
+                                      select ASSOCIATENO from list_order l inner join list_inspection i on l.code=i.ordercode 
+                                      where l.ASSOCIATENO is not null and l.isinvalid=0 and i.isinvalid=0 and i.STATUS!=130      
+                                      ) a on lo.ASSOCIATENO=a.ASSOCIATENO 
+                                left join (select ordercode from list_inspection ld where ld.isinvalid=0 and ld.STATUS!=130) b on li.ordercode=b.ordercode
+                            WHERE li.STATUS=130 and li.isinvalid=0 and lo.isinvalid=0 and INSTR('" + busitypeid + "',lo.busitype)>0 " + where
+                        + " and a.ASSOCIATENO is null and b.ordercode is null";
 
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
@@ -2501,34 +2497,23 @@ namespace MvcPlatform.Controllers
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
-            /*string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
-                            det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
-                            det.TRANSNAME DECL_TRANSNAME, det.ISPRINT,
-                            det.TRANSNAME,det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
-                            ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
-                            ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE, 
-                            cus.SCENEDECLAREID，ort.CONTRACTNO CONTRACTNOORDER ,ort.CREATETIME                                                                      
-                            from list_declaration det 
-                                 left join list_order ort on det.ordercode = ort.code 
-                                 left join cusdoc.sys_customer cus on ort.customercode = cus.code 
-                            where (DECLSTATUS=130 or DECLSTATUS=110) and det.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where
-                      + " and not exists("
-                      + "select * from list_order l where ort.ASSOCIATENO is not null and ort.ASSOCIATENO=l.ASSOCIATENO and ((l.DECLSTATUS!=130 and l.DECLSTATUS!=110) or l.DECLSTATUS is null)"
-                      + ")";
-            */
-            string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
-                            det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
-                            det.TRANSNAME DECL_TRANSNAME, det.ISPRINT,
-                            det.TRANSNAME,det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
-                            ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
-                            ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE, 
-                            cus.SCENEDECLAREID,ort.CONTRACTNO CONTRACTNOORDER ,ort.CREATETIME                                                                      
-                            from list_declaration det 
-                                 left join list_order ort on det.ordercode = ort.code 
-                                 left join cusdoc.sys_customer cus on ort.customercode = cus.code 
-                                 left join (select * from list_order l where l.ASSOCIATENO is not null and isinvalid=0 and (l.DECLSTATUS!=130 and l.DECLSTATUS!=110)) a on ort.ASSOCIATENO=a.ASSOCIATENO 
-                            where (ort.DECLSTATUS=130 or ort.DECLSTATUS=110) and det.isinvalid=0 and ort.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where
-                      + " and a.ASSOCIATENO is null";
+           string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
+                           det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
+                           det.TRANSNAME DECL_TRANSNAME, det.ISPRINT,
+                           det.TRANSNAME,det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
+                           ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
+                           ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE, 
+                           cus.SCENEDECLAREID,ort.CONTRACTNO CONTRACTNOORDER ,ort.CREATETIME                                                                      
+                           from list_declaration det 
+                                left join list_order ort on det.ordercode = ort.code 
+                                left join cusdoc.sys_customer cus on ort.customercode = cus.code 
+                                left join (
+                                      select ASSOCIATENO from list_order l inner join list_declaration i on l.code=i.ordercode 
+                                      where l.ASSOCIATENO is not null and l.isinvalid=0 and i.isinvalid=0 and (i.STATUS!=130 and i.STATUS!=110)          
+                                      ) a on ort.ASSOCIATENO=a.ASSOCIATENO 
+                                left join (select ordercode from list_declaration ld where ld.isinvalid=0 and ld.STATUS!=130 and ld.STATUS!=110) b on det.ordercode=b.ordercode
+                           where (det.STATUS=130 or det.STATUS=110) and det.isinvalid=0 and ort.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where
+                    + " and a.ASSOCIATENO is null and b.ordercode is  null ";
             DataTable dt = DBMgr.GetDataTable(sql);
 
             //创建Excel文件的对象
