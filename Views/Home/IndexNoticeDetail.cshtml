@@ -1,27 +1,83 @@
 ﻿@model IDictionary<string, System.Data.DataTable>
-
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@using System.Configuration
 @{
     ViewBag.Title = "IndexNoticeDetail";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_Layout_width.cshtml";
 }
 
-<p>
-    <center>
-        <h4><b>@Model["dt_notice"].Rows[0]["title"]</b></h4>
-    </center>
-</p>
 
-<div style="border-top-width:1px; border-top-color:gray; border-top-style:dashed; height:5px;"></div>
+@{
+    string AdminUrl = ConfigurationManager.AppSettings["AdminUrl"];
+    string attachment = Model["dt_notice"].Rows[0]["attachment"].ToString();
+    JArray jarry = JsonConvert.DeserializeObject<JArray>(attachment);
+    int i = 0;
+}
 
-<p style="text-align:right;">
-    发布时间：@Model["dt_notice"].Rows[0]["updatetime"].ToString().Substring(0, 16)
-</p> 
+<img src="/Images/zxdt_header.png" alt="" />
+<div class="container" style="min-height: 600px;margin-top:1px">
+    <p>
+        <center>
+            <h4><b>@Model["dt_notice"].Rows[0]["title"]</b></h4>
+        </center>
+    </p>
 
-@Html.Raw(Model["dt_notice"].Rows[0]["content"])
+    <div style="border-top-width:1px; border-top-color:gray; border-top-style:dashed; height:5px;"></div>
 
-<p>
-    附件：
-</p>
-<p>
-    精华推荐：
-</p>
+    <p style="text-align:right;">
+        发布时间：@Model["dt_notice"].Rows[0]["updatetime"].ToString().Substring(0, 16)
+    </p>
+
+    @Html.Raw(Model["dt_notice"].Rows[0]["content"])
+
+    @if (jarry.Count > 0)
+    {
+        <p>
+            附件：
+
+            @foreach (JObject json in jarry)
+            {
+                if (i == 0)
+                {
+                    <a href="@Html.Raw(AdminUrl+json.Value<string>("FILENAME"))" target="_blank">@Html.Raw(json.Value<string>("ORIGINALNAME"))</a>
+                }
+                else
+                {
+                    <a style="padding-left:45px;" href="@Html.Raw(AdminUrl+json.Value<string>("FILENAME"))" target="_blank">@Html.Raw(json.Value<string>("ORIGINALNAME"))</a>
+                }
+
+                <br />
+                i++;
+            }
+
+        </p>
+    }
+    <div style="border-top-width:1px; border-top-color:gray; border-top-style:dashed; height:5px;"></div>
+    <p>
+        上一篇：
+        @if (Model["dt_notice_pre"].Rows.Count > 0)
+        {
+            <a href="@Html.Raw("/Home/IndexNoticeDetail?id=" + Model["dt_notice_pre"].Rows[0]["id"])" target="_self">
+                @Html.Raw(Model["dt_notice_pre"].Rows[0]["title"].ToString())
+            </a>
+        }
+        else
+        {
+            @Html.Raw("无")
+        }
+        <br />
+        下一篇：
+        @if (Model["dt_notice_next"].Rows.Count > 0)
+        {
+            <a href="@Html.Raw("/Home/IndexNoticeDetail?id=" + Model["dt_notice_next"].Rows[0]["id"])" target="_self">
+                @Html.Raw(Model["dt_notice_next"].Rows[0]["title"].ToString())
+            </a>
+        }
+        else
+        {
+            @Html.Raw("无")
+        }
+    </p>
+
+</div>

@@ -33,11 +33,20 @@ namespace MvcPlatform.Controllers
         {
             Dictionary<string, DataTable> dic = new Dictionary<string, DataTable>();//新建字典
             DataTable dt_notice = new DataTable();
+            DataTable dt_notice_pre = new DataTable(); DataTable dt_notice_next = new DataTable();
+            string type = "";
 
             dt_notice = DBMgr.GetDataTable("select type,title,content,attachment,to_char(updatetime,'yyyy/mm/dd hh24:mi:ss') as updatetime from web_notice where isinvalid=0 and id='" + ID + "'");
             dic.Add("dt_notice", dt_notice);
+            type = dt_notice.Rows[0]["type"].ToString();
 
-            ViewBag.navigator = "资讯动态 > 分类：" + dt_notice.Rows[0]["type"].ToString();
+            dt_notice_pre = DBMgr.GetDataTable("select ID,title from web_notice where isinvalid=0 and type='" + type + "' and id<" + Convert.ToInt32(ID) + " and ROWNUM=1 order by id desc");
+            dic.Add("dt_notice_pre", dt_notice_pre);
+
+            dt_notice_next = DBMgr.GetDataTable("select ID,title from web_notice where isinvalid=0 and type='" + type + "' and id>" + Convert.ToInt32(ID) + " and ROWNUM=1 order by id");
+            dic.Add("dt_notice_next", dt_notice_next);
+
+            ViewBag.navigator = "资讯动态 > 分类：" + type;
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View(dic);
         }
