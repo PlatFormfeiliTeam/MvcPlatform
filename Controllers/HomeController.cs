@@ -19,7 +19,7 @@ namespace MvcPlatform.Controllers
             DataTable dt_notice = new DataTable();
 
             dt_type = DBMgr.GetDataTable("select distinct type from web_notice where isinvalid=0 order by type");
-            dt_notice = DBMgr.GetDataTable("select type,title,to_char(updatetime,'yyyy/mm/dd hh24:mi:ss') as updatetime from web_notice where isinvalid=0 order by type");           
+            dt_notice = DBMgr.GetDataTable("select id,type,title,to_char(updatetime,'yyyy/mm/dd hh24:mi:ss') as updatetime from web_notice where isinvalid=0 order by type");           
             
             dic.Add("dt_type", dt_type);
             dic.Add("dt_notice", dt_notice);
@@ -28,6 +28,20 @@ namespace MvcPlatform.Controllers
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View(dic);
         }
+
+        public ActionResult IndexNoticeDetail(string ID)
+        {
+            Dictionary<string, DataTable> dic = new Dictionary<string, DataTable>();//新建字典
+            DataTable dt_notice = new DataTable();
+
+            dt_notice = DBMgr.GetDataTable("select type,title,content,attachment,to_char(updatetime,'yyyy/mm/dd hh24:mi:ss') as updatetime from web_notice where isinvalid=0 and id='" + ID + "'");
+            dic.Add("dt_notice", dt_notice);
+
+            ViewBag.navigator = "资讯动态 > 分类：" + dt_notice.Rows[0]["type"].ToString();
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View(dic);
+        }
+
         public string Header()
         {
             string result = "<li><a href=\"/Home/Index\"><i class=\"icon iconfont\">&#xe66c;</i>&nbsp;&nbsp;首页</a></li>";

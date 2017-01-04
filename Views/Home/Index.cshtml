@@ -209,7 +209,7 @@
                                type = Model["dt_notice"].Rows[count]["type"].ToString();
                                @Html.Raw("</ul></div></div></div><div class='product'><div class='topRec_List'><div class='maquee'><ul>");
                             }
-                        <li>
+                        <li onclick=shownotice(@Model["dt_notice"].Rows[count]["id"])>
                             <div>@Model["dt_notice"].Rows[count]["title"]</div>
                             <div>@Model["dt_notice"].Rows[count]["updatetime"].ToString().Substring(0,16)</div>
                         </li>                           
@@ -222,6 +222,9 @@
 
 </div>
 <script type="text/javascript">
+    function shownotice(id) {
+        window.location.href = "/Home/IndexNoticeDetail?id=" + id;
+    }
     function autoScroll(obj) {
         $(obj).find("ul").animate({
             marginTop: "-39px"

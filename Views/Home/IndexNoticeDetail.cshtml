@@ -1,0 +1,27 @@
+﻿@model IDictionary<string, System.Data.DataTable>
+
+@{
+    ViewBag.Title = "IndexNoticeDetail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<p>
+    <center>
+        <h4><b>@Model["dt_notice"].Rows[0]["title"]</b></h4>
+    </center>
+</p>
+
+<div style="border-top-width:1px; border-top-color:gray; border-top-style:dashed; height:5px;"></div>
+
+<p style="text-align:right;">
+    发布时间：@Model["dt_notice"].Rows[0]["updatetime"].ToString().Substring(0, 16)
+</p> 
+
+@Html.Raw(Model["dt_notice"].Rows[0]["content"])
+
+<p>
+    附件：
+</p>
+<p>
+    精华推荐：
+</p>
