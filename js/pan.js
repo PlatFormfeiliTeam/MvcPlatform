@@ -1436,7 +1436,7 @@ function ini_container_truck() {
             },
             '->',
             {
-                text: '<span class="icon iconfont" style="font-size:10px">&#xe606;</span>&nbsp;删 除',
+                text: '<span class="icon iconfont" style="font-size:10px">&#xe6d3;</span>&nbsp;删 除',
                 handler: function () {
                     var recs = w_grid.getSelectionModel().getSelection();
                     if (recs.length > 0) {
@@ -1447,7 +1447,7 @@ function ini_container_truck() {
                 }
             },
             {
-                text: '<span class="icon iconfont" style="font-size:10px">&#xe60b;</span>&nbsp;保 存',
+                text: '<span class="icon iconfont" style="font-size:10px">&#xe622;</span>&nbsp;保 存',
                 handler: function () {
                     var msg = "";
                     if (!w_ontainerno.getValue() && !w_combo_truckno.getValue()) {
