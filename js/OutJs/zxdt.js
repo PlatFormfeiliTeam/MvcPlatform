@@ -10,10 +10,10 @@ $(function(){
 	
 
 	$('.product-wrap .product li').hover(function(){
-		$(this).css("border-color","#ff6600");
-		$(this).find('p > a').css('color','#ff6600');
+	    $(this).css("background-color","#CEE4F1");
+	    $(this).find('p > a').css('color', '#CEE4F1');
 	},function(){
-		$(this).css("border-color","#fafafa");
+	    $(this).css("background-color", "#fafafa");
 		$(this).find('p > a').css('color','#666666');
 	});
 	});
