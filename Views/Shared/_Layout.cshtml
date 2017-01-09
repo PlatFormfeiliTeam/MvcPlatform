@@ -38,7 +38,7 @@
             <ul class="sf-menu" id="na_menu" style="font-size:14px">
                 @Html.Action("Header", "Home")
             </ul>
-            <div style="width: 100%; text-align: right; margin-top:7px; font-size: 14px; color: #fff">@ViewBag.navigator</div>
+            <div style="width: 100%; text-align: right; margin-top:7px; font-size: 14px; color: #fff">@Html.Raw(ViewBag.navigator)</div>
         </div>
     </div>
     <div class="container" style="min-height: 600px;margin-top:1px">

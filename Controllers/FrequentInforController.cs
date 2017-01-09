@@ -23,6 +23,20 @@ namespace MvcPlatform.Controllers
             return View();
         }
 
+        public ActionResult BaseCommodityHSDetail(string id)
+        {
+            Dictionary<string, DataTable> dic = new Dictionary<string, DataTable>();//新建字典
+            DataTable dt_CommodityHSDetail = new DataTable();
+
+            string sql = @"select((SELECT name from base_ProductUnit where code =  t.LEGALUNIT) ||'/'||(SELECT name from base_ProductUnit where code =  t.SECONDUNIT))as LEGALUNITNAME, HSCODE||EXTRACODE AS HSCODEEXTRACODE, t.* from BASE_COMMODITYHS t where t.ID = " + id;
+            dt_CommodityHSDetail = DBMgrBase.GetDataTable(sql);
+            dic.Add("dt_CommodityHSDetail", dt_CommodityHSDetail);
+
+            ViewBag.navigator = "基础信息 ><a href='/FrequentInfor/BaseCommodityHS'> HS编码</a> > 详细";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View(dic);
+        }        
+
         public string LoadBaseDeclhsclass()
         {
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 

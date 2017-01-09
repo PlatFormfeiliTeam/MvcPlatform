@@ -18,10 +18,10 @@
 
 <script type="text/javascript">
     Ext.onReady(function () {
-       
+
         //主表
         Ext.regModel('TRADE', { fields: ['NAME', 'CODE', 'CREATETIME'] })
-        
+
         var store_Trade = Ext.create('Ext.data.JsonStore', {
             model: 'TRADE',
             pageSize: 20,
@@ -85,8 +85,9 @@
             xtype: 'textfield',
             name: 'HSCODEEXTRACODE',
             margin: '10',
-            columnWidth: 2,
-            fieldLabel: '商品编码',
+            columnWidth: 3,
+            fieldLabel: 'HS编码',
+            emptyText: '输入4-10位HS编码'
         });
         var field_NAME = Ext.create('Ext.form.field.Text', {
             xtype: 'textfield',
@@ -94,6 +95,7 @@
             margin: '10',
             columnWidth: 3,
             fieldLabel: '商品名称',
+            emptyText: '输入1个汉字或以上的品名'
         });
 
         var searchButton = new Ext.Button({
@@ -104,7 +106,6 @@
                 var proxys = store_Trade1.proxy;
                 proxys.extraParams.HSCODEEXTRACODE = field_HSCODEEXTRACODE.getValue();
                 proxys.extraParams.NAME = field_NAME.getValue();
-                //alert(field_HSCODEEXTRACODE.getValue());
                 store_Trade1.load();
             }
         })
@@ -157,35 +158,36 @@
             region: 'center',
             columns: [
 
-                { header: '商品编码', dataIndex: 'HSCODEEXTRACODE', width: 80, sortable: true },
-                {
-                    header: '商品名称', dataIndex: 'NAME', width: 198, sortable: true, tdCls: 'tdValign',
-                    renderer: function (value, meta, record) {
-                        meta.tdAttr = 'data-qtip="' + value + '"';
-                        return value;
-                    }
-                },
+                { header: '商品编码', dataIndex: 'HSCODEEXTRACODE', width: 80, sortable: true, renderer: render },
+                { header: '商品名称', dataIndex: 'NAME', width: 198, sortable: true, tdCls: 'tdValign', renderer: render },
                 { header: '最惠率', dataIndex: 'FAVORABLERATE', width: 60, sortable: true },
                 { header: '普通', dataIndex: 'GENERALRATE', width: 50, sortable: true },
-                { header: '增值税率', dataIndex: 'VATRATE', width: 80, sortable: true },
-                { header: '出口退税', dataIndex: 'EXPORTREBATRATE', width: 80, sortable: true },
-
-                { header: '计量单位', dataIndex: 'LEGALUNITNAME', width: 80, sortable: true },
+                { header: '增值税率', dataIndex: 'VATRATE', width: 60, sortable: true },
+                { header: '出口退税', dataIndex: 'EXPORTREBATRATE', width: 60, sortable: true },
+                { header: '计量单位', dataIndex: 'LEGALUNITNAME', width: 60, sortable: true },
                 { header: '第二计量单位', dataIndex: 'SECONDUNITNAME', width: 85, sortable: true },
-                { header: '海关监管', dataIndex: 'CUSTOMREGULATORY', width: 80, sortable: true },
-                { header: '检验规范', dataIndex: 'INSPECTIONREGULATORY', width: 80, sortable: true },
-                { header: '', dataIndex: 'CREATETIME', width: 0, sortable: true, tdCls: 'tdValign' }
-            ],
-
-            listeners:
-            {
-                'itemclick': function (view, record, item, index, e) {
-                    id = record.data.ID;
-                    //window.open('/BaseDeclhsclassDetails/Index?id=' + id);
-                }
-            }
+                { header: '海关监管', dataIndex: 'CUSTOMREGULATORY', width: 60, sortable: true },
+                { header: '检验规范', dataIndex: 'INSPECTIONREGULATORY', width: 60, sortable: true }
+            ]
 
         });
     })
+
+    function render(value, cellmeta, record, rowIndex, columnIndex, store) {
+        var rtn = "";
+        var dataindex = cellmeta.column.dataIndex;
+        if (dataindex == "HSCODEEXTRACODE" && value) {
+            rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='showCommodityDetail(\"" + record.get("ID") + "\")'>" + value + "</div>";
+        }
+        if (dataindex == "NAME" && value) {
+            cellmeta.tdAttr = 'data-qtip="' + value + '"';
+            rtn = value;
+        }
+        return rtn;
+    }
+
+    function showCommodityDetail(id) {
+        window.open('/FrequentInfor/BaseCommodityHSDetail?id=' + id);
+    }
 
 </script>
