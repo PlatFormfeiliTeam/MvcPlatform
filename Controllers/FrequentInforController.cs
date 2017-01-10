@@ -16,6 +16,7 @@ namespace MvcPlatform.Controllers
         //
         // GET: /FrequentInfor/
 
+        
         public ActionResult BaseCommodityHS()
         {
             ViewBag.navigator = "基础信息 > HS编码";
@@ -23,7 +24,7 @@ namespace MvcPlatform.Controllers
             return View();
         }
 
-        public ActionResult BaseCommodityHSDetail(string id)
+        public ActionResult BaseCommodityHSDetail(string id)//HS编码 详细界面
         {
             Dictionary<string, DataTable> dic = new Dictionary<string, DataTable>();//新建字典
             DataTable dt_CommodityHSDetail = new DataTable();
@@ -35,8 +36,17 @@ namespace MvcPlatform.Controllers
             ViewBag.navigator = "基础信息 ><a href='/FrequentInfor/BaseCommodityHS'> HS编码</a> > 详细";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View(dic);
-        }        
+        }
 
+        public ActionResult BaseInspHS()
+        {
+            ViewBag.navigator = "基础信息 > 国检代码";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
+
+
+        #region HS编码
         public string LoadBaseDeclhsclass()
         {
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
@@ -79,7 +89,37 @@ namespace MvcPlatform.Controllers
             return "{rows:" + json + ",total:" + totalProperty + "}";
         }
 
-        //为了基础数据新增的
+        #endregion
+
+        public string LoadBaseInsphs(string HSCODE, string HSNAME)
+        {
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+            string where = string.Empty;
+            if (!string.IsNullOrEmpty(HSCODE))
+            {
+                where += " AND bi.HSCODE LIKE '%" + HSCODE + "%' ";
+            }
+            if (!string.IsNullOrEmpty(HSNAME))
+            {
+                where += "AND bi.HSNAME LIKE '%" + HSNAME + "%' ";
+            }
+
+            string sql = @"SELECT bi.*, su.NAME AS CREATENAME, su2.NAME AS STOPNAME, bp.NAME AS UNITNAME 
+                        FROM BASE_INSPHS bi 
+                            LEFT JOIN SYS_USER su ON bi.CREATEMAN = su.ID 
+                            LEFT JOIN SYS_USER su2 ON bi.STOPMAN = su2.ID 
+                            LEFT JOIN BASE_PRODUCTUNIT bp ON bi.LEGALUNIT = bp.CODE 
+                        WHERE 1=1 " + where;
+
+            DataTable dt = DBMgrBase.GetDataTable(GetPageSqlBase(sql, "bi.createdate", "desc"));
+            var json = JsonConvert.SerializeObject(dt, iso);
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+
+
+        }
+
         private string GetPageSqlBase(string tempsql, string order, string asc)
         {
             int start = Convert.ToInt32(Request["start"]);

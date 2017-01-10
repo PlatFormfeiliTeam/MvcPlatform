@@ -43,10 +43,8 @@
             displayInfo: true
         });
 
-        var code = "";
+        var code = ""; var type = "";
 
-        var type = "";
-        //创建一个面板
         var gridpanel = Ext.create('Ext.grid.Panel', {
             renderTo: "appConId",
             store: store_Trade,
@@ -57,23 +55,13 @@
             columns:
             [
                 { header: '类别编码', dataIndex: 'CODE', width: 65, sortable: true, tdCls: 'tdValign' },
-                {
-                    header: '类别名称', dataIndex: 'NAME', width: 258, sortable: true, tdCls: 'tdValign',
-                    renderer: function (value, meta, record) {
-                        meta.tdAttr = 'data-qtip="' + value + '"';
-                        return value;
-                    }
-                },
+                { header: '类别名称', dataIndex: 'NAME', width: 258, sortable: true, tdCls: 'tdValign', renderer: render },
                 { header: '', dataIndex: 'CREATETIME', width: 0, sortable: true, tdCls: 'tdValign' }
             ],
-
-            //添加点击事件
             listeners:
             {
                 'itemclick': function (view, record, item, index, e) {
                     code = record.data.CODE;
-
-                    //alert(code);
                     type = 1;
                     Ext.getCmp("panel").store.load();
                 }
@@ -157,7 +145,6 @@
             bbar: pgbar1,
             region: 'center',
             columns: [
-
                 { header: '商品编码', dataIndex: 'HSCODEEXTRACODE', width: 80, sortable: true, renderer: render },
                 { header: '商品名称', dataIndex: 'NAME', width: 198, sortable: true, tdCls: 'tdValign', renderer: render },
                 { header: '最惠率', dataIndex: 'FAVORABLERATE', width: 60, sortable: true },
@@ -168,8 +155,10 @@
                 { header: '第二计量单位', dataIndex: 'SECONDUNITNAME', width: 85, sortable: true },
                 { header: '海关监管', dataIndex: 'CUSTOMREGULATORY', width: 60, sortable: true },
                 { header: '检验规范', dataIndex: 'INSPECTIONREGULATORY', width: 60, sortable: true }
-            ]
-
+            ],
+            viewConfig: {
+                enableTextSelection: true
+            }
         });
     })
 
@@ -177,17 +166,13 @@
         var rtn = "";
         var dataindex = cellmeta.column.dataIndex;
         if (dataindex == "HSCODEEXTRACODE" && value) {
-            rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='showCommodityDetail(\"" + record.get("ID") + "\")'>" + value + "</div>";
+            rtn = "<a style='color:red;cursor:pointer; text-decoration:underline;' href='/FrequentInfor/BaseCommodityHSDetail?id=" + record.get("ID") + "'>" + value + "</a>";
         }
         if (dataindex == "NAME" && value) {
             cellmeta.tdAttr = 'data-qtip="' + value + '"';
             rtn = value;
         }
         return rtn;
-    }
-
-    function showCommodityDetail(id) {
-        window.open('/FrequentInfor/BaseCommodityHSDetail?id=' + id);
     }
 
 </script>

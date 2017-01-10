@@ -1,0 +1,113 @@
+﻿@{
+    ViewBag.Title = "BaseInspHS";
+    Layout = "~/Views/Shared/_Layout_home.cshtml";
+}
+
+<link href="/js/Extjs42/resources/css/ext-all-gray.css" rel="stylesheet" type="text/css" />
+<script src="/js/Extjs42/bootstrap.js" type="text/javascript"></script>
+<link href="/css/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+
+<script type="text/javascript">
+    var groupid, store_Trade;
+
+    Ext.onReady(function () {
+
+        var field_HSCODE = Ext.create('Ext.form.field.Text', {
+            xtype: 'textfield',
+            name: 'HSCODE',
+            margin: '10',
+            columnWidth: .25,
+            width: 200,
+            fieldLabel: '代码',
+            labelAlign: 'right',
+        });
+        var field_HSNAME = Ext.create('Ext.form.field.Text', {
+            xtype: 'textfield',
+            name: 'HSNAME',
+            margin: '10',
+            columnWidth: .25,
+            width: 200,
+            fieldLabel: '名称',
+            labelAlign: 'right',
+        });
+
+        var searchButton = new Ext.Button({
+            text: '<i class="fa fa-search"></i> 查询',
+            margin: '10px 50px 10px 10px',
+            id: 'searchButton',
+            handler: function () {
+                var proxys = store_Trade.proxy;
+                proxys.extraParams.HSCODE = field_HSCODE.getValue();
+                proxys.extraParams.HSNAME = field_HSNAME.getValue();
+                store_Trade.load();
+            }
+        })
+
+        var formpanel = Ext.create('Ext.form.Panel', {
+            items: [
+            { layout: 'column', border: 0, items: [field_HSCODE, field_HSNAME, searchButton] },
+            ]
+        });
+
+        Ext.regModel('TRADE', { fields: ['ID', 'HSCODE', 'HSNAME', 'WEIGHT', 'CUSTOMREGULATORY', 'NUM', 'CREATEDATE', 'STARTDATE', 'ENDDATE', 'CREATEMAN', 'CREATENAME', 'STOPMAN', 'ENABLED', 'YEARID', 'INSPECTIONREGULATORY', 'LEGALUNIT', 'UNITNAME', 'EXTRACODE'] })
+        store_Trade = Ext.create('Ext.data.JsonStore', {
+            model: 'TRADE',
+            pageSize: 20,
+            proxy: {
+                type: 'ajax',
+                url: '/FrequentInfor/LoadBaseInsphs',
+                reader: {
+                    root: 'rows',
+                    type: 'json',
+                    totalProperty: 'total'
+                }
+            },
+            autoLoad: true
+        })
+        Ext.tip.QuickTipManager.init();
+
+        var pgbar = Ext.create('Ext.toolbar.Paging', {
+            displayMsg: '显示 {0} - {1} 条,共计 {2} 条',
+            store: store_Trade,
+            displayInfo: true
+        })
+
+        var gridpanel = Ext.create('Ext.grid.Panel', {
+            renderTo: "appConId",
+            tbar: formpanel,
+            store: store_Trade,
+            bbar: pgbar,
+            columns: [
+            { xtype: 'rownumberer', width: 45, tdCls: 'tdValign' },
+            { header: 'ID', dataIndex: 'ID', width: 80, sortable: true, tdCls: 'tdValign', hidden: true },
+            { header: '代码', dataIndex: 'HSCODE', width: 100, sortable: true, tdCls: 'tdValign' },
+            { header: '名称', dataIndex: 'HSNAME', width: 260, sortable: true, tdCls: 'tdValign' },
+            { header: '重量', dataIndex: 'WEIGHT', width: 80, sortable: true, tdCls: 'tdValign' },
+            { header: '海关监管', dataIndex: 'CUSTOMREGULATORY', width: 100, sortable: true, tdCls: 'tdValign' },
+            { header: '数量', dataIndex: 'NUM', width: 70, sortable: true, tdCls: 'tdValign' },
+            { header: '创建时间', dataIndex: 'CREATEDATE', width: 120, sortable: true, tdCls: 'tdValign', renderer: Ext.util.Format.dateRenderer('Y-m-d') },
+            //{ header: '开始时间', dataIndex: 'STARTDATE', width: 100, sortable: true, tdCls: 'tdValign' },
+            //{ header: '结束时间', dataIndex: 'ENDDATE', width: 100, sortable: true, tdCls: 'tdValign' },
+            { header: '创建人', dataIndex: 'CREATENAME', width: 90, sortable: true, tdCls: 'tdValign' },
+            //{ header: '结束人', dataIndex: 'STOPMAN', width: 100, sortable: true, tdCls: 'tdValign' },
+            //{ header: 'ENABLED', dataIndex: 'ENABLED', width: 80, sortable: true, tdCls: 'tdValign' },
+            { header: '代码年份库', dataIndex: 'YEARID', width: 100, sortable: true, tdCls: 'tdValign' },
+            { header: '检验检疫监管', dataIndex: 'INSPECTIONREGULATORY', width: 120, sortable: true, tdCls: 'tdValign' },
+            //{ header: '单位代码', dataIndex: 'LEGALUNIT', width: 100, sortable: true, tdCls: 'tdValign' },
+            { header: '法定单位', dataIndex: 'UNITNAME', width: 90, sortable: true, tdCls: 'tdValign' },
+            //{ header: 'EXTRACODE', dataIndex: 'EXTRACODE', width: 100, sortable: true, tdCls: 'tdValign' },
+            ],
+            viewConfig: {
+                enableTextSelection: true
+            }
+        })
+
+
+    })
+</script>
+
+
+
+<div class="container" style="min-height: 600px;margin-top:1px">
+    <div id="appConId" style="width:100%; height:500px;"></div>
+</div>
