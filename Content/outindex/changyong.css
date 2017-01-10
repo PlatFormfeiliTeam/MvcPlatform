@@ -13,12 +13,6 @@ body, html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
-.index_rt{ width:1278px;margin:50px auto;padding:15px; border:1px solid #ccc; border-radius:10px;}
-.ir_main{ clear:both;}
-.div2 {
-    height: 110px;
-}
-
 .ir_25{ width:12%; float:left; text-align:center}
 .ir_25 p{ color:#6d6d6d;}
 
