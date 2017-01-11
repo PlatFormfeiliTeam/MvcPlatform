@@ -643,7 +643,7 @@ function selectmyfs(cb_myfs, tradeway_m) {//传入需要赋值的控件tradeway_
         region: 'center',
         tbar: tb_myfs,
         bbar: pb_myfs,
-        columns: [{ xtype: 'rownumberer', width: 50 },
+        columns: [{ xtype: 'rownumberer', width: 30 },
                   { header: 'ID', dataIndex: 'ID', hidden: true },
                   { header: '贸易方式代码', dataIndex: 'CODE', width: 300 },
                   { header: '贸易方式名称', dataIndex: 'NAME', flex: 1 }],
