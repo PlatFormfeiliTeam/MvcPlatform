@@ -1747,11 +1747,13 @@ function Export(busitypeid) {
     var CONDITION8 = Ext.getCmp('CONDITION8').getValue(); var VALUE8_1 = Ext.Date.format(Ext.getCmp("CONDITION8_1").getValue(), 'Y-m-d H:i:s'); var VALUE8_2 = Ext.Date.format(Ext.getCmp("CONDITION8_2").getValue(), 'Y-m-d H:i:s');
 
     var dec_insp_status = JSON.stringify(orderstatus_js_data);
+    var seniorsearch = seniorcondition;
 
     var path = '/Common/ExportList?busitypeid=' + busitypeid + '&OnlySelf=' + OnlySelf + '&CONDITION1=' + CONDITION1 + '&VALUE1=' + VALUE1
         + '&CONDITION2=' + CONDITION2 + '&VALUE2=' + VALUE2 + '&CONDITION3=' + CONDITION3 + '&VALUE3=' + VALUE3
         + '&CONDITION4=' + CONDITION4 + '&VALUE4_1=' + VALUE4_1 + '&VALUE4_2=' + VALUE4_2 + '&CONDITION5=' + CONDITION5 + '"&VALUE5=' + VALUE5
         + '&CONDITION6=' + CONDITION6 + '&VALUE6=' + VALUE6 + '&CONDITION7=' + CONDITION7 + '&VALUE7=' + VALUE7
-        + '&CONDITION8=' + CONDITION8 + '&VALUE8_1=' + VALUE8_1 + '&VALUE8_2=' + VALUE8_2 + "&dec_insp_status=" + dec_insp_status;
+        + '&CONDITION8=' + CONDITION8 + '&VALUE8_1=' + VALUE8_1 + '&VALUE8_2=' + VALUE8_2 + "&dec_insp_status=" + dec_insp_status
+        + "&seniorsearch=" + seniorsearch;
     $('#exportform').attr("action", path).submit();
 }
