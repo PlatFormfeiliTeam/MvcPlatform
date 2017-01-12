@@ -2417,65 +2417,418 @@ namespace MvcPlatform.Controllers
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string where = QueryCondition();
-            string dec_insp_status = Request["dec_insp_status"];
+            string dec_insp_status = Request["dec_insp_status"]; string busitypeid = Request["busitypeid"]; string busitype = "";
+
+            switch (busitypeid)
+            {
+                case "11":
+                    busitype = "空运进口";
+                    break;
+                case "10":
+                    busitype = "空运出口";
+                    break;
+                case "21":
+                    busitype = "海运进口";
+                    break;
+                case "20":
+                    busitype = "海运出口";
+                    break;
+                case "31":
+                    busitype = "陆运进口";
+                    break;
+                case "30":
+                    busitype = "陆运出口";
+                    break;
+                case "40,41":
+                    busitype = "国内";
+                    break;
+                case "50,51":
+                    busitype = "特殊区域";
+                    break;
+            }
 
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
             string sql = "select a.*,b.REPWAYNAME from LIST_ORDER a "
-                    + " left join (select CODE,NAME||'('||CODE||')' REPWAYNAME from cusdoc.SYS_REPWAY where Enabled=1 and instr(busitype,'" + Request["busitypeid"] + "')>0) b on a.REPWAYID=b.CODE "
-                    + " where instr('" + Request["busitypeid"] + "',a.BUSITYPE)>0 and a.customercode='" + json_user.Value<string>("CUSTOMERCODE") + "' " + where;
+                    + " left join (select CODE,NAME||'('||CODE||')' REPWAYNAME from cusdoc.SYS_REPWAY where Enabled=1 and instr(busitype,'" + busitype + "')>0) b on a.REPWAYID=b.CODE "
+                    + " where instr('" + busitypeid + "',a.BUSITYPE)>0 and a.customercode='" + json_user.Value<string>("CUSTOMERCODE") + "' " + where;
             DataTable dt = DBMgr.GetDataTable(sql);
 
             //创建Excel文件的对象
             NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();
 
             //添加一个导出成功sheet
-            NPOI.SS.UserModel.ISheet sheet_S = book.CreateSheet("订单信息");
+            NPOI.SS.UserModel.ISheet sheet_S;
+            string filename = "订单文件";
 
-            //给sheet1添加第一行的头部标题
-            NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
-            row1.CreateCell(0).SetCellValue("报关状态"); row1.CreateCell(1).SetCellValue("报检状态"); row1.CreateCell(2).SetCellValue("订单编号"); row1.CreateCell(3).SetCellValue("客户编号");
-            row1.CreateCell(4).SetCellValue("经营单位"); row1.CreateCell(5).SetCellValue("合同号"); row1.CreateCell(6).SetCellValue("国检提单号"); row1.CreateCell(7).SetCellValue("海关提单号");
-            row1.CreateCell(8).SetCellValue("件数/重量"); row1.CreateCell(9).SetCellValue("申报关区"); row1.CreateCell(10).SetCellValue("进/出口岸"); row1.CreateCell(11).SetCellValue("申报方式");
-            row1.CreateCell(12).SetCellValue("转关预录号"); row1.CreateCell(13).SetCellValue("法检"); row1.CreateCell(14).SetCellValue("委托时间");
-
-
-            //将数据逐步写入sheet_S各个行
-            for (int i = 0; i < dt.Rows.Count; i++)
+            #region 11 空进
+            if (busitypeid == "11")//空进
             {
-                NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
-                rowtemp.CreateCell(0).SetCellValue(getStatusName(dt.Rows[i]["DECLSTATUS"].ToString(), dec_insp_status));
-                rowtemp.CreateCell(1).SetCellValue(getStatusName(dt.Rows[i]["INSPSTATUS"].ToString(), dec_insp_status));
-                rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["CODE"].ToString());
-                rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
-                rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
-                rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
-                rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["FIRSTLADINGBILLNO"].ToString());
-                rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["SECONDLADINGBILLNO"].ToString());
-                if (dt.Rows[i]["GOODSNUM"].ToString() != "")
-                {
-                    rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString() + "/" + dt.Rows[i]["GOODSGW"].ToString());
-                }
-                else
-                {
-                    rowtemp.CreateCell(8).SetCellValue("");
-                }
+                sheet_S = book.CreateSheet("订单信息_空进"); filename = filename + "_空进.xls";
 
-                rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["CUSTOMAREACODE"].ToString());
-                rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
-                rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());//REPWAYID
-                rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["TURNPRENO"].ToString());
-                rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
-                rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
+                NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
+                row1.CreateCell(0).SetCellValue("报关状态"); row1.CreateCell(1).SetCellValue("报检状态"); row1.CreateCell(2).SetCellValue("订单编号"); row1.CreateCell(3).SetCellValue("客户编号");
+                row1.CreateCell(4).SetCellValue("经营单位"); row1.CreateCell(5).SetCellValue("合同号"); row1.CreateCell(6).SetCellValue("总单号"); row1.CreateCell(7).SetCellValue("分单号"); 
+                row1.CreateCell(8).SetCellValue("件数/重量"); row1.CreateCell(9).SetCellValue("打印状态");row1.CreateCell(10).SetCellValue("申报关区"); row1.CreateCell(11).SetCellValue("进/出口岸");
+                row1.CreateCell(12).SetCellValue("申报方式");row1.CreateCell(13).SetCellValue("转关预录号");row1.CreateCell(14).SetCellValue("法检"); row1.CreateCell(15).SetCellValue("委托时间");                 
+
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                    rowtemp.CreateCell(0).SetCellValue(getStatusName(dt.Rows[i]["DECLSTATUS"].ToString(), dec_insp_status));
+                    rowtemp.CreateCell(1).SetCellValue(getStatusName(dt.Rows[i]["INSPSTATUS"].ToString(), dec_insp_status));
+                    rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["CODE"].ToString());
+                    rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+
+                    rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
+                    rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                    rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["TOTALNO"].ToString());
+                    rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["DIVIDENO"].ToString());
+
+                    if (dt.Rows[i]["GOODSNUM"].ToString() != "")
+                    {
+                        rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString() + "/" + dt.Rows[i]["GOODSGW"].ToString());
+                    }
+                    else
+                    {
+                        rowtemp.CreateCell(8).SetCellValue("");
+                    }
+                    rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["PRINTSTATUS"].ToString() == "1" ? "已打印" : "未打印");
+                    rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["CUSTOMAREACODE"].ToString());
+                    rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
+
+                    rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());//REPWAYID
+                    rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["TURNPRENO"].ToString());
+                    rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
+                    rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
+                }
             }
+            #endregion
 
+            #region 10 空出
+            if (busitypeid == "10")//空出
+            {
+                sheet_S = book.CreateSheet("订单信息_空出"); filename = filename + "_空出.xls";
+
+                NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
+                row1.CreateCell(0).SetCellValue("报关状态"); row1.CreateCell(1).SetCellValue("报检状态"); row1.CreateCell(2).SetCellValue("订单编号"); row1.CreateCell(3).SetCellValue("客户编号");
+                row1.CreateCell(4).SetCellValue("经营单位"); row1.CreateCell(5).SetCellValue("合同号"); row1.CreateCell(6).SetCellValue("总单号"); row1.CreateCell(7).SetCellValue("分单号");
+                row1.CreateCell(8).SetCellValue("件数/重量"); row1.CreateCell(9).SetCellValue("打印状态"); row1.CreateCell(10).SetCellValue("申报关区"); row1.CreateCell(11).SetCellValue("进/出口岸");
+                row1.CreateCell(12).SetCellValue("申报方式"); row1.CreateCell(13).SetCellValue("运抵编号"); row1.CreateCell(14).SetCellValue("法检"); row1.CreateCell(15).SetCellValue("委托时间");
+
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                    rowtemp.CreateCell(0).SetCellValue(getStatusName(dt.Rows[i]["DECLSTATUS"].ToString(), dec_insp_status));
+                    rowtemp.CreateCell(1).SetCellValue(getStatusName(dt.Rows[i]["INSPSTATUS"].ToString(), dec_insp_status));
+                    rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["CODE"].ToString());
+                    rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+
+                    rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
+                    rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                    rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["TOTALNO"].ToString());
+                    rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["DIVIDENO"].ToString());
+
+                    if (dt.Rows[i]["GOODSNUM"].ToString() != "")
+                    {
+                        rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString() + "/" + dt.Rows[i]["GOODSGW"].ToString());
+                    }
+                    else
+                    {
+                        rowtemp.CreateCell(8).SetCellValue("");
+                    }
+                    rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["PRINTSTATUS"].ToString() == "1" ? "已打印" : "未打印");
+                    rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["CUSTOMAREACODE"].ToString());
+                    rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
+
+                    rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());//REPWAYID
+                    rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["ARRIVEDNO"].ToString());
+                    rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
+                    rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
+                }
+            }
+            #endregion
+
+            #region 21 海进
+            if (busitypeid == "21")//海进
+            {
+                sheet_S = book.CreateSheet("订单信息_海进"); filename = filename + "_海进.xls";
+
+                NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
+                row1.CreateCell(0).SetCellValue("报关状态"); row1.CreateCell(1).SetCellValue("报检状态"); row1.CreateCell(2).SetCellValue("订单编号"); row1.CreateCell(3).SetCellValue("客户编号");
+                row1.CreateCell(4).SetCellValue("经营单位"); row1.CreateCell(5).SetCellValue("合同号"); row1.CreateCell(6).SetCellValue("打印状态"); row1.CreateCell(7).SetCellValue("国检提单号");
+                row1.CreateCell(8).SetCellValue("海关提单号"); row1.CreateCell(9).SetCellValue("件数/重量"); row1.CreateCell(10).SetCellValue("申报关区"); row1.CreateCell(11).SetCellValue("进/出口岸");
+                row1.CreateCell(12).SetCellValue("申报方式"); row1.CreateCell(13).SetCellValue("转关预录号"); row1.CreateCell(14).SetCellValue("法检"); row1.CreateCell(15).SetCellValue("委托时间");
+
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                    rowtemp.CreateCell(0).SetCellValue(getStatusName(dt.Rows[i]["DECLSTATUS"].ToString(), dec_insp_status));
+                    rowtemp.CreateCell(1).SetCellValue(getStatusName(dt.Rows[i]["INSPSTATUS"].ToString(), dec_insp_status));
+                    rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["CODE"].ToString());
+                    rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+
+                    rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
+                    rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                    rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["PRINTSTATUS"].ToString() == "1" ? "已打印" : "未打印");
+                    rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["FIRSTLADINGBILLNO"].ToString());
+
+                    rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["SECONDLADINGBILLNO"].ToString());
+                    if (dt.Rows[i]["GOODSNUM"].ToString() != "")
+                    {
+                        rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString() + "/" + dt.Rows[i]["GOODSGW"].ToString());
+                    }
+                    else
+                    {
+                        rowtemp.CreateCell(9).SetCellValue("");
+                    }
+                    rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["CUSTOMAREACODE"].ToString());
+                    rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
+
+                    rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());//REPWAYID
+                    rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["TURNPRENO"].ToString());
+                    rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
+                    rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
+                }
+            }
+            #endregion
+
+            #region 20 海出
+            if (busitypeid == "20")//海出
+            {
+                sheet_S = book.CreateSheet("订单信息_海出"); filename = filename + "_海出.xls";
+
+                NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
+                row1.CreateCell(0).SetCellValue("报关状态"); row1.CreateCell(1).SetCellValue("报检状态"); row1.CreateCell(2).SetCellValue("订单编号"); row1.CreateCell(3).SetCellValue("客户编号");
+                row1.CreateCell(4).SetCellValue("经营单位"); row1.CreateCell(5).SetCellValue("合同号"); row1.CreateCell(6).SetCellValue("提单号"); row1.CreateCell(7).SetCellValue("打印状态");
+                row1.CreateCell(8).SetCellValue("运抵编号"); row1.CreateCell(9).SetCellValue("件数/重量"); row1.CreateCell(10).SetCellValue("申报关区"); row1.CreateCell(11).SetCellValue("进/出口岸");
+                row1.CreateCell(12).SetCellValue("申报方式"); row1.CreateCell(13).SetCellValue("转关预录号"); row1.CreateCell(14).SetCellValue("法检"); row1.CreateCell(15).SetCellValue("委托时间");
+
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                    rowtemp.CreateCell(0).SetCellValue(getStatusName(dt.Rows[i]["DECLSTATUS"].ToString(), dec_insp_status));
+                    rowtemp.CreateCell(1).SetCellValue(getStatusName(dt.Rows[i]["INSPSTATUS"].ToString(), dec_insp_status));
+                    rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["CODE"].ToString());
+                    rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+
+                    rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
+                    rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                    rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["SECONDLADINGBILLNO"].ToString());
+                    rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["PRINTSTATUS"].ToString() == "1" ? "已打印" : "未打印");
+
+                    rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["ARRIVEDNO"].ToString());
+                    if (dt.Rows[i]["GOODSNUM"].ToString() != "")
+                    {
+                        rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString() + "/" + dt.Rows[i]["GOODSGW"].ToString());
+                    }
+                    else
+                    {
+                        rowtemp.CreateCell(9).SetCellValue("");
+                    }
+                    rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["CUSTOMAREACODE"].ToString());
+                    rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
+
+                    rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());//REPWAYID
+                    rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["TURNPRENO"].ToString());
+                    rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
+                    rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
+                }
+            }
+            #endregion
+
+            #region 31 陆进
+            if (busitypeid == "31")//陆进
+            {
+                sheet_S = book.CreateSheet("订单信息_陆进"); filename = filename + "_陆进.xls";
+
+                NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
+                row1.CreateCell(0).SetCellValue("报关状态"); row1.CreateCell(1).SetCellValue("报检状态"); row1.CreateCell(2).SetCellValue("订单编号"); row1.CreateCell(3).SetCellValue("客户编号");
+                row1.CreateCell(4).SetCellValue("经营单位"); row1.CreateCell(5).SetCellValue("合同号"); row1.CreateCell(6).SetCellValue("分单号"); row1.CreateCell(7).SetCellValue("打印状态");
+                row1.CreateCell(8).SetCellValue("件数/重量"); row1.CreateCell(9).SetCellValue("申报关区"); row1.CreateCell(10).SetCellValue("进/出口岸"); row1.CreateCell(11).SetCellValue("申报方式");
+                row1.CreateCell(12).SetCellValue("法检"); row1.CreateCell(13).SetCellValue("委托时间");
+
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                    rowtemp.CreateCell(0).SetCellValue(getStatusName(dt.Rows[i]["DECLSTATUS"].ToString(), dec_insp_status));
+                    rowtemp.CreateCell(1).SetCellValue(getStatusName(dt.Rows[i]["INSPSTATUS"].ToString(), dec_insp_status));
+                    rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["CODE"].ToString());
+                    rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+
+                    rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
+                    rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                    rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["DIVIDENO"].ToString());
+                    rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["PRINTSTATUS"].ToString() == "1" ? "已打印" : "未打印");
+
+                    if (dt.Rows[i]["GOODSNUM"].ToString() != "")
+                    {
+                        rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString() + "/" + dt.Rows[i]["GOODSGW"].ToString());
+                    }
+                    else
+                    {
+                        rowtemp.CreateCell(8).SetCellValue("");
+                    }
+                    rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["CUSTOMAREACODE"].ToString());
+                    rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
+                    rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());//REPWAYID
+
+                    rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
+                    rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
+                }
+            }
+            #endregion
+
+            #region 30 陆出
+            if (busitypeid == "30")//陆出
+            {
+                sheet_S = book.CreateSheet("订单信息_陆出"); filename = filename + "_陆出.xls";
+
+                NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
+                row1.CreateCell(0).SetCellValue("报关状态"); row1.CreateCell(1).SetCellValue("报检状态"); row1.CreateCell(2).SetCellValue("订单编号"); row1.CreateCell(3).SetCellValue("客户编号");
+                row1.CreateCell(4).SetCellValue("经营单位"); row1.CreateCell(5).SetCellValue("合同号"); row1.CreateCell(6).SetCellValue("总单号"); row1.CreateCell(7).SetCellValue("分单号");
+                row1.CreateCell(8).SetCellValue("打印状态"); row1.CreateCell(9).SetCellValue("件数/重量"); row1.CreateCell(10).SetCellValue("申报关区"); row1.CreateCell(11).SetCellValue("进/出口岸");
+                row1.CreateCell(12).SetCellValue("申报方式"); row1.CreateCell(13).SetCellValue("运抵编号"); row1.CreateCell(14).SetCellValue("转关预录号"); row1.CreateCell(15).SetCellValue("法检");
+                row1.CreateCell(16).SetCellValue("委托时间");
+
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                    rowtemp.CreateCell(0).SetCellValue(getStatusName(dt.Rows[i]["DECLSTATUS"].ToString(), dec_insp_status));
+                    rowtemp.CreateCell(1).SetCellValue(getStatusName(dt.Rows[i]["INSPSTATUS"].ToString(), dec_insp_status));
+                    rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["CODE"].ToString());
+                    rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+
+                    rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
+                    rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                    rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["TOTALNO"].ToString());
+                    rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["DIVIDENO"].ToString());
+
+                    rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["PRINTSTATUS"].ToString() == "1" ? "已打印" : "未打印");
+                    if (dt.Rows[i]["GOODSNUM"].ToString() != "")
+                    {
+                        rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString() + "/" + dt.Rows[i]["GOODSGW"].ToString());
+                    }
+                    else
+                    {
+                        rowtemp.CreateCell(9).SetCellValue("");
+                    }
+                    rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["CUSTOMAREACODE"].ToString());
+                    rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
+
+                    rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());//REPWAYID
+                    rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["ARRIVEDNO"].ToString());
+                    rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["TURNPRENO"].ToString());
+                    rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
+
+                    rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
+                }
+            }
+            #endregion
+
+            #region 40,41 国内
+            if (busitypeid == "40,41")//国内
+            {
+                sheet_S = book.CreateSheet("订单信息_国内"); filename = filename + "_国内.xls";
+
+                NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
+                row1.CreateCell(0).SetCellValue("报关状态"); row1.CreateCell(1).SetCellValue("报检状态"); row1.CreateCell(2).SetCellValue("订单编号"); row1.CreateCell(3).SetCellValue("客户编号");
+                row1.CreateCell(4).SetCellValue("经营单位"); row1.CreateCell(5).SetCellValue("合同号"); row1.CreateCell(6).SetCellValue("件数/重量"); row1.CreateCell(7).SetCellValue("打印状态");
+                row1.CreateCell(8).SetCellValue("申报关区"); row1.CreateCell(9).SetCellValue("申报方式"); row1.CreateCell(10).SetCellValue("法检"); row1.CreateCell(11).SetCellValue("业务类型");
+                row1.CreateCell(12).SetCellValue("两单关联号"); row1.CreateCell(13).SetCellValue("委托时间"); row1.CreateCell(14).SetCellValue("多单关联号");
+
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                    rowtemp.CreateCell(0).SetCellValue(getStatusName(dt.Rows[i]["DECLSTATUS"].ToString(), dec_insp_status));
+                    rowtemp.CreateCell(1).SetCellValue(getStatusName(dt.Rows[i]["INSPSTATUS"].ToString(), dec_insp_status));
+                    rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["CODE"].ToString());
+                    rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+
+                    rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
+                    rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                    if (dt.Rows[i]["GOODSNUM"].ToString() != "")
+                    {
+                        rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString() + "/" + dt.Rows[i]["GOODSGW"].ToString());
+                    }
+                    else
+                    {
+                        rowtemp.CreateCell(6).SetCellValue("");
+                    }
+                    rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["PRINTSTATUS"].ToString() == "1" ? "已打印" : "未打印");
+
+                    rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["CUSTOMAREACODE"].ToString());
+                    rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());//REPWAYID
+                    rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
+                    if (dt.Rows[i]["BUSITYPE"].ToString()=="40")
+                    {
+                        rowtemp.CreateCell(11).SetCellValue("国内出口");
+                    }
+                    else if (dt.Rows[i]["BUSITYPE"].ToString() == "41")
+                    {
+                        rowtemp.CreateCell(11).SetCellValue("国内进口");
+                    }
+                    else
+                    {
+                        rowtemp.CreateCell(11).SetCellValue("");
+                    }                   
+
+                    rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["ASSOCIATENO"].ToString());
+                    rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
+                    rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["CORRESPONDNO"].ToString());
+                    
+                }
+            }
+            #endregion
+
+            #region 50,51 特殊
+            if (busitypeid == "50,51")//特殊
+            {
+                sheet_S = book.CreateSheet("订单信息_特殊"); filename = filename + "_特殊.xls";
+
+                NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
+                row1.CreateCell(0).SetCellValue("报关状态"); row1.CreateCell(1).SetCellValue("报检状态"); row1.CreateCell(2).SetCellValue("订单编号"); row1.CreateCell(3).SetCellValue("客户编号");
+                row1.CreateCell(4).SetCellValue("合同号"); row1.CreateCell(5).SetCellValue("经营单位"); row1.CreateCell(6).SetCellValue("打印状态"); row1.CreateCell(7).SetCellValue("申报方式");
+                row1.CreateCell(8).SetCellValue("件数/重量"); row1.CreateCell(9).SetCellValue("申报关区"); row1.CreateCell(10).SetCellValue("进/出口岸"); row1.CreateCell(11).SetCellValue("转关预录号"); 
+                row1.CreateCell(12).SetCellValue("法检"); row1.CreateCell(13).SetCellValue("委托时间");
+
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                    rowtemp.CreateCell(0).SetCellValue(getStatusName(dt.Rows[i]["DECLSTATUS"].ToString(), dec_insp_status));
+                    rowtemp.CreateCell(1).SetCellValue(getStatusName(dt.Rows[i]["INSPSTATUS"].ToString(), dec_insp_status));
+                    rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["CODE"].ToString());
+                    rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CUSNO"].ToString());    
+                
+                    rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                    rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
+                    rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["PRINTSTATUS"].ToString() == "1" ? "已打印" : "未打印");
+                    rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());//REPWAYID
+
+                    if (dt.Rows[i]["GOODSNUM"].ToString() != "")
+                    {
+                        rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString() + "/" + dt.Rows[i]["GOODSGW"].ToString());
+                    }
+                    else
+                    {
+                        rowtemp.CreateCell(8).SetCellValue("");
+                    }
+                    rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["CUSTOMAREACODE"].ToString());
+                    rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
+                    rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["TURNPRENO"].ToString());                
+                   
+                    rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
+                    rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
+                }
+            }
+            #endregion
 
             // 写入到客户端 
             System.IO.MemoryStream ms = new System.IO.MemoryStream();
             book.Write(ms);
             ms.Seek(0, SeekOrigin.Begin);
-            return File(ms, "application/vnd.ms-excel", "订单文件.xls");
+            return File(ms, "application/vnd.ms-excel", filename);
         }
 
         public string getStatusName(string curstatus, string dec_insp_status)
