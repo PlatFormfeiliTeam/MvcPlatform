@@ -38,9 +38,10 @@
                 })
                 store_Trade = Ext.create('Ext.data.JsonStore', {
                     model: 'TRADE',
-                    pageSize: 22,
+                    pageSize: 22, 
                     proxy: {
                         type: 'ajax',
+                        getMethod: function () { return 'POST'; },//亮点，设置请求方式,默认为GET  考虑到分单号传参时字符串长度比较大,所以需要改为POST模式
                         url: '/Common/LoadList',
                         reader: {
                             root: 'rows',
