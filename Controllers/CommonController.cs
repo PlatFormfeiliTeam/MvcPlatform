@@ -214,7 +214,7 @@ namespace MvcPlatform.Controllers
                 {
                     dr = dtall.Select("DIVIDENO like '%" + seniorarray[i] + "%'");//("instr(DIVIDENO,'" + seniorarray[i] + "')>0");
                     dr_n = dt_senior.NewRow();
-                    dr_n["DIVIDENO"] = seniorarray[i]; dr_n["ISYN"] = dr.Length;
+                    dr_n["DIVIDENO"] = seniorarray[i]; dr_n["ISYN"] = dr.Length > 0 ? 1 : 0;
                     dt_senior.Rows.Add(dr_n);
                 }
                 json_senior = JsonConvert.SerializeObject(dt_senior, iso);
