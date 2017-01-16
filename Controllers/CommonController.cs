@@ -191,7 +191,6 @@ namespace MvcPlatform.Controllers
         //订单列表页加载方法 by panhuaguo 2016-08-25
         public string LoadList()
         {
-
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string where = QueryCondition();
 
@@ -201,7 +200,27 @@ namespace MvcPlatform.Controllers
             string sql = @"select * from LIST_ORDER where instr('" + Request["busitypeid"] + "',BUSITYPE)>0 and customercode='" + json_user.Value<string>("CUSTOMERCODE") + "' " + where;
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "createtime", "desc"));
             var json = JsonConvert.SerializeObject(dt, iso);
-            return "{rows:" + json + ",total:" + totalProperty + "}";
+
+            var json_senior = "[]";
+            if (!string.IsNullOrEmpty(Request["seniorsearch"] + ""))
+            {
+                DataTable dtall = DBMgr.GetDataTable(sql);
+                DataTable dt_senior = new DataTable();
+                dt_senior.Columns.Add("DIVIDENO", typeof(string)); dt_senior.Columns.Add("ISYN", typeof(int));
+
+                DataRow[] dr; DataRow dr_n;
+                string[] seniorarray = Request["seniorsearch"].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                for (int i = 0; i < seniorarray.Length; i++)
+                {
+                    dr = dtall.Select("DIVIDENO like '%" + seniorarray[i] + "%'");//("instr(DIVIDENO,'" + seniorarray[i] + "')>0");
+                    dr_n = dt_senior.NewRow();
+                    dr_n["DIVIDENO"] = seniorarray[i]; dr_n["ISYN"] = dr.Length;
+                    dt_senior.Rows.Add(dr_n);
+                }
+                json_senior = JsonConvert.SerializeObject(dt_senior, iso);
+            }
+
+            return "{rows:" + json + ",total:" + totalProperty + ",json_senior:" + json_senior + "}";
         }
 
         public string QueryCondition()

@@ -844,7 +844,7 @@ function seniorsearch(pagebar_p) {
         Ext.getCmp('win_seniorsearch').expand();
         return;
     }
-    var fieldarray = ['DIVIDENO'];
+    var fieldarray = ['DIVIDENO', 'ISYN'];
     var store_seniorsearch = Ext.create('Ext.data.JsonStore', {
         fields: fieldarray
     })
@@ -881,6 +881,7 @@ function seniorsearch(pagebar_p) {
         }, '->', field_paste]
     });
     var grid_seniorsearch = Ext.create('Ext.grid.Panel', {
+        id: "grid_seniorsearch",
         tbar: tbar_senior,
         plugins: [Ext.create('Ext.grid.plugin.CellEditing', {
             clicksToEdit: 1
@@ -890,7 +891,20 @@ function seniorsearch(pagebar_p) {
         selModel: { selType: 'checkboxmodel' },
         columns: [
         { xtype: 'rownumberer', width: 35 },
-        { header: '分单号', dataIndex: 'DIVIDENO', width: 130, field: { xtype: 'textfield' } }
+        { header: '分单号', dataIndex: 'DIVIDENO', width: 130, field: { xtype: 'textfield' } },
+        {
+            header: '查询结果', dataIndex: 'ISYN', width: 80, renderer: function renderOrder(value, cellmeta, record, rowIndex, columnIndex, store) {
+                if (value == "1") {
+                    return '<i class="fa fa-check" style="color:blue" aria-hidden="true"></i>'
+                }
+                else if (value == "0") {
+                    return '<i class="fa fa-times" style="color:red" aria-hidden="true"></i>'
+                }
+                else {
+                    return '';
+                }
+            }
+        }
         ]
     })
     var win_seniorsearch = Ext.create("Ext.window.Window", {

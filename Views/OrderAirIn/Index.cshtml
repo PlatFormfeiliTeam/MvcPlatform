@@ -65,6 +65,12 @@
                                 CONDITION7: Ext.getCmp('CONDITION7').getValue(), VALUE7: Ext.getCmp("CONDITION7_1").getValue(),
                                 CONDITION8: Ext.getCmp('CONDITION8').getValue(), VALUE8_1: Ext.Date.format(Ext.getCmp("CONDITION8_1").getValue(), 'Y-m-d H:i:s'), VALUE8_2: Ext.Date.format(Ext.getCmp("CONDITION8_2").getValue(), 'Y-m-d H:i:s')
                             }
+                        },
+                        load: function () {
+                            var read = store_Trade.getProxy().getReader();
+                            if (Ext.getCmp('win_seniorsearch')) {
+                                Ext.getCmp('grid_seniorsearch').store.loadData(read.rawData.json_senior);
+                            }
                         }
                     }
                 })
