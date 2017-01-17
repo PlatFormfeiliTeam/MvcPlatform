@@ -212,7 +212,7 @@ namespace MvcPlatform.Controllers
                 string[] seniorarray = Request["seniorsearch"].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
                 for (int i = 0; i < seniorarray.Length; i++)
                 {
-                    dr = dtall.Select("DIVIDENO like '%" + seniorarray[i] + "%'");//("instr(DIVIDENO,'" + seniorarray[i] + "')>0");
+                    dr = dtall.Select("DIVIDENO='" + seniorarray[i] + "'");//"DIVIDENO like '%" + seniorarray[i] + "%'"
                     dr_n = dt_senior.NewRow();
                     dr_n["DIVIDENO"] = seniorarray[i]; dr_n["ISYN"] = dr.Length > 0 ? 1 : 0;
                     dt_senior.Rows.Add(dr_n);
@@ -236,11 +236,13 @@ namespace MvcPlatform.Controllers
                 {
                     if (i != seniorarray.Length - 1)
                     {
-                        where += "instr(DIVIDENO,'" + seniorarray[i] + "')>0 or ";
+                        //where += "instr(DIVIDENO,'" + seniorarray[i] + "')>0 or ";
+                        where += "DIVIDENO='" + seniorarray[i] + "' or ";
                     }
                     else
                     {
-                        where += "instr(DIVIDENO,'" + seniorarray[i] + "')>0)";
+                        //where += "instr(DIVIDENO,'" + seniorarray[i] + "')>0)";
+                        where += "DIVIDENO='" + seniorarray[i] + "')";
                     }
                 }
             }
