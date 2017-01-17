@@ -2426,12 +2426,10 @@ namespace MvcPlatform.Controllers
                 return newname + ".pdf";
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return "error";
-
+                return ex.Message;
             }
-
         }
 
 

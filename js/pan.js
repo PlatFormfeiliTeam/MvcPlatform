@@ -852,7 +852,7 @@ function seniorsearch(pagebar_p) {
         fieldLabel: '<i class="fa fa-clipboard" aria-hidden="true"></i>&nbsp;粘贴区',
         labelWidth: 60,
         listeners: {
-            change: function (field_paste, newValue, oldValue, eOpts) { 
+            change: function (field_paste, newValue, oldValue, eOpts) {
                 if (newValue) {
                     var len = newValue.split("\n"); //获取行数    
                     var trStr;
@@ -1710,8 +1710,8 @@ function printFile(type) {
         params: { ordercode: ordercode, repwayname: Ext.getCmp("combo_REPWAYNAME").getRawValue(), createtime: Ext.getCmp('field_CREATETIME').getValue(), filename: records[0].get("FILENAME"), type: type },
         success: function (response, options) {
             //var json = Ext.decode(response.responseText);
-            if (response.responseText == "error") {
-                Ext.MessageBox.alert("提示", "打印文件失败！");
+            if (response.responseText.indexOf('.pdf') <= 0) {
+                Ext.MessageBox.alert("提示", response.responseText);
                 return;
             }
             var win = Ext.create("Ext.window.Window", {
