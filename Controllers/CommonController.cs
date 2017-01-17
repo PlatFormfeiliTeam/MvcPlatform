@@ -15,6 +15,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Diagnostics;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace MvcPlatform.Controllers
 {
@@ -2952,7 +2953,6 @@ namespace MvcPlatform.Controllers
             book.Write(ms);
             ms.Seek(0, SeekOrigin.Begin);
             return File(ms, "application/vnd.ms-excel", "报关单文件.xls");
-        }
-
+        } 
     }
 }

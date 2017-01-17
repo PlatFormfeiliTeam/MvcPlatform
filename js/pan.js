@@ -848,16 +848,18 @@ function seniorsearch(pagebar_p) {
     var store_seniorsearch = Ext.create('Ext.data.JsonStore', {
         fields: fieldarray
     })
-    var field_paste = Ext.create('Ext.form.field.Text', {
+    var field_paste = Ext.create('Ext.form.field.TextArea', {
         fieldLabel: '<i class="fa fa-clipboard" aria-hidden="true"></i>&nbsp;粘贴区',
         labelWidth: 60,
         listeners: {
-            change: function (field_paste, newValue, oldValue, eOpts) {
+            change: function (field_paste, newValue, oldValue, eOpts) { 
                 if (newValue) {
-                    var len = newValue.split(" "); //获取行数   
+                    var len = newValue.split("\n"); //获取行数    
                     var trStr;
                     for (var i = 0; i < len.length ; i++) {
-                        store_seniorsearch.insert(store_seniorsearch.data.length, { 'DIVIDENO': len[i] });
+                        if (len[i]) {
+                            store_seniorsearch.insert(store_seniorsearch.data.length, { 'DIVIDENO': len[i] });
+                        }
                     }
                     field_paste.setValue("");
                 }
@@ -1016,12 +1018,11 @@ function formcontrol() {
     }
 
     if (status < 10) {
-        if (uploader==null)
-        {
+        if (uploader == null) {
             upload_ini();
         }
-        
-        
+
+
     }
     //2016-10-18增加判断,因为提交表单后页面并没有刷新,虽然上传按钮禁用了,但uploader对象并没有销毁,还是能上传 10表示已委托 
     if (status >= 10 && uploader) {
@@ -1769,6 +1770,6 @@ function Export(busitypeid) {
         + '&CONDITION4=' + CONDITION4 + '&VALUE4_1=' + VALUE4_1 + '&VALUE4_2=' + VALUE4_2 + '&CONDITION5=' + CONDITION5 + '"&VALUE5=' + VALUE5
         + '&CONDITION6=' + CONDITION6 + '&VALUE6=' + VALUE6 + '&CONDITION7=' + CONDITION7 + '&VALUE7=' + VALUE7
         + '&CONDITION8=' + CONDITION8 + '&VALUE8_1=' + VALUE8_1 + '&VALUE8_2=' + VALUE8_2 + "&dec_insp_status=" + dec_insp_status;
-        //+ "&seniorsearch=" + seniorsearch;
+    //+ "&seniorsearch=" + seniorsearch;
     $('#exportform').attr("action", path).submit();
 }
