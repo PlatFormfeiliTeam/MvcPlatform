@@ -477,10 +477,9 @@ namespace MvcPlatform.Controllers
                     }
                     break;
             }
-
             if ((Request["OnlySelf"] + "").Trim() == "fa fa-check-square-o")
             {
-                where += " and CREATEUSERID = " + json_user.Value<string>("ID") + " ";
+                where += " and (CREATEUSERID = " + json_user.Value<string>("ID") + " or submitusername='" + json_user.Value<string>("REALNAME") + "') ";
             }
 
             where += " and ISINVALID=0 ";
