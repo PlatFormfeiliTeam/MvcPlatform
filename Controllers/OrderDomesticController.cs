@@ -240,6 +240,10 @@ namespace MvcPlatform.Controllers
             {
                 sql = @"select ID from list_fileconfig where STATUS = 0 and ordercode in (select CODE FROM LIST_ORDER WHERE ASSOCIATENO='" + dt.Rows[0]["ASSOCIATENO"] + "')";
             }
+            else
+            {
+                sql = @"select ID from list_fileconfig where STATUS = 0 and ordercode = '" + Request["ORDERCODE"] + "'";
+            }
             dt = DBMgr.GetDataTable(sql);
             return "{result:" + dt.Rows.Count + "}";
         }
