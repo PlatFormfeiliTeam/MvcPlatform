@@ -44,6 +44,13 @@ namespace MvcPlatform.Controllers
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
+        public ActionResult ProcessServer()//委托服务
+        {
+            ViewBag.navigator = "客户服务>>委托服务";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
+
         public string GetCode(string combin)
         {
             if (string.IsNullOrEmpty(combin))
