@@ -2,5 +2,58 @@
     ViewBag.Title = "ProcessServer";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<link href="/js/Extjs42/resources/css/ext-all-gray.css" rel="stylesheet" type="text/css" />
+<script src="/js/Extjs42/bootstrap.js" type="text/javascript"></script>
+<link href="/css/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
 
-<h2>ProcessServer</h2>
+<script type="text/javascript">
+    function getdata() {
+        var upf = $('#upfile').val();
+        if ($('#upfile').val() == "") {
+            Ext.MessageBox.alert('提示', '请选择将要上传的文件!');
+            return;
+        } else {
+            var stuff = upf.match(/^(.*)(\.)(.{1,8})$/)[3];
+            if (stuff != 'xls' && stuff != 'xlsx') {
+                Ext.MessageBox.alert('提示', '文件类型不正确，请选择.xls、.xlsx文件!');
+                return;
+            }
+            else {
+                Ext.getBody().mask("请稍等，正在上传中...", "x-mask-loading");
+                Ext.Ajax.request({
+                    url: "/EnterpriseOrder/UploadExcel",
+                    isUpload: true,
+                    form: "uploadform",
+                    success: function (response, option) {
+                        Ext.getBody().unmask();
+                        var json_obj = Ext.decode(response.responseText);                        
+                        $('#filename').text(json_obj.filename); 
+                        $('#filepath').val(json_obj.filepath);
+                    }
+                    })
+            }
+        }  
+    }
+
+</script>
+<div class="container">
+    <div id="div_form" style="width:100%;">
+        <form id="uploadform" name="form" enctype="multipart/form-data" method="post" style="float:left">
+            导入文件
+            <input type="text" name="upfile" id="upfile" readonly="readonly" style="width: 400px; height: 25px; border-radius: 4px; border: 1px solid #888888; " />
+            <button type="button" class="btn btn-primary btn-sm" onclick="rtbAttachment.click()"><i class="fa fa-exchange fa-fw"></i>&nbsp;浏览</button>
+
+            <input type="file" id="rtbAttachment" name="rtbAttachment" style="display:none" onchange="upfile.value=this.value"
+                   accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+
+            <button type="button" id="btn_Submit" class="btn btn-primary btn-sm" onclick="getdata()"><i class="fa fa-upload"></i>&nbsp;导入</button>    
+        </form>
+        <form id="exportform" name="form" enctype="multipart/form-data" method="post" style="float:left" action="/EnterpriseOrder/ExportStu2">
+            <input type="hidden" id="filepath" name="filepath" />
+            <button type="submit" id="btn_Export" class="btn btn-primary btn-sm"><i class="fa fa-level-down"></i>&nbsp;导出</button>
+        </form>       
+    </div>
+</div>
+<div style="width:1200px;">
+<div id="filename"></div>
+</div>

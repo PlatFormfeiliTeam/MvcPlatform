@@ -1,4 +1,5 @@
-﻿using MvcPlatform.Common;
+﻿using Aspose.Cells;
+using MvcPlatform.Common;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
@@ -391,5 +392,269 @@ namespace MvcPlatform.Controllers
             return result;
 
         }
+
+        #region excel重组
+        /// <summary>
+        /// 读取Excel数据并重组
+        /// </summary>
+        /// <param name="hasTitle"></param>
+        /// <returns></returns>
+        private DataTable GetDataFromExcelByConn(string filepath, bool hasTitle = false)
+        {
+            /* OpenFileDialog openFile = new OpenFileDialog();
+             openFile.Filter = "Excel文件(*.xls)|*.xls;*.xlsx";
+             openFile.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+             openFile.Multiselect = false;
+             if (openFile.ShowDialog() == DialogResult.Cancel) return null;
+             var filePath = openFile.FileName;
+             string fileType = System.IO.Path.GetExtension(filePath);
+             if (string.IsNullOrEmpty(fileType)) return null;
+             * */
+
+
+
+            DataTable dtExcel = ExcelToDatatalbe(Server.MapPath(filepath));
+
+
+            /* string strConn = string.Format("Provider=Microsoft.Jet.OLEDB.{0}.0;" +
+                             "Extended Properties=\"Excel {1}.0;HDR={2};IMEX=1;\";" +
+                             "data source={3};",
+                             (fileType == ".xls" ? 4 : 12), (fileType == ".xls" ? 8 : 12), (hasTitle ? "Yes" : "NO"), filePath);
+
+             OleDbConnection conn = new OleDbConnection(strConn);
+             conn.Open();
+
+             DataTable dtSheetName = conn.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, new object[] { null, null, null, "Table" });
+             string strTableName = dtSheetName.Rows[0]["TABLE_NAME"].ToString();
+             OleDbDataAdapter myCommand = null;
+             string strExcel = "select * from [" + strTableName + "]";
+             myCommand = new OleDbDataAdapter(strExcel, strConn);
+             myCommand.Fill(ds);
+             * */
+
+            DataTable newdt = new DataTable();
+            newdt.Columns.Add("BR", typeof(string));
+            newdt.Columns.Add("BS", typeof(Int32));
+            newdt.Columns.Add("BS1", typeof(Int32));
+            for (int i = 0; i < dtExcel.Rows.Count; i++)
+            {
+                string bs = dtExcel.Rows[i]["REMARKS"].ToString();
+                string[] bs1 = bs.Split(';');
+                List<string> bsnew = new List<string>();
+                for (int t1 = 0; t1 < bs1.Length; t1++)
+                {
+                    string bs2 = bs1[t1].ToString();
+                    if (bs2.Contains("-"))
+                    {
+                        string bs21 = bs2.Split('-')[0].ToString();
+                        string bs22 = bs2.Split('-')[1].ToString();
+                        int bs211 = Convert.ToInt32(bs21.Split('(')[0].ToString());
+                        int bs212 = Convert.ToInt32(bs22.Split('(')[0].ToString());
+                        for (int t3 = 0; t3 < bs212 - bs211 + 1; t3++)
+                        {
+                            string newbs = (bs211 + t3) + "(" + bs21.Split('(')[1].ToString();
+                            bsnew.Add(newbs);
+                        }
+                    }
+                    else
+                        bsnew.Add(bs2);
+                }
+                for (int t2 = 0; t2 < bsnew.Count(); t2++)
+                {
+                    string br = dtExcel.Rows[i]["PRECUSTOMS_CLEARANCE_ID"].ToString();
+                    string bs3 = bsnew[t2].Split('(')[0].ToString();
+                    string bs4 = bsnew[t2].Split('(')[1].ToString().Replace(")", "");
+                    DataRow[] rows = newdt.Select("BR='" + br + "' and BS='" + bs3.ToString() + "'");
+                    if (rows.Count() > 0)
+                    {
+                        DataRow drs = rows[0];
+                        drs["BS1"] = (Convert.ToInt32(drs[2].ToString()) + Convert.ToInt32(bs4));
+                    }
+                    else
+                    {
+                        DataRow dr = newdt.NewRow();
+                        dr["BR"] = dtExcel.Rows[i]["PRECUSTOMS_CLEARANCE_ID"].ToString();
+                        dr["BS"] = bs3;
+                        dr["BS1"] = bs4;
+                        newdt.Rows.Add(dr);
+                    }
+                }
+            }
+            DataView dv = newdt.DefaultView;
+            dv.Sort = " BR Asc,BS Asc";
+            DataTable ndt = dv.ToTable();
+            DataTable newbsdt = CreateNewDt(ndt);
+            DataTable dt = CreateOldDt(dtExcel, newbsdt);
+            return dt;
+
+        }
+
+        /// <summary>
+        /// 重组原表，把原表中REMARKS格式重组为34061(30);34062(4)
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <param name="newdt"></param>
+        /// <returns></returns>
+        private DataTable CreateOldDt(DataTable dt, DataTable newdt)
+        {
+            string br = dt.Rows[dt.Rows.Count - 1]["PRECUSTOMS_CLEARANCE_ID"].ToString();
+            //string bs=
+            for (int i = dt.Rows.Count - 2; i > -1; i--)
+            {
+                if (br == dt.Rows[i]["PRECUSTOMS_CLEARANCE_ID"].ToString())
+                {
+                    dt.Rows.RemoveAt(i + 1);
+                    if (i == 0)
+                    {
+                        DataRow[] rows = newdt.Select("BR='" + br + "' ");
+                        if (rows.Count() > 0)
+                        {
+                            DataRow drs = rows[0];
+                            dt.Rows[i]["REMARKS"] = (drs["BS"].ToString());
+                        }
+                    }
+                }
+                else
+                {
+                    DataRow[] rows = newdt.Select("BR='" + br + "' ");
+                    if (rows.Count() > 0)
+                    {
+                        DataRow drs = rows[0];
+                        dt.Rows[i + 1]["REMARKS"] = (drs["BS"].ToString());
+
+                    }
+                    br = dt.Rows[i]["PRECUSTOMS_CLEARANCE_ID"].ToString();
+                }
+            }
+
+            return dt;
+        }
+
+        #endregion
+
+        #region 重组临时表数据，重组后格式为：E1C1703848 34061(30);34062(4)
+        /// <summary>
+        /// 重组临时表数据，组合后格式为：34061(30);34062(4)
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        private DataTable CreateNewDt(DataTable dt)
+        {
+            DataTable newdt = new DataTable();
+            newdt.Columns.Add("BR", typeof(string));
+            newdt.Columns.Add("BS", typeof(string));
+            string br = "";
+            string bs = "";
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                if (i == 0)
+                {
+                    br = dt.Rows[i]["BR"].ToString();
+                    bs = dt.Rows[i]["BS"].ToString() + "(" + dt.Rows[i]["BS1"].ToString() + ")" + ";";
+                }
+                else
+                {
+                    if (dt.Rows[i]["BR"].ToString() == dt.Rows[i - 1]["BR"].ToString())
+                    {
+                        bs += dt.Rows[i]["BS"].ToString() + "(" + dt.Rows[i]["BS1"].ToString() + ")" + ";";
+                        if (i == dt.Rows.Count - 1)
+                            newdt = ADDNewRow(newdt, br, bs);
+                    }
+                    else
+                    {
+                        newdt = ADDNewRow(newdt, br, bs);
+                        br = dt.Rows[i]["BR"].ToString();
+                        bs = dt.Rows[i]["BS"].ToString() + "(" + dt.Rows[i]["BS1"].ToString() + ")" + ";";
+                        if (i == dt.Rows.Count - 1)
+                            newdt = ADDNewRow(newdt, br, bs);
+                    }
+                }
+            }
+            return newdt;
+        }
+
+        /// <summary>
+        /// 新增一条数据
+        /// </summary>
+        /// <param name="newdt"></param>
+        /// <param name="br"></param>
+        /// <param name="bs"></param>
+        /// <returns></returns>
+        private static DataTable ADDNewRow(DataTable newdt, string br, string bs)
+        {
+            DataRow dr = newdt.NewRow();
+            dr["BR"] = br;
+            dr["BS"] = bs.Substring(0, bs.Length - 1).ToString();
+            newdt.Rows.Add(dr);
+            return newdt;
+        }
+
+        public DataTable ExcelToDatatalbe(string filePath)
+        {
+            Workbook book = new Workbook();
+            book.Open(filePath);
+            Worksheet sheet = book.Worksheets[0];
+            Cells cells = sheet.Cells;
+            DataTable dt_Import = cells.ExportDataTableAsString(0, 0, cells.MaxDataRow + 1, cells.MaxDataColumn + 1, true);//获取excel中的数据保存到一个datatable中
+            return dt_Import;
+        }
+
+
+        public string UploadExcel()
+       {
+        HttpPostedFileBase file = Request.Files[0];
+            string oldfilename = Path.GetFileName(file.FileName);//file.FileName:IE返回全路径，其他浏览器只返回文件名称
+            if (!Directory.Exists(Server.MapPath("~/FileUpload/Excel")))
+            {
+                Directory.CreateDirectory(Server.MapPath("~/FileUpload/Excel"));
+            }
+            string filename = oldfilename.Insert(oldfilename.LastIndexOf("."), "_" + DateTime.Now.ToString("yyyyMMddhhmmss"));
+            string newfile = @"~/FileUpload/Excel/" + filename;
+            string filepath = Server.MapPath(newfile);
+            file.SaveAs(filepath);
+
+
+            string json = "{\"filepath\":'" + (@"\/FileUpload\/Excel\/" + filename) + "',\"filename\":'" + filename + "'}";
+            return json;
+       
+       }
+        public FileResult ExportStu2()
+        {
+            string filepath = Request["filepath"];
+            DataTable dt = GetDataFromExcelByConn(filepath);
+            
+
+            NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();
+            //添加一个导出成功sheet
+            NPOI.SS.UserModel.ISheet sheet_S = book.CreateSheet("导入成功");
+
+            //给sheet1添加第一行的头部标题
+            NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
+            for (int j = 0; j < dt.Columns.Count; j++)
+            {
+                row1.CreateCell(j).SetCellValue(dt.Columns[j].ColumnName);
+            }
+           
+
+
+            //将数据逐步写入sheet_S各个行
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                for (int j = 0; j < dt.Columns.Count; j++)
+                {
+                    rowtemp.CreateCell(j).SetCellValue(dt.Rows[i][j].ToString());
+                }
+            }
+
+
+            System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            book.Write(ms);
+            ms.Seek(0, SeekOrigin.Begin);
+            return File(ms, "application/vnd.ms-excel", "PPAF_abc.xls");
+
+        }
+        #endregion
+
     }
 }
