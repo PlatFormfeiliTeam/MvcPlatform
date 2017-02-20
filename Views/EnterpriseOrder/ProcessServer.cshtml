@@ -5,55 +5,104 @@
 <link href="/js/Extjs42/resources/css/ext-all-gray.css" rel="stylesheet" type="text/css" />
 <script src="/js/Extjs42/bootstrap.js" type="text/javascript"></script>
 <link href="/css/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+<script type="text/javascript" src="/js/upload/plupload.full.min.js"></script>
 
 <script type="text/javascript">
-    function getdata() {
-        var upf = $('#upfile').val();
-        if ($('#upfile').val() == "") {
-            Ext.MessageBox.alert('提示', '请选择将要上传的文件!');
-            return;
-        } else {
-            var stuff = upf.match(/^(.*)(\.)(.{1,8})$/)[3];
-            if (stuff != 'xls' && stuff != 'xlsx') {
-                Ext.MessageBox.alert('提示', '文件类型不正确，请选择.xls、.xlsx文件!');
-                return;
+    var file_store;
+    var uploader;
+    $(document).ready(function () {
+        panel_file_ini();
+        if (uploader == null) {
+             upload_ini();
+        }
+    });
+ 
+
+
+    function upload_ini() {
+        uploader = new plupload.Uploader({
+            runtimes: 'html5,flash,silverlight,html4',
+            browse_button: 'pickfiles', // you can pass an id...
+            url: '/Common/UploadFile',
+            flash_swf_url: '/js/upload/Moxie.swf',
+            silverlight_xap_url: '/js/upload/Moxie.xap',
+            unique_names: true,
+            filters: {
+                max_file_size: '5000mb',
+                mime_types: [
+                    { title: "Excel files", extensions: "xls,xlsx" },
+                    
+                ]
             }
-            else {
-                Ext.getBody().mask("请稍等，正在上传中...", "x-mask-loading");
-                Ext.Ajax.request({
-                    url: "/EnterpriseOrder/UploadExcel",
-                    isUpload: true,
-                    form: "uploadform",
-                    success: function (response, option) {
-                        Ext.getBody().unmask();
-                        var json_obj = Ext.decode(response.responseText);                        
-                        $('#filename').text(json_obj.filename); 
-                        $('#filepath').val(json_obj.filepath);
-                    }
-                    })
-            }
-        }  
+        });
+        uploader.init();
+        uploader.bind('FilesAdded', function (up, files) {
+            uploader.start();
+        });
+        uploader.bind('FileUploaded', function (up, file) {
+           
+            var timestamp = Ext.Date.now();  //1351666679575  这个方法只是获取的时间戳
+            var date = new Date(timestamp);
+
+            file_store.insert(file_store.data.length,
+           { FILENAME: '/FileUpload/file/' + file.target_name, ORIGINALNAME: file.name, SIZES: file.size, UPLOADTIME: Ext.Date.format(date, 'Y-m-d H:i:s') });
+        });
     }
 
+
+    function panel_file_ini() {
+        file_store = Ext.create('Ext.data.JsonStore', {
+            fields: ['ID', 'FILENAME', 'ORIGINALNAME', 'UPLOADTIME', 'SIZES', 'IETYPE']
+        })
+        var tmp = new Ext.XTemplate(
+             '<tpl for=".">',
+            '<div class="panel panel-default thumb-wrap fl" style="margin-top:5px;margin-left:5px;width:240px">',
+            '<div class="panel-heading" style="padding-left:5px;padding-right:5px">{[values.ORIGINALNAME.substr(0,23)]}<div class="fr"><span class="glyphicon glyphicon-paperclip"></span></div></div>',
+            '<div class="panel-body" style="padding-left:5px;">{FILETYPENAME}|',
+            '<tpl>{[values.SIZES/1024 > 1024?Math.round(values.SIZES/(1024*1024))+"M":Math.round(values.SIZES/1024)+"K"]}</tpl>',
+            //'|{[values.UPLOADTIME.substr(0,values.UPLOADTIME.indexOf("T"))]}</div></div>',
+            '|{[values.UPLOADTIME]}</div></div>',
+            '</tpl>'
+            )
+        var fileview = Ext.create('Ext.view.View', {
+            id: 'w_fileview',
+            store: file_store,
+            tpl: tmp,
+            itemSelector: 'div.thumb-wrap',
+            multiSelect: true
+        })
+        var panel = Ext.create('Ext.panel.Panel', {
+            title: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;文件列表</span></h4>',
+            renderTo: "div_panel",
+            border: 0,
+            width: '100%',
+            minHeight: 100,
+            items: [fileview]
+        })
+    }
+    function Export() {
+        var records = Ext.getCmp('w_fileview').getSelectionModel().getSelection();
+        if (records.length == 0) {
+            Ext.MessageBox.alert("提示", "请选择要导出的文件记录！");
+            return
+        }
+        $("#filepath").val(records[0].get("FILENAME"));
+        $("#ORIGINALNAME").val(records[0].get("ORIGINALNAME"));
+        var path = '/EnterpriseOrder/ExportStu2'
+        $('#exportform').attr("action", path).submit();
+    }
 </script>
 <div class="container">
     <div id="div_form" style="width:100%;">
-        <form id="uploadform" name="form" enctype="multipart/form-data" method="post" style="float:left">
-            导入文件
-            <input type="text" name="upfile" id="upfile" readonly="readonly" style="width: 400px; height: 25px; border-radius: 4px; border: 1px solid #888888; " />
-            <button type="button" class="btn btn-primary btn-sm" onclick="rtbAttachment.click()"><i class="fa fa-exchange fa-fw"></i>&nbsp;浏览</button>
-
-            <input type="file" id="rtbAttachment" name="rtbAttachment" style="display:none" onchange="upfile.value=this.value"
-                   accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
-
-            <button type="button" id="btn_Submit" class="btn btn-primary btn-sm" onclick="getdata()"><i class="fa fa-upload"></i>&nbsp;导入</button>    
-        </form>
-        <form id="exportform" name="form" enctype="multipart/form-data" method="post" style="float:left" action="/EnterpriseOrder/ExportStu2">
+        <div style="float:left"><button type="button" class="btn btn-primary btn-sm" id="pickfiles"><i class="fa fa-upload"></i>&nbsp;上传文件</button></div>   
+        <form id="exportform" name="form" enctype="multipart/form-data" method="post" style="float:left">
             <input type="hidden" id="filepath" name="filepath" />
-            <button type="submit" id="btn_Export" class="btn btn-primary btn-sm"><i class="fa fa-level-down"></i>&nbsp;导出</button>
-        </form>       
+            <input type="hidden" id="ORIGINALNAME" name="ORIGINALNAME" />
+            <button type="button" id="btn_Export" class="btn btn-primary btn-sm" onclick="Export()"><i class="fa fa-level-down"></i>&nbsp;导出</button>
+        </form> 
     </div>
+
+  
 </div>
-<div style="width:1200px;">
-<div id="filename"></div>
-</div>
+
+<div id="div_panel"></div>

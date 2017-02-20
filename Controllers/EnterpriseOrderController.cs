@@ -591,42 +591,25 @@ namespace MvcPlatform.Controllers
 
         public DataTable ExcelToDatatalbe(string filePath)
         {
-            Workbook book = new Workbook();
-            book.Open(filePath);
+            Workbook book = new Workbook(filePath);
+            //book.Open(filePath);
             Worksheet sheet = book.Worksheets[0];
             Cells cells = sheet.Cells;
             DataTable dt_Import = cells.ExportDataTableAsString(0, 0, cells.MaxDataRow + 1, cells.MaxDataColumn + 1, true);//获取excel中的数据保存到一个datatable中
             return dt_Import;
+            
         }
 
-
-        public string UploadExcel()
-       {
-        HttpPostedFileBase file = Request.Files[0];
-            string oldfilename = Path.GetFileName(file.FileName);//file.FileName:IE返回全路径，其他浏览器只返回文件名称
-            if (!Directory.Exists(Server.MapPath("~/FileUpload/Excel")))
-            {
-                Directory.CreateDirectory(Server.MapPath("~/FileUpload/Excel"));
-            }
-            string filename = oldfilename.Insert(oldfilename.LastIndexOf("."), "_" + DateTime.Now.ToString("yyyyMMddhhmmss"));
-            string newfile = @"~/FileUpload/Excel/" + filename;
-            string filepath = Server.MapPath(newfile);
-            file.SaveAs(filepath);
-
-
-            string json = "{\"filepath\":'" + (@"\/FileUpload\/Excel\/" + filename) + "',\"filename\":'" + filename + "'}";
-            return json;
-       
-       }
         public FileResult ExportStu2()
         {
             string filepath = Request["filepath"];
+            string ORIGINALNAME = Request["ORIGINALNAME"];            
             DataTable dt = GetDataFromExcelByConn(filepath);
             
 
             NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();
             //添加一个导出成功sheet
-            NPOI.SS.UserModel.ISheet sheet_S = book.CreateSheet("导入成功");
+            NPOI.SS.UserModel.ISheet sheet_S = book.CreateSheet("sheet1");
 
             //给sheet1添加第一行的头部标题
             NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
@@ -651,7 +634,7 @@ namespace MvcPlatform.Controllers
             System.IO.MemoryStream ms = new System.IO.MemoryStream();
             book.Write(ms);
             ms.Seek(0, SeekOrigin.Begin);
-            return File(ms, "application/vnd.ms-excel", "PPAF_abc.xls");
+            return File(ms, "application/vnd.ms-excel", ORIGINALNAME.Substring(0, ORIGINALNAME.LastIndexOf(".")) + ".xls");
 
         }
         #endregion
