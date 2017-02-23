@@ -116,6 +116,11 @@ namespace MvcPlatform.Controllers
         {
             return View();
         }
+        public ActionResult DeclareList_Enterprise()
+        {
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
 
         //登录后显示菜单栏 by heguiqin 2016-08-25
         public string Header()
@@ -491,9 +496,22 @@ namespace MvcPlatform.Controllers
         {
             IDatabase db = SeRedis.redis.GetDatabase();
             string sql = "";
+
+            string json_sbfs_all = "[]";//申报关区 进口口岸 
+            if (db.KeyExists("common_data:sbfs_all"))
+            {
+                json_sbfs_all = db.StringGet("common_data:sbfs_all");
+            }
+            else
+            {
+                sql = "select CODE,NAME||'('||CODE||')' NAME from SYS_REPWAY where Enabled=1 ORDER BY CODE";
+                json_sbfs_all = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:sbfs_all", json_sbfs_all);
+            }
+
+            #region 申报方式
             string json_sbfs = "[]";//申报方式
             string busitype = Request["busitype"];
-            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             sql = "select CODE,NAME||'('||CODE||')' NAME from SYS_REPWAY where Enabled=1 and instr(busitype,'" + busitype + "')>0";
             if (busitype == "空运进口")
             {
@@ -591,6 +609,7 @@ namespace MvcPlatform.Controllers
                     db.StringSet("common_data_sbfs:gn", json_sbfs);
                 }
             }
+            #endregion
 
             string json_sbgq = "[]";//申报关区 进口口岸 
             if (db.KeyExists("common_data:sbgq"))
@@ -760,10 +779,11 @@ namespace MvcPlatform.Controllers
                 json_dzfwdw = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
                 db.StringSet("common_data:dzfwdw", json_dzfwdw);
             }
-            return "{jydw:" + json_jydw + ",sbfs:" + json_sbfs + ",sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",bzzl:" + json_bzzl
+            return "{jydw:" + json_jydw + ",sbfs_all:" + json_sbfs_all + ",sbfs:" + json_sbfs + ",sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",bzzl:" + json_bzzl
                 + ",myfs:" + json_myfs + ",containertype:" + json_containertype + ",containersize:" + json_containersize + ",truckno:" + json_truckno
                 + ",relacontainer:" + json_relacontainer + ",mzbz:" + json_mzbz + ",jylb:" + json_jylb + ",json_sbkb:" + json_sbkb
-                + ",inspbzzl:" + json_inspbzzl + ",adminurl:'" + AdminUrl + "',curuser:" + Extension.Get_UserInfo(HttpContext.User.Identity.Name) + ",dzfwdw:" + json_dzfwdw + "}";
+                + ",inspbzzl:" + json_inspbzzl + ",adminurl:'" + AdminUrl + "',curuser:" + Extension.Get_UserInfo(HttpContext.User.Identity.Name) 
+                + ",dzfwdw:" + json_dzfwdw + "}";
         }
 
         /*保存查询条件设置 by panhuaguo 2016-01-17*/
@@ -1173,10 +1193,6 @@ namespace MvcPlatform.Controllers
             if (role == "supplier") //如果是现场服务角色
             {
                 where += @" and cus.SCENEDECLAREID ='" + json_user.Value<string>("CUSTOMERID") + "' ";
-            }//如果是企业服务
-            if (role == "enterprise")
-            {
-                where += @" and ort.BUSIUNITCODE ='" + json_user.Value<string>("CUSTOMERHSCODE") + "' ";
             }
             if (role == "customer")//如果角色是客户
             {
@@ -2950,6 +2966,210 @@ namespace MvcPlatform.Controllers
             book.Write(ms);
             ms.Seek(0, SeekOrigin.Begin);
             return File(ms, "application/vnd.ms-excel", "报关单文件.xls");
-        } 
+        }
+
+
+
+        public string LoadDeclarationList_E()
+        {
+            string where = QueryConditionDecl_E();
+            string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
+                           det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
+                           det.TRANSNAME DECL_TRANSNAME, det.ISPRINT,
+                           det.TRANSNAME,det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
+                           ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
+                           ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE, 
+                           cus.SCENEDECLAREID,ort.CONTRACTNO CONTRACTNOORDER ,ort.CREATETIME,ort.REPUNITNAME,ort.REPNO                                                                      
+                           from list_declaration det 
+                                left join list_order ort on det.ordercode = ort.code 
+                                left join cusdoc.sys_customer cus on ort.customercode = cus.code 
+                                left join (
+                                      select ASSOCIATENO from list_order l inner join list_declaration i on l.code=i.ordercode 
+                                      where l.ASSOCIATENO is not null and l.isinvalid=0 and i.isinvalid=0 and (i.STATUS!=130 and i.STATUS!=110)          
+                                      ) a on ort.ASSOCIATENO=a.ASSOCIATENO 
+                                left join (select ordercode from list_declaration ld where ld.isinvalid=0 and ld.STATUS!=130 and ld.STATUS!=110) b on det.ordercode=b.ordercode
+                           where (det.STATUS=130 or det.STATUS=110) and det.isinvalid=0 and ort.isinvalid=0 " + where
+                      + " and a.ASSOCIATENO is null and b.ordercode is  null ";
+
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            var json = JsonConvert.SerializeObject(dt, iso);
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
+        public string QueryConditionDecl_E()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            string where = "";
+            if (!string.IsNullOrEmpty(Request["VALUE1"]))//判断查询条件1是否有值
+            {
+                switch (Request["CONDITION1"])
+                {
+                    case "REPUNITCODE"://申报单位
+                        where += " and ort.REPUNITCODE='" + Request["VALUE1"] + "' ";
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(Request["VALUE2"]))//判断查询条件2是否有值
+            {
+                switch (Request["CONDITION2"])
+                {
+                    case "REPNO"://对应号
+                        where += " and instr(ort.REPNO,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "BLNO"://提运单号
+                        where += " and instr(det.BLNO,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "ORDERCODE"://订单编号
+                        where += " and instr(det.ORDERCODE,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "DECLCARNO"://报关车号
+                        where += " and instr(ort.DECLCARNO,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "TRANSNAME"://运输工具名称
+                        where += " and instr(det.TRANSNAME,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "DECLNO"://报关单号
+                        where += " and instr(det.DECLARATIONCODE,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "CONTRACTNO"://合同协议号
+                        where += " and instr(det.CONTRACTNO,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "CONTRACTNOORDER"://合同发票号
+                        where += " and instr(ort.CONTRACTNO,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(Request["VALUE3"]))//判断查询条件3是否有值
+            {
+                switch (Request["CONDITION3"])
+                {
+                    case "DYBZ"://打印标志
+                        where += " and det.ISPRINT='" + Request["VALUE3"] + "' ";
+                        break;
+                }
+            }
+            switch (Request["CONDITION4"])
+            {
+                case "SUBMITTIME"://订单委托日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and ort.SUBMITTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and ort.SUBMITTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "REPTIME"://申报完成时间
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and det.REPENDTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and det.REPENDTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
+                    }
+                    break;
+            }
+            where += @" and ort.BUSIUNITCODE ='" + json_user.Value<string>("CUSTOMERHSCODE") + "' ";
+            return where;
+
+        }
+
+
+        public FileResult ExportDeclList_E()
+        {
+            string busitypeid = Request["busitypeid"];
+            string where = QueryConditionDecl_E();
+            string common_data_busitype = Request["common_data_busitype"];
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+            string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
+                           det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
+                           det.TRANSNAME DECL_TRANSNAME, det.ISPRINT,
+                           det.TRANSNAME,det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
+                           ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
+                           ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE, 
+                           cus.SCENEDECLAREID,ort.CONTRACTNO CONTRACTNOORDER ,ort.CREATETIME,ort.REPUNITNAME,ort.REPNO                                                                     
+                           from list_declaration det 
+                                left join list_order ort on det.ordercode = ort.code 
+                                left join cusdoc.sys_customer cus on ort.customercode = cus.code 
+                                left join (
+                                      select ASSOCIATENO from list_order l inner join list_declaration i on l.code=i.ordercode 
+                                      where l.ASSOCIATENO is not null and l.isinvalid=0 and i.isinvalid=0 and (i.STATUS!=130 and i.STATUS!=110)          
+                                      ) a on ort.ASSOCIATENO=a.ASSOCIATENO 
+                                left join (select ordercode from list_declaration ld where ld.isinvalid=0 and ld.STATUS!=130 and ld.STATUS!=110) b on det.ordercode=b.ordercode
+                           where (det.STATUS=130 or det.STATUS=110) and det.isinvalid=0 and ort.isinvalid=0 " + where
+                     + " and a.ASSOCIATENO is null and b.ordercode is  null ";
+            DataTable dt = DBMgr.GetDataTable(sql);
+
+            //创建Excel文件的对象
+            NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();
+
+            //添加一个导出成功sheet
+            NPOI.SS.UserModel.ISheet sheet_S = book.CreateSheet("报关单信息");
+
+            //给sheet1添加第一行的头部标题
+            NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
+            row1.CreateCell(0).SetCellValue("海关状态"); row1.CreateCell(1).SetCellValue("报关单号"); row1.CreateCell(2).SetCellValue("合同发票号"); row1.CreateCell(3).SetCellValue("申报单位");
+            row1.CreateCell(4).SetCellValue("申报完成时间"); row1.CreateCell(5).SetCellValue("运输工具名称"); row1.CreateCell(6).SetCellValue("业务类型"); row1.CreateCell(7).SetCellValue("出口口岸");
+            row1.CreateCell(8).SetCellValue("提运单号"); row1.CreateCell(9).SetCellValue("申报方式"); row1.CreateCell(10).SetCellValue("报关方式"); row1.CreateCell(11).SetCellValue("贸易方式");
+            row1.CreateCell(12).SetCellValue("合同协议号"); row1.CreateCell(13).SetCellValue("件数"); row1.CreateCell(14).SetCellValue("重量"); row1.CreateCell(15).SetCellValue("张数");
+            row1.CreateCell(16).SetCellValue("订单编号"); row1.CreateCell(17).SetCellValue("客户编号"); row1.CreateCell(18).SetCellValue("进/出"); row1.CreateCell(19).SetCellValue("两单关联号");
+            row1.CreateCell(20).SetCellValue("多单关联号"); 
+
+
+
+            //将数据逐步写入sheet_S各个行
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["CUSTOMSSTATUS"].ToString());
+                rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["DECLARATIONCODE"].ToString());
+                rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["CONTRACTNOORDER"].ToString());
+                rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["REPUNITNAME"].ToString());
+                rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["REPFINISHTIME"].ToString());
+                if (dt.Rows[i]["DECLTYPE"].ToString() == "17" || dt.Rows[i]["DECLTYPE"].ToString() == "13")
+                {
+                    rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["DECL_TRANSNAME"].ToString());
+
+                }
+                else
+                {
+                    rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["TRANSNAME"].ToString());
+
+                }
+                rowtemp.CreateCell(6).SetCellValue(getStatusName(dt.Rows[i]["BUSITYPE"].ToString(), common_data_busitype));
+                rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
+                rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["BLNO"].ToString());
+                rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());
+                rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["DECLWAYNAME"].ToString());//REPWAYID
+                rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["TRADEWAYCODES"].ToString());
+                rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
+                rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
+                rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
+                rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
+                rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+                rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["IETYPE"].ToString());
+                rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["ASSOCIATENO"].ToString());
+                rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["CORRESPONDNO"].ToString());
+            }
+
+
+            // 写入到客户端 
+            System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            book.Write(ms);
+            ms.Seek(0, SeekOrigin.Begin);
+            return File(ms, "application/vnd.ms-excel", "报关单文件.xls");
+        }
+
+
+
+
     }
 }
