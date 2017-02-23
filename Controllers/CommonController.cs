@@ -64,6 +64,10 @@ namespace MvcPlatform.Controllers
         {
             return View();
         }
+        public ActionResult FileConsult_E()//文件调阅
+        {
+            return View();
+        }
 
         public ActionResult MultiPrint()//批量打印
         {
@@ -1221,7 +1225,8 @@ namespace MvcPlatform.Controllers
         //文件调阅功能菜单
         public string ConsultInfo()
         {
-            string ordercode = Request["ordercode"];
+
+            string ordercode = Request["ordercode"];string role = Request["role"];
             string id = Request["id"];
             string sql = "";
             DataTable dt;
@@ -1233,19 +1238,38 @@ namespace MvcPlatform.Controllers
                 if (dt.Rows.Count > 0)
                 {
                     string entrusttypeid = dt.Rows[0]["ENTRUSTTYPE"] + "";
-                    switch (entrusttypeid)
+                    if (role == "enterprise")
                     {
-                        case "01":
-                            result += "[{id:'order',typename:'委托',leaf:false},{id:'declare',typename:'报关'}]";
-                            break;
-                        case "02":
-                            result += "[{id:'order',typename:'委托',leaf:false},{id:'declare',typename:'报检'}]";
-                            break;
-                        case "03":
-                            result += "[{id:'order',typename:'委托',leaf:false},{id:'declare',typename:'报关'},{id:'inspect',typename:'报检'}]";
-                            break;
+                        switch (entrusttypeid)
+                        {
+                            case "01":
+                                result += "[{id:'declare',typename:'报关'}]";
+                                break;
+                            case "02":
+                                result += "[{id:'declare',typename:'报检'}]";
+                                break;
+                            case "03":
+                                result += "[{id:'declare',typename:'报关'},{id:'inspect',typename:'报检'}]";
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (entrusttypeid)
+                        {
+                            case "01":
+                                result += "[{id:'order',typename:'委托',leaf:false},{id:'declare',typename:'报关'}]";
+                                break;
+                            case "02":
+                                result += "[{id:'order',typename:'委托',leaf:false},{id:'declare',typename:'报检'}]";
+                                break;
+                            case "03":
+                                result += "[{id:'order',typename:'委托',leaf:false},{id:'declare',typename:'报关'},{id:'inspect',typename:'报检'}]";
+                                break;
+                        }
                     }
                 }
+
                 return result;
             }
             //44 订单文件  58 配仓单文件  57  转关单文件  这三种类型都属于订单业务下

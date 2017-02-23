@@ -159,7 +159,7 @@
 
     //打开调阅信息
     function FileConsult(ORDERCODE, BUSITYPE, PREDECLCODE) {
-        opencenterwin("/Common/FileConsult?source=declare&ORDERCODE=" + ORDERCODE + "&BUSITYPE=" + BUSITYPE + "&PREDECLCODE=" + PREDECLCODE, 1200, 900);
+        opencenterwin("/Common/FileConsult_E?source=declare&ORDERCODE=" + ORDERCODE + "&BUSITYPE=" + BUSITYPE + "&PREDECLCODE=" + PREDECLCODE, 1200, 900);
     }
 
     function ClickShowwinwj() {   //打开调阅信息
@@ -168,7 +168,7 @@
             Ext.MessageBox.alert('提示', '请选择需要调阅的记录！');
             return;
         }
-        opencenterwin("/Common/FileConsult?source=declare&ORDERCODE=" + recs[0].get("ORDERCODE") + "&BUSITYPE=" + recs[0].get("BUSITYPE") + "&PREDECLCODE=" + recs[0].get("CODE"), 1200, 900);
+        opencenterwin("/Common/FileConsult_E?source=declare&ORDERCODE=" + recs[0].get("ORDERCODE") + "&BUSITYPE=" + recs[0].get("BUSITYPE") + "&PREDECLCODE=" + recs[0].get("CODE"), 1200, 900);
     }
 
     //显示海关状态回执记录
