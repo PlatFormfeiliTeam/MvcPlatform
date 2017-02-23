@@ -60,7 +60,7 @@
                 text: '<i class="fa fa-print" aria-hidden="true"></i>&nbsp;标准打印', handler: function (btn) {
                     Ext.Ajax.request({
                         url: '/Common/SinglePrint',
-                        params: { fileid: fileid, printtype: 'standardprint', printtmp: cbg_printtmp.getValue(), busitype: busitype },
+                        params: { fileid: fileid, printtype: 'standardprint', printtmp: cbg_printtmp.getValue(), busitype: busitype,role:'enterprise' },
                         success: function (response, success) {
                             Ext.getDom("contentIframe").src = response.responseText;
                         }
@@ -70,7 +70,7 @@
                 id: 'btn_taoda', text: '<i class="fa fa-print" aria-hidden="true"></i>&nbsp;套打打印', handler: function (btn) {
                     Ext.Ajax.request({
                         url: '/Common/SinglePrint',
-                        params: { fileid: fileid, printtype: 'templateprint' },
+                        params: { fileid: fileid, printtype: 'templateprint', role: 'enterprise' },
                         success: function (response, success) {
                             Ext.getDom("contentIframe").src = response.responseText;
                         }

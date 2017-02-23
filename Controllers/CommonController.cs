@@ -1549,6 +1549,7 @@ namespace MvcPlatform.Controllers
             DataTable dt = DBMgr.GetDataTable(sql);
             string output = Guid.NewGuid() + "";
             IList<string> filelist = new List<string>();
+            string role=Request["role"];
             if (printtype == "standardprint")//如果是标准打印
             { 
                 //报关单标准打印的时候用户必须在前端选择多个打印模板 单证二期已经删除了草单表,报关单标准打印已经摒弃了申报库别的判断 by panhuaguo2016-12-13
@@ -1560,18 +1561,18 @@ namespace MvcPlatform.Controllers
                         string outpath = AddBackground(dt.Rows[0]["FILENAME"] + "", tmpname, busitype, "");
                         filelist.Add(outpath);
                     }
-                    UpdatePrintInfo("list_declaration", dt.Rows[0]["DECLCODE"] + "");
+                    UpdatePrintInfo("list_declaration", dt.Rows[0]["DECLCODE"] + "", role);
                 }
                 else
                 {
                     filelist.Add(AdminUrl + "/file/" + dt.Rows[0]["FILENAME"]);
-                    UpdatePrintInfo("list_declaration", dt.Rows[0]["DECLCODE"] + "");
+                    UpdatePrintInfo("list_declaration", dt.Rows[0]["DECLCODE"] + "", role);
                 }
             }
             else//套打打印
             {
                 filelist.Add(AdminUrl + "/file/" + dt.Rows[0]["FILENAME"]);
-                UpdatePrintInfo("list_declaration", dt.Rows[0]["DECLCODE"] + "");
+                UpdatePrintInfo("list_declaration", dt.Rows[0]["DECLCODE"] + "", role);
             }
             string result = string.Empty;
             if (filelist.Count > 1)
@@ -1684,10 +1685,18 @@ namespace MvcPlatform.Controllers
             return "http://192.168.252.8:8012/Declare/" + outname + ".pdf";
         }
 
-        public void UpdatePrintInfo(string tablename, string code)
+        public void UpdatePrintInfo(string tablename, string code, string role)
         {
-            string sql = @"update " + tablename + " set PRINTNUM = PRINTNUM+1,ISPRINT = 1,PRINTTIME=sysdate where CODE='" + code + "'";
+            if(role=="enterprise")
+            {
+           
+            }
+            else
+            {
+             string sql = @"update " + tablename + " set PRINTNUM = PRINTNUM+1,ISPRINT = 1,PRINTTIME=sysdate where CODE='" + code + "'";
             DBMgr.ExecuteNonQuery(sql);
+            }
+            
         }
 
         //pdf文件合并
@@ -1822,7 +1831,7 @@ namespace MvcPlatform.Controllers
                     }
                     if (dt.Rows.Count > 0)
                     {
-                        UpdatePrintInfo("list_declaration", json.Value<string>("CODE"));
+                        UpdatePrintInfo("list_declaration", json.Value<string>("CODE"),"");
                     }
                 }
                 if (filetype == "63")
@@ -1835,7 +1844,7 @@ namespace MvcPlatform.Controllers
                     }
                     if (dt.Rows.Count > 0)
                     {
-                        UpdatePrintInfo("list_declaration", json.Value<string>("CODE") + "");
+                        UpdatePrintInfo("list_declaration", json.Value<string>("CODE") + "","");
                     }
                 }
                 if (filetype == "62" || filetype == "121")
@@ -1848,7 +1857,7 @@ namespace MvcPlatform.Controllers
                     }
                     if (dt.Rows.Count > 0)
                     {
-                        UpdatePrintInfo("list_inspection", json.Value<string>("CODE") + "");
+                        UpdatePrintInfo("list_inspection", json.Value<string>("CODE") + "","");
                     }
                 }
             }
