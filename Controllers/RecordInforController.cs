@@ -42,36 +42,90 @@ namespace MvcPlatform.Controllers
             return "{recordid:" + json_recordid + "}";
         }
 
-        public string Query_RecordInfor()
+        public string Query_RecordInfor(string type)
         {
             string where = "";
             if (!string.IsNullOrEmpty(Request["RECORDINFORID"]))
             {
-                where += " and t.CODE='" + Request["RECORDINFORID"] + "'";
+                where += " and a.CODE='" + Request["RECORDINFORID"] + "'";
             }
             if (!string.IsNullOrEmpty(Request["ITEMNO"]))
             {
-                where += " and  t.ITEMNO='" + Request["ITEMNO"] + "'";
+                where += " and  b.ITEMNO='" + Request["ITEMNO"] + "'";
             }
             if (!string.IsNullOrEmpty(Request["HSCODE"]))
             {
-                where += " and  t.HSCODE='" + Request["HSCODE"] + "'";
+                where += " and  b.HSCODE='" + Request["HSCODE"] + "'";
             }
-            if (!string.IsNullOrEmpty(Request["OPTIONS"]))
+            if (!string.IsNullOrEmpty(Request["OPTIONS"]) && type == "go")
             {
-                where += " and  t.OPTIONS='" + Request["OPTIONS"] + "'";
+                where += " and  b.OPTIONS='" + Request["OPTIONS"] + "'";
             }
-            if (!string.IsNullOrEmpty(Request["STATUS"]))
+            if (!string.IsNullOrEmpty(Request["STATUS"]) && type == "go")
             {
-                where += " and  t.STATUS='" + Request["STATUS"] + "'";
+                where += " and  b.STATUS='" + Request["STATUS"] + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["ITEMNOATTRIBUTE"]))
+            {
+                where += " and  b.ITEMNOATTRIBUTE='" + Request["ITEMNOATTRIBUTE"] + "'";
             }
             return where;
         }
 
-        public string loadRecordDetail_lj()
+        /*all sql
+         * string sql = @"select a.code,b.*
+                        from cusdoc.sys_recordinfo a
+                             inner join (  
+                                     select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
+                                            ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark
+                                            ,aa.options,aa.status,aa.customercode,aa.customername
+                                     from sys_recordinfo_detail_task aa where aa.status<50 
+                                     union
+                                     select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
+                                            ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark 
+                                            ,null options,null status,null customercode,null customername
+                                     from cusdoc.sys_recordinfo_detail aa 
+                                          left join (select * from sys_recordinfo_detail_task where status<50 and OPTIONS<>'A') bb on aa.id=bb.rid
+                                     where bb.rid is null
+                                ) b on a.id=b.recordinfoid ";*/
+        public string loadRecordDetail()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            string where = Query_RecordInfor();
+            string where = Query_RecordInfor("");
+
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+            string sql = @"select a.code,b.*
+                            from cusdoc.sys_recordinfo a
+                                 inner join (
+                                         select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
+                                                ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark 
+                                                ,null options,null status,null customercode,null customername
+                                         from cusdoc.sys_recordinfo_detail aa 
+                                              left join (select * from sys_recordinfo_detail_task where status<50 and OPTIONS<>'A') bb on aa.id=bb.rid
+                                         where bb.rid is null
+                                    ) b on a.id=b.recordinfoid ";
+            if (Request["ERROR"].ToString() == "true")
+            {
+                sql = sql + " left join (select hscode from cusdoc.BASE_COMMODITYHS where enabled=1) c on b.hscode=c.hscode";
+            }
+            sql = sql + " where a.busiunit='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where;
+
+            if (Request["ERROR"].ToString() == "true")
+            {
+                sql = sql + " and c.hscode is null";
+            }
+
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "OPTIONS", "desc"));
+            var json = JsonConvert.SerializeObject(dt, iso);
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
+        public string loadRecordDetail_Go()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string where = Query_RecordInfor("go");
 
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
@@ -82,14 +136,7 @@ namespace MvcPlatform.Controllers
                                          select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
                                                 ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark
                                                 ,aa.options,aa.status,aa.customercode,aa.customername
-                                         from sys_recordinfo_detail_task aa where aa.status<50 and aa.itemnoattribute='料件' 
-                                         union
-                                         select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
-                                                ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark 
-                                                ,null options,null status,null customercode,null customername
-                                         from cusdoc.sys_recordinfo_detail aa 
-                                              left join (select * from sys_recordinfo_detail_task where status<50 and OPTIONS<>'A') bb on aa.id=bb.rid
-                                         where aa.itemnoattribute='料件' and bb.rid is null
+                                         from sys_recordinfo_detail_task aa where aa.status<50
                                     ) b on a.id=b.recordinfoid ";
 
             if (Request["ERROR"].ToString() == "true")
