@@ -10,6 +10,7 @@
 <script src="/js/pan.js" type="text/javascript"></script>
 <script type="text/javascript">
     var common_data_recordid = [];
+    var gridpanel_lj, gridpanel_cp,total_lj,total_cp;
 
     Ext.onReady(function () {
         Ext.Ajax.request({
@@ -17,7 +18,76 @@
             success: function (response, opts) {
                 var commondata = Ext.decode(response.responseText);
                 common_data_recordid = commondata.recordid;//账册号
-                initSearch();
+                initSearch();                             
+
+                Ext.regModel('RecrodDetail', {
+                    fields: ['ID', 'OPTIONS', 'STATUS', 'RECORDINFOID', 'ITEMNO', 'HSCODE', 'ADDITIONALNO', 'ITEMNOATTRIBUTE', 'COMMODITYNAME'
+                        , 'SPECIFICATIONSMODEL', 'UNIT', 'CUSTOMERCODE', 'CUSTOMERNAME', 'REMARK']
+                });
+
+                var store_RecrodDetail_lj = Ext.create('Ext.data.JsonStore', {
+                    model: 'RecrodDetail',
+                    proxy: {
+                        type: 'ajax',
+                        url: '/RecordInfor/loadRecordDetail_lj',
+                        reader: {
+                            root: 'rows',
+                            type: 'json',
+                            totalProperty: 'total'
+                        }
+                    },
+                    autoLoad: true,
+                    listeners: {
+                        beforeload: function () {
+                            store_RecrodDetail_lj.getProxy().extraParams = {
+                                RECORDINFORID: Ext.getCmp('s_combo_recordid').getValue(), ITEMNO: Ext.getCmp("field_ITEMNO").getValue(), HSCODE: Ext.getCmp('field_HSCODE').getValue(),
+                                OPTIONS: Ext.getCmp('s_combo_optionstatus').getValue(), STATUS: Ext.getCmp("s_combo_status").getValue(), ERROR: Ext.getCmp('chk_error').getValue()
+                            }
+                        },
+                        load: function () {
+                            total_lj = store_RecrodDetail_lj.getProxy().getReader().rawData.total;
+                        }
+                    }
+                });
+
+                var pgbar_lj = Ext.create('Ext.toolbar.Paging', {
+                    id: 'pgbar_lj',
+                    displayMsg: '显示 {0} - {1} 条,共计 {2} 条',
+                    store: store_RecrodDetail_lj,
+                    displayInfo: true
+                })
+                gridpanel_lj = Ext.create('Ext.grid.Panel', {
+                    store: store_RecrodDetail_lj,
+                    height: 500,
+                    selModel: { selType: 'checkboxmodel' },
+                    bbar: pgbar_lj,
+                    enableColumnHide: false,
+                    columns: [
+                    { xtype: 'rownumberer', width: 35 },
+                    { header: 'ID', dataIndex: 'ID', hidden: true },
+                    { header: '变动状态', dataIndex: 'OPTIONS', width: 110 },
+                    { header: '申请状态', dataIndex: 'STATUS', width: 110},
+                    { header: '账册号', dataIndex: 'RECORDINFOID', width: 130 },
+                    { header: '项号', dataIndex: 'ITEMNO', width: 80 },
+                    { header: 'HS编码', dataIndex: 'HSCODE', width: 130 },
+                    { header: '附加码', dataIndex: 'ADDITIONALNO', width: 80 },
+                    { header: '项号属性', dataIndex: 'ITEMNOATTRIBUTE', width: 80 },
+                    { header: '商品名称', dataIndex: 'COMMODITYNAME', width: 200 },
+                    { header: '规格型号', dataIndex: 'SPECIFICATIONSMODEL', width: 200 },
+                    { header: '成交单位', dataIndex: 'UNIT', width: 100 },
+                    { header: '报关行', dataIndex: 'CUSTOMERNAME', width: 150 },
+                    { header: '备注', dataIndex: 'REMARK', width: 150 }
+                    ],
+                    viewConfig: {
+                        enableTextSelection: true
+                    },
+                    forceFit: true
+                });
+                var items = [{ title: '料件', items: [gridpanel_lj] }, { title: '成品', items: [gridpanel_cp] }];
+                var tabpanel = Ext.create('Ext.tab.Panel', {
+                    items: items,
+                    renderTo: 'appConId'
+                });
             }
         });
     });
@@ -33,6 +103,8 @@
             editable: false,
             store: store_recordid,
             fieldLabel: '账册号',
+            labelWidth: 50,
+            width: 220,
             displayField: 'NAME',
             name: 'recordid',
             valueField: 'CODE',
@@ -43,12 +115,15 @@
         var field_ITEMNO = Ext.create('Ext.form.field.Text', {
             id: 'field_ITEMNO',
             fieldLabel: '项号',
-            name: 'ITEMNO'
+            labelWidth: 50,
+            name: 'ITEMNO',
+            flex: .2
         });
         //HS编码
         var field_HSCODE = Ext.create('Ext.form.field.Text', {
             id: 'field_HSCODE',
             fieldLabel: 'HS编码',
+            labelWidth: 50,
             name: 'HSCODE'
         });
         //变动状态
@@ -61,6 +136,7 @@
             editable: false,
             store: store_optionstatus,
             fieldLabel: '变动状态',
+            labelWidth: 60,
             displayField: 'NAME',
             name: 'OPTIONS',
             valueField: 'CODE',
@@ -77,6 +153,7 @@
             editable: false,
             store: store_status,
             fieldLabel: '申请状态',
+            labelWidth: 60,
             displayField: 'NAME',
             name: 'STATUS',
             valueField: 'CODE',
@@ -86,8 +163,9 @@
         //非法码比对
         var chk_error = Ext.create('Ext.form.field.Checkbox', {
             id: 'chk_error',
-            fieldLabel: '非法码比对',
-            name: 'error'
+            boxLabel: '非法码比对',
+            name: 'error',
+            minWidth: 80
         });
         var formpanel = Ext.create('Ext.form.Panel', {
             id: 'formpanel',
@@ -102,7 +180,7 @@
     }
 
     function Select() {
-        Ext.getCmp('pgbar').moveFirst();
+        Ext.getCmp('pgbar_lj').moveFirst();
     }
     function Reset() {
         Ext.each(Ext.getCmp('formpanel').getForm().getFields().items, function (field) {
@@ -112,7 +190,7 @@
 </script>
 
 <div class="container">
-    <div id="div_form" style="width:100%;height:70px"></div>
+    <div id="div_form" style="width:100%;height:50px"></div>
     <div>
         <div class="btn-group" role="group">
             <button onclick="" type="button" class="btn btn-primary btn-sm"><i class="fa fa-rss"></i>&nbsp;调阅明细</button>
