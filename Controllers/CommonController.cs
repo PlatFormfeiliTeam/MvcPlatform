@@ -122,6 +122,7 @@ namespace MvcPlatform.Controllers
         }
         public ActionResult DeclareList_Enterprise()
         {
+            ViewBag.navigator = "通关管理>>通关信息";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
