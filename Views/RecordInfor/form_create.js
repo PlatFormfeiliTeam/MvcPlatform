@@ -810,15 +810,23 @@ function form_ini() {
     var field_HSCODE = Ext.create('Ext.form.field.Text', {
         id: 'HSCODE',
         name: 'HSCODE',
-        fieldLabel: 'HS编码'
+        flex:0.50
     });
 
     //附加码
     var field_ADDITIONALNO = Ext.create('Ext.form.field.Text', {
         id: 'ADDITIONALNO',
         name: 'ADDITIONALNO',
-        fieldLabel: '附加码'
+        flex: 0.50
     });
+    var hs_container = {
+        columnWidth: .25,
+        xtype: 'fieldcontainer',
+        layout: 'hbox',
+        fieldLabel: 'HS编码/附加码',
+        items: [field_HSCODE, field_ADDITIONALNO]
+    }
+
 
     //商品名称
     var field_COMMODITYNAME = Ext.create('Ext.form.field.Text', {
@@ -836,7 +844,7 @@ function form_ini() {
 
     //成交单位
     var store_UNIT = Ext.create('Ext.data.JsonStore', {
-        fields: ['CODE','NAME'],
+        fields: ['CODE', 'NAME', 'CODENAME'],
         data: common_data_unit
     });
     var combo_UNIT = Ext.create('Ext.form.field.ComboBox', {
@@ -844,8 +852,9 @@ function form_ini() {
         name: 'UNIT',
         store: store_UNIT,
         fieldLabel: '成交单位',
-        displayField: 'NAME',
+        displayField: 'CODENAME',
         valueField: 'CODE',
+        hideTrigger: true,
         triggerAction: 'all',
         forceSelection: true,
         queryMode: 'local',
@@ -915,6 +924,175 @@ function form_ini() {
             text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
         }]
     }
+    //变动状态
+    var store_OPTIONS = Ext.create('Ext.data.JsonStore', {
+        fields: ['CODE', 'NAME'],
+        data: optionstatus_js_data
+    });
+    var combo_OPTIONS = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_OPTIONS',
+        name: 'OPTIONS',
+        store: store_OPTIONS,
+        fieldLabel: '变动状态',
+        displayField: 'NAME',
+        valueField: 'CODE',
+        triggerAction: 'all',
+        forceSelection: true,
+        queryMode: 'local',
+        anyMatch: true,
+        readOnly: true,
+        flex: .33,
+        listeners: {
+            focus: function (cb) {
+                if (!cb.getValue()) {
+                    cb.clearInvalid();
+                    cb.store.clearFilter();
+                    cb.expand()
+                }
+            }
+        }
+    });
+
+    //状态
+    var store_STATUS = Ext.create('Ext.data.JsonStore', {
+        fields: ['CODE', 'NAME'],
+        data: status_js_data
+    });
+    var combo_STATUS = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_STATUS',
+        name: 'STATUS',
+        store: store_STATUS,
+        fieldLabel: '状态',
+        displayField: 'NAME',
+        valueField: 'CODE',
+        triggerAction: 'all',
+        forceSelection: true,
+        queryMode: 'local',
+        anyMatch: true,
+        readOnly: true,
+        flex: .33,
+        listeners: {
+            focus: function (cb) {
+                if (!cb.getValue()) {
+                    cb.clearInvalid();
+                    cb.store.clearFilter();
+                    cb.expand()
+                }
+            }
+        }
+    });
+    //打印状态
+    var store_ISPRINT_APPLY = Ext.create('Ext.data.JsonStore', {
+        fields: ['CODE', 'NAME'],
+        data:  [{ "CODE": "0", "NAME": "未打印" }, { "CODE": "1", "NAME": "已打印" }]
+    });
+    var combo_ISPRINT_APPLY = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_ISPRINT_APPLY',
+        name: 'ISPRINT_APPLY',
+        store: store_ISPRINT_APPLY,
+        fieldLabel: '打印状态',
+        displayField: 'NAME',
+        valueField: 'CODE',
+        triggerAction: 'all',
+        forceSelection: true,
+        queryMode: 'local',
+        anyMatch: true,
+        readOnly: true,
+        flex: .33,
+        listeners: {
+            focus: function (cb) {
+                if (!cb.getValue()) {
+                    cb.clearInvalid();
+                    cb.store.clearFilter();
+                    cb.expand()
+                }
+            }
+        }
+    });
+    
+
+    var combo_container = {
+        columnWidth: .50,
+        xtype: 'fieldcontainer',
+        layout: 'hbox',
+        items: [combo_OPTIONS, combo_STATUS, combo_ISPRINT_APPLY]
+    }
+ 
+
+    //-----------------------------
+
+    //备注
+    var field_REMARK = Ext.create('Ext.form.field.Text', {
+        id: 'REMARK',
+        name: 'REMARK',
+        fieldLabel: '备注',
+        flex: .50
+
+
+    });
+    //修改原因
+    var field_MODIFYREASON = Ext.create('Ext.form.field.Text', {
+        id: 'MODIFYREASON',
+        name: 'MODIFYREASON',
+        fieldLabel: '修改原因',
+        flex: .50
+    });
+    var textarea_container = {
+        columnWidth:1,
+        xtype: 'fieldcontainer',
+        layout: 'hbox',
+        items: [field_REMARK, field_MODIFYREASON]
+    }
+
+    //维护时间
+    var field_CREATEDATE = Ext.create('Ext.form.field.Text', {
+        id: 'CREATEDATE',
+        name: 'CREATEDATE',
+        fieldLabel: '维护时间'
+    });
+    //维护人
+    var field_CREATEMAN = Ext.create('Ext.form.field.Text', {
+        id: 'CREATEMAN',
+        name: 'CREATEMAN',
+        fieldLabel: '维护人'
+    });
+    //提交时间
+    var field_SUBMITTIME = Ext.create('Ext.form.field.Text', {
+        id: 'SUBMITTIME',
+        name: 'SUBMITTIME',
+        fieldLabel: '提交时间'
+    });
+    //提交人
+    var field_SUBMITMAN = Ext.create('Ext.form.field.Text', {
+        id: 'SUBMITMAN',
+        name: 'SUBMITMAN',
+        fieldLabel: '提交人'
+    });
+    //受理时间
+    var field_ACCEPTTIME = Ext.create('Ext.form.field.Text', {
+        id: 'ACCEPTTIME',
+        name: 'ACCEPTTIME',
+        fieldLabel: '受理时间'
+    });
+    //受理人
+    var field_ACCEPTMAN = Ext.create('Ext.form.field.Text', {
+        id: 'ACCEPTMAN',
+        name: 'ACCEPTMAN',
+        fieldLabel: '受理人'
+    });
+    //预录时间
+    var field_PRETIME = Ext.create('Ext.form.field.Text', {
+        id: 'PRETIME',
+        name: 'PRETIME',
+        fieldLabel: '预录时间'
+    });
+    //预录人
+    var field_PREMAN = Ext.create('Ext.form.field.Text', {
+        id: 'PREMAN',
+        name: 'PREMAN',
+        fieldLabel: '预录人'
+    });
+
 
     var bbar_r = '<div class="btn-group" role="group">'
                         + '<button type="button" onclick="orderBack();" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤单</button>'
@@ -951,10 +1129,13 @@ function form_ini() {
             validateOnChange: false
         },
         items: [
-            { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_RECORDINFOID, combo_CUSTOMAREA] },
-            { layout: 'column', height: 42, border: 0, items: [field_ITEMNO, combo_ITEMNOATTRIBUTE, field_HSCODE, field_ADDITIONALNO] },
-            { layout: 'column', height: 42, border: 0, items: [field_COMMODITYNAME, field_SPECIFICATIONSMODEL] },
-            { layout: 'column', height: 42, border: 0, items: [combo_UNIT, field_CUSTOMER] },
+            { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_RECORDINFOID, combo_CUSTOMAREA, field_CUSTOMER] },
+            { layout: 'column', height: 42, border: 0, items: [field_ITEMNO, combo_ITEMNOATTRIBUTE, hs_container,combo_UNIT] },
+            { layout: 'column', height: 42, border: 0, items: [field_COMMODITYNAME, field_SPECIFICATIONSMODEL, combo_container] },
+            { layout: 'column', height: 42, border: 0, items: [textarea_container] },
+            { layout: 'column', height: 42, border: 0, items: [field_CREATEDATE, field_CREATEMAN, field_SUBMITTIME, field_SUBMITMAN] },
+            { layout: 'column', height: 42, border: 0, items: [field_ACCEPTTIME, field_ACCEPTMAN, field_PRETIME, field_PREMAN] },
+
         /*{ layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_CODE, combo_ENTRUSTTYPENAME, combo_REPWAYNAME, combo_CUSTOMDISTRICTNAME, cont_bgsbdw] },
         { layout: 'column', height: 42, border: 0, items: [combo_DECLWAY, field_SUBMITUSERNAME, field_SUBMITTIME, field_STATUS, cont_bjsbdw] },
         { layout: 'column', height: 42, border: 0, items: [field_CREATEUSERNAME, field_CREATETIME, combo_dzfwdw] },
