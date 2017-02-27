@@ -60,7 +60,7 @@ namespace MvcPlatform.Controllers
             }
             else
             {
-                sql = @"select code,name,code||'('||name||')' as codename from base_declproductunit where enabled=1";
+                sql = @"select code,name,code||'('||name||')' as codename from base_declproductunit where enabled=1 order by code";
                 json_unit = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
                 db.StringSet("common_data:unit", json_unit);
             }
