@@ -151,6 +151,13 @@
                     cb.store.clearFilter();
                     cb.expand();
                 }
+            },
+            change: function (field_paste, newValue, oldValue, eOpts) {
+                if (newValue == "成品") {
+                    $("#div_form_con").show();
+                } else {
+                    $("#div_form_con").hide();
+                }
             }
         },
         allowBlank: false,
@@ -312,7 +319,7 @@
     
 
     var combo_container = {
-        columnWidth: .50,
+        columnWidth: .50, 
         xtype: 'fieldcontainer',
         layout: 'hbox', margin: 0,
         items: [combo_OPTIONS, combo_STATUS, combo_ISPRINT_APPLY]
@@ -392,7 +399,199 @@
         name: 'PREMAN',
         fieldLabel: '预录人'
     });
+    
+    formpanel = Ext.create('Ext.form.Panel', {
+        renderTo: 'div_form',
+        minHeight: 250,
+        border: 0,
+        tbar: tbar,
+        fieldDefaults: {
+            margin: '0 5 10 0',
+            labelWidth: 80,
+            columnWidth: .25,
+            labelAlign: 'right',
+            labelSeparator: '',
+            msgTarget: 'under',
+            validateOnBlur: false,
+            validateOnChange: false
+        },
+        items: [
+            { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_RECORDINFOID, combo_CUSTOMAREA, field_CUSTOMER] },
+            { layout: 'column', height: 42, border: 0, items: [field_ITEMNO, combo_ITEMNOATTRIBUTE, hs_container,combo_UNIT] },
+            { layout: 'column', height: 42, border: 0, items: [field_COMMODITYNAME, field_SPECIFICATIONSMODEL, combo_container] },
+            { layout: 'column', height: 42, border: 0, items: [textarea_container] },
+            { layout: 'column', height: 42, border: 0, items: [field_CREATEDATE, field_CREATEMAN, field_SUBMITTIME, field_SUBMITMAN] },
+            { layout: 'column', height: 42, border: 0, items: [field_ACCEPTTIME, field_ACCEPTMAN, field_PRETIME, field_PREMAN] },
+        field_CUSTOMERNAME
+        ]
+    });
+}
 
+function form_ini_con() {
+    var label_baseinfo = {
+        xtype: 'label',
+        margin: '5',
+        html: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;成品单耗信息</span></h4>'
+    }
+    var tbar = Ext.create('Ext.toolbar.Toolbar', {
+        items: [label_baseinfo, '->']
+    })
+
+
+    //对应料件序号
+    var field_ITEMNO_CONSUME = Ext.create('Ext.form.field.Text', {
+        id: 'ITEMNO_CONSUME',
+        name: 'ITEMNO_CONSUME',
+        fieldLabel: '对应料件序号', flex: .85, margin: 0
+    });
+
+    //报关行
+    var field_ITEMNO_LJ = {
+        xtype: 'fieldcontainer',
+        layout: 'hbox', columnWidth: 0.25,
+        items: [field_ITEMNO_CONSUME,
+            {
+                id: 'ITEMNO_CONSUME_btn', xtype: 'button', handler: function () {
+                    //selectjydw(combo_CUSTOMER, field_CUSTOMERNAME);
+                },
+                text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
+            }
+        ]
+    }
+
+    //对应料件名称
+    var field_ITEMNO_CONSUME_NAME = Ext.create('Ext.form.field.Text', {
+        id: 'ITEMNO_CONSUME_NAME',
+        name: 'ITEMNO_CONSUME_NAME',
+        fieldLabel: '对应名称'
+    });
+
+    //对应料件规格
+    var field_ITEMNO_CONSUME_SPEC = Ext.create('Ext.form.field.Text', {
+        id: 'ITEMNO_CONSUME_SPEC',
+        name: 'ITEMNO_CONSUME_SPEC',
+        fieldLabel: '对应规格'
+    });
+
+    //对应料件计量单位
+    var field_ITEMNO_CONSUME_UNIT = Ext.create('Ext.form.field.Text', {
+        id: 'ITEMNO_CONSUME_UNIT',
+        name: 'ITEMNO_CONSUME_UNIT',
+        fieldLabel: '对应计量单位'
+    });
+
+    //单耗
+    var field_CONSUME = Ext.create('Ext.form.field.Text', {
+        id: 'CONSUME',
+        name: 'CONSUME',
+        fieldLabel: '单耗'
+    });
+
+    //损耗率
+    var field_ATTRITIONRATE = Ext.create('Ext.form.field.Text', {
+        id: 'ATTRITIONRATE',
+        name: 'ATTRITIONRATE',
+        fieldLabel: '损耗率'
+    });
+
+    var formpanel_con = Ext.create('Ext.form.Panel', {
+        renderTo: 'div_form_con',
+        minHeight: 250,
+        border: 0,
+        tbar: tbar,
+        fieldDefaults: {
+            margin: '0 5 10 0',
+            labelWidth: 80,
+            columnWidth: .25,
+            labelAlign: 'right',
+            labelSeparator: '',
+            msgTarget: 'under',
+            validateOnBlur: false,
+            validateOnChange: false
+        },
+        items: [
+            { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_ITEMNO_LJ, field_ITEMNO_CONSUME_NAME, field_ITEMNO_CONSUME_SPEC, field_ITEMNO_CONSUME_UNIT] },
+            { layout: 'column', height: 42, border: 0, items: [field_CONSUME, field_ATTRITIONRATE] }
+        ]
+    });
+    //=================================================
+    Ext.regModel('RecrodDetail', {
+        fields: ['ID', 'OPTIONS', 'STATUS', 'RECORDINFOID', 'CODE', 'ITEMNO', 'HSCODE', 'ADDITIONALNO', 'ITEMNOATTRIBUTE', 'COMMODITYNAME'
+            , 'SPECIFICATIONSMODEL', 'UNIT', 'CUSTOMERCODE', 'CUSTOMERNAME', 'REMARK']
+    });
+
+    var store_RecrodDetail_lj = Ext.create('Ext.data.JsonStore', {
+        model: 'RecrodDetail',
+        pageSize: 20,
+        proxy: {
+            type: 'ajax',
+            url: '/RecordInfor/loadRecordDetail',
+            reader: {
+                root: 'rows',
+                type: 'json',
+                totalProperty: 'total'
+            }
+        },
+        autoLoad: true,
+        listeners: {
+            beforeload: function () {
+                store_RecrodDetail_lj.getProxy().extraParams = {
+                    ITEMNOATTRIBUTE: '料件',
+                    RECORDINFORID: Ext.getCmp('s_combo_recordid').getValue(), ITEMNO: Ext.getCmp("field_ITEMNO").getValue(), HSCODE: Ext.getCmp('field_HSCODE').getValue(),
+                    OPTIONS: Ext.getCmp('s_combo_optionstatus').getValue(), STATUS: Ext.getCmp("s_combo_status").getValue(), ERROR: Ext.getCmp('chk_error').getValue()
+                }
+            },
+            load: function () {
+                var total_lj = store_RecrodDetail_lj.getProxy().getReader().rawData.total;
+                Ext.getCmp("tabpanel").items.items[0].setTitle("料件(" + total_lj + ")");
+            }
+        }
+    });
+
+    var pgbar_lj = Ext.create('Ext.toolbar.Paging', {
+        id: 'pgbar_lj',
+        displayMsg: '显示 {0} - {1} 条,共计 {2} 条',
+        store: store_RecrodDetail_lj,
+        displayInfo: true
+    })
+    gridpanel_lj = Ext.create('Ext.grid.Panel', {
+        store: store_RecrodDetail_lj,
+        height: 500,
+        selModel: { selType: 'checkboxmodel' },
+        bbar: pgbar_lj,
+        enableColumnHide: false,
+        columns: [
+        { xtype: 'rownumberer', width: 35 },
+        { header: 'ID', dataIndex: 'ID', hidden: true },
+        //{ header: '变动状态', dataIndex: 'OPTIONS', width: 110 },
+        //{ header: '申请状态', dataIndex: 'STATUS', width: 110 },
+        { header: '账册号', dataIndex: 'CODE', width: 130 },
+        { header: '项号', dataIndex: 'ITEMNO', width: 80 },
+        { header: 'HS编码', dataIndex: 'HSCODE', width: 130 },
+        { header: '附加码', dataIndex: 'ADDITIONALNO', width: 80 },
+        { header: '项号属性', dataIndex: 'ITEMNOATTRIBUTE', width: 80 },
+        { header: '商品名称', dataIndex: 'COMMODITYNAME', width: 200 },
+        { header: '规格型号', dataIndex: 'SPECIFICATIONSMODEL', width: 200 },
+        { header: '成交单位', dataIndex: 'UNIT', width: 80, renderer: renderOrder },
+        //{ header: '报关行', dataIndex: 'CUSTOMERNAME', width: 150 },
+        { header: '备注', dataIndex: 'REMARK', width: 150 }
+        ],
+        viewConfig: {
+            enableTextSelection: true
+        },
+        forceFit: true
+    });
+
+
+
+
+
+
+
+}
+
+
+function form_ini_btn() {
 
     var bbar_r = '<div class="btn-group" role="group">'
                         + '<button type="button" onclick="orderBack();" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤单</button>'
@@ -411,12 +610,9 @@
         items: [bbar_l, '->', bbar_r]
     })
 
-
     formpanel = Ext.create('Ext.form.Panel', {
-        renderTo: 'div_form',
-        minHeight: 350,
+        renderTo: 'div_form_btn',
         border: 0,
-        tbar: tbar,
         bbar: bbar,
         fieldDefaults: {
             margin: '0 5 10 0',
@@ -428,22 +624,7 @@
             validateOnBlur: false,
             validateOnChange: false
         },
-        items: [
-            { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_RECORDINFOID, combo_CUSTOMAREA, field_CUSTOMER] },
-            { layout: 'column', height: 42, border: 0, items: [field_ITEMNO, combo_ITEMNOATTRIBUTE, hs_container,combo_UNIT] },
-            { layout: 'column', height: 42, border: 0, items: [field_COMMODITYNAME, field_SPECIFICATIONSMODEL, combo_container] },
-            { layout: 'column', height: 42, border: 0, items: [textarea_container] },
-            { layout: 'column', height: 42, border: 0, items: [field_CREATEDATE, field_CREATEMAN, field_SUBMITTIME, field_SUBMITMAN] },
-            { layout: 'column', height: 42, border: 0, items: [field_ACCEPTTIME, field_ACCEPTMAN, field_PRETIME, field_PREMAN] },
-
-        /*{ layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_CODE, combo_ENTRUSTTYPENAME, combo_REPWAYNAME, combo_CUSTOMDISTRICTNAME, cont_bgsbdw] },
-        { layout: 'column', height: 42, border: 0, items: [combo_DECLWAY, field_SUBMITUSERNAME, field_SUBMITTIME, field_STATUS, cont_bjsbdw] },
-        { layout: 'column', height: 42, border: 0, items: [field_CREATEUSERNAME, field_CREATETIME, combo_dzfwdw] },
-        { layout: 'column', border: 42, border: 0, items: [label_busiinfo, chk_container] },
-        { layout: 'column', height: 42, border: 0, items: [field_CUSNO, combo_PORTCODE, field_jydw, field_TOTALNO, field_DIVIDENO] },
-        { layout: 'column', height: 42, border: 0, items: [field_quanpackage, field_weight, field_contractno, field_myfs, field_TURNPRENO] },
-        { layout: 'column', height: 42, border: 0, items: [combo_mzbz, field_CLEARANCENO, container_bgch, field_ORDERREQUEST, chk_CHKLAWCONDITION] },*/
-        field_CUSTOMERNAME
-        ]
+        items: []
     });
 }
+
