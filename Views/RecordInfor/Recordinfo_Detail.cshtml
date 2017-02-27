@@ -393,6 +393,10 @@
         });
     }
 
+    function Open() {
+        opencenterwin("/RecordInfor/Create", 1600, 900);
+    }
+
 </script>
 
 <div class="container">
@@ -400,7 +404,7 @@
     <div>
         <div class="btn-group" role="group">
             <button onclick="" type="button" class="btn btn-primary btn-sm"><i class="fa fa-rss"></i>&nbsp;调阅明细</button>
-            <button onclick="" type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;添加</button>
+            <button onclick="Open()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;添加</button>
             <button onclick="" type="button" class="btn btn-primary btn-sm dropdown-toggle"><i class="fa fa-pencil-square-o fa-fw"></i>&nbsp;变动申请</button>
             <button onclick="" type="button" class="btn btn-primary btn-sm"><i class="fa fa-trash-o"></i>&nbsp;项号删除申请</button>
             <button onclick="" type="button" class="btn btn-primary btn-sm dropdown-toggle"><i class="fa fa-pencil-square-o fa-fw"></i>&nbsp;修改</button>
