@@ -1663,6 +1663,12 @@ function renderOrder(value, cellmeta, record, rowIndex, columnIndex, store) {
         case "PRINTSTATUS":
             rtn = value == "1" ? '<i class="fa fa-check" style="color:blue" aria-hidden="true"></i>' : '<i class="fa fa-times" style="color:red" aria-hidden="true"></i>';
             break;
+        case "UNIT":
+            var rec = store_unit.findRecord('CODE', value);
+            if (rec) {
+                rtn = rec.get("NAME");
+            }
+            break;
     }
     return rtn;
 }

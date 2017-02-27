@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -33,13 +34,26 @@ namespace MvcPlatform.Controllers
         public string Ini_Record_Data()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            IDatabase db = SeRedis.redis.GetDatabase();
             string sql = "";
 
             string json_recordid = "[]";
             sql = @"select code,code||'('||bookattribute||')' as name from sys_recordinfo where busiunit= '" + json_user.Value<string>("CUSTOMERHSCODE") + "'";
             json_recordid = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
 
-            return "{recordid:" + json_recordid + "}";
+            string json_unit = "[]";
+            if (db.KeyExists("common_data:unit"))
+            {
+                json_unit = db.StringGet("common_data:unit");
+            }
+            else
+            {
+                sql = @"select code,name,code||'('||name||')' as codename from base_declproductunit where enabled=1";
+                json_unit = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:unit", json_unit);
+            }
+
+            return "{recordid:" + json_recordid + ",unit:" + json_unit + "}";
         }
 
         public string Query_RecordInfor(string type)
@@ -102,9 +116,7 @@ namespace MvcPlatform.Controllers
                                          select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
                                                 ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark 
                                                 ,null options,null status,null customercode,null customername
-                                         from cusdoc.sys_recordinfo_detail aa 
-                                              left join (select * from sys_recordinfo_detail_task where status<50 and OPTIONS<>'A') bb on aa.id=bb.rid
-                                         where bb.rid is null
+                                         from cusdoc.sys_recordinfo_detail aa
                                     ) b on a.id=b.recordinfoid ";
             if (Request["ERROR"].ToString() == "true")
             {
@@ -117,7 +129,7 @@ namespace MvcPlatform.Controllers
                 sql = sql + " and c.hscode is null";
             }
 
-            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "OPTIONS", "desc"));
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "recordinfoid,itemno", "asc"));
             var json = JsonConvert.SerializeObject(dt, iso);
             return "{rows:" + json + ",total:" + totalProperty + "}";
         }
@@ -150,7 +162,7 @@ namespace MvcPlatform.Controllers
                 sql = sql + " and c.hscode is null";
             }
 
-            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "OPTIONS", "desc"));
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "options,status", "asc"));
             var json = JsonConvert.SerializeObject(dt, iso);
             return "{rows:" + json + ",total:" + totalProperty + "}";
         }
