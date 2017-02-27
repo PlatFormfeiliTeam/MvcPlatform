@@ -342,6 +342,7 @@
         id: 'MODIFYREASON',
         name: 'MODIFYREASON',
         fieldLabel: '<font color=red>修改原因</font>',
+        fieldStyle: 'border-color:red;',
         flex: .50
     });
     var textarea_container = {
@@ -355,49 +356,64 @@
     var field_CREATEDATE = Ext.create('Ext.form.field.Text', {
         id: 'CREATEDATE',
         name: 'CREATEDATE',
-        fieldLabel: '维护时间'
+        fieldLabel: '维护时间',
+        fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
     //维护人
     var field_CREATEMAN = Ext.create('Ext.form.field.Text', {
         id: 'CREATEMAN',
         name: 'CREATEMAN',
-        fieldLabel: '维护人'
+        fieldLabel: '维护人',
+        fieldStyle: 'background-color: #CECECE; background-image: none;'
+
     });
     //提交时间
     var field_SUBMITTIME = Ext.create('Ext.form.field.Text', {
         id: 'SUBMITTIME',
         name: 'SUBMITTIME',
-        fieldLabel: '提交时间'
+        fieldLabel: '提交时间',
+        fieldStyle: 'background-color: #CECECE; background-image: none;'
+
     });
     //提交人
     var field_SUBMITMAN = Ext.create('Ext.form.field.Text', {
         id: 'SUBMITMAN',
         name: 'SUBMITMAN',
-        fieldLabel: '提交人'
+        fieldLabel: '提交人',
+        fieldStyle: 'background-color: #CECECE; background-image: none;'
+
     });
     //受理时间
     var field_ACCEPTTIME = Ext.create('Ext.form.field.Text', {
         id: 'ACCEPTTIME',
         name: 'ACCEPTTIME',
-        fieldLabel: '受理时间'
+        fieldLabel: '受理时间',
+        fieldStyle: 'background-color: #CECECE; background-image: none;'
+
     });
     //受理人
     var field_ACCEPTMAN = Ext.create('Ext.form.field.Text', {
         id: 'ACCEPTMAN',
         name: 'ACCEPTMAN',
-        fieldLabel: '受理人'
+        fieldLabel: '受理人',
+        fieldStyle: 'background-color: #CECECE; background-image: none;'
+
     });
     //预录时间
     var field_PRETIME = Ext.create('Ext.form.field.Text', {
         id: 'PRETIME',
         name: 'PRETIME',
-        fieldLabel: '预录时间'
+        fieldLabel: '预录时间',
+        fieldStyle: 'background-color: #CECECE;background-image: none;'
+
     });
     //预录人
     var field_PREMAN = Ext.create('Ext.form.field.Text', {
         id: 'PREMAN',
         name: 'PREMAN',
-        fieldLabel: '预录人'
+        fieldLabel: '预录人',
+        fieldStyle: 'background-color: #CECECE; background-image: none;'
+
     });
     
     formpanel = Ext.create('Ext.form.Panel', {
@@ -496,7 +512,7 @@ function form_ini_con() {
 
     var formpanel_con = Ext.create('Ext.form.Panel', {
         renderTo: 'div_form_con',
-        minHeight: 250,
+        minHeight: 100,
         border: 0,
         tbar: tbar,
         fieldDefaults: {
@@ -515,66 +531,54 @@ function form_ini_con() {
         ]
     });
     //=================================================
-    Ext.regModel('RecrodDetail', {
-        fields: ['ID', 'OPTIONS', 'STATUS', 'RECORDINFOID', 'CODE', 'ITEMNO', 'HSCODE', 'ADDITIONALNO', 'ITEMNOATTRIBUTE', 'COMMODITYNAME'
-            , 'SPECIFICATIONSMODEL', 'UNIT', 'CUSTOMERCODE', 'CUSTOMERNAME', 'REMARK']
+    var data_PRODUCTCONSUME= [];
+    var store_PRODUCTCONSUME = Ext.create('Ext.data.JsonStore', {
+        fields: ['ITEMNO_CONSUME', 'CONSUME', 'ATTRITIONRATE'],
+        data: data_PRODUCTCONSUME
     });
+    var w_tbar = Ext.create('Ext.toolbar.Toolbar', {
+        items: ['<span style="color:red">说明：双击列表项可对已添加的记录进行修改</span>',
+               '->',
+               {
+                   text: '<span class="icon iconfont" style="font-size:10px">&#xe622;</span>&nbsp;保 存',
+                   handler: function () {
+                       //var recs = w_grid.getSelectionModel().getSelection();
+                       //if (recs.length > 0) {
+                       //    w_gridstore.remove(recs);
+                       //}
+                       //Ext.getCmp('btn_mode').setText('<span style="color:blue">新增模式</span>');
+                       //rownum = -1;
+                   }
+               },
+               {
+                   text: '<span class="icon iconfont" style="font-size:10px">&#xe6d3;</span>&nbsp;删 除',
+                   handler: function () {
+                       //var recs = w_grid.getSelectionModel().getSelection();
+                       //if (recs.length > 0) {
+                       //    w_gridstore.remove(recs);
+                       //}
+                       //Ext.getCmp('btn_mode').setText('<span style="color:blue">新增模式</span>');
+                       //rownum = -1;
+                   }
+               }]
 
-    var store_RecrodDetail_lj = Ext.create('Ext.data.JsonStore', {
-        model: 'RecrodDetail',
-        pageSize: 20,
-        proxy: {
-            type: 'ajax',
-            url: '/RecordInfor/loadRecordDetail',
-            reader: {
-                root: 'rows',
-                type: 'json',
-                totalProperty: 'total'
-            }
-        },
-        autoLoad: true,
-        listeners: {
-            beforeload: function () {
-                store_RecrodDetail_lj.getProxy().extraParams = {
-                    ITEMNOATTRIBUTE: '料件',
-                    RECORDINFORID: Ext.getCmp('s_combo_recordid').getValue(), ITEMNO: Ext.getCmp("field_ITEMNO").getValue(), HSCODE: Ext.getCmp('field_HSCODE').getValue(),
-                    OPTIONS: Ext.getCmp('s_combo_optionstatus').getValue(), STATUS: Ext.getCmp("s_combo_status").getValue(), ERROR: Ext.getCmp('chk_error').getValue()
-                }
-            },
-            load: function () {
-                var total_lj = store_RecrodDetail_lj.getProxy().getReader().rawData.total;
-                Ext.getCmp("tabpanel").items.items[0].setTitle("料件(" + total_lj + ")");
-            }
-        }
     });
-
-    var pgbar_lj = Ext.create('Ext.toolbar.Paging', {
-        id: 'pgbar_lj',
-        displayMsg: '显示 {0} - {1} 条,共计 {2} 条',
-        store: store_RecrodDetail_lj,
-        displayInfo: true
-    })
-    gridpanel_lj = Ext.create('Ext.grid.Panel', {
-        store: store_RecrodDetail_lj,
-        height: 500,
+    gridpanel_PRODUCTCONSUME = Ext.create('Ext.grid.Panel', {
+        renderTo: 'div_form_con',
+        store: store_PRODUCTCONSUME,
+        height: 150,
         selModel: { selType: 'checkboxmodel' },
-        bbar: pgbar_lj,
         enableColumnHide: false,
+        tbar:w_tbar,
         columns: [
         { xtype: 'rownumberer', width: 35 },
         { header: 'ID', dataIndex: 'ID', hidden: true },
-        //{ header: '变动状态', dataIndex: 'OPTIONS', width: 110 },
-        //{ header: '申请状态', dataIndex: 'STATUS', width: 110 },
-        { header: '账册号', dataIndex: 'CODE', width: 130 },
-        { header: '项号', dataIndex: 'ITEMNO', width: 80 },
-        { header: 'HS编码', dataIndex: 'HSCODE', width: 130 },
-        { header: '附加码', dataIndex: 'ADDITIONALNO', width: 80 },
-        { header: '项号属性', dataIndex: 'ITEMNOATTRIBUTE', width: 80 },
-        { header: '商品名称', dataIndex: 'COMMODITYNAME', width: 200 },
-        { header: '规格型号', dataIndex: 'SPECIFICATIONSMODEL', width: 200 },
-        { header: '成交单位', dataIndex: 'UNIT', width: 80, renderer: renderOrder },
-        //{ header: '报关行', dataIndex: 'CUSTOMERNAME', width: 150 },
-        { header: '备注', dataIndex: 'REMARK', width: 150 }
+        { header: '对应料件序号', dataIndex: 'ITEMNO_CONSUME', width: 80 },
+        { header: '对应料件名称', dataIndex: '', width: 130 },
+        { header: '对应料件规格', dataIndex: '', width: 130 },
+        { header: '对应料件计量单位', dataIndex: '', width: 80 },
+        { header: '单耗', dataIndex: 'CONSUME', width: 80 },
+        { header: '损耗率', dataIndex: 'ATTRITIONRATE', width: 80 }
         ],
         viewConfig: {
             enableTextSelection: true
