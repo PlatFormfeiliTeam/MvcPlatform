@@ -79,6 +79,69 @@
             minHeight: 100,
             items: [fileview]
         })
+
+
+        //打印
+        var field_code = Ext.create('Ext.form.field.Text', {
+            id: 'declCODE',
+            name: 'CODE',
+            fieldLabel: 'CODE',
+            labelWidth: 40,
+            labelAlign: 'right',
+            width:300
+
+        });
+
+        var btn_print=Ext.create('Ext.Button', {
+            text: '打印条码',
+            handler: function () {
+                if ($.trim(Ext.getCmp("declCODE").getValue()).length!=18) {
+                    Ext.MessageBox.alert("提示","CODE长度必须为18位！");
+                    return;
+                }
+
+                    Ext.Ajax.request({
+                        url: "/EnterpriseOrder/DealCode",
+                        params: {
+                            code: Ext.getCmp("declCODE").getValue()
+                        },
+                        success: function (response, opts) {
+
+                            var data = Ext.decode(response.responseText);
+                            if (data.message == "success") {                                
+                                var win = Ext.create("Ext.window.Window", {
+                                    title: "文件预览",
+                                    width: 800,
+                                    height: 600,
+                                    layout: "fit",
+                                    modal: true,
+                                    closeAction: "destroy",
+                                    items: [{
+                                        html: "<div id='fileViewDiv' style='height: 100%;width: 100%;'></div>"
+                                    }]
+                                });
+                                win.show();
+                                document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="/FileUpload/file/' + data.url + '"></embed>';
+                                
+
+                            }
+                            else {
+                                Ext.MessageBox.alert("提示", data.message);
+                            }
+                        }
+                    })
+                }
+            
+      
+        });
+        var panelPrint = Ext.create('Ext.panel.Panel', {
+            title: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;条码打印</span></h4>',
+            renderTo: "div_print",
+            border: 0,
+            width: '100%',
+            minHeight: 100,
+            items: [{ layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_code, btn_print] }]
+        })
     }
     function Export() {
         var records = Ext.getCmp('w_fileview').getSelectionModel().getSelection();
@@ -106,3 +169,4 @@
 </div>
 
 <div id="div_panel"></div>
+<div id="div_print"></div>
