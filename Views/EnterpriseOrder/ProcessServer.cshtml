@@ -88,15 +88,19 @@
             fieldLabel: 'CODE',
             labelWidth: 40,
             labelAlign: 'right',
-            width:300
-
+            width:300,
+            maxLength: 18,
+            minLength: 18,
+            minLengthText: '条码长度应为18位！',
+            msgTarget: 'under',
+            enforceMaxLength: true
         });
 
         var btn_print=Ext.create('Ext.Button', {
             text: '打印条码',
             handler: function () {
                 if ($.trim(Ext.getCmp("declCODE").getValue()).length!=18) {
-                    Ext.MessageBox.alert("提示","CODE长度必须为18位！");
+                   // Ext.MessageBox.alert("提示","CODE长度必须为18位！");
                     return;
                 }
 
@@ -108,7 +112,12 @@
                         success: function (response, opts) {
 
                             var data = Ext.decode(response.responseText);
-                            if (data.message == "success") {                                
+                            if (data.message == "success") {
+                                if(data.flag=="1")
+                                {
+                                    Ext.MessageBox.alert("提示", "一周之内有重复CODE");
+                                    return;
+                                }
                                 var win = Ext.create("Ext.window.Window", {
                                     title: "文件预览",
                                     width: 800,

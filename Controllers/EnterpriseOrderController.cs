@@ -648,35 +648,48 @@ namespace MvcPlatform.Controllers
         {
             DateTime dt = DateTime.Now;  //当前时间
             string No = dt.ToString("yyyyMMddHHmmss");
-            dt.AddDays(-7).ToString();
-            string message = string.Empty;
-            string declcode = Request["code"] + "";
+            //dt.AddDays(-7).ToString();
+            string message = "success"; ;
+            string flag = string.Empty;
             string ImageUrl = string.Empty;
             string WebFilePath = ConfigurationManager.AppSettings["WebFilePath"];
-            try
+            string declcode = Request["code"] + "";
+            DataTable dt_barcode = new DataTable();
+            dt_barcode=DBMgr.GetDataTable("select * from sys_barcode where barcode='" + declcode + "' and createdate > sysdate - interval '7' day ");
+            if (dt_barcode.Rows.Count > 0)
             {
-                Declcode = declcode;
-                Code128C code128c = new Code128C();
-                bmp_Print = code128c.GetCodeImage(declcode);
-
-                //GetViewImage(bmp_Print, declcode);
-                System.IO.MemoryStream _Stream = new System.IO.MemoryStream();
-                bmp_Print.Save(_Stream, System.Drawing.Imaging.ImageFormat.Jpeg);
-                string path = WebFilePath + No + ".jpeg";
-
-                bmp_Print.Save(path);
-
-                ConvertJPG2PDF(path, WebFilePath + No + ".pdf");
-                ImageUrl = string.Format("{0}.pdf", No);
-                message = "success";
-                
+                flag = "1";
             }
-            catch (Exception e)
+            else
             {
-                message = e.Message;
-               // throw;
+                try
+                {
+                    Declcode = declcode;
+                    Code128C code128c = new Code128C();
+                    bmp_Print = code128c.GetCodeImage(declcode);
+
+                    GetViewImage(bmp_Print, declcode);
+                    System.IO.MemoryStream _Stream = new System.IO.MemoryStream();
+                    bmp_Print.Save(_Stream, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    string path = WebFilePath + No + ".jpeg";
+
+                    bmp_Print.Save(path);
+
+                    ConvertJPG2PDF(path, WebFilePath + No + ".pdf");
+                    ImageUrl = string.Format("{0}.pdf", No);
+                    DBMgr.ExecuteNonQuery("insert into sys_barcode(ID,BARCODE) values(SYS_BARCODE_id.Nextval,'" + declcode + "')");
+
+                }
+                catch (Exception e)
+                {
+                    message = e.Message;
+                    // throw;
+                }
             }
-            return "{message:\"" + message +"\",url:\""+ImageUrl+"\"}";
+
+
+
+            return "{message:\"" + message + "\",url:\"" + ImageUrl + "\",flag:\"" + flag + "\"}";
         }
 
 
@@ -708,7 +721,7 @@ namespace MvcPlatform.Controllers
 
         private void GetViewImage(Bitmap p_CodeImage, string p_Text)
         {
-            System.Drawing.Font fntTxt = new System.Drawing.Font("微软雅黑", 20, FontStyle.Bold, GraphicsUnit.Document);//正文文字 
+            System.Drawing.Font fntTxt = new System.Drawing.Font("微软雅黑", 30, FontStyle.Bold, GraphicsUnit.Document);//正文文字 
             Graphics _Graphics = Graphics.FromImage(p_CodeImage);
             SizeF _FontSize = _Graphics.MeasureString(p_Text, fntTxt);
             if (_FontSize.Width > p_CodeImage.Width || _FontSize.Height > p_CodeImage.Height - 20)
