@@ -326,6 +326,14 @@
     }
  
 
+    var label_busiinfo = {
+        columnWidth: 1,
+        xtype: 'label',
+        margin: '0 0 5 5',
+        html: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;申报要素</span></h4>'
+    }
+
+
     //-----------------------------
 
     //备注
@@ -435,12 +443,30 @@
             { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_RECORDINFOID, combo_CUSTOMAREA, field_CUSTOMER] },
             { layout: 'column', height: 42, border: 0, items: [field_ITEMNO, combo_ITEMNOATTRIBUTE, hs_container,combo_UNIT] },
             { layout: 'column', height: 42, border: 0, items: [field_COMMODITYNAME, field_SPECIFICATIONSMODEL, combo_container] },
+            { layout: 'column', height: 42, border: 0, items: [label_busiinfo] },
             { layout: 'column', height: 42, border: 0, items: [textarea_container] },
             { layout: 'column', height: 42, border: 0, items: [field_CREATEDATE, field_CREATEMAN, field_SUBMITTIME, field_SUBMITMAN] },
             { layout: 'column', height: 42, border: 0, items: [field_ACCEPTTIME, field_ACCEPTMAN, field_PRETIME, field_PREMAN] },
         field_CUSTOMERNAME
         ]
     });
+
+    var field_PREMAN2 = Ext.create('Ext.form.field.Text', {
+        id: 'PREMAN2',
+        name: 'PREMAN2',
+        fieldLabel: '预录人2',
+
+    });
+
+    var field_PREMAN3 = Ext.create('Ext.form.field.Text', {
+        id: 'PREMAN3',
+        name: 'PREMAN3',
+        fieldLabel: '预录人3',
+
+    });
+
+    var configItem = [field_PREMAN2,field_PREMAN3];
+    formpanel.add(configItem); //formpanel.doLayout();
 }
 
 function form_ini_con() {
