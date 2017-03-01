@@ -10,7 +10,7 @@
 <script type="text/javascript">
     var file_store;
     var uploader;
-    $(document).ready(function () {
+    Ext.onReady(function () {
         panel_file_ini();
         if (uploader == null) {
              upload_ini();
@@ -96,7 +96,7 @@
             enforceMaxLength: true
         });
 
-        var btn_print=Ext.create('Ext.Button', {
+        var btn_print = Ext.create('Ext.Button', {
             text: '打印条码',
             handler: function () {
                 if ($.trim(Ext.getCmp("declCODE").getValue()).length!=18) {
@@ -149,7 +149,7 @@
             border: 0,
             width: '100%',
             minHeight: 100,
-            items: [{ layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_code, btn_print] }]
+            items: [{ layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_code,btn_print] }]
         })
     }
     function Export() {
