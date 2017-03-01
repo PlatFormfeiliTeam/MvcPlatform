@@ -409,18 +409,25 @@
 
     });
 
+    var test = {
+        id: 'test',
+        columnWidth: 1,
+        xtype: 'fieldcontainer',
+        items: []
+    }
+
     var configItem = [
         { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_RECORDINFOID, combo_CUSTOMAREA, field_CUSTOMER] },
         { layout: 'column', height: 42, border: 0, items: [field_ITEMNO, combo_ITEMNOATTRIBUTE, hs_container, combo_UNIT] },
         { layout: 'column', height: 42, border: 0, items: [field_COMMODITYNAME, field_SPECIFICATIONSMODEL, combo_container] },
-        //{ layout: 'column', border: 0, items: [test] },
+        { layout: 'column', border: 0, items: [test] },
         { layout: 'column', height: 42, border: 0, items: [textarea_container] },
         { layout: 'column', height: 42, border: 0, items: [field_CREATEDATE, field_CREATEMAN, field_SUBMITTIME, field_SUBMITMAN] },
         { layout: 'column', height: 42, border: 0, items: [field_ACCEPTTIME, field_ACCEPTMAN, field_PRETIME, field_PREMAN] },        
         field_CUSTOMERNAME
     ];
     
-    formpanel = Ext.create('Ext.form.Panel', {
+    var formpanel = Ext.create('Ext.form.Panel', {
         id:'formpanel_id',
         renderTo: 'div_form',
         minHeight: 250,
@@ -593,7 +600,7 @@ function form_ini_btn() {
 
     var bbar_r = '<div class="btn-group" role="group">'
                         + '<button type="button" onclick="Element_ini()" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤回</button>'
-                        + '<button type="button" onclick="" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
+                        + '<button type="button" onclick="ss()" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
                         + '<button type="button" onclick="" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交申请</button></div>'
 
     var bbar_l = '<div class="btn-group">'
@@ -648,7 +655,7 @@ function Element_ini() {
     var field_PREMAN5 = Ext.create('Ext.form.field.Text', {
         id: 'PREMAN5',
         name: 'PREMAN5',
-        fieldLabel: '4.特殊',
+        fieldLabel: '4.特殊'
 
     });
 
@@ -660,30 +667,44 @@ function Element_ini() {
     }
 
     var configItem = [
-    //{ layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_RECORDINFOID, combo_CUSTOMAREA, field_CUSTOMER] },
-    //{ layout: 'column', height: 42, border: 0, items: [field_ITEMNO, combo_ITEMNOATTRIBUTE, hs_container, combo_UNIT] },
-    //{ layout: 'column', height: 42, border: 0, items: [field_COMMODITYNAME, field_SPECIFICATIONSMODEL, combo_container] },
-    { layout: 'column', height: 42, margin: '0 0 15 0', border: 0, items: [label_busiinfo] },//1
-    { layout: 'column', height: 42, border: 0, items: [field_PREMAN2, field_PREMAN3, field_PREMAN4, field_PREMAN5] },//2
-    { layout: 'column', height: 20, border: 0, items: [label_busiinfo_end] }//3,
-    //{ layout: 'column', height: 42, border: 0, items: [textarea_container] },
-    //{ layout: 'column', height: 42, border: 0, items: [field_CREATEDATE, field_CREATEMAN, field_SUBMITTIME, field_SUBMITMAN] },
-    //{ layout: 'column', height: 42, border: 0, items: [field_ACCEPTTIME, field_ACCEPTMAN, field_PRETIME, field_PREMAN] },
-    //field_CUSTOMERNAME
-    ];
+            { layout: 'column', height: 42, margin: '0 0 15 0', border: 0, items: [label_busiinfo] },
+            { layout: 'column', height: 42, border: 0, items: [field_PREMAN2, field_PREMAN3, field_PREMAN4, field_PREMAN5] },
+            { layout: 'column', height: 20, border: 0, items: [label_busiinfo_end] }
+            ];
 
-    var test = {
-        id:'test',
-        columnWidth: 1,
-        xtype: 'fieldcontainer',
-        items: configItem
-    }
+
+    //var formelement = Ext.create('Ext.form.Panel', {
+    //    id: "formelement_id",
+    //    border: 0,
+    //    fieldDefaults: {
+    //        margin: '0 5 10 0',
+    //        labelWidth: 80,
+    //        columnWidth: .25,
+    //        labelAlign: 'right',
+    //        labelSeparator: '',
+    //        msgTarget: 'under',
+    //        validateOnBlur: false,
+    //        validateOnChange: false
+    //    },
+    //    items: configItem
+
+    //});
 
     //==============================================================================================================================
+    Ext.getCmp('test').add(configItem);
+   
+    //Ext.getCmp('formpanel_id').items.insert(3, formelement);
+    //Ext.getCmp('formpanel_id').doLayout();
+}
 
 
+function ss() {
+    var formdata = Ext.encode(Ext.getCmp('formpanel_id').getForm().getValues());
+    alert(formdata);
 
-    //Ext.getCmp('test').add(configItem);
-    Ext.getCmp('formpanel_id').items.insert(3, [field_PREMAN4,field_PREMAN5]);
-    Ext.getCmp('formpanel_id').doLayout();
+    //if (Ext.getCmp('formelement_id')) {
+    //    var formelement_id = Ext.encode(Ext.getCmp('formelement_id').getForm().getValues());
+    //    alert(formelement_id);
+    //}
+    
 }
