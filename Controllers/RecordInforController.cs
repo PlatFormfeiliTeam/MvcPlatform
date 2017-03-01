@@ -43,31 +43,6 @@ namespace MvcPlatform.Controllers
             return View();
         }
 
-        public string Ini_Record_Data()
-        {
-            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            IDatabase db = SeRedis.redis.GetDatabase();
-            string sql = "";
-
-            string json_recordid = "[]";
-            sql = @"select id,code,code||'('||bookattribute||')' as name from sys_recordinfo where busiunit= '" + json_user.Value<string>("CUSTOMERHSCODE") + "'";
-            json_recordid = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
-
-            string json_unit = "[]";
-            if (db.KeyExists("common_data:unit"))
-            {
-                json_unit = db.StringGet("common_data:unit");
-            }
-            else
-            {
-                sql = @"select code,name,code||'('||name||')' as codename from base_declproductunit where enabled=1 order by code";
-                json_unit = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
-                db.StringSet("common_data:unit", json_unit);
-            }
-
-            return "{recordid:" + json_recordid + ",unit:" + json_unit + "}";
-        }
-
         public string Query_RecordInfor(string type)
         {
             string where = "";

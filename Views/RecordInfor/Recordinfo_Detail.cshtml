@@ -15,7 +15,7 @@
 
     Ext.onReady(function () {
         Ext.Ajax.request({
-            url: "/RecordInfor/Ini_Record_Data",
+            url: "/Common/Ini_Base_Data",
             success: function (response, opts) {
                 var commondata = Ext.decode(response.responseText);
                 common_data_recordid = commondata.recordid;//账册号

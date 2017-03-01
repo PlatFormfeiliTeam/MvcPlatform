@@ -11,16 +11,18 @@
 
 <script type="text/javascript">
     var ID = getQueryString("ID");
-    var common_data_recordid = [], common_data_unit = [];
+    var common_data_recordid = [], common_data_unit = [], common_data_customarea = [], common_data_jydw = [];
     var formpanel;
 
     Ext.onReady(function () {
         Ext.Ajax.request({
-            url: "/RecordInfor/Ini_Record_Data",
+            url: "/Common/Ini_Base_Data",
             success: function (response, opts) {
                 var commondata = Ext.decode(response.responseText)
                 common_data_recordid = commondata.recordid;//账册号
                 common_data_unit = commondata.unit;//单位
+                common_data_customarea = commondata.customarea;//备案关区
+                common_data_jydw = commondata.jydw;//报关行
 
                 form_ini();//表单初始化
                 form_ini_con();
@@ -31,7 +33,7 @@
     })
 
     function loadform_record() {
-        
+
     }
 </script>
 <div class="container">
@@ -39,6 +41,5 @@
     <br />
     <div id="div_form_con"></div>
     <br />
-    <div id="div_form_btn">
-    </div>
+    <div id="div_form_btn"></div>
 </div>

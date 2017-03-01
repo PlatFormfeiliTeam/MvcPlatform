@@ -40,15 +40,15 @@
 
     //备案关区
     var store_CUSTOMAREA = Ext.create('Ext.data.JsonStore', {
-        fields: ['CODE', 'NAME', 'ID'],
-        //data: common_data_recordid
+        fields: ['ID', 'NAME', 'CUSTOMAREA', 'CUSTOMAREANAME'],
+        data: common_data_customarea
     });
     var combo_CUSTOMAREA = Ext.create('Ext.form.field.ComboBox', {
         id: 'combo_CUSTOMAREA',
         name: 'CUSTOMAREA',
         store: store_CUSTOMAREA,
         fieldLabel: '备案关区',
-        displayField: 'NAME',
+        displayField: 'CUSTOMAREANAME',
         valueField: 'ID',
         triggerAction: 'all',
         forceSelection: true,
@@ -71,7 +71,7 @@
     //报关行
     var store_CUSTOMER = Ext.create('Ext.data.JsonStore', {  //报关行combostore
         fields: ['CODE', 'NAME'],
-        //data: common_data_jydw
+        data: common_data_jydw
     })
     var combo_CUSTOMER = Ext.create('Ext.form.field.ComboBox', {
         id: 'combo_CUSTOMER',
@@ -226,6 +226,9 @@
                 }
             }
         },
+        listConfig: {
+            maxHeight: 130
+        },
         allowBlank: false,
         blankText: '成交单位不能为空!'
     });
@@ -240,24 +243,16 @@
         id: 'combo_OPTIONS',
         name: 'OPTIONS',
         store: store_OPTIONS,
-        fieldLabel: '变动状态',
+        fieldLabel: '<font color=red>变动状态</font>',
         displayField: 'NAME',
         valueField: 'CODE',
         triggerAction: 'all',
-        forceSelection: true,
         queryMode: 'local',
-        anyMatch: true,
         readOnly: true,
+        editable: false,
         flex: .33,
-        listeners: {
-            focus: function (cb) {
-                if (!cb.getValue()) {
-                    cb.clearInvalid();
-                    cb.store.clearFilter();
-                    cb.expand()
-                }
-            }
-        }
+        value:'A',
+        fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
 
     //状态
@@ -273,25 +268,17 @@
         displayField: 'NAME',
         valueField: 'CODE',
         triggerAction: 'all',
-        forceSelection: true,
         queryMode: 'local',
-        anyMatch: true,
         readOnly: true,
+        editable: false,
         flex: .33,
-        listeners: {
-            focus: function (cb) {
-                if (!cb.getValue()) {
-                    cb.clearInvalid();
-                    cb.store.clearFilter();
-                    cb.expand()
-                }
-            }
-        }
+        value: 0,
+        fieldStyle: 'background-color: #CECECE; background-image: none;'        
     });
     //打印状态
     var store_ISPRINT_APPLY = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
-        data:  [{ "CODE": "0", "NAME": "未打印" }, { "CODE": "1", "NAME": "已打印" }]
+        data:  [{ "CODE": 0, "NAME": "未打印" }, { "CODE": 1, "NAME": "已打印" }]
     });
     var combo_ISPRINT_APPLY = Ext.create('Ext.form.field.ComboBox', {
         id: 'combo_ISPRINT_APPLY',
@@ -301,20 +288,12 @@
         displayField: 'NAME',
         valueField: 'CODE',
         triggerAction: 'all',
-        forceSelection: true,
         queryMode: 'local',
-        anyMatch: true,
         readOnly: true,
+        editable: false,
         flex: .33,
-        listeners: {
-            focus: function (cb) {
-                if (!cb.getValue()) {
-                    cb.clearInvalid();
-                    cb.store.clearFilter();
-                    cb.expand()
-                }
-            }
-        }
+        value: 0,
+        fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
     
 
@@ -323,14 +302,6 @@
         xtype: 'fieldcontainer',
         layout: 'hbox', margin: 0,
         items: [combo_OPTIONS, combo_STATUS, combo_ISPRINT_APPLY]
-    }
- 
-
-    var label_busiinfo = {
-        columnWidth: 1,
-        xtype: 'label',
-        margin: '0 0 5 5',
-        html: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;申报要素</span></h4>'
     }
 
 
@@ -365,6 +336,7 @@
         id: 'CREATEDATE',
         name: 'CREATEDATE',
         fieldLabel: '维护时间',
+        readOnly: true,
         fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
     //维护人
@@ -372,6 +344,7 @@
         id: 'CREATEMAN',
         name: 'CREATEMAN',
         fieldLabel: '维护人',
+        readOnly: true,
         fieldStyle: 'background-color: #CECECE; background-image: none;'
 
     });
@@ -380,6 +353,7 @@
         id: 'SUBMITTIME',
         name: 'SUBMITTIME',
         fieldLabel: '提交时间',
+        readOnly: true,
         fieldStyle: 'background-color: #CECECE; background-image: none;'
 
     });
@@ -388,6 +362,7 @@
         id: 'SUBMITMAN',
         name: 'SUBMITMAN',
         fieldLabel: '提交人',
+        readOnly: true,
         fieldStyle: 'background-color: #CECECE; background-image: none;'
 
     });
@@ -396,6 +371,7 @@
         id: 'ACCEPTTIME',
         name: 'ACCEPTTIME',
         fieldLabel: '受理时间',
+        readOnly: true,
         fieldStyle: 'background-color: #CECECE; background-image: none;'
 
     });
@@ -404,6 +380,7 @@
         id: 'ACCEPTMAN',
         name: 'ACCEPTMAN',
         fieldLabel: '受理人',
+        readOnly: true,
         fieldStyle: 'background-color: #CECECE; background-image: none;'
 
     });
@@ -412,6 +389,7 @@
         id: 'PRETIME',
         name: 'PRETIME',
         fieldLabel: '预录时间',
+        readOnly: true,
         fieldStyle: 'background-color: #CECECE;background-image: none;'
 
     });
@@ -420,9 +398,69 @@
         id: 'PREMAN',
         name: 'PREMAN',
         fieldLabel: '预录人',
+        readOnly: true,
         fieldStyle: 'background-color: #CECECE; background-image: none;'
 
     });
+
+    //==================================================================add field===================================================
+    var label_busiinfo = {
+        columnWidth: 1,
+        xtype: 'label',
+        margin: '0 0 5 5',
+        html: '<div style="border-bottom-width: 2px; border-bottom-color: gray; border-bottom-style: dashed;padding-left:20px;"><h5><b>申报要素</b></h5></div>'
+        //html: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;申报要素</span></h4>'
+    }
+
+
+    var field_PREMAN2 = Ext.create('Ext.form.field.Text', {
+        id: 'PREMAN2',
+        name: 'PREMAN2',
+        fieldLabel: '1.品名',
+
+    });
+
+    var field_PREMAN3 = Ext.create('Ext.form.field.Text', {
+        id: 'PREMAN3',
+        name: 'PREMAN3',
+        fieldLabel: '2.型号',
+
+    });
+
+    var field_PREMAN4 = Ext.create('Ext.form.field.Text', {
+        id: 'PREMAN4',
+        name: 'PREMAN4',
+        fieldLabel: '3.描述',
+
+    });
+
+    var field_PREMAN5 = Ext.create('Ext.form.field.Text', {
+        id: 'PREMAN5',
+        name: 'PREMAN5',
+        fieldLabel: '4.特殊',
+
+    });
+
+    var label_busiinfo_end = {
+        columnWidth: 1,
+        xtype: 'label',
+        margin: '0 0 5 5',
+        html: '<div style="border-bottom-width: 2px; border-bottom-color: gray; border-bottom-style: dashed;"></div>'
+    }
+    //==============================================================================================================================
+
+    var configItem = [
+        { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_RECORDINFOID, combo_CUSTOMAREA, field_CUSTOMER] },
+        { layout: 'column', height: 42, border: 0, items: [field_ITEMNO, combo_ITEMNOATTRIBUTE, hs_container, combo_UNIT] },
+        { layout: 'column', height: 42, border: 0, items: [field_COMMODITYNAME, field_SPECIFICATIONSMODEL, combo_container] },
+        { layout: 'column', height: 42, margin: '0 0 15 0', border: 0, items: [label_busiinfo] },//1
+        { layout: 'column', height: 42, border: 0, items: [field_PREMAN2, field_PREMAN3, field_PREMAN4, field_PREMAN5] },//2
+        { layout: 'column', height: 42, border: 0, items: [label_busiinfo_end] },//3
+        { layout: 'column', height: 42, border: 0, items: [textarea_container] },
+        { layout: 'column', height: 42, border: 0, items: [field_CREATEDATE, field_CREATEMAN, field_SUBMITTIME, field_SUBMITMAN] },
+        { layout: 'column', height: 42, border: 0, items: [field_ACCEPTTIME, field_ACCEPTMAN, field_PRETIME, field_PREMAN] },
+        field_CUSTOMERNAME
+    ];
     
     formpanel = Ext.create('Ext.form.Panel', {
         renderTo: 'div_form',
@@ -439,34 +477,9 @@
             validateOnBlur: false,
             validateOnChange: false
         },
-        items: [
-            { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_RECORDINFOID, combo_CUSTOMAREA, field_CUSTOMER] },
-            { layout: 'column', height: 42, border: 0, items: [field_ITEMNO, combo_ITEMNOATTRIBUTE, hs_container,combo_UNIT] },
-            { layout: 'column', height: 42, border: 0, items: [field_COMMODITYNAME, field_SPECIFICATIONSMODEL, combo_container] },
-            { layout: 'column', height: 42, border: 0, items: [label_busiinfo] },
-            { layout: 'column', height: 42, border: 0, items: [textarea_container] },
-            { layout: 'column', height: 42, border: 0, items: [field_CREATEDATE, field_CREATEMAN, field_SUBMITTIME, field_SUBMITMAN] },
-            { layout: 'column', height: 42, border: 0, items: [field_ACCEPTTIME, field_ACCEPTMAN, field_PRETIME, field_PREMAN] },
-        field_CUSTOMERNAME
-        ]
+        items: configItem
     });
 
-    var field_PREMAN2 = Ext.create('Ext.form.field.Text', {
-        id: 'PREMAN2',
-        name: 'PREMAN2',
-        fieldLabel: '预录人2',
-
-    });
-
-    var field_PREMAN3 = Ext.create('Ext.form.field.Text', {
-        id: 'PREMAN3',
-        name: 'PREMAN3',
-        fieldLabel: '预录人3',
-
-    });
-
-    var configItem = [field_PREMAN2,field_PREMAN3];
-    formpanel.add(configItem); //formpanel.doLayout();
 }
 
 function form_ini_con() {
@@ -490,7 +503,7 @@ function form_ini_con() {
     //报关行
     var field_ITEMNO_LJ = {
         xtype: 'fieldcontainer',
-        layout: 'hbox', columnWidth: 0.25,
+        layout: 'hbox',
         items: [field_ITEMNO_CONSUME,
             {
                 id: 'ITEMNO_CONSUME_btn', xtype: 'button', handler: function () {
@@ -552,7 +565,7 @@ function form_ini_con() {
             validateOnChange: false
         },
         items: [
-            { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_ITEMNO_LJ, field_ITEMNO_CONSUME_NAME, field_ITEMNO_CONSUME_SPEC, field_ITEMNO_CONSUME_UNIT] },
+            { layout: 'column', height: 42, border: 0, items: [field_ITEMNO_LJ, field_ITEMNO_CONSUME_NAME, field_ITEMNO_CONSUME_SPEC, field_ITEMNO_CONSUME_UNIT] },
             { layout: 'column', height: 42, border: 0, items: [field_CONSUME, field_ATTRITIONRATE] }
         ]
     });
@@ -612,29 +625,18 @@ function form_ini_con() {
         forceFit: true
     });
 
-
-
-
-
-
-
 }
 
 
 function form_ini_btn() {
 
     var bbar_r = '<div class="btn-group" role="group">'
-                        + '<button type="button" onclick="orderBack();" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤单</button>'
-                        + '<button type="button" onclick="add_new(11)" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;新增</button>'
-                        + '<button type="button" onclick="copyorder(11)" class="btn btn-primary btn-sm"><i class="fa fa-files-o"></i>&nbsp;复制新增</button>'
+                        + '<button type="button" onclick="orderBack();" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤回</button>'
                         + '<button type="button" onclick="save(\'save\',11)" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
-                        + '<button type="button" onclick="save(\'submit\',11)" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交委托</button></div>'
+                        + '<button type="button" onclick="save(\'submit\',11)" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交申请</button></div>'
 
     var bbar_l = '<div class="btn-group">'
-               + '<button type="button" class="btn btn-primary btn-sm" id="pickfiles"><i class="fa fa-upload"></i>&nbsp;上传文件</button>'
-               + '<button type="button" onclick="browsefile()" class="btn btn-primary btn-sm"><i class="fa fa-exchange fa-fw"></i>&nbsp;浏览文件</button>'
-               + '<button type="button" onclick="removeFile()" class="btn btn-primary btn-sm" id="deletefile"><i class="fa fa-trash-o"></i>&nbsp;删除文件</button>'
-               + '<button type="button" onclick="printFile()" class="btn btn-primary btn-sm"><i class="fa fa-print"></i>&nbsp;打印文件</button>'
+               + '<button type="button" onclick="printFile()" class="btn btn-primary btn-sm"><i class="fa fa-print"></i>&nbsp;申请表打印</button>'
            + '</div>';
     var bbar = Ext.create('Ext.toolbar.Toolbar', {
         items: [bbar_l, '->', bbar_r]

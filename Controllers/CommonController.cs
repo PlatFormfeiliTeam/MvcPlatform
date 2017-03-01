@@ -499,6 +499,7 @@ namespace MvcPlatform.Controllers
         //基础资料 by heguiqin 2016-08-25
         public string Ini_Base_Data()
         {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             IDatabase db = SeRedis.redis.GetDatabase();
             string sql = "";
 
@@ -784,11 +785,34 @@ namespace MvcPlatform.Controllers
                 json_dzfwdw = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
                 db.StringSet("common_data:dzfwdw", json_dzfwdw);
             }
+
+            //========================================备案信息============================================================================
+            string json_recordid = "[]";//账册号
+            sql = @"select id,code,code||'('||bookattribute||')' as name from sys_recordinfo where busiunit= '" + json_user.Value<string>("CUSTOMERHSCODE") + "'";
+            json_recordid = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+
+            string json_unit = "[]";//单位
+            if (db.KeyExists("common_data:unit"))
+            {
+                json_unit = db.StringGet("common_data:unit");
+            }
+            else
+            {
+                sql = @"select code,name,code||'('||name||')' as codename from base_declproductunit where enabled=1 order by code";
+                json_unit = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:unit", json_unit);
+            }
+
+            string json_customarea = "[]";//备案关区
+            sql = @"select id,name,customarea,name||'('||customarea||')' as customareaname from cusdoc.base_year where customarea is not null and enabled=1";
+            json_customarea = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+            //============================================================================================================================
+
             return "{jydw:" + json_jydw + ",sbfs_all:" + json_sbfs_all + ",sbfs:" + json_sbfs + ",sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",bzzl:" + json_bzzl
                 + ",myfs:" + json_myfs + ",containertype:" + json_containertype + ",containersize:" + json_containersize + ",truckno:" + json_truckno
                 + ",relacontainer:" + json_relacontainer + ",mzbz:" + json_mzbz + ",jylb:" + json_jylb + ",json_sbkb:" + json_sbkb
                 + ",inspbzzl:" + json_inspbzzl + ",adminurl:'" + AdminUrl + "',curuser:" + Extension.Get_UserInfo(HttpContext.User.Identity.Name) 
-                + ",dzfwdw:" + json_dzfwdw + "}";
+                + ",dzfwdw:" + json_dzfwdw + ",recordid:" + json_recordid + ",unit:" + json_unit + ",customarea:" + json_customarea + "}";
         }
 
         /*保存查询条件设置 by panhuaguo 2016-01-17*/
