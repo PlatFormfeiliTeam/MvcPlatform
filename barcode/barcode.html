@@ -1,0 +1,79 @@
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head media="screen"> 
+<title></title> 
+    <script type="text/javascript">
+
+
+        function getQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]); return null;
+        }
+        var declcode = getQueryString("declcode"); 
+    </script>
+<style type="text/css" media="print"> 
+@page 
+{ 
+size: 55mm 18mm; /* auto is the initial value */ 
+
+font-family: sans-serif; 
+font-weight:bold; 
+} 
+
+html 
+{ 
+background-color: #FFFFFF; 
+margin:0; 
+marks:none; 
+font-family: sans-serif; 
+font-weight:bold; 
+} 
+
+body 
+{ 
+border: none ; 
+margin: 2px 0 0 0px; 
+marks:none; 
+font-family: sans-serif; 
+
+} 
+</style> 
+</head> 
+<body align="center"> 
+
+<div style="margin: 0 0 5px 8px; page-break-after: always;"> 
+	<table align="center" cellpadding="0" cellspacing="0" border="0" width="300"> 
+		<tr> 
+			<td colspan="2" align="center" style="background: #f00;"> 
+				<div class="bcTarget" align="center" style="margin:0;padding:0; text-align:center;"> 
+				</div> 
+			</td> 
+		</tr> 
+		<tr> 
+			<td id="declcode_td" colspan="2" align="center" style="margin:2px; "> 
+			</td> 
+		</tr>  
+	</table> 
+</div> 
+<script type="text/javascript" src="jquery-1.4.4.min.js"></script>
+		<script type="text/javascript" src="jquery-barcode.js"></script>
+		<script type="text/javascript" src="jquery.jPrintArea.js"></script>
+<script type="text/javascript"> 
+
+
+   
+    jQuery(document).ready(function () {
+        $('#declcode_td').text(declcode);
+        $(".bcTarget").each(function () {
+            $(this).empty().barcode(declcode, "code128", { barWidth: 2, barHeight: 50, showHRI: true, fontSize: 9, output: "bmp" });
+        });
+
+        $(".bcTarget object").attr("width", "300px");
+        $(".bcTarget").css("width", "300");
+        window.print();
+
+    });
+
+</script> 
+</body> 
+</html>
