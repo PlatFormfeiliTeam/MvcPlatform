@@ -622,6 +622,18 @@ function Element_ini() {
     var customarea = Ext.getCmp('combo_CUSTOMAREA').getValue();
     var hscode = Ext.getCmp('HSCODE').getValue() + Ext.getCmp('ADDITIONALNO').getValue();
 
+    if (customarea == "" || hscode == "") {
+        return;
+    }
+
+    Ext.Ajax.request({
+        url: "/RecordInfor/GetElements",
+        params: { customarea: customarea, hscode: hscode },
+        success: function (response, opts) {
+            var commondata = Ext.decode(response.responseText);
+
+        }
+    });
 
     //==================================================================add field===================================================
     var label_busiinfo = {

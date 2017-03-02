@@ -43,6 +43,7 @@ namespace MvcPlatform.Controllers
             return View();
         }
 
+        #region Recordinfo_Detail
         public string Query_RecordInfor(string type)
         {
             string where = "";
@@ -152,6 +153,16 @@ namespace MvcPlatform.Controllers
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "options,status", "asc"));
             var json = JsonConvert.SerializeObject(dt, iso);
             return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
+        #endregion
+
+        public string GetElements()
+        {
+            string customarea = Request["customarea"].ToString(); string hscode = Request["hscode"].ToString();
+            string sql = "select elements from BASE_COMMODITYHS where hscode='" + hscode + "'and yearid='" + customarea + "'";
+
+            return "";
         }
 
         private string GetPageSql(string tempsql, string order, string asc)
