@@ -470,12 +470,13 @@ function form_ini_con() {
     var field_ITEMNO_CONSUME = Ext.create('Ext.form.field.Text', {
         id: 'ITEMNO_CONSUME',
         name: 'ITEMNO_CONSUME',
-        fieldLabel: '对应料件序号', flex: .85, margin: 0
+        flex: .85, margin: 0
     });
 
     var field_ITEMNO_LJ = {
         xtype: 'fieldcontainer',
         layout: 'hbox',
+        fieldLabel: '对应料件序号',
         items: [field_ITEMNO_CONSUME,
             {
                 id: 'ITEMNO_CONSUME_btn', xtype: 'button', handler: function () {
