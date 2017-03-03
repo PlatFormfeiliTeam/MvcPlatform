@@ -409,18 +409,18 @@
 
     });
 
-    var test = {
-        id: 'test',
+    var panel_ele = Ext.create('Ext.panel.Panel', {
+        id: 'panel_ele',
         columnWidth: 1,
-        xtype: 'fieldcontainer',
+        border: 0, 
         items: []
-    }
+    });
 
     var configItem = [
         { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_RECORDINFOID, combo_CUSTOMAREA, field_CUSTOMER] },
         { layout: 'column', height: 42, border: 0, items: [field_ITEMNO, combo_ITEMNOATTRIBUTE, hs_container, combo_UNIT] },
         { layout: 'column', height: 42, border: 0, items: [field_COMMODITYNAME, field_SPECIFICATIONSMODEL, combo_container] },
-        { layout: 'column', border: 0, items: [test] },
+        { layout: 'column', border: 0, items: [panel_ele] },
         { layout: 'column', height: 42, border: 0, items: [textarea_container] },
         { layout: 'column', height: 42, border: 0, items: [field_CREATEDATE, field_CREATEMAN, field_SUBMITTIME, field_SUBMITMAN] },
         { layout: 'column', height: 42, border: 0, items: [field_ACCEPTTIME, field_ACCEPTMAN, field_PRETIME, field_PREMAN] },        
@@ -619,23 +619,19 @@ function form_ini_btn() {
 
 
 function Element_ini() {
+    
+    //alert(Ext.getCmp('test').items.getCount());
+    //if (Ext.getCmp('test').items.getCount()>0) {
+    //    return;
+    //}61034200、52115100、85011099
+
     var customarea = Ext.getCmp('combo_CUSTOMAREA').getValue();
-    var hscode = Ext.getCmp('HSCODE').getValue() + Ext.getCmp('ADDITIONALNO').getValue();
+    var hscode = "52115100"//Ext.getCmp('HSCODE').getValue() + Ext.getCmp('ADDITIONALNO').getValue();
 
     if (customarea == "" || hscode == "") {
         return;
     }
 
-    Ext.Ajax.request({
-        url: "/RecordInfor/GetElements",
-        params: { customarea: customarea, hscode: hscode },
-        success: function (response, opts) {
-            var commondata = Ext.decode(response.responseText);
-
-        }
-    });
-
-    //==================================================================add field===================================================
     var label_busiinfo = {
         columnWidth: 1,
         xtype: 'label',
@@ -643,80 +639,55 @@ function Element_ini() {
         html: '<div style="border-bottom-width: 2px; border-bottom-color: gray; border-bottom-style: dashed;padding-left:20px;"><h5><b>申报要素</b></h5></div>'
     }
 
-    var field_PREMAN2 = Ext.create('Ext.form.field.Text', {
-        id: 'PREMAN2',
-        name: 'PREMAN2',
-        fieldLabel: '1.品名',
-
-    });
-
-    var field_PREMAN3 = Ext.create('Ext.form.field.Text', {
-        id: 'PREMAN3',
-        name: 'PREMAN3',
-        fieldLabel: '2.型号',
-
-    });
-
-    var field_PREMAN4 = Ext.create('Ext.form.field.Text', {
-        id: 'PREMAN4',
-        name: 'PREMAN4',
-        fieldLabel: '3.描述',
-
-    });
-
-    var field_PREMAN5 = Ext.create('Ext.form.field.Text', {
-        id: 'PREMAN5',
-        name: 'PREMAN5',
-        fieldLabel: '4.特殊'
-
-    });
-
     var label_busiinfo_end = {
         columnWidth: 1,
         xtype: 'label',
         margin: '0 0 5 5',
         html: '<div style="border-bottom-width: 2px; border-bottom-color: gray; border-bottom-style: dashed;"></div>'
     }
+    
+    var configItem = new Array();
 
-    var configItem = [
-            { layout: 'column', height: 42, margin: '0 0 15 0', border: 0, items: [label_busiinfo] },
-            { layout: 'column', height: 42, border: 0, items: [field_PREMAN2, field_PREMAN3, field_PREMAN4, field_PREMAN5] },
-            { layout: 'column', height: 20, border: 0, items: [label_busiinfo_end] }
-            ];
+    Ext.Ajax.request({
+        url: "/RecordInfor/GetElements",
+        params: { customarea: customarea, hscode: hscode },
+        success: function (response, opts) {
+            var json = Ext.decode(response.responseText);
 
+            if (json.elements.length > 0) {
+                configItem.push({ layout: 'column', height: 42, margin: '0 0 15 0', border: 0, items: [label_busiinfo] });
+            }
 
-    //var formelement = Ext.create('Ext.form.Panel', {
-    //    id: "formelement_id",
-    //    border: 0,
-    //    fieldDefaults: {
-    //        margin: '0 5 10 0',
-    //        labelWidth: 80,
-    //        columnWidth: .25,
-    //        labelAlign: 'right',
-    //        labelSeparator: '',
-    //        msgTarget: 'under',
-    //        validateOnBlur: false,
-    //        validateOnChange: false
-    //    },
-    //    items: configItem
+            var items_i;
+            for (var i = 0; i < json.elements.length; i = i + 4) {
 
-    //});
+                items_i = [];
+                items_i.push(Ext.create('Ext.form.field.Text', { id: 'field_ele_' + (i), name: 'field_ele_' + (i), fieldLabel: json.elements[i].ELEMENTS }));//, labelWidth: 300, columnWidth: .50
 
-    //==============================================================================================================================
-    Ext.getCmp('test').add(configItem);
-   
-    //Ext.getCmp('formpanel_id').items.insert(3, formelement);
-    //Ext.getCmp('formpanel_id').doLayout();
+                if ((i + 1) < json.elements.length) {
+                    items_i.push(Ext.create('Ext.form.field.Text', { id: 'field_ele_' + (i + 1), name: 'field_ele_' + (i + 1), fieldLabel: json.elements[i + 1].ELEMENTS }));
+                }
+                if ((i + 2) < json.elements.length) {
+                    items_i.push(Ext.create('Ext.form.field.Text', { id: 'field_ele_' + (i + 2), name: 'field_ele_' + (i + 2), fieldLabel: json.elements[i + 2].ELEMENTS }));
+                }
+                if ((i + 3) < json.elements.length) {
+                    items_i.push(Ext.create('Ext.form.field.Text', { id: 'field_ele_' + (i + 3), name: 'field_ele_' + (i + 3), fieldLabel: json.elements[i + 3].ELEMENTS }));
+                }
+
+                configItem.push({ layout: 'column', border: 0, items: items_i });//layout: 'column', border: 0
+            }
+
+            if (json.elements.length > 0) {
+                configItem.push({ layout: 'column', height: 20, border: 0, items: [label_busiinfo_end] });
+            }
+
+            Ext.getCmp('panel_ele').add(configItem);
+        }
+    });
 }
 
 
 function ss() {
     var formdata = Ext.encode(Ext.getCmp('formpanel_id').getForm().getValues());
-    alert(formdata);
-
-    //if (Ext.getCmp('formelement_id')) {
-    //    var formelement_id = Ext.encode(Ext.getCmp('formelement_id').getForm().getValues());
-    //    alert(formelement_id);
-    //}
-    
+    alert(formdata);    
 }

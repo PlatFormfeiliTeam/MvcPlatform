@@ -160,9 +160,14 @@ namespace MvcPlatform.Controllers
         public string GetElements()
         {
             string customarea = Request["customarea"].ToString(); string hscode = Request["hscode"].ToString();
-            string sql = "select elements from BASE_COMMODITYHS where hscode='" + hscode + "'and yearid='" + customarea + "'";
+            string sql = @"select regexp_substr(elements,'[^;]+',1,level,'i') elements 
+                    from (select elements from cusdoc.BASE_COMMODITYHS where hscode='{0}' and yearid={1} and rownum<=1) t1
+                    connect by level <= length(elements) - length(replace(elements,';',''))";
+            sql = string.Format(sql, hscode, customarea);
 
-            return "";
+            DataTable dt = DBMgrBase.GetDataTable(sql);
+            string json = JsonConvert.SerializeObject(dt);
+            return "{elements:" + json + "}";
         }
 
         private string GetPageSql(string tempsql, string order, string asc)
