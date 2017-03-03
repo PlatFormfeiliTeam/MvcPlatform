@@ -964,6 +964,15 @@ namespace MvcPlatform.Controllers
             return Json(json5, JsonRequestBehavior.AllowGet);
         }
 
+        //备案信息 项号选择窗体弹出时加载基础库数据
+        public string LoadItemno()
+        {
+            string sql = "select * from sys_recordinfo_detail WHERE recordinfoid={0} and itemnoattribute='料件' and commodityname LIKE '%{1}%'";
+            sql = string.Format(sql, Request["RECORDINFOID"] + "", Request["NAME"] + "");
+            var json = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(GetPageSqlBase(sql, "itemno", "asc")));
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
         //贸易方式开窗加载资料
         public string LoadMyfs()
         {

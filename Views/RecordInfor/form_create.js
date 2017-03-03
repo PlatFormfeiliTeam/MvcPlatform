@@ -479,7 +479,7 @@ function form_ini_con() {
         items: [field_ITEMNO_CONSUME,
             {
                 id: 'ITEMNO_CONSUME_btn', xtype: 'button', handler: function () {
-                    //selectjydw(combo_CUSTOMER, field_CUSTOMERNAME);
+                    selectitemno(Ext.getCmp('combo_RECORDINFOID').getValue(),field_ITEMNO_CONSUME, field_ITEMNO_CONSUME_NAME, field_ITEMNO_CONSUME_SPEC, field_ITEMNO_CONSUME_UNIT);
                 },
                 text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
             }

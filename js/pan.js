@@ -1779,3 +1779,97 @@ function Export(busitypeid) {
     //+ "&seniorsearch=" + seniorsearch;
     $('#exportform').attr("action", path).submit();
 }
+
+//对应料件项号
+function selectitemno(RECORDINFOID,txt_itemno, field_name, field_spec, field_unit) {//传入需要赋值的控件
+    var tb_itemno = Ext.create('Ext.toolbar.Toolbar', {
+        items: [
+           { xtype: 'textfield', fieldLabel: '商品名称', labelWidth: 100, labelAlign: 'right', id: 'NAME_itemno_s' },
+           {
+               text: '<i class="fa fa-search"></i>&nbsp;查询', handler: function () {
+                   pb_itemno.moveFirst();
+               }
+           }
+        ]
+    });
+    var store_itemno = Ext.create('Ext.data.JsonStore', {
+        fields: ['ID', 'RECORDINFOID', 'ITEMNO', 'HSCODE', 'ADDITIONALNO', 'ITEMNOATTRIBUTE', 'COMMODITYNAME', 'SPECIFICATIONSMODEL', 'UNIT'],
+        proxy: {
+            url: '/Common/LoadItemno',
+            type: 'ajax',
+            reader: {
+                type: 'json',
+                root: 'rows',
+                totalProperty: 'total'
+            }
+        },
+        pageSize: 20,
+        autoLoad: true,
+        listeners: {
+            beforeload: function () {
+                store_itemno.getProxy().extraParams = {
+                    RECORDINFOID: RECORDINFOID,
+                    NAME: Ext.getCmp('NAME_itemno_s').getValue()
+                }
+            }
+        }
+    })
+    var pb_itemno = Ext.create('Ext.toolbar.Paging', {
+        displayMsg: '显示 {0} - {1} 条,共计 {2} 条',
+        store: store_itemno,
+        displayInfo: true
+    })
+    var grid_itemno = Ext.create('Ext.grid.Panel', {
+        store: store_itemno,
+        selModel: { selType: 'checkboxmodel' },
+        region: 'center',
+        tbar: tb_itemno,
+        bbar: pb_itemno,
+        columns: [
+                    { xtype: 'rownumberer', width: 50 },
+                    { header: 'ID', dataIndex: 'ID', hidden: true },
+                    { header: '项号', dataIndex: 'ITEMNO',width:50 },
+                    { header: 'HS编码', dataIndex: 'HSCODE', width: 100 },
+                    { header: '附加码', dataIndex: 'ADDITIONALNO', width: 80 },
+                    { header: '项号属性', dataIndex: 'ITEMNOATTRIBUTE', width: 80 },
+                    { header: '商品名称', dataIndex: 'COMMODITYNAME' },
+                    { header: '规格型号', dataIndex: 'SPECIFICATIONSMODEL' },
+                    { header: '成交单位', dataIndex: 'UNIT', width: 80 }
+        ],
+        listeners: {
+            itemdblclick: function (gd, record, item, index, e, eOpts) {
+                txt_itemno.setValue(record.get("ITEMNO"));
+                field_name.setValue(record.get("COMMODITYNAME")); 
+                field_spec.setValue(record.get("SPECIFICATIONSMODEL"));
+                field_unit.setValue(record.get("UNIT"));
+                win_itemno.close();
+            }
+        }
+    });
+    var win_itemno = Ext.create("Ext.window.Window", {
+        title: '对应料件序号选择',
+        width: 700,
+        height: 570,
+        modal: true,
+        items: [grid_itemno],
+        layout: 'border',
+        buttonAlign: 'center',
+        buttons: [{
+            text: '<i class="fa fa-check-square-o"></i>&nbsp;确定', handler: function () {
+                var recs = grid_itemno.getSelectionModel().getSelection();
+                if (recs.length > 0) {
+                    txt_itemno.setValue(recs[0].get("ITEMNO"));
+                    field_name.setValue(recs[0].get("COMMODITYNAME"));
+                    field_spec.setValue(recs[0].get("SPECIFICATIONSMODEL"));
+                    field_unit.setValue(recs[0].get("UNIT"));
+                    win_itemno.close();
+                }
+            }
+        }, {
+            text: '<i class="fa fa-times"></i>&nbsp;取消', handler: function () {
+                win_itemno.close();
+            }
+        }]
+    });
+    win_itemno.show();
+}
