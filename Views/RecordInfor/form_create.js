@@ -623,10 +623,10 @@ function Element_ini() {
     //alert(Ext.getCmp('test').items.getCount());
     //if (Ext.getCmp('test').items.getCount()>0) {
     //    return;
-    //}61034200、52115100、85011099
+    //}61034200、52115100、85011099、74101100、41041111
 
     var customarea = Ext.getCmp('combo_CUSTOMAREA').getValue();
-    var hscode = "52115100"//Ext.getCmp('HSCODE').getValue() + Ext.getCmp('ADDITIONALNO').getValue();
+    var hscode = "85011099"//Ext.getCmp('HSCODE').getValue() + Ext.getCmp('ADDITIONALNO').getValue();
 
     if (customarea == "" || hscode == "") {
         return;
@@ -645,6 +645,11 @@ function Element_ini() {
         margin: '0 0 5 5',
         html: '<div style="border-bottom-width: 2px; border-bottom-color: gray; border-bottom-style: dashed;"></div>'
     }
+
+    var filed_jsonEle = Ext.create('Ext.form.field.Hidden', {
+        id: 'jsonEle',
+        name: 'jsonEle'
+    });
     
     var configItem = new Array();
 
@@ -653,6 +658,7 @@ function Element_ini() {
         params: { customarea: customarea, hscode: hscode },
         success: function (response, opts) {
             var json = Ext.decode(response.responseText);
+            Ext.getCmp('jsonEle').setValue(response.responseText);//json.elements
 
             if (json.elements.length > 0) {
                 configItem.push({ layout: 'column', height: 42, margin: '0 0 15 0', border: 0, items: [label_busiinfo] });
@@ -662,23 +668,27 @@ function Element_ini() {
             for (var i = 0; i < json.elements.length; i = i + 4) {
 
                 items_i = [];
-                items_i.push(Ext.create('Ext.form.field.Text', { id: 'field_ele_' + (i), name: 'field_ele_' + (i), fieldLabel: json.elements[i].ELEMENTS }));//, labelWidth: 300, columnWidth: .50
+                items_i.push(Ext.create('Ext.form.Label', { id: 'label_ele_' + (i), name: 'label_ele_' + (i), text: json.elements[i].ELEMENTS, cls: "lab" }));
+                items_i.push(Ext.create('Ext.form.field.Text', { id: 'field_ele_' + (i), name: 'field_ele_' + (i) }));//, fieldLabel: json.elements[i].ELEMENTS
 
                 if ((i + 1) < json.elements.length) {
-                    items_i.push(Ext.create('Ext.form.field.Text', { id: 'field_ele_' + (i + 1), name: 'field_ele_' + (i + 1), fieldLabel: json.elements[i + 1].ELEMENTS }));
+                    items_i.push(Ext.create('Ext.form.Label', { id: 'label_ele_' + (i + 1), name: 'label_ele_' + (i + 1), text: json.elements[i + 1].ELEMENTS ,cls:"lab"}));
+                    items_i.push(Ext.create('Ext.form.field.Text', { id: 'field_ele_' + (i + 1), name: 'field_ele_' + (i + 1) }));//, fieldLabel: json.elements[i + 1].ELEMENTS
                 }
                 if ((i + 2) < json.elements.length) {
-                    items_i.push(Ext.create('Ext.form.field.Text', { id: 'field_ele_' + (i + 2), name: 'field_ele_' + (i + 2), fieldLabel: json.elements[i + 2].ELEMENTS }));
+                    items_i.push(Ext.create('Ext.form.Label', { id: 'label_ele_' + (i + 2), name: 'label_ele_' + (i + 2), text: json.elements[i + 2].ELEMENTS, cls: "lab" }));
+                    items_i.push(Ext.create('Ext.form.field.Text', { id: 'field_ele_' + (i + 2), name: 'field_ele_' + (i + 2) }));//, fieldLabel: json.elements[i + 2].ELEMENTS
                 }
                 if ((i + 3) < json.elements.length) {
-                    items_i.push(Ext.create('Ext.form.field.Text', { id: 'field_ele_' + (i + 3), name: 'field_ele_' + (i + 3), fieldLabel: json.elements[i + 3].ELEMENTS }));
+                    items_i.push(Ext.create('Ext.form.Label', { id: 'label_ele_' + (i + 3), name: 'label_ele_' + (i + 3), text: json.elements[i + 3].ELEMENTS, cls: "lab" }));
+                    items_i.push(Ext.create('Ext.form.field.Text', { id: 'field_ele_' + (i + 3), name: 'field_ele_' + (i + 3) }));//, fieldLabel: json.elements[i + 3].ELEMENTS
                 }
 
-                configItem.push({ layout: 'column', border: 0, items: items_i });//layout: 'column', border: 0
+                configItem.push({ layout: 'column', margin: '0 0 0 50', border: 0, items: items_i });
             }
 
             if (json.elements.length > 0) {
-                configItem.push({ layout: 'column', height: 20, border: 0, items: [label_busiinfo_end] });
+                configItem.push({ layout: 'column', height: 20, border: 0, items: [label_busiinfo_end] }, filed_jsonEle);
             }
 
             Ext.getCmp('panel_ele').add(configItem);
