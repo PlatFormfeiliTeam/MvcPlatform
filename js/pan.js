@@ -1781,7 +1781,7 @@ function Export(busitypeid) {
 }
 
 //对应料件项号
-function selectitemno(RECORDINFOID,txt_itemno, field_name, field_spec, field_unit) {//传入需要赋值的控件
+function selectitemno(RECORDINFOID,txt_itemno, field_name, field_spec,field_unitname, field_unit) {//传入需要赋值的控件
     var tb_itemno = Ext.create('Ext.toolbar.Toolbar', {
         items: [
            { xtype: 'textfield', fieldLabel: '商品名称', labelWidth: 100, labelAlign: 'right', id: 'NAME_itemno_s' },
@@ -1793,7 +1793,7 @@ function selectitemno(RECORDINFOID,txt_itemno, field_name, field_spec, field_uni
         ]
     });
     var store_itemno = Ext.create('Ext.data.JsonStore', {
-        fields: ['ID', 'RECORDINFOID', 'ITEMNO', 'HSCODE', 'ADDITIONALNO', 'ITEMNOATTRIBUTE', 'COMMODITYNAME', 'SPECIFICATIONSMODEL', 'UNIT'],
+        fields: ['ID', 'RECORDINFOID', 'ITEMNO', 'HSCODE', 'ADDITIONALNO', 'ITEMNOATTRIBUTE', 'COMMODITYNAME', 'SPECIFICATIONSMODEL', 'UNIT', 'UNITNAME'],
         proxy: {
             url: '/Common/LoadItemno',
             type: 'ajax',
@@ -1834,7 +1834,7 @@ function selectitemno(RECORDINFOID,txt_itemno, field_name, field_spec, field_uni
                     { header: '项号属性', dataIndex: 'ITEMNOATTRIBUTE', width: 80 },
                     { header: '商品名称', dataIndex: 'COMMODITYNAME' },
                     { header: '规格型号', dataIndex: 'SPECIFICATIONSMODEL' },
-                    { header: '成交单位', dataIndex: 'UNIT', width: 80 }
+                    { header: '成交单位', dataIndex: 'UNITNAME', width: 80 }
         ],
         listeners: {
             itemdblclick: function (gd, record, item, index, e, eOpts) {
@@ -1842,6 +1842,7 @@ function selectitemno(RECORDINFOID,txt_itemno, field_name, field_spec, field_uni
                 field_name.setValue(record.get("COMMODITYNAME")); 
                 field_spec.setValue(record.get("SPECIFICATIONSMODEL"));
                 field_unit.setValue(record.get("UNIT"));
+                field_unitname.setValue(record.get("UNITNAME"));
                 win_itemno.close();
             }
         }
@@ -1862,6 +1863,7 @@ function selectitemno(RECORDINFOID,txt_itemno, field_name, field_spec, field_uni
                     field_name.setValue(recs[0].get("COMMODITYNAME"));
                     field_spec.setValue(recs[0].get("SPECIFICATIONSMODEL"));
                     field_unit.setValue(recs[0].get("UNIT"));
+                    field_unitname.setValue(recs[0].get("UNITNAME"));
                     win_itemno.close();
                 }
             }

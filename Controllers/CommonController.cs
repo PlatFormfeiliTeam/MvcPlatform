@@ -967,7 +967,7 @@ namespace MvcPlatform.Controllers
         //备案信息 项号选择窗体弹出时加载基础库数据
         public string LoadItemno()
         {
-            string sql = "select * from sys_recordinfo_detail WHERE recordinfoid={0} and itemnoattribute='料件' and commodityname LIKE '%{1}%'";
+            string sql = "select a.*,b.name as unitname from sys_recordinfo_detail a left join base_declproductunit b on a.unit=b.code WHERE a.recordinfoid={0} and a.itemnoattribute='料件' and a.commodityname LIKE '%{1}%'";
             sql = string.Format(sql, Request["RECORDINFOID"] + "", Request["NAME"] + "");
             var json = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(GetPageSqlBase(sql, "itemno", "asc")));
             return "{rows:" + json + ",total:" + totalProperty + "}";

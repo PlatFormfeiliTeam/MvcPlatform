@@ -158,13 +158,10 @@
                     $("#div_form_con").show();
                     if (!Ext.getCmp('formpanel_con')) {
                         form_ini_con();
-                    }                       
+                    } 
                 } else {
                     $("#div_form_con").hide();
                 }
-            },
-            load: function () {
-                alert(1);
             }
         },
         allowBlank: false,
@@ -456,6 +453,8 @@
 }
 
 function form_ini_con() {
+    var rownum = -1;//记录当前编辑的行号
+
     var label_baseinfo = {
         xtype: 'label',
         margin: '5',
@@ -470,7 +469,9 @@ function form_ini_con() {
     var field_ITEMNO_CONSUME = Ext.create('Ext.form.field.Text', {
         id: 'ITEMNO_CONSUME',
         name: 'ITEMNO_CONSUME',
-        flex: .85, margin: 0
+        flex: .85, margin: 0,
+        allowBlank: false,
+        blankText: '对应料件序号不能为空!'
     });
 
     var field_ITEMNO_LJ = {
@@ -480,7 +481,7 @@ function form_ini_con() {
         items: [field_ITEMNO_CONSUME,
             {
                 id: 'ITEMNO_CONSUME_btn', xtype: 'button', handler: function () {
-                    selectitemno(Ext.getCmp('combo_RECORDINFOID').getValue(),field_ITEMNO_CONSUME, field_ITEMNO_CONSUME_NAME, field_ITEMNO_CONSUME_SPEC, field_ITEMNO_CONSUME_UNIT);
+                    selectitemno(Ext.getCmp('combo_RECORDINFOID').getValue(), field_ITEMNO_CONSUME, field_ITEMNO_COMMODITYNAME, field_ITEMNO_SPECIFICATIONSMODEL, field_ITEMNO_UNITNAME, field_ITEMNO_UNIT);
                 },
                 text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
             }
@@ -488,38 +489,50 @@ function form_ini_con() {
     }
 
     //对应料件名称
-    var field_ITEMNO_CONSUME_NAME = Ext.create('Ext.form.field.Text', {
-        id: 'ITEMNO_CONSUME_NAME',
-        name: 'ITEMNO_CONSUME_NAME',
-        fieldLabel: '对应名称'
+    var field_ITEMNO_COMMODITYNAME = Ext.create('Ext.form.field.Text', {
+        id: 'ITEMNO_COMMODITYNAME',
+        name: 'ITEMNO_COMMODITYNAME',
+        fieldLabel: '对应名称',readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;',
+        allowBlank: false,
+        blankText: '对应名称不能为空!'
     });
 
     //对应料件规格
-    var field_ITEMNO_CONSUME_SPEC = Ext.create('Ext.form.field.Text', {
-        id: 'ITEMNO_CONSUME_SPEC',
-        name: 'ITEMNO_CONSUME_SPEC',
+    var field_ITEMNO_SPECIFICATIONSMODEL = Ext.create('Ext.form.field.Text', {
+        id: 'ITEMNO_SPECIFICATIONSMODEL',
+        name: 'ITEMNO_SPECIFICATIONSMODEL', readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;',
         fieldLabel: '对应规格'
     });
 
     //对应料件计量单位
-    var field_ITEMNO_CONSUME_UNIT = Ext.create('Ext.form.field.Text', {
-        id: 'ITEMNO_CONSUME_UNIT',
-        name: 'ITEMNO_CONSUME_UNIT',
-        fieldLabel: '对应计量单位'
+    var field_ITEMNO_UNITNAME = Ext.create('Ext.form.field.Text', {
+        id: 'ITEMNO_UNITNAME',
+        name: 'ITEMNO_UNITNAME',
+        fieldLabel: '对应计量单位', readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;',
+        allowBlank: false,
+        blankText: '对应计量单位不能为空!'
     });
 
+    var field_ITEMNO_UNIT = Ext.create('Ext.form.field.Hidden', {
+        name: 'ITEMNO_UNIT'
+    })
+
     //单耗
-    var field_CONSUME = Ext.create('Ext.form.field.Text', {
+    var field_CONSUME = Ext.create('Ext.form.field.Number', {
         id: 'CONSUME',
         name: 'CONSUME',
-        fieldLabel: '单耗'
+        fieldLabel: '单耗',
+        allowBlank: false, hideTrigger: true,
+        blankText: '单耗不能为空!'
     });
 
     //损耗率
     var field_ATTRITIONRATE = Ext.create('Ext.form.field.Text', {
         id: 'ATTRITIONRATE',
         name: 'ATTRITIONRATE',
-        fieldLabel: '损耗率'
+        fieldLabel: '损耗率',
+        allowBlank: false,
+        blankText: '损耗率不能为空!'
     });
 
     var formpanel_con = Ext.create('Ext.form.Panel', {
@@ -539,39 +552,60 @@ function form_ini_con() {
             validateOnChange: false
         },
         items: [
-            { layout: 'column', height: 42, border: 0, margin: '5 0 0 0', items: [field_ITEMNO_LJ, field_ITEMNO_CONSUME_NAME, field_ITEMNO_CONSUME_SPEC, field_ITEMNO_CONSUME_UNIT] },
-            { layout: 'column', height: 42, border: 0, items: [field_CONSUME, field_ATTRITIONRATE] }
+            { layout: 'column', height: 42, border: 0, margin: '5 0 0 0', items: [field_ITEMNO_LJ, field_ITEMNO_COMMODITYNAME, field_ITEMNO_SPECIFICATIONSMODEL, field_ITEMNO_UNITNAME] },
+            { layout: 'column', height: 42, border: 0, items: [field_CONSUME, field_ATTRITIONRATE] },
+            field_ITEMNO_UNIT
         ]
     });
     //=================================================
     var data_PRODUCTCONSUME= [];
     var store_PRODUCTCONSUME = Ext.create('Ext.data.JsonStore', {
-        fields: ['ITEMNO_CONSUME', 'CONSUME', 'ATTRITIONRATE'],
+        storeId: 'store_PRODUCTCONSUME',
+        fields: ['ITEMNO_CONSUME', 'ITEMNO_COMMODITYNAME', 'ITEMNO_SPECIFICATIONSMODEL', 'ITEMNO_UNITNAME','ITEMNO_UNIT', 'CONSUME', 'ATTRITIONRATE'],
         data: data_PRODUCTCONSUME
     });
     var w_tbar = Ext.create('Ext.toolbar.Toolbar', {
         items: ['<span style="color:red">说明：双击列表项可对已添加的记录进行修改</span>',
+                {
+                    text: '<span style="color:blue">新增模式</span>', id: 'btn_mode', handler: function () {
+                        if (Ext.getCmp('btn_mode').getText() == '<span style="color:blue">编辑模式</span>') {
+                            Ext.getCmp('btn_mode').setText('<span style="color:blue">新增模式</span>');
+                            rownum = -1;
+                        }
+                    }
+                },
                '->',
                {
                    text: '<span class="icon iconfont" style="font-size:10px">&#xe622;</span>&nbsp;保 存',
                    handler: function () {
-                       //var recs = w_grid.getSelectionModel().getSelection();
-                       //if (recs.length > 0) {
-                       //    w_gridstore.remove(recs);
-                       //}
-                       //Ext.getCmp('btn_mode').setText('<span style="color:blue">新增模式</span>');
-                       //rownum = -1;
+
+                       if (!formpanel_con.getForm().isValid()) {
+                           return;
+                       }
+
+                       var formdata = formpanel_con.getForm().getValues();
+                       if (rownum < 0) {//添加模式
+                           store_PRODUCTCONSUME.insert(store_PRODUCTCONSUME.data.length, formdata);
+                       }
+                       else {//修改模式
+                           var rec = store_PRODUCTCONSUME.getAt(rownum);
+                           store_PRODUCTCONSUME.remove(rec);
+                           store_PRODUCTCONSUME.insert(rownum, formdata);
+                       }
+                       formpanel_con.getForm().reset();
+                       rownum = -1;
+                       Ext.getCmp('btn_mode').setText('<span style="color:blue">新增模式</span>');
                    }
                },
                {
                    text: '<span class="icon iconfont" style="font-size:10px">&#xe6d3;</span>&nbsp;删 除',
                    handler: function () {
-                       //var recs = w_grid.getSelectionModel().getSelection();
-                       //if (recs.length > 0) {
-                       //    w_gridstore.remove(recs);
-                       //}
-                       //Ext.getCmp('btn_mode').setText('<span style="color:blue">新增模式</span>');
-                       //rownum = -1;
+                       var recs = gridpanel_PRODUCTCONSUME.getSelectionModel().getSelection();
+                       if (recs.length > 0) {
+                           store_PRODUCTCONSUME.remove(recs);
+                       }
+                       Ext.getCmp('btn_mode').setText('<span style="color:blue">新增模式</span>');
+                       rownum = -1;
                    }
                }]
 
@@ -588,12 +622,19 @@ function form_ini_con() {
         { xtype: 'rownumberer', width: 35 },
         { header: 'ID', dataIndex: 'ID', hidden: true },
         { header: '对应料件序号', dataIndex: 'ITEMNO_CONSUME', width: 80 },
-        { header: '对应料件名称', dataIndex: '', width: 130 },
-        { header: '对应料件规格', dataIndex: '', width: 130 },
-        { header: '对应料件计量单位', dataIndex: '', width: 80 },
+        { header: '对应料件名称', dataIndex: 'ITEMNO_COMMODITYNAME', width: 130 },
+        { header: '对应料件规格', dataIndex: 'ITEMNO_SPECIFICATIONSMODEL', width: 130 },
+        { header: '对应料件计量单位', dataIndex: 'ITEMNO_UNITNAME', width: 80 },
         { header: '单耗', dataIndex: 'CONSUME', width: 80 },
         { header: '损耗率', dataIndex: 'ATTRITIONRATE', width: 80 }
         ],
+        listeners: {
+            itemdblclick: function (w_grid, record, item, index, e, eOpts) {
+                rownum = index;
+                formpanel_con.getForm().setValues(record.data);
+                Ext.getCmp('btn_mode').setText('<span style="color:blue">编辑模式</span>');
+            }
+        },
         viewConfig: {
             enableTextSelection: true
         },
@@ -695,5 +736,30 @@ function Element_ini() {//61034200、52115100、85011099、74101100、41041111
 
 function ss() {
     var formdata = Ext.encode(Ext.getCmp('formpanel_id').getForm().getValues());
-    alert(formdata);    
+    alert(formdata);
+
+    /*  成品单耗信息
+    if (w_gridstore.data.length > 0) {//将列表数据序列化成数组保存至订单表CONTAINERTRUCK字段                
+        var detaildata = Ext.encode(Ext.pluck(w_gridstore.data.items, 'data'));
+        Ext.getCmp('field_CONTAINERTRUCK').setValue(detaildata);
+        Ext.each(w_gridstore.getRange(), function (rec) {  //找到第一条有报关车牌号的信息
+            if (rec.get("CDCARNAME") && Ext.getCmp('DECLCARNO')) {
+                Ext.getCmp('DECLCARNO').setValue(rec.get("CDCARNAME"));
+                return false;
+            }
+        });
+        Ext.each(w_gridstore.getRange(), function (rec) {  //找到第一条有集装箱号的记录
+            if (rec.get("CONTAINERNO") && Ext.getCmp('CONTAINERNO')) {
+                Ext.getCmp('CONTAINERNO').setValue(rec.get("CONTAINERNO"));
+                return false;
+            }
+        });
+    }
+    else {
+        Ext.getCmp('DECLCARNO').setValue("");
+        if (Ext.getCmp('CONTAINERNO')) {
+            Ext.getCmp('CONTAINERNO').setValue("");
+        }
+        Ext.getCmp('field_CONTAINERTRUCK').setValue("");
+    }*/
 }
