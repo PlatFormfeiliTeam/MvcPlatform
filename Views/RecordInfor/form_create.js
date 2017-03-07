@@ -358,9 +358,9 @@
         fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
     //维护人
-    var field_CREATEMAN = Ext.create('Ext.form.field.Text', {
-        id: 'CREATEMAN',
-        name: 'CREATEMAN',
+    var field_CREATENAME = Ext.create('Ext.form.field.Text', {
+        id: 'CREATENAME',
+        name: 'CREATENAME',
         fieldLabel: '维护人',
         readOnly: true,
         fieldStyle: 'background-color: #CECECE; background-image: none;'
@@ -376,9 +376,9 @@
 
     });
     //提交人
-    var field_SUBMITMAN = Ext.create('Ext.form.field.Text', {
-        id: 'SUBMITMAN',
-        name: 'SUBMITMAN',
+    var field_SUBMITNAME = Ext.create('Ext.form.field.Text', {
+        id: 'SUBMITNAME',
+        name: 'SUBMITNAME',
         fieldLabel: '提交人',
         readOnly: true,
         fieldStyle: 'background-color: #CECECE; background-image: none;'
@@ -394,9 +394,9 @@
 
     });
     //受理人
-    var field_ACCEPTMAN = Ext.create('Ext.form.field.Text', {
-        id: 'ACCEPTMAN',
-        name: 'ACCEPTMAN',
+    var field_ACCEPTNAME = Ext.create('Ext.form.field.Text', {
+        id: 'ACCEPTNAME',
+        name: 'ACCEPTNAME',
         fieldLabel: '受理人',
         readOnly: true,
         fieldStyle: 'background-color: #CECECE; background-image: none;'
@@ -412,14 +412,19 @@
 
     });
     //预录人
-    var field_PREMAN = Ext.create('Ext.form.field.Text', {
-        id: 'PREMAN',
-        name: 'PREMAN',
+    var field_PRENAME = Ext.create('Ext.form.field.Text', {
+        id: 'PRENAME',
+        name: 'PRENAME',
         fieldLabel: '预录人',
         readOnly: true,
         fieldStyle: 'background-color: #CECECE; background-image: none;'
 
     });
+
+    var field_CREATENAME = Ext.create('Ext.form.field.Hidden', { name: 'CREATENAME' });
+    var field_SUBMITNAME = Ext.create('Ext.form.field.Hidden', { name: 'SUBMITNAME' });
+    var field_PRENAME = Ext.create('Ext.form.field.Hidden', { name: 'PRENAME' });
+    var field_FINISHNAME = Ext.create('Ext.form.field.Hidden', { name: 'FINISHNAME' });
 
     var panel_ele = Ext.create('Ext.panel.Panel', {
         id: 'panel_ele',
@@ -434,9 +439,9 @@
         { layout: 'column', height: 42, border: 0, items: [field_COMMODITYNAME, field_SPECIFICATIONSMODEL, combo_container] },
         { layout: 'column', border: 0, items: [panel_ele] },
         { layout: 'column', height: 42, border: 0, items: [textarea_container] },
-        { layout: 'column', height: 42, border: 0, items: [field_CREATEDATE, field_CREATEMAN, field_SUBMITTIME, field_SUBMITMAN] },
-        { layout: 'column', height: 42, border: 0, items: [field_ACCEPTTIME, field_ACCEPTMAN, field_PRETIME, field_PREMAN] },        
-        field_CUSTOMERNAME
+        { layout: 'column', height: 42, border: 0, items: [field_CREATEDATE, field_CREATENAME, field_SUBMITTIME, field_SUBMITNAME] },
+        { layout: 'column', height: 42, border: 0, items: [field_ACCEPTTIME, field_ACCEPTNAME, field_PRETIME, field_PRENAME] },        
+        field_CUSTOMERNAME, field_CREATENAME, field_SUBMITNAME, field_PRENAME, field_FINISHNAME
     ];
     
     var formpanel = Ext.create('Ext.form.Panel', {
@@ -464,7 +469,7 @@ function form_ini_btn() {
 
     var bbar_r = '<div class="btn-group" role="group">'
                         + '<button type="button" onclick="" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤回</button>'
-                        + '<button type="button" onclick="create_save(\'save\'))" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
+                        + '<button type="button" onclick="create_save(\'save\')" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
                         + '<button type="button" onclick="create_save(\'submit\')" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交申请</button></div>'
 
     var bbar_l = '<div class="btn-group">'
@@ -483,15 +488,22 @@ function form_ini_btn() {
 
 function create_save(action) {
 
+   
     if (action == 'submit') { 
 
         if (!Ext.getCmp('formpanel_id').getForm().isValid()) {
             return;
         }
 
-        var validate = "";
+        var validate = ""; 
         if (!Ext.getCmp('panel_ele_2')) {
-            validate += "申报要素存在，请重新输入HS编码、备案关区！<br />";
+            validate += "申报要素不存在，请重新输入HS编码、备案关区！<br />";
+        }
+
+        if (Ext.getCmp('combo_ITEMNOATTRIBUTE').getValue() == "成品") {
+            if (Ext.data.StoreManager.lookup('store_PRODUCTCONSUME').data.items.length <= 0) {
+                validate += "成品单耗信息不可为空！<br />";
+            } 
         }
        
         if (validate) {
@@ -500,9 +512,15 @@ function create_save(action) {
         }
 
     }
+
     var formdata = Ext.encode(Ext.getCmp('formpanel_id').getForm().getValues());
-    var productconsume = Ext.encode(Ext.pluck(Ext.getCmp('store_PRODUCTCONSUME').data.items, 'data'));
+    var productconsume = [];
+    if (Ext.getCmp('combo_ITEMNOATTRIBUTE').getValue() == "成品") {
+        productconsume = Ext.encode(Ext.pluck(Ext.data.StoreManager.lookup('store_PRODUCTCONSUME').data.items, 'data'));
+    }
+     
     var mask = new Ext.LoadMask(Ext.get(Ext.getBody()), { msg: "数据保存中，请稍等..." });
+
     mask.show();
     Ext.Ajax.request({
         url: "/RecordInfor/Create_Save",
@@ -525,30 +543,48 @@ function create_save(action) {
     });
 }
 
-function ss() {
+function loadform_record() {
+    Ext.Ajax.request({
+        url: "/RecordInfor/loadrecord_create",
+        params: { id: id },
+        success: function (response, opts) {
+            var data = Ext.decode(response.responseText);
+            Ext.getCmp('formpanel_id').getForm().setValues(data.formdata);
+            /*file_store.loadData(data.filedata);
+            //如果是修改时申报单位取先前保存的值,如无则取默认值2016-10-19 by panhuaguo  
+            if (data.formdata.REPUNITNAME) {
+                repunitcode = data.formdata.REPUNITNAME + '(' + data.formdata.REPUNITCODE + ')';
+            }
+            if (data.formdata.INSPUNITNAME) {
+                inspunitcode = data.formdata.INSPUNITNAME + '(' + data.formdata.INSPUNITCODE + ')';
+            }
+            //如果是修改需要将随附文件的ID拼接成字符串 赋值到
+            var fileids = "";
+            Ext.each(file_store.getRange(), function (rec) {
+                fileids += rec.get("ID") + ",";
+            });
+            Ext.getCmp('field_ORIGINALFILEIDS').setValue(fileids);
+            if (!win_container_truck) {
+                ini_container_truck();//初始化集装箱和报关车号选择界面
+            }
+            else {
+                Ext.getCmp('w_grid').store.loadData(Ext.decode(Ext.getCmp('field_CONTAINERTRUCK').getValue()));
+            }
+            formcontrol();//表单字段控制
+            //add 2016/10/9 add
+            if (ordercode == "" && copyordercode == "") {//编辑或复制新增时，直接以上面的formdata赋值为准，新增则需要抓取值
+                if (Ext.getCmp('WEIGHTCHECK')) {
+                    if (data.WEIGHTCHECK == "1") {
+                        Ext.getCmp('WEIGHTCHECK').setValue(true);
+                        Ext.getCmp('ISWEIGHTCHECK').setReadOnly(false);
+                    } else {
+                        Ext.getCmp('WEIGHTCHECK').setValue(false);
 
-    /*  成品单耗信息
-    if (w_gridstore.data.length > 0) {//将列表数据序列化成数组保存至订单表CONTAINERTRUCK字段                
-        var detaildata = Ext.encode(Ext.pluck(w_gridstore.data.items, 'data'));
-        Ext.getCmp('field_CONTAINERTRUCK').setValue(detaildata);
-        Ext.each(w_gridstore.getRange(), function (rec) {  //找到第一条有报关车牌号的信息
-            if (rec.get("CDCARNAME") && Ext.getCmp('DECLCARNO')) {
-                Ext.getCmp('DECLCARNO').setValue(rec.get("CDCARNAME"));
-                return false;
-            }
-        });
-        Ext.each(w_gridstore.getRange(), function (rec) {  //找到第一条有集装箱号的记录
-            if (rec.get("CONTAINERNO") && Ext.getCmp('CONTAINERNO')) {
-                Ext.getCmp('CONTAINERNO').setValue(rec.get("CONTAINERNO"));
-                return false;
-            }
-        });
-    }
-    else {
-        Ext.getCmp('DECLCARNO').setValue("");
-        if (Ext.getCmp('CONTAINERNO')) {
-            Ext.getCmp('CONTAINERNO').setValue("");
+                        Ext.getCmp('ISWEIGHTCHECK').setValue(false);
+                        Ext.getCmp('ISWEIGHTCHECK').setReadOnly(true);
+                    }
+                }
+            }*/
         }
-        Ext.getCmp('field_CONTAINERTRUCK').setValue("");
-    }*/
+    });
 }

@@ -170,149 +170,103 @@ namespace MvcPlatform.Controllers
             return "{elements:" + json + "}";
         }
 
+        public string loadrecord_create()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string id = Request["id"];
+            DataTable dt;
+            string sql = "";
+            string result = "{}";
+            if (!string.IsNullOrEmpty(id))
+            {
+
+                /*
+                //订单基本信息 CONTAINERTRUCK 这个字段本身不属于list_order表,虚拟出来存储集装箱和报关车号记录,是个数组形式的字符串
+                sql = @"select t.*,'' CONTAINERTRUCK from LIST_ORDER t where t.CODE = '" + Request["ordercode"] + "' and rownum=1";
+                dt = DBMgr.GetDataTable(sql);
+                IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+                iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                sql = "select * from list_predeclcontainer t where t.ordercode='" + dt.Rows[0]["CODE"] + "' order by containerorder";
+                DataTable dt_container = DBMgr.GetDataTable(sql);
+                dt.Rows[0]["CONTAINERTRUCK"] = JsonConvert.SerializeObject(dt_container);
+                string formdata = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
+                //订单随附文件
+                sql = @"select * from LIST_ATTACHMENT where instr(ordercode,'{0}') >0 
+                      and ((filetype=44 or filetype=58) or ( filetype=57 AND confirmstatus = 1 )) and (abolishstatus is null or abolishstatus=0)";
+                sql = string.Format(sql, ordercode);
+                dt = DBMgr.GetDataTable(sql);
+                string filedata = JsonConvert.SerializeObject(dt, iso);
+                result = "{formdata:" + formdata + ",filedata:" + filedata + "}";
+                 * */
+            }
+
+            return result;            
+        }
+
         public string Create_Save()
         {
             string action = Request["action"];            
-            JObject json = (JObject)JsonConvert.DeserializeObject(Request["formdata"]);
-            JObject productconsume = (JObject)JsonConvert.DeserializeObject(Request["productconsume"]);
+            JObject json = (JObject)JsonConvert.DeserializeObject(Request["formdata"]);           
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
 
             string sql = "";
-            string id = string.Empty; 
+            string ID = string.Empty; 
             if (Request["action"] + "" == "submit")
             {
-                json.Remove("STATUS"); json.Remove("SUBMITTIME"); json.Remove("SUBMITUSERNAME");
-                json.Add("STATUS", 10); json.Add("SUBMITTIME", "sysdate"); json.Add("SUBMITUSERNAME", json_user.Value<string>("REALNAME"));
+                json.Remove("STATUS"); json.Add("STATUS", 10);
+                json.Remove("SUBMITTIME"); json.Add("SUBMITTIME", "sysdate");
+                json.Remove("SUBMITNAME"); json.Add("SUBMITNAME", json_user.Value<string>("REALNAME"));
+                json.Remove("SUBMITID"); json.Add("SUBMITID", json_user.Value<string>("ID")); 
             }
 
             if (string.IsNullOrEmpty(json.Value<string>("ID")))//新增
             {
                 sql = "select SYS_RECORDINFO_DETAIL_TASK_ID.Nextval from dual";
-                id = DBMgr.GetDataTable(sql).Rows[0][0] + "";//获取ID
-                sql = @"INSERT INTO SYS_RECORDINFO_DETAIL_TASK (ID,
-                          id, 
-rid, 
-recordinfoid, 
-itemno, 
-hscode, 
-additionalno, 
-itemnoattribute, 
-commodityname, 
-specificationsmodel, 
-unit, 
-remark, 
-modifyreason, 
-createman, 
-createdate, 
-options, 
-status, 
-customercode, 
-customername, 
-submitman, 
-submittime, 
-acceptman, 
-accepttime, 
-preman, 
-pretime, 
-finishman, 
-finishtime, 
-isprint_apply, 
-isprint_accept, 
-customarea                        
-                        ) VALUES (LIST_ORDER_id.Nextval
-                            ,'{0}','{1}','{2}','{3}','{4}','{5}'
+                ID = DBMgr.GetDataTable(sql).Rows[0][0] + "";//获取ID
+                sql = @"INSERT INTO SYS_RECORDINFO_DETAIL_TASK (ID
+                        ,RECORDINFOID,ITEMNO,HSCODE,ADDITIONALNO,ITEMNOATTRIBUTE
+                        ,COMMODITYNAME,SPECIFICATIONSMODEL,UNIT,REMARK,MODIFYREASON
+                        ,CREATEID,CREATENAME,CREATEDATE,OPTIONS,STATUS,CUSTOMERCODE
+                        ,CUSTOMERNAME,SUBMITID,SUBMITNAME,SUBMITTIME,CUSTOMAREA                       
+                        ) VALUES (,'{0}'
+                            ,'{1}','{2}','{3}','{4}','{5}'
                             ,'{6}','{7}','{8}','{9}','{10}'
-                            ,'{11}','{12}','{13}','{14}','{15}'
-                            ,'{16}','{17}','{18}','{19}','{20}'
-                            ,'{21}','{22}','{23}','{24}','{25}'
-                            ,'{26}','{27}','{28}','{29}','{30}'
-                            ,'{31}','{32}','{33}','{34}','{35}'
-                            ,'{36}','{37}','{38}',sysdate,'{39}','{40}'
-                            ,'{41}',{42},'{43}','{44}','{45}'
+                            ,'{11}','{12}',sysdate,'{13}','{14}','{15}'
+                            ,'{16}','{17}','{18}',{19},'{20}'
                             )";
-
-                /*id = Extension.getOrderCode();
-                sql = @"INSERT INTO LIST_ORDER (ID,
-                            BUSITYPE,CODE,CUSNO,BUSIUNITCODE,BUSIUNITNAME,CONTRACTNO
-                            ,TOTALNO,DIVIDENO,TURNPRENO,GOODSNUM,WOODPACKINGID
-                            ,CLEARANCENO,LAWFLAG,ENTRUSTTYPE,REPWAYID,CUSTOMAREACODE
-                            ,REPUNITCODE,REPUNITNAME,DECLWAY,PORTCODE,INSPUNITCODE
-                            ,INSPUNITNAME,ORDERREQUEST,CREATEUSERID,CREATEUSERNAME,STATUS
-                            ,SUBMITUSERID,SUBMITUSERNAME,CUSTOMERCODE,CUSTOMERNAME,DECLCARNO
-                            ,TRADEWAYCODES,GOODSGW,GOODSNW,PACKKIND,BUSIKIND
-                            ,ORDERWAY,CLEARUNIT,CLEARUNITNAME,CREATETIME,SPECIALRELATIONSHIP,PRICEIMPACT
-                            ,PAYPOYALTIES,SUBMITTIME,DECLSTATUS,INSPSTATUS,DOCSERVICECODE                        
-                        ) VALUES (LIST_ORDER_id.Nextval
-                            ,'{0}','{1}','{2}','{3}','{4}','{5}'
-                            ,'{6}','{7}','{8}','{9}','{10}'
-                            ,'{11}','{12}','{13}','{14}','{15}'
-                            ,'{16}','{17}','{18}','{19}','{20}'
-                            ,'{21}','{22}','{23}','{24}','{25}'
-                            ,'{26}','{27}','{28}','{29}','{30}'
-                            ,'{31}','{32}','{33}','{34}','{35}'
-                            ,'{36}','{37}','{38}',sysdate,'{39}','{40}'
-                            ,'{41}',{42},'{43}','{44}','{45}'
-                            )";
-                sql = string.Format(sql
-                        , "11", ordercode, json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME"), json.Value<string>("CONTRACTNO")
-                        , json.Value<string>("TOTALNO"), json.Value<string>("DIVIDENO"), json.Value<string>("TURNPRENO"), json.Value<string>("GOODSNUM"), json.Value<string>("WOODPACKINGID")
-                        , json.Value<string>("CLEARANCENO"), GetChk(json.Value<string>("LAWFLAG")), json.Value<string>("ENTRUSTTYPE"), json.Value<string>("REPWAYID"), json.Value<string>("CUSTOMAREACODE")
-                        , GetCode(json.Value<string>("REPUNITCODE")), GetName(json.Value<string>("REPUNITCODE")), json.Value<string>("DECLWAY"), json.Value<string>("PORTCODE"), GetCode(json.Value<string>("INSPUNITCODE"))
-                        , GetName(json.Value<string>("INSPUNITCODE")), json.Value<string>("ORDERREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"), json.Value<string>("STATUS")
-                        , json.Value<string>("SUBMITUSERID"), json.Value<string>("SUBMITUSERNAME"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLCARNO")
-                        , json.Value<string>("TRADEWAYCODES"), json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW"), json.Value<string>("PACKKIND"), "001"
-                        , "1", json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT"))
-                        , GetChk(json.Value<string>("PAYPOYALTIES")), json.Value<string>("SUBMITTIME"), json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS"), json.Value<string>("DOCSERVICECODE")
-                   );*/
+                sql = string.Format(sql, ID
+                    , json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), json.Value<string>("HSCODE"), json.Value<string>("ADDITIONALNO"), json.Value<string>("ITEMNOATTRIBUTE")
+                    , json.Value<string>("COMMODITYNAME"), json.Value<string>("SPECIFICATIONSMODEL"), json.Value<string>("UNIT"), json.Value<string>("REMARK"), json.Value<string>("MODIFYREASON")
+                    , json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"), 'A', json.Value<string>("STATUS"), json.Value<string>("CUSTOMERCODE")
+                    , json.Value<string>("CUSTOMERNAME"), json.Value<string>("SUBMITID"), json.Value<string>("SUBMITNAME"), json.Value<string>("SUBMITTIME"), json.Value<string>("CUSTOMAREA")
+                    );
             }
             else//修改
             {
-                id = json.Value<string>("ID");
-                /*
-                string allcol = @"CODE
-                            ,BUSITYPE,CUSNO,BUSIUNITCODE,BUSIUNITNAME,CONTRACTNO 
-                            ,TOTALNO,DIVIDENO,TURNPRENO,GOODSNUM,WOODPACKINGID 
-                            ,CLEARANCENO,LAWFLAG,ENTRUSTTYPE,REPWAYID,CUSTOMAREACODE 
-                            ,REPUNITCODE,REPUNITNAME,DECLWAY,PORTCODE,INSPUNITCODE 
-                            ,INSPUNITNAME,ORDERREQUEST,STATUS,SUBMITUSERID,SUBMITUSERNAME 
-                            ,CUSTOMERCODE,CUSTOMERNAME,DECLCARNO,TRADEWAYCODES,GOODSGW 
-                            ,GOODSNW,PACKKIND,BUSIKIND,ORDERWAY,CLEARUNIT 
-                            ,CLEARUNITNAME,SPECIALRELATIONSHIP, PRICEIMPACT,PAYPOYALTIES,SUBMITTIME
-                            ,DOCSERVICECODE,DECLSTATUS,INSPSTATUS
-                            ";
-                sql = Extension.getUpdateSql(allcol, ordercode, IsSubmitAfterSave);
-                if (sql != "")
-                {
-                    sql = string.Format(sql
-                            , ordercode, "11", json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME"), json.Value<string>("CONTRACTNO")
-                            , json.Value<string>("TOTALNO"), json.Value<string>("DIVIDENO"), json.Value<string>("TURNPRENO"), json.Value<string>("GOODSNUM"), json.Value<string>("WOODPACKINGID")
-                            , json.Value<string>("CLEARANCENO"), GetChk(json.Value<string>("LAWFLAG")), json.Value<string>("ENTRUSTTYPE"), json.Value<string>("REPWAYID"), json.Value<string>("CUSTOMAREACODE")
-                            , GetCode(json.Value<string>("REPUNITCODE")), GetName(json.Value<string>("REPUNITCODE")), json.Value<string>("DECLWAY"), json.Value<string>("PORTCODE"), GetCode(json.Value<string>("INSPUNITCODE"))
-                            , GetName(json.Value<string>("INSPUNITCODE")), json.Value<string>("ORDERREQUEST"), json.Value<string>("STATUS"), json.Value<string>("SUBMITUSERID"), json.Value<string>("SUBMITUSERNAME")
-                            , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLCARNO"), json.Value<string>("TRADEWAYCODES"), json.Value<string>("GOODSGW")
-                            , json.Value<string>("GOODSNW"), json.Value<string>("PACKKIND"), "001", "1", json_user.Value<string>("CUSTOMERCODE")
-                            , json_user.Value<string>("CUSTOMERNAME"), GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT")), GetChk(json.Value<string>("PAYPOYALTIES")), json.Value<string>("SUBMITTIME")
-                            , json.Value<string>("DOCSERVICECODE"), json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS")
-                            );
-                }*/
+                ID = json.Value<string>("ID");
+                sql = @"UPDATE SYS_RECORDINFO_DETAIL_TASK SET RECORDINFOID='{1}',ITEMNO='{2}',HSCODE='{3}',ADDITIONALNO='{4}',ITEMNOATTRIBUTE='{5}' 
+                            ,COMMODITYNAME='{6}',SPECIFICATIONSMODEL='{7}',UNIT='{8}',REMARK='{9}',MODIFYREASON='{10}'
+                            ,OPTIONS='{11}',STATUS='{12}',CUSTOMERCODE='{13}',CUSTOMERNAME='{14}',SUBMITID='{15}'
+                            ,SUBMITNAME='{16}',SUBMITTIME={17},CUSTOMAREA='{18}'
+                        WHERE ID={0}";
+                sql = string.Format(sql, ID
+                    , json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), json.Value<string>("HSCODE"), json.Value<string>("ADDITIONALNO"), json.Value<string>("ITEMNOATTRIBUTE")
+                    , json.Value<string>("COMMODITYNAME"), json.Value<string>("SPECIFICATIONSMODEL"), json.Value<string>("UNIT"), json.Value<string>("REMARK"), json.Value<string>("MODIFYREASON")
+                    , 'A', json.Value<string>("STATUS"), json.Value<string>("CUSTOMERCODE"), json.Value<string>("CUSTOMERNAME"), json.Value<string>("SUBMITID")
+                    , json.Value<string>("SUBMITNAME"), json.Value<string>("SUBMITTIME"), json.Value<string>("CUSTOMAREA")
+                    );
             }
             if (sql != "")
             {
                 int result = DBMgr.ExecuteNonQuery(sql);
                 if (result == 1)
-                {
-                    //集装箱及报关车号列表更新
-                    //Extension.predeclcontainer_update(ordercode, json.Value<string>("CONTAINERTRUCK"));
-                    ////更新随附文件 
-                    //Extension.Update_Attachment(ordercode, filedata, json.Value<string>("ORIGINALFILEIDS"), json_user);
-
-                    ////插入订单状态变更日志
-                    //Extension.add_list_time(json.Value<Int32>("STATUS"), ordercode, json_user);
-                    //if (json.Value<Int32>("STATUS") > 10)
-                    //{
-                    //    Extension.Insert_FieldUpdate_History(ordercode, json, json_user, "11");
-                    //}
-                    return "{success:true,ordercode:'" + id + "'}";
+                {                    
+                    update_elements(json, json_user);//申报要素                   
+                    if (json.Value<string>("ITEMNOATTRIBUTE") == "成品") //成品单耗
+                    {
+                        update_productconsume(json, json_user);
+                    }
+                    return "{success:true,ordercode:'" + ID + "'}";
                 }
                 else
                 {
@@ -323,6 +277,55 @@ customarea
             {
                 return "{success:false}";
             }
+        }
+
+        //申报要素  
+        public string update_elements(JObject json, JObject json_user)
+        {
+            string sql = "";
+            //先清空
+            sql = @"delete SYS_ELEMENTS where RECORDINFOID='{0}' and ITEMNO='{1}' and ITEMNOATTRIBUTE='{2}'";
+            sql = string.Format(sql, json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), json.Value<string>("ITEMNOATTRIBUTE"));
+            DBMgr.ExecuteNonQuery(sql);
+
+            //在插入
+            string jsonEle = json.Value<string>("jsonEle").Substring(("{elements:").Length);
+            jsonEle = jsonEle.Substring(0, jsonEle.Length - 1);
+            JArray je = (JArray)JsonConvert.DeserializeObject(jsonEle);
+            for (int i = 0; i < je.Count; i++)
+            {
+                sql = @"insert into SYS_ELEMENTS(ID,RECORDINFOID,ITEMNO,ITEMNOATTRIBUTE,SNO,FUNCTIONTYPE,DESCRIPTIONS,CREATEMAN,CREATEDATE) 
+                            values(SYS_ELEMENTS_id.Nextval,'{0}','{1}','{2}','{3}','{4}','{5}','{6}',sysdate)";
+                sql = string.Format(sql, json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), json.Value<string>("ITEMNOATTRIBUTE"), i, je[i].Value<string>("ELEMENTS")
+                    , json.Value<string>("field_ele_" + i), json_user.Value<string>("ID"));
+                DBMgr.ExecuteNonQuery(sql);
+            }
+            return "success";
+        }
+
+        //成品单耗
+        public string update_productconsume(JObject json, JObject json_user)
+        {
+            string sql = "";
+            //先清空
+            sql = @"delete SYS_PRODUCTCONSUME where RECORDINFOID='{0}' and ITEMNO='{1}'";
+            sql = string.Format(sql, json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"));
+            DBMgr.ExecuteNonQuery(sql);
+
+            //在插入
+            JArray ja = (JArray)JsonConvert.DeserializeObject(Request["productconsume"]);
+            for (int j = 0; j < ja.Count; j++)
+            {
+                sql = @"insert into SYS_PRODUCTCONSUME(ID,RECORDINFOID,ITEMNO,ITEMNO_CONSUME,ITEMNO_COMMODITYNAME,ITEMNO_SPECIFICATIONSMODEL,ITEMNO_UNIT,
+                                        ITEMNO_UNITNAME,CONSUME,ATTRITIONRATE,CREATEMAN,CREATEDATE) 
+                                    values(SYS_PRODUCTCONSUME_id.Nextval,'{0}','{1}','{2}','{3}','{4}','{5}'
+                                    ,'{6}','{7}','{8}','{9}',sysdate)";
+                sql = string.Format(sql, json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), ja[j].Value<string>("ITEMNO_CONSUME"), ja[j].Value<string>("ITEMNO_COMMODITYNAME"), ja[j].Value<string>("ITEMNO_SPECIFICATIONSMODEL"), ja[j].Value<string>("ITEMNO_UNIT")
+                    , ja[j].Value<string>("ITEMNO_UNITNAME"), ja[j].Value<string>("CONSUME"), ja[j].Value<string>("ATTRITIONRATE"), json_user.Value<string>("ID")
+                    );
+                DBMgr.ExecuteNonQuery(sql);
+            }
+            return "success";
         }
 
         private string GetPageSql(string tempsql, string order, string asc)
