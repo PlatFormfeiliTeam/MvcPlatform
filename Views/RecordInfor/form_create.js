@@ -62,6 +62,11 @@
                     cb.store.clearFilter();
                     cb.expand()
                 }
+            },
+            change: function (field_paste, newValue, oldValue, eOpts) {
+                if (newValue != oldValue) {
+                    Element_ini();
+                }
             }
         },
         allowBlank: false,
@@ -421,10 +426,10 @@
 
     });
 
-    var field_CREATENAME = Ext.create('Ext.form.field.Hidden', { name: 'CREATENAME' });
-    var field_SUBMITNAME = Ext.create('Ext.form.field.Hidden', { name: 'SUBMITNAME' });
-    var field_PRENAME = Ext.create('Ext.form.field.Hidden', { name: 'PRENAME' });
-    var field_FINISHNAME = Ext.create('Ext.form.field.Hidden', { name: 'FINISHNAME' });
+    var field_CREATEID = Ext.create('Ext.form.field.Hidden', { name: 'CREATEID' });
+    var field_SUBMITID = Ext.create('Ext.form.field.Hidden', { name: 'SUBMITID' });
+    var field_PREID = Ext.create('Ext.form.field.Hidden', { name: 'PREID' });
+    var field_FINISHID = Ext.create('Ext.form.field.Hidden', { name: 'FINISHID' });
 
     var panel_ele = Ext.create('Ext.panel.Panel', {
         id: 'panel_ele',
@@ -441,10 +446,10 @@
         { layout: 'column', height: 42, border: 0, items: [textarea_container] },
         { layout: 'column', height: 42, border: 0, items: [field_CREATEDATE, field_CREATENAME, field_SUBMITTIME, field_SUBMITNAME] },
         { layout: 'column', height: 42, border: 0, items: [field_ACCEPTTIME, field_ACCEPTNAME, field_PRETIME, field_PRENAME] },        
-        field_CUSTOMERNAME, field_CREATENAME, field_SUBMITNAME, field_PRENAME, field_FINISHNAME
+        field_CUSTOMERNAME, field_CREATEID, field_SUBMITID, field_PREID, field_FINISHID
     ];
     
-    var formpanel = Ext.create('Ext.form.Panel', {
+     var formpanel = Ext.create('Ext.form.Panel', {
         id:'formpanel_id',
         renderTo: 'div_form',
         minHeight: 250,
@@ -479,7 +484,7 @@ function form_ini_btn() {
         items: [bbar_l, '->', bbar_r]
     })
 
-    formpanel = Ext.create('Ext.form.Panel', {
+    var formpanel_btn = Ext.create('Ext.form.Panel', {
         renderTo: 'div_form_btn',
         border: 0,
         bbar: bbar
@@ -549,7 +554,11 @@ function loadform_record() {
         params: { id: id },
         success: function (response, opts) {
             var data = Ext.decode(response.responseText);
-            Ext.getCmp('formpanel_id').getForm().setValues(data.formdata);
+            Ext.getCmp("formpanel_id").getForm().setValues(data.formdata);
+            
+            //Ext.getCmp('combo_RECORDINFOID').setValue('1191');
+
+
             /*file_store.loadData(data.filedata);
             //如果是修改时申报单位取先前保存的值,如无则取默认值2016-10-19 by panhuaguo  
             if (data.formdata.REPUNITNAME) {

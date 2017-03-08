@@ -22,10 +22,10 @@
     var hscode = Ext.getCmp('HSCODE').getValue();
 
     var configItem = new Array();
-
+    
     Ext.Ajax.request({
         url: "/RecordInfor/GetElements",
-        params: { customarea: customarea, hscode: hscode },
+        params: { customarea: customarea, hscode: hscode, id: id },
         success: function (response, opts) {
             var json = Ext.decode(response.responseText);
 

@@ -1669,6 +1669,18 @@ function renderOrder(value, cellmeta, record, rowIndex, columnIndex, store) {
                 rtn = rec.get("NAME");
             }
             break;
+        case "OPTIONS":
+            var rec = store_optionstatus.findRecord('CODE', value);
+            if (rec) {
+                rtn = rec.get("NAME");
+            }
+            break;
+        case "STATUS":
+            var rec = store_status.findRecord('CODE', value);
+            if (rec) {
+                rtn = rec.get("NAME");
+            }
+            break;
     }
     return rtn;
 }

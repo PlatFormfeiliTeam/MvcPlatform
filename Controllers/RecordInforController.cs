@@ -136,7 +136,7 @@ namespace MvcPlatform.Controllers
                                          select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
                                                 ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark
                                                 ,aa.options,aa.status,aa.customercode,aa.customername
-                                         from sys_recordinfo_detail_task aa where aa.status<50
+                                         from sys_recordinfo_detail_task aa 
                                     ) b on a.id=b.recordinfoid ";
 
             if (Request["ERROR"].ToString() == "true")
@@ -159,14 +159,36 @@ namespace MvcPlatform.Controllers
 
         public string GetElements()
         {
-            string customarea = Request["customarea"].ToString(); string hscode = Request["hscode"].ToString();
-            string sql = @"select regexp_substr(elements,'[^;]+',1,level,'i') elements 
+            string customarea = Request["customarea"].ToString(); string hscode = Request["hscode"].ToString(); string id = Request["id"].ToString();
+            string sql = string.Empty; string json = "[]";
+
+            bool flag = false;
+            if (id == "") { flag = true; }//查总库
+            else
+            {
+                sql = @"select * from sys_recordinfo_detail_task where id='" + id + "'";
+                DataTable dt = DBMgr.GetDataTable(sql);
+                string hscode_database = dt.Rows[0]["HSCODE"].ToString(); string customarea_database = dt.Rows[0]["CUSTOMAREA"].ToString();
+                if (hscode_database != hscode || customarea_database != customarea)//修改了这两个字段
+                {
+                    flag = true;//查总库
+                }
+            }
+
+            if (flag)//查总库
+            {
+                sql = @"select regexp_substr(elements,'[^;]+',1,level,'i') elements 
                     from (select elements from cusdoc.BASE_COMMODITYHS where hscode='{0}' and yearid={1} and rownum<=1) t1
                     connect by level <= length(elements) - length(replace(elements,';',''))";
-            sql = string.Format(sql, hscode, customarea);
+                sql = string.Format(sql, hscode, customarea);
+                json = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+            }
+            else
+            {
+                sql = "select functiontype as elements from SYS_ELEMENTS where rid='" + id + "' order by sno";
+                json = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
+            }           
 
-            DataTable dt = DBMgrBase.GetDataTable(sql);
-            string json = JsonConvert.SerializeObject(dt);
             return "{elements:" + json + "}";
         }
 
@@ -179,6 +201,18 @@ namespace MvcPlatform.Controllers
             string result = "{}";
             if (!string.IsNullOrEmpty(id))
             {
+                sql = @"select * from sys_recordinfo_detail_task where id='" + id + "'";
+                dt = DBMgr.GetDataTable(sql);
+
+                IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+                iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                string formdata = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
+               
+                //申报要素
+
+                //成品单耗
+                result = "{formdata:" + formdata + "}";
+
 
                 /*
                 //订单基本信息 CONTAINERTRUCK 这个字段本身不属于list_order表,虚拟出来存储集装箱和报关车号记录,是个数组形式的字符串
@@ -210,13 +244,18 @@ namespace MvcPlatform.Controllers
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
 
             string sql = "";
-            string ID = string.Empty; 
+            string ID = string.Empty;
             if (Request["action"] + "" == "submit")
             {
                 json.Remove("STATUS"); json.Add("STATUS", 10);
                 json.Remove("SUBMITTIME"); json.Add("SUBMITTIME", "sysdate");
                 json.Remove("SUBMITNAME"); json.Add("SUBMITNAME", json_user.Value<string>("REALNAME"));
-                json.Remove("SUBMITID"); json.Add("SUBMITID", json_user.Value<string>("ID")); 
+                json.Remove("SUBMITID"); json.Add("SUBMITID", json_user.Value<string>("ID"));
+            }
+            else
+            {
+                json.Remove("SUBMITTIME"); //委托时间  
+                json.Add("SUBMITTIME", "null");
             }
 
             if (string.IsNullOrEmpty(json.Value<string>("ID")))//新增
@@ -228,7 +267,7 @@ namespace MvcPlatform.Controllers
                         ,COMMODITYNAME,SPECIFICATIONSMODEL,UNIT,REMARK,MODIFYREASON
                         ,CREATEID,CREATENAME,CREATEDATE,OPTIONS,STATUS,CUSTOMERCODE
                         ,CUSTOMERNAME,SUBMITID,SUBMITNAME,SUBMITTIME,CUSTOMAREA                       
-                        ) VALUES (,'{0}'
+                        ) VALUES ('{0}'
                             ,'{1}','{2}','{3}','{4}','{5}'
                             ,'{6}','{7}','{8}','{9}','{10}'
                             ,'{11}','{12}',sysdate,'{13}','{14}','{15}'
@@ -260,11 +299,11 @@ namespace MvcPlatform.Controllers
             {
                 int result = DBMgr.ExecuteNonQuery(sql);
                 if (result == 1)
-                {                    
-                    update_elements(json, json_user);//申报要素                   
+                {
+                    update_elements(json, json_user, ID);//申报要素                   
                     if (json.Value<string>("ITEMNOATTRIBUTE") == "成品") //成品单耗
                     {
-                        update_productconsume(json, json_user);
+                        update_productconsume(json, json_user, ID);
                     }
                     return "{success:true,ordercode:'" + ID + "'}";
                 }
@@ -280,12 +319,11 @@ namespace MvcPlatform.Controllers
         }
 
         //申报要素  
-        public string update_elements(JObject json, JObject json_user)
+        public string update_elements(JObject json, JObject json_user, string ID)
         {
             string sql = "";
             //先清空
-            sql = @"delete SYS_ELEMENTS where RECORDINFOID='{0}' and ITEMNO='{1}' and ITEMNOATTRIBUTE='{2}'";
-            sql = string.Format(sql, json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), json.Value<string>("ITEMNOATTRIBUTE"));
+            sql = @"delete SYS_ELEMENTS where RID='" + ID + "'";
             DBMgr.ExecuteNonQuery(sql);
 
             //在插入
@@ -294,22 +332,21 @@ namespace MvcPlatform.Controllers
             JArray je = (JArray)JsonConvert.DeserializeObject(jsonEle);
             for (int i = 0; i < je.Count; i++)
             {
-                sql = @"insert into SYS_ELEMENTS(ID,RECORDINFOID,ITEMNO,ITEMNOATTRIBUTE,SNO,FUNCTIONTYPE,DESCRIPTIONS,CREATEMAN,CREATEDATE) 
-                            values(SYS_ELEMENTS_id.Nextval,'{0}','{1}','{2}','{3}','{4}','{5}','{6}',sysdate)";
+                sql = @"insert into SYS_ELEMENTS(ID,RECORDINFOID,ITEMNO,ITEMNOATTRIBUTE,SNO,FUNCTIONTYPE,DESCRIPTIONS,CREATEMAN,CREATEDATE,RID) 
+                            values(SYS_ELEMENTS_id.Nextval,'{0}','{1}','{2}','{3}','{4}','{5}','{6}',sysdate,'{7}')";
                 sql = string.Format(sql, json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), json.Value<string>("ITEMNOATTRIBUTE"), i, je[i].Value<string>("ELEMENTS")
-                    , json.Value<string>("field_ele_" + i), json_user.Value<string>("ID"));
+                    , json.Value<string>("field_ele_" + i), json_user.Value<string>("ID"), ID);
                 DBMgr.ExecuteNonQuery(sql);
             }
             return "success";
         }
 
         //成品单耗
-        public string update_productconsume(JObject json, JObject json_user)
+        public string update_productconsume(JObject json, JObject json_user,string ID)
         {
             string sql = "";
             //先清空
-            sql = @"delete SYS_PRODUCTCONSUME where RECORDINFOID='{0}' and ITEMNO='{1}'";
-            sql = string.Format(sql, json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"));
+            sql = @"delete SYS_PRODUCTCONSUME where RID='" + ID + "'";
             DBMgr.ExecuteNonQuery(sql);
 
             //在插入
@@ -317,11 +354,11 @@ namespace MvcPlatform.Controllers
             for (int j = 0; j < ja.Count; j++)
             {
                 sql = @"insert into SYS_PRODUCTCONSUME(ID,RECORDINFOID,ITEMNO,ITEMNO_CONSUME,ITEMNO_COMMODITYNAME,ITEMNO_SPECIFICATIONSMODEL,ITEMNO_UNIT,
-                                        ITEMNO_UNITNAME,CONSUME,ATTRITIONRATE,CREATEMAN,CREATEDATE) 
+                                        ITEMNO_UNITNAME,CONSUME,ATTRITIONRATE,CREATEMAN,CREATEDATE,RID) 
                                     values(SYS_PRODUCTCONSUME_id.Nextval,'{0}','{1}','{2}','{3}','{4}','{5}'
-                                    ,'{6}','{7}','{8}','{9}',sysdate)";
+                                    ,'{6}','{7}','{8}','{9}',sysdate,'{10}')";
                 sql = string.Format(sql, json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), ja[j].Value<string>("ITEMNO_CONSUME"), ja[j].Value<string>("ITEMNO_COMMODITYNAME"), ja[j].Value<string>("ITEMNO_SPECIFICATIONSMODEL"), ja[j].Value<string>("ITEMNO_UNIT")
-                    , ja[j].Value<string>("ITEMNO_UNITNAME"), ja[j].Value<string>("CONSUME"), ja[j].Value<string>("ATTRITIONRATE"), json_user.Value<string>("ID")
+                    , ja[j].Value<string>("ITEMNO_UNITNAME"), ja[j].Value<string>("CONSUME"), ja[j].Value<string>("ATTRITIONRATE"), json_user.Value<string>("ID"), ID
                     );
                 DBMgr.ExecuteNonQuery(sql);
             }
