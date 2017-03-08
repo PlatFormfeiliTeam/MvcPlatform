@@ -162,8 +162,8 @@ namespace MvcPlatform.Controllers
             string customarea = Request["customarea"].ToString(); string hscode = Request["hscode"].ToString(); string id = Request["id"].ToString();
             string sql = string.Empty; string json = "[]";
 
-            bool flag = false;
-            if (id == "") { flag = true; }//查总库
+            string flag = "";
+            if (id == "") { flag = "1"; }//查总库
             else
             {
                 sql = @"select * from sys_recordinfo_detail_task where id='" + id + "'";
@@ -171,13 +171,13 @@ namespace MvcPlatform.Controllers
                 string hscode_database = dt.Rows[0]["HSCODE"].ToString(); string customarea_database = dt.Rows[0]["CUSTOMAREA"].ToString();
                 if (hscode_database != hscode || customarea_database != customarea)//修改了这两个字段
                 {
-                    flag = true;//查总库
+                    flag = "1";//查总库
                 }
             }
 
-            if (flag)//查总库
+            if (flag == "1")//查总库
             {
-                sql = @"select regexp_substr(elements,'[^;]+',1,level,'i') elements 
+                sql = @"select regexp_substr(elements,'[^;]+',1,level,'i') elements,'' descriptions 
                     from (select elements from cusdoc.BASE_COMMODITYHS where hscode='{0}' and yearid={1} and rownum<=1) t1
                     connect by level <= length(elements) - length(replace(elements,';',''))";
                 sql = string.Format(sql, hscode, customarea);
@@ -185,7 +185,7 @@ namespace MvcPlatform.Controllers
             }
             else
             {
-                sql = "select functiontype as elements from SYS_ELEMENTS where rid='" + id + "' order by sno";
+                sql = "select functiontype as elements,descriptions from SYS_ELEMENTS where rid='" + id + "' order by sno";
                 json = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
             }           
 

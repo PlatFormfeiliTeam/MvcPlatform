@@ -37,19 +37,19 @@
 
                     items_i = [];
                     items_i.push(Ext.create('Ext.form.Label', { id: 'label_ele_' + (i), name: 'label_ele_' + (i), text: json.elements[i].ELEMENTS, cls: "lab" }));
-                    items_i.push(Ext.create('Ext.form.field.Text', { id: 'field_ele_' + (i), name: 'field_ele_' + (i) }));//, fieldLabel: json.elements[i].ELEMENTS
+                    items_i.push(Ext.create('Ext.form.field.Text', { id: 'field_ele_' + (i), name: 'field_ele_' + (i), value: json.elements[i].DESCRIPTIONS }));//, fieldLabel: json.elements[i].ELEMENTS
 
                     if ((i + 1) < json.elements.length) {
                         items_i.push(Ext.create('Ext.form.Label', { id: 'label_ele_' + (i + 1), name: 'label_ele_' + (i + 1), text: json.elements[i + 1].ELEMENTS, cls: "lab" }));
-                        items_i.push(Ext.create('Ext.form.field.Text', { id: 'field_ele_' + (i + 1), name: 'field_ele_' + (i + 1) }));//, fieldLabel: json.elements[i + 1].ELEMENTS
+                        items_i.push(Ext.create('Ext.form.field.Text', { id: 'field_ele_' + (i + 1), name: 'field_ele_' + (i + 1), value: json.elements[i].DESCRIPTIONS }));//, fieldLabel: json.elements[i + 1].ELEMENTS
                     }
                     if ((i + 2) < json.elements.length) {
                         items_i.push(Ext.create('Ext.form.Label', { id: 'label_ele_' + (i + 2), name: 'label_ele_' + (i + 2), text: json.elements[i + 2].ELEMENTS, cls: "lab" }));
-                        items_i.push(Ext.create('Ext.form.field.Text', { id: 'field_ele_' + (i + 2), name: 'field_ele_' + (i + 2) }));//, fieldLabel: json.elements[i + 2].ELEMENTS
+                        items_i.push(Ext.create('Ext.form.field.Text', { id: 'field_ele_' + (i + 2), name: 'field_ele_' + (i + 2), value: json.elements[i].DESCRIPTIONS }));//, fieldLabel: json.elements[i + 2].ELEMENTS
                     }
                     if ((i + 3) < json.elements.length) {
                         items_i.push(Ext.create('Ext.form.Label', { id: 'label_ele_' + (i + 3), name: 'label_ele_' + (i + 3), text: json.elements[i + 3].ELEMENTS, cls: "lab" }));
-                        items_i.push(Ext.create('Ext.form.field.Text', { id: 'field_ele_' + (i + 3), name: 'field_ele_' + (i + 3) }));//, fieldLabel: json.elements[i + 3].ELEMENTS
+                        items_i.push(Ext.create('Ext.form.field.Text', { id: 'field_ele_' + (i + 3), name: 'field_ele_' + (i + 3), value: json.elements[i].DESCRIPTIONS }));//, fieldLabel: json.elements[i + 3].ELEMENTS
                     }
 
                     configItem.push({ layout: 'column', margin: '0 0 0 50', border: 0, items: items_i });
