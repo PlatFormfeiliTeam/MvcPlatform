@@ -376,7 +376,41 @@ namespace MvcPlatform.Controllers
             return pageSql;
         }
 
+        //================================================================================================//
+        public ActionResult PrintRecordDetail()//备案信息 change
+        {
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
+        public string GetPrintDetail()
+        {
+            string ids = Request["id"] + ",0";
+            string ITEMNOATTRIBUTE = (Request["ITEMNOATTRIBUTE"] + "").Trim();
+            string sql = string.Empty; string sql_cp = string.Empty;
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();
+            sql = "select a.itemno,a.hscode,a.commodityname,b.ele,a.options,(select name from cusdoc.base_declproductunit where enabled=1 and code=a.unit) unit," +
+                      "(select name from cusdoc.base_declproductunit where enabled=1 and code=c.legalunit) legalunit,(select name from cusdoc.base_declproductunit where enabled=1 and code=c.secondunit) secondunit " +
+                      " from SYS_RECORDINFO_DETAIL_TASK  A left join " +
+                       "(select RID,listagg(to_char(FUNCTIONTYPE||':'||DESCRIPTIONS),'<br/>') within group(order by sno) as ELE from SYS_ELEMENTS  GROUP BY RID) B on A.Id=B.RID " +
+                       "left join (select a.hscode,a.yearid, a.legalunit,a.secondunit " +
+                       "from cusdoc.base_commodityhs a " +
+                       "inner join (select hscode,yearid,max(ID) id from cusdoc.base_commodityhs group by hscode,yearid ) b on a.id=b.id)  C on A.HSCODE=C.HSCODE AND A.CUSTOMAREA=C.YEARID " +
+                       "  where id in(" + ids + ")";
+            string json = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso);
+            if (ITEMNOATTRIBUTE == "成品")
+            {
+                sql_cp = "select a.itemno,a.hscode,a.commodityname,a.options,a.unit,ITEMNO_CONSUME,ITEMNO_COMMODITYNAME,ITEMNO_SPECIFICATIONSMODEL,ITEMNO_UNITNAME,CONSUMEATTRITIONRATE " +
+                         "from SYS_RECORDINFO_DETAIL_TASK  A left join SYS_PRODUCTCONSUME B onselect * from SYS_RECORDINFO_DETAIL_TASK  A left join SYS_PRODUCTCONSUME B on A.ID=B.RID WHERE A.ID IN (" + ids + ")";
+                string json_cp = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql_cp), iso);
+                return "{jsonrows:" + json + ",jsonrows_cp:" + json_cp + "}";
 
+            }
+
+            return "{jsonrows:" + json + "}";
+
+
+        }
+        //================================================================================================//
 
     }
 }
