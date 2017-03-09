@@ -22,6 +22,7 @@
         displayField: 'NAME',
         valueField: 'ID',
         triggerAction: 'all',
+        value: store_RECORDINFOID.getCount() > 0 ? store_RECORDINFOID.getAt(0).get("ID") : '',
         forceSelection: true,
         queryMode: 'local',
         anyMatch: true,
@@ -148,6 +149,7 @@
         fieldLabel: '项号属性',
         displayField: 'NAME',
         valueField: 'NAME',
+        value: "料件",
         triggerAction: 'all',
         forceSelection: true,
         queryMode: 'local',
@@ -179,7 +181,7 @@
     var field_HSCODE = Ext.create('Ext.form.field.Text', {
         id: 'HSCODE',
         name: 'HSCODE',
-        flex: 0.80, margin: 0,
+        flex: 0.75, margin: 0,
         listeners: {
             change: function (field_paste, newValue, oldValue, eOpts) {
                 if (newValue != oldValue) {
@@ -195,7 +197,11 @@
     var field_ADDITIONALNO = Ext.create('Ext.form.field.Text', {
         id: 'ADDITIONALNO',
         name: 'ADDITIONALNO',
-        flex: 0.20, margin: 0,
+        flex: 0.25, margin: 0,
+        maxLength: 2,
+        minLength: 2,
+        enforceMaxLength: true,
+        minLengthText: '2位！',
         allowBlank: false,
         blankText: '空!'
     });
@@ -473,12 +479,12 @@
 function form_ini_btn() {
 
     var bbar_r = '<div class="btn-group" role="group">'
-                        + '<button type="button" onclick="" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤回</button>'
-                        + '<button type="button" onclick="create_save(\'save\')" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
+                        + '<button type="button" onclick="create_cancel()" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤回</button>'
+                        + '<button type="button" onclick="create_save(\'save\')" id="btn_save" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
                         + '<button type="button" onclick="create_save(\'submit\')" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交申请</button></div>'
 
     var bbar_l = '<div class="btn-group">'
-               + '<button type="button" onclick="" class="btn btn-primary btn-sm"><i class="fa fa-print"></i>&nbsp;申请表打印</button>'
+               + '<button type="button" onclick="" id="btn_print" class="btn btn-primary btn-sm"><i class="fa fa-print"></i>&nbsp;申请表打印</button>'
            + '</div>';
     var bbar = Ext.create('Ext.toolbar.Toolbar', {
         items: [bbar_l, '->', bbar_r]
@@ -491,10 +497,36 @@ function form_ini_btn() {
     });
 }
 
+function create_cancel() {   
+    var status = Ext.getCmp('combo_STATUS').getValue();
+    var msg = "";
+    if (status > 10) { msg = "当前状态为已受理，确认要执行撤回操作吗？"; }
+    else { msg = "确定要执行撤单操作吗？"; }
+
+    Ext.MessageBox.confirm("提示", msg, function (btn) {
+        if (btn == "yes") {
+            Ext.Ajax.request({
+                url: '/RecordInfor/cancel_create',
+                params: { id: id },
+                success: function (response, options) {
+                    var json = Ext.decode(response.responseText);
+                    if (json.success == true) {
+                        Ext.MessageBox.alert("提示", "撤单成功！");
+                    }
+                    else {
+                        Ext.MessageBox.alert("提示", "撤单失败,订单状态已发生变化！");
+                    }
+                    loadform_record();
+                }
+            });
+        }
+    });
+
+}
+
 function create_save(action) {
 
-   
-    if (action == 'submit') { 
+    if (action == 'submit') {
 
         if (!Ext.getCmp('formpanel_id').getForm().isValid()) {
             return;
@@ -507,7 +539,7 @@ function create_save(action) {
 
         if (Ext.getCmp('combo_ITEMNOATTRIBUTE').getValue() == "成品") {
             if (Ext.data.StoreManager.lookup('store_PRODUCTCONSUME').data.items.length <= 0) {
-                validate += "成品单耗信息不可为空！<br />";
+                validate += "成品单耗信息为空！<br />";
             } 
         }
        
@@ -541,7 +573,10 @@ function create_save(action) {
                     });
                 }
                 else {
-                    Ext.MessageBox.alert("提示", action == 'submit' ? "提交失败！" : "保存失败！");
+                    if (data.isrepeate == "Y") { Ext.MessageBox.alert("提示", "项号重复!"); }
+                    else {
+                        Ext.MessageBox.alert("提示", action == 'submit' ? "提交失败！" : "保存失败！");
+                    }
                 }
             }
         }
@@ -555,45 +590,37 @@ function loadform_record() {
         success: function (response, opts) {
             var data = Ext.decode(response.responseText);
             Ext.getCmp("formpanel_id").getForm().setValues(data.formdata);
-            
-            //Ext.getCmp('combo_RECORDINFOID').setValue('1191');
 
-
-            /*file_store.loadData(data.filedata);
-            //如果是修改时申报单位取先前保存的值,如无则取默认值2016-10-19 by panhuaguo  
-            if (data.formdata.REPUNITNAME) {
-                repunitcode = data.formdata.REPUNITNAME + '(' + data.formdata.REPUNITCODE + ')';
+            if (Ext.getCmp('gridpanel_PRODUCTCONSUME')) {
+                Ext.getCmp('gridpanel_PRODUCTCONSUME').store.loadData(data.productsonsumedata);
             }
-            if (data.formdata.INSPUNITNAME) {
-                inspunitcode = data.formdata.INSPUNITNAME + '(' + data.formdata.INSPUNITCODE + ')';
-            }
-            //如果是修改需要将随附文件的ID拼接成字符串 赋值到
-            var fileids = "";
-            Ext.each(file_store.getRange(), function (rec) {
-                fileids += rec.get("ID") + ",";
-            });
-            Ext.getCmp('field_ORIGINALFILEIDS').setValue(fileids);
-            if (!win_container_truck) {
-                ini_container_truck();//初始化集装箱和报关车号选择界面
-            }
-            else {
-                Ext.getCmp('w_grid').store.loadData(Ext.decode(Ext.getCmp('field_CONTAINERTRUCK').getValue()));
-            }
-            formcontrol();//表单字段控制
-            //add 2016/10/9 add
-            if (ordercode == "" && copyordercode == "") {//编辑或复制新增时，直接以上面的formdata赋值为准，新增则需要抓取值
-                if (Ext.getCmp('WEIGHTCHECK')) {
-                    if (data.WEIGHTCHECK == "1") {
-                        Ext.getCmp('WEIGHTCHECK').setValue(true);
-                        Ext.getCmp('ISWEIGHTCHECK').setReadOnly(false);
-                    } else {
-                        Ext.getCmp('WEIGHTCHECK').setValue(false);
-
-                        Ext.getCmp('ISWEIGHTCHECK').setValue(false);
-                        Ext.getCmp('ISWEIGHTCHECK').setReadOnly(true);
-                    }
-                }
-            }*/
+                     
+            formpanelcontrol();//表单字段控制
         }
     });
+}
+
+function formpanelcontrol() {
+    var status = Ext.getCmp('combo_STATUS').getValue();
+    document.getElementById("btn_save").disabled = status >= 10; //保存 
+    document.getElementById("btn_cancelsubmit").disabled = status == 0;//撤回:只有草稿才不可以撤回  
+    document.getElementById("btn_submitorder").disabled = status >= 10;//提交申请
+    document.getElementById("btn_print").disabled = status < 10;//打印
+
+    if (status >= 10) {
+        Ext.Array.each(Ext.getCmp("formpanel_id").getForm().getFields().items, function (item) {
+            if (item.id != "CUSTOMER_btn" && item.id != "ITEMNO_CONSUME_btn") {//item.id != "combo_OPTIONS" && item.id != "combo_STATUS" && item.id != "combo_ISPRINT_APPLY" &&
+                item.setReadOnly(true);
+            }
+        });
+    }
+    
+
+    //下面是表单控件涉及的弹窗选择按钮
+    Ext.getCmp('CUSTOMER_btn').setDisabled(status >= 10); //报关行     
+    if (Ext.getCmp("ITEMNO_CONSUME_btn")) { Ext.getCmp("ITEMNO_CONSUME_btn").setDisabled(status >= 10) }//对应料件序号
+
+    //成品单耗 保存删除按钮
+    if (Ext.getCmp("btn_pro_save")) { Ext.getCmp("btn_pro_save").setDisabled(status >= 10); }
+    if (Ext.getCmp("btn_pro_del")) { Ext.getCmp("btn_pro_del").setDisabled(status >= 10); }
 }
