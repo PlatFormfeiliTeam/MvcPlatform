@@ -430,28 +430,32 @@ namespace MvcPlatform.Controllers
         public string GetPrintDetail()
         {
             string ids = Request["id"] + ",0";
-            string ITEMNOATTRIBUTE = (Request["ITEMNOATTRIBUTE"] + "").Trim();
+            string id = ids.Substring(0, ids.IndexOf(","));
+            string ITEMNOATTRIBUTE = string.Empty;
             string sql = string.Empty; string sql_cp = string.Empty;
             IsoDateTimeConverter iso = new IsoDateTimeConverter();
+            string sql_recordinfo = "select a.itemnoattribute,(select code from cusdoc.SYS_RECORDINFO where id=a.recordinfoid) recordcode from SYS_RECORDINFO_DETAIL_TASK a where id=" + id;
+            DataTable dt_recordinfo = DBMgr.GetDataTable(sql_recordinfo);
+            string json_recordinfo = JsonConvert.SerializeObject(dt_recordinfo, iso);
+            ITEMNOATTRIBUTE = dt_recordinfo.Rows[0]["ITEMNOATTRIBUTE"].ToString();
             sql = "select a.itemno,a.hscode,a.commodityname,b.ele,a.options,(select name from cusdoc.base_declproductunit where enabled=1 and code=a.unit) unit," +
                       "(select name from cusdoc.base_declproductunit where enabled=1 and code=c.legalunit) legalunit,(select name from cusdoc.base_declproductunit where enabled=1 and code=c.secondunit) secondunit " +
                       " from SYS_RECORDINFO_DETAIL_TASK  A left join " +
                        "(select RID,listagg(to_char(FUNCTIONTYPE||':'||DESCRIPTIONS),'<br/>') within group(order by sno) as ELE from SYS_ELEMENTS  GROUP BY RID) B on A.Id=B.RID " +
-                       "left join (select a.hscode,a.yearid, a.legalunit,a.secondunit " +
-                       "from cusdoc.base_commodityhs a " +
-                       "inner join (select hscode,yearid,max(ID) id from cusdoc.base_commodityhs group by hscode,yearid ) b on a.id=b.id)  C on A.HSCODE=C.HSCODE AND A.CUSTOMAREA=C.YEARID " +
-                       "  where id in(" + ids + ")";
+                       "left join cusdoc.base_commodityhs  C on A.HSCODE=C.HSCODE AND A.CUSTOMAREA=C.YEARID AND A.Additionalno=C.Extracode " +
+                       "  where A.ID in(" + ids + ")";
             string json = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso);
+
             if (ITEMNOATTRIBUTE == "成品")
             {
-                sql_cp = "select a.itemno,a.hscode,a.commodityname,a.options,a.unit,ITEMNO_CONSUME,ITEMNO_COMMODITYNAME,ITEMNO_SPECIFICATIONSMODEL,ITEMNO_UNITNAME,CONSUMEATTRITIONRATE " +
-                         "from SYS_RECORDINFO_DETAIL_TASK  A left join SYS_PRODUCTCONSUME B onselect * from SYS_RECORDINFO_DETAIL_TASK  A left join SYS_PRODUCTCONSUME B on A.ID=B.RID WHERE A.ID IN (" + ids + ")";
+                sql_cp = "select a.ITEMNO,a.HSCODE,a.COMMODITYNAME,a.OPTIONS,(select name from cusdoc.base_declproductunit where enabled=1 and code=a.unit) UNIT,ITEMNO_CONSUME,ITEMNO_COMMODITYNAME,ITEMNO_SPECIFICATIONSMODEL,ITEMNO_UNITNAME " +
+                         "from SYS_RECORDINFO_DETAIL_TASK  A left join SYS_PRODUCTCONSUME B  on A.ID=B.RID WHERE A.ID IN (" + ids + ")";
                 string json_cp = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql_cp), iso);
-                return "{jsonrows:" + json + ",jsonrows_cp:" + json_cp + "}";
+                return "{jsonrows:" + json + ",jsonrows_cp:" + json_cp + ",json_recordinfo:" + json_recordinfo + "}";
 
             }
 
-            return "{jsonrows:" + json + "}";
+            return "{jsonrows:" + json + ",json_recordinfo:" + json_recordinfo + "}";
 
 
         }
