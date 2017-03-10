@@ -10,3 +10,7 @@ MvcPlatform.v12.suo
 Declare/
 Web.Debug.config
 Web.Release.config
+.svn/entries
+*.svn-base
+.svn/format
+*.db
