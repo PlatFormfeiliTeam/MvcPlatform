@@ -431,7 +431,7 @@ namespace MvcPlatform.Controllers
         public string GetPrintDetail()
         {
             string ids = Request["id"];
-            string id = ids.Substring(0, ids.IndexOf(","));
+            string id = ids.IndexOf(",") == -1 ? ids : ids.Substring(0, ids.IndexOf(","));
             string ITEMNOATTRIBUTE = string.Empty;
             string sql = string.Empty; string sql_cp = string.Empty;
             IsoDateTimeConverter iso = new IsoDateTimeConverter();
