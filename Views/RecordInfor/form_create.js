@@ -164,12 +164,18 @@
             },
             change: function (field_paste, newValue, oldValue, eOpts) {
                 if (newValue == "成品") {
-                    $("#div_form_con").show();
-                    if (!Ext.getCmp('formpanel_con')) {
+                    //$("#div_form_con").show();
+                    if (!Ext.getCmp('gridpanel_PRODUCTCONSUME') && !Ext.getCmp('gridpanel_PRODUCTCONSUME')) {
                         form_ini_con();
                     } 
                 } else {
-                    $("#div_form_con").hide();
+                    if (Ext.getCmp('formpanel_con')) {
+                        Ext.getCmp('formpanel_con').destroy();
+                    }
+                    if (Ext.getCmp('gridpanel_PRODUCTCONSUME')) {
+                        Ext.getCmp('gridpanel_PRODUCTCONSUME').destroy();
+                    }
+                    //$("#div_form_con").hide();
                 }
             }
         },
@@ -491,7 +497,7 @@ function form_ini_btn() {
                         + '<button type="button" onclick="create_save(\'submit\')" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交申请</button></div>'
 
     var bbar_l = '<div class="btn-group">'
-               + '<button type="button" onclick="" id="btn_print" class="btn btn-primary btn-sm"><i class="fa fa-print"></i>&nbsp;申请表打印</button>'
+               + '<button type="button" onclick="printitemno(' + id + ')" id="btn_print" class="btn btn-primary btn-sm"><i class="fa fa-print"></i>&nbsp;申请表打印</button>'
            + '</div>';
     var bbar = Ext.create('Ext.toolbar.Toolbar', {
         items: [bbar_l, '->', bbar_r]

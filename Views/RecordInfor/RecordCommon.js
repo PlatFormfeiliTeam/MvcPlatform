@@ -227,16 +227,8 @@ function itemsbind() {
                    handler: function () { delete_task('gridpanel_lj_Go', 'pgbar_lj_Go'); }
                },
                {
-                   text: '<span class="icon iconfont" style="font-size:12px">&#xe666;</span>&nbsp;提 交',
-                   handler: function () {
-
-                   }
-               },
-               {
                    text: '<span class="icon iconfont" style="font-size:12px">&#xe601;</span>&nbsp;申请表打印',
-                   handler: function () {
-
-                   }
+                   handler: function () { print_task('gridpanel_lj_Go'); }
                }]
 
     });
@@ -316,16 +308,8 @@ function itemsbind() {
                    handler: function () { delete_task('gridpanel_cp_Go', 'pgbar_cp_Go'); }
                },
                {
-                   text: '<span class="icon iconfont" style="font-size:12px">&#xe666;</span>&nbsp;提 交',
-                   handler: function () {
-
-                   }
-               },
-               {
                    text: '<span class="icon iconfont" style="font-size:12px">&#xe601;</span>&nbsp;申请表打印',
-                   handler: function () {
-
-                   }
+                   handler: function () { print_task('gridpanel_cp_Go'); }
                }]
 
     });
@@ -463,6 +447,25 @@ function delete_task(Compentid, Compentid_pgbar) {
     });
 }
 
+function print_task(Compentid) {
+    var recs = Ext.getCmp(Compentid).getSelectionModel().getSelection();
+    if (recs.length == 0) {
+        Ext.Msg.alert("提示", "请选择打印记录!");
+        return;
+    }
+    var ids = ""; var bf = false;
+    Ext.each(recs, function (rec) {
+        if (rec.get("STATUS") == "0") { bf = true; }
+        ids += rec.get("ID") + ",";
+    });
+    if (bf) {
+        Ext.Msg.alert("提示", "状态为草稿 不可以打印，请重新选择需要打印的记录!");
+        return;
+    }
+    ids = ids.substr(0, ids.length - 1);
+    printitemno(ids);
+    
+}
 
 //-----------------------------------------------------------------------------create or change-----------------------------------------------------------
 function Element_ini() {//61034200、52115100、85011099、74101100、41041111  
@@ -723,3 +726,6 @@ function form_ini_con() {
 
 }
 
+function printitemno(ids) {
+    opencenterwin("/RecordInfor/PrintRecordDetail?ids=" + ids, 1600, 900);
+}

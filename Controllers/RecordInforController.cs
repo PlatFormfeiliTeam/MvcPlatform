@@ -430,7 +430,7 @@ namespace MvcPlatform.Controllers
         }
         public string GetPrintDetail()
         {
-            string ids = Request["id"] + ",0";
+            string ids = Request["id"];
             string id = ids.Substring(0, ids.IndexOf(","));
             string ITEMNOATTRIBUTE = string.Empty;
             string sql = string.Empty; string sql_cp = string.Empty;
@@ -444,13 +444,13 @@ namespace MvcPlatform.Controllers
                       " from SYS_RECORDINFO_DETAIL_TASK  A left join " +
                        "(select RID,listagg(to_char(FUNCTIONTYPE||':'||DESCRIPTIONS),'<br/>') within group(order by sno) as ELE from SYS_ELEMENTS  GROUP BY RID) B on A.Id=B.RID " +
                        "left join cusdoc.base_commodityhs  C on A.HSCODE=C.HSCODE AND A.CUSTOMAREA=C.YEARID AND A.Additionalno=C.Extracode " +
-                       "  where A.ID in(" + ids + ")";
+                       "  where A.ID in(" + ids + ") order by a.itemno";
             string json = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso);
 
             if (ITEMNOATTRIBUTE == "成品")
             {
                 sql_cp = "select a.ITEMNO,a.HSCODE,a.COMMODITYNAME,a.OPTIONS,(select name from cusdoc.base_declproductunit where enabled=1 and code=a.unit) UNIT,ITEMNO_CONSUME,ITEMNO_COMMODITYNAME,ITEMNO_SPECIFICATIONSMODEL,ITEMNO_UNITNAME " +
-                         "from SYS_RECORDINFO_DETAIL_TASK  A left join SYS_PRODUCTCONSUME B  on A.ID=B.RID WHERE A.ID IN (" + ids + ")";
+                         "from SYS_RECORDINFO_DETAIL_TASK  A left join SYS_PRODUCTCONSUME B  on A.ID=B.RID WHERE A.ID IN (" + ids + ") order by a.itemno";
                 string json_cp = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql_cp), iso);
                 return "{jsonrows:" + json + ",jsonrows_cp:" + json_cp + ",json_recordinfo:" + json_recordinfo + "}";
 

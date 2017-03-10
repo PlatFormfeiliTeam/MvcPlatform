@@ -7,6 +7,7 @@
 <link href="~/css/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
 <script src="~/barcode/jquery-printTable-1.0.js"></script>
 <script src="~/barcode/jquery.jPrintArea.js"></script>
+<script src="~/js/pan.js"></script>
 <script src="~/js/RecordData.js"></script>
 
 
@@ -21,7 +22,7 @@
             data: optionstatus_js_data
         });
 
-        var ids = "34";
+        var ids = getQueryString("ids");
         var ITEMNOATTRIBUTE , RECORDINFOID;
         var store_cp_data;
         var store_record_print = Ext.create('Ext.data.JsonStore', {
