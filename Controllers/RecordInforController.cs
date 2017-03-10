@@ -449,8 +449,8 @@ namespace MvcPlatform.Controllers
 
             if (ITEMNOATTRIBUTE == "成品")
             {
-                sql_cp = "select a.ITEMNO,a.HSCODE,a.COMMODITYNAME,a.OPTIONS,(select name from cusdoc.base_declproductunit where enabled=1 and code=a.unit) UNIT,ITEMNO_CONSUME,ITEMNO_COMMODITYNAME,ITEMNO_SPECIFICATIONSMODEL,ITEMNO_UNITNAME " +
-                         "from SYS_RECORDINFO_DETAIL_TASK  A left join SYS_PRODUCTCONSUME B  on A.ID=B.RID WHERE A.ID IN (" + ids + ") order by a.itemno";
+                sql_cp = "select a.ITEMNO,a.HSCODE,a.COMMODITYNAME,a.OPTIONS,(select name from cusdoc.base_declproductunit where enabled=1 and code=a.unit) UNIT,ITEMNO_CONSUME,ITEMNO_COMMODITYNAME,ITEMNO_SPECIFICATIONSMODEL,ITEMNO_UNITNAME," +
+                         "CONSUME,ATTRITIONRATE from SYS_RECORDINFO_DETAIL_TASK  A left join SYS_PRODUCTCONSUME B  on A.ID=B.RID WHERE A.ID IN (" + ids + ") order by a.itemno";
                 string json_cp = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql_cp), iso);
                 return "{jsonrows:" + json + ",jsonrows_cp:" + json_cp + ",json_recordinfo:" + json_recordinfo + "}";
 
