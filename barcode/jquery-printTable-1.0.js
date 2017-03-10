@@ -52,7 +52,8 @@
 			 startPage     : 1,
 			 pageHeight    : 1230,
 			 topMargin     : 50,
-			 bottomMargin  : 50
+			 bottomMargin: 50,
+	         pageBreak    :1
          };
 	 var settings = {};//global settings
 	 var rowCount = 0;//行总数
@@ -69,7 +70,7 @@
 		$tbodyTr = $table.find("tbody tr");
 		switch ( settings.mode ){
             case modes.rowHeight :
-            	rowHeightPage();//行高分页
+                rowHeightPage();//行高分页
                 break;
             case modes.rowNumber :
             	rowNumberPage();//行数分页
@@ -80,9 +81,9 @@
 		return getPageStyle(startPage , pageCount);
 	};
 	//行高分页
-	function rowHeightPage(){
-		var contentHeight =	 initHeightPage();
-		getContentColne();
+	function rowHeightPage() {
+	    var contentHeight = initHeightPage();
+	    getContentColne();
 	    beginPageByHeight(contentHeight);
 	    hidenContent();
 	}
@@ -97,7 +98,7 @@
 	}
 	
 	//按行高分页
-	function beginPageByHeight(contentHeight){
+	function beginPageByHeight(contentHeight) {
 		var totalHeight = 0;
 		var startLine = 0;
 		$tbodyTr.each(function (i) {
@@ -108,8 +109,14 @@
 				totalHeight += cHeight;
 				//if(i == $tbodyTr.length){
 				//    newPage(i);
-				//}
-				if ((totalHeight + 2 * cHeight) > contentHeight || i==$tbodyTr.length-1)
+			    //}
+				var cHeightNext = 0;
+				if (i < $tbodyTr.length - 1)
+				{
+				     cHeightNext = $($tbodyTr[i + 1]).outerHeight(true);
+				}
+				
+				if ((totalHeight + cHeight + cHeightNext) > contentHeight || i == $tbodyTr.length - 1)
 				{
 				    newPage(i+1);
 				}
@@ -166,8 +173,14 @@
 		var $pageContent = $content.clone().append(getTrRecord(startLine,offsetLine));
 		var $pageFooter = $footer.clone();
 		$pageFooter.find(settings.pageNumClass).text(getPageStyle(currentPage , pageCount));//页码显示格式
-		if(offsetLine == rowCount){
-		    $table.before($pageHeader).before($pageContent).before($pageFooter).before(addPageBreak());
+		if (offsetLine == rowCount) {
+		    if (settings.pageBreak == 0) {
+		        $table.before($pageHeader).before($pageContent).before($pageFooter);
+		    }
+		    else {
+		        $table.before($pageHeader).before($pageContent).before($pageFooter).before(addPageBreak());
+		    }
+		    
 		}else{
 			$table.before($pageHeader).before($pageContent).before($pageFooter).before(addPageBreak());
 		}
