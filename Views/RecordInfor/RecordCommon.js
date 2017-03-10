@@ -127,6 +127,7 @@ function itemsbind() {
         displayInfo: true
     })
     gridpanel_lj = Ext.create('Ext.grid.Panel', {
+        id: "gridpanel_lj",
         store: store_RecrodDetail_lj,
         height: 500,
         selModel: { selType: 'checkboxmodel' },
@@ -188,6 +189,7 @@ function itemsbind() {
         displayInfo: true
     })
     gridpanel_cp = Ext.create('Ext.grid.Panel', {
+        id: "gridpanel_cp",
         store: store_RecrodDetail_cp,
         height: 500,
         selModel: { selType: 'checkboxmodel' },
@@ -391,14 +393,28 @@ function Reset() {
     });
 }
 
-function Open() {
-    opencenterwin("/RecordInfor/Create", 1600, 900);
+function Open(type) {
+    if (type == 'A') {//新增申请
+        opencenterwin("/RecordInfor/Create", 1600, 900);
+    }
+    if (type == 'U') {//变更申请
+        var Compentid = ""; 
+        if (Ext.getCmp("tabpanel").getActiveTab().id == "tab_0") { Compentid = "gridpanel_lj"; }
+        if (Ext.getCmp("tabpanel").getActiveTab().id == "tab_1") { Compentid = "gridpanel_cp"; }
+        
+        var recs = Ext.getCmp(Compentid).getSelectionModel().getSelection(); 
+        if (recs.length != 1) {
+            Ext.Msg.alert("提示", "请选择一笔变更申请的记录!");
+            return;
+        }       
+        opencenterwin("/RecordInfor/Change?zid=" + recs[0].get("ID"), 1600, 900);
+    }
 }
 
 function edit_task(Compentid) {
     var recs = Ext.getCmp(Compentid).getSelectionModel().getSelection();
-    if (recs.length == 0) {
-        Ext.Msg.alert("提示", "请选择修改记录!");
+    if (recs.length != 1) {
+        Ext.Msg.alert("提示", "请选择一笔修改记录!");
         return;
     }
 
