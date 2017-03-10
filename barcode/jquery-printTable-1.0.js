@@ -67,14 +67,16 @@
 	$.fn.printTable = function( options ) {
 		$.extend( settings, defaults, options );
 		$table = $(this);
-		$tbodyTr = $table.find("tbody tr");
-		switch ( settings.mode ){
-            case modes.rowHeight :
-                rowHeightPage();//行高分页
-                break;
-            case modes.rowNumber :
-            	rowNumberPage();//行数分页
-        }
+		if ($table.css("display") == "table") {
+		    $tbodyTr = $table.find("tbody tr");
+		    switch (settings.mode) {
+		        case modes.rowHeight:
+		            rowHeightPage();//行高分页
+		            break;
+		        case modes.rowNumber:
+		            rowNumberPage();//行数分页
+		    }
+		}
 	};
 	//获取页总数
 	$.fn.printTable.getStartPage = function(startPage) {
