@@ -159,7 +159,8 @@ namespace MvcPlatform.Controllers
 
         public string GetElements()
         {
-            string customarea = Request["customarea"].ToString(); string hscode = Request["hscode"].ToString(); string id = Request["id"].ToString();
+            string customarea = Request["customarea"].ToString(); string hscode = Request["hscode"].ToString(); 
+            string additionalno = Request["additionalno"].ToString(); string id = Request["id"].ToString();
             string sql = string.Empty; string json = "[]";
 
             string flag = "";
@@ -168,8 +169,8 @@ namespace MvcPlatform.Controllers
             {
                 sql = @"select * from sys_recordinfo_detail_task where id='" + id + "'";
                 DataTable dt = DBMgr.GetDataTable(sql);
-                string hscode_database = dt.Rows[0]["HSCODE"].ToString(); string customarea_database = dt.Rows[0]["CUSTOMAREA"].ToString();
-                if (hscode_database != hscode || customarea_database != customarea)//修改了这两个字段
+                string hscode_database = dt.Rows[0]["HSCODE"].ToString(); string customarea_database = dt.Rows[0]["CUSTOMAREA"].ToString(); string additionalno_database = dt.Rows[0]["ADDITIONALNO"].ToString();
+                if (hscode_database != hscode || customarea_database != customarea || additionalno_database != additionalno)//修改了这两个字段
                 {
                     flag = "1";//查总库
                 }
@@ -178,9 +179,9 @@ namespace MvcPlatform.Controllers
             if (flag == "1")//查总库
             {
                 sql = @"select regexp_substr(elements,'[^;]+',1,level,'i') elements,'' descriptions 
-                    from (select elements from cusdoc.BASE_COMMODITYHS where hscode='{0}' and yearid={1} and rownum<=1) t1
+                    from (select elements from cusdoc.BASE_COMMODITYHS where hscode='{0}' and yearid={1} and extracode='{2}') t1
                     connect by level <= length(elements) - length(replace(elements,';',''))";
-                sql = string.Format(sql, hscode, customarea);
+                sql = string.Format(sql, hscode, customarea, additionalno);
                 json = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
             }
             else

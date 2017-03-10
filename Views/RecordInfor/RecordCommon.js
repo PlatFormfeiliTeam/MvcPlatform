@@ -487,12 +487,13 @@ function Element_ini() {//61034200、52115100、85011099、74101100、41041111
 
     var customarea = Ext.getCmp('combo_CUSTOMAREA').getValue();
     var hscode = Ext.getCmp('HSCODE').getValue();
+    var additionalno = Ext.getCmp('ADDITIONALNO').getValue();
 
     var configItem = new Array();
     
     Ext.Ajax.request({
         url: "/RecordInfor/GetElements",
-        params: { customarea: customarea, hscode: hscode, id: id },
+        params: { customarea: customarea, hscode: hscode, additionalno: additionalno, id: id },
         success: function (response, opts) {
             var json = Ext.decode(response.responseText);
 

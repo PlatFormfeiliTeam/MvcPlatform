@@ -202,6 +202,13 @@
         minLength: 2,
         enforceMaxLength: true,
         minLengthText: '2位！',
+        listeners: {
+            change: function (field_paste, newValue, oldValue, eOpts) {
+                if (newValue != oldValue) {
+                    Element_ini();
+                }
+            }
+        },
         allowBlank: false,
         blankText: '空!'
     });
@@ -607,14 +614,14 @@ function formpanelcontrol() {
     document.getElementById("btn_submitorder").disabled = status >= 10;//提交申请
     document.getElementById("btn_print").disabled = status < 10;//打印
 
-    if (status >= 10) {
-        Ext.Array.each(Ext.getCmp("formpanel_id").getForm().getFields().items, function (item) {
-            if (item.id != "CUSTOMER_btn" && item.id != "ITEMNO_CONSUME_btn") {//item.id != "combo_OPTIONS" && item.id != "combo_STATUS" && item.id != "combo_ISPRINT_APPLY" &&
-                item.setReadOnly(true);
-            }
-        });
-    }
-    
+    Ext.Array.each(Ext.getCmp("formpanel_id").getForm().getFields().items, function (item) {
+        if (item.id != "combo_OPTIONS" && item.id != "combo_STATUS" && item.id != "combo_ISPRINT_APPLY"
+             && item.id != "CREATEDATE" && item.id != "CREATENAME" && item.id != "SUBMITTIME" && item.id != "SUBMITNAME"
+             && item.id != "ACCEPTTIME" && item.id != "ACCEPTNAME" && item.id != "PRETIME" && item.id != "PRENAME") {
+            item.setReadOnly(status >= 10);
+        }
+    });
+
 
     //下面是表单控件涉及的弹窗选择按钮
     Ext.getCmp('CUSTOMER_btn').setDisabled(status >= 10); //报关行     
