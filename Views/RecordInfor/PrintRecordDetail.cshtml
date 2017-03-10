@@ -128,7 +128,7 @@
         return rtn.substr(0,2)
     }
 
-    function print()
+    function printTable()
     {
         $("#printTable").printTable({
             header: "#headerInfo",
@@ -151,20 +151,19 @@
             bottomMargin: 5,
             pageBreak: 0
         });
-
-
-        var oWin = window.open();
-        oWin.document.open();
-        oWin.document.write(document.getElementById("printArea").innerHTML);
-        oWin.document.close();
-        oWin.print();
-        oWin.close();
+        $("#btn").html("");
+        window.print();
+        $("#btn").html("<button type='button' onclick='printTable()'>打印申请表</button>");
+        //var oWin = window.open();
+        //oWin.document.open();
+        //oWin.document.write(document.getElementById("printArea").innerHTML);
+        //oWin.document.close();
+        //oWin.print();
+      //oWin.close();
  
     }
-
-
 </script>
-<div class="container" align="right"><button type="button" onclick="print()">打印申请表</button></div>
+<div id="btn" class="container" align="right"><button type="button" onclick="printTable()">打印申请表</button></div>
 <div id ="printArea">
     <div class="container">
         <div id="div_form">
