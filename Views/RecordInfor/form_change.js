@@ -93,7 +93,7 @@
 
     //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //HS编码left
-    var field_HSCODE_left = Ext.create('Ext.form.field.Text', { id: 'HSCODE_left', name: 'HSCODE_left', readOnly: true, fieldLabel: 'HS编码', flex: .5, margin: 0 });
+    var field_HSCODE_left = Ext.create('Ext.form.field.Text', { id: 'HSCODE_left', name: 'HSCODE_left', readOnly: true, fieldLabel: 'HS编码', flex: .5 });
     //附加码left
     var field_ADDITIONALNO_left = Ext.create('Ext.form.field.Text', { id: 'ADDITIONALNO_left', name: 'ADDITIONALNO_left', readOnly: true, fieldLabel: 'HS附加码', flex: .5, margin: 0 });
 
@@ -113,7 +113,7 @@
 
     //HS编码right
     var field_HSCODE = Ext.create('Ext.form.field.Text', {
-        id: 'HSCODE', name: 'HSCODE', fieldLabel: 'HS编码', flex: .5, margin: 0,
+        id: 'HSCODE', name: 'HSCODE', fieldLabel: 'HS编码', flex: .5,
         listeners: {
             change: function (field_paste, newValue, oldValue, eOpts) {
                 //if (newValue != Ext.getCmp('HSCODE_left').getValue()) {
@@ -340,7 +340,7 @@
     var field_FINISHID = Ext.create('Ext.form.field.Hidden', { name: 'FINISHID' });
 
     var configItem = [
-        { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_RECORDINFOID, field_ITEMNO, combo_ITEMNOATTRIBUTE, combo_OPTIONS, combo_CUSTOMAREA] },
+        { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_RECORDINFOID, field_ITEMNO, combo_ITEMNOATTRIBUTE, combo_CUSTOMAREA] },
         { layout: 'column', border: 0, items: [panel_compare] },
         { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [textarea_container] },
         { layout: 'column', height: 42, border: 0, items: [combo_container] },
