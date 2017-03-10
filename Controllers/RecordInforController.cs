@@ -315,11 +315,9 @@ namespace MvcPlatform.Controllers
                 int result = DBMgr.ExecuteNonQuery(sql);
                 if (result == 1)
                 {
-                    update_elements(json, json_user, id);//申报要素                   
-                    if (json.Value<string>("ITEMNOATTRIBUTE") == "成品") //成品单耗
-                    {
-                        update_productconsume(json, json_user, id);
-                    }
+                    update_elements(json, json_user, id);//申报要素  
+                    update_productconsume(json, json_user, id);//成品单耗
+
                     resultmsg = "{success:true,id:'" + id + "'}";
                 }
             }
@@ -360,18 +358,21 @@ namespace MvcPlatform.Controllers
             sql = @"delete SYS_PRODUCTCONSUME where RID='" + id + "'";
             DBMgr.ExecuteNonQuery(sql);
 
-            //在插入
-            JArray ja = (JArray)JsonConvert.DeserializeObject(Request["productconsume"]);
-            for (int j = 0; j < ja.Count; j++)
+            if (json.Value<string>("ITEMNOATTRIBUTE") == "成品") 
             {
-                sql = @"insert into SYS_PRODUCTCONSUME(ID,RECORDINFOID,ITEMNO,ITEMNO_CONSUME,ITEMNO_COMMODITYNAME,ITEMNO_SPECIFICATIONSMODEL,ITEMNO_UNIT,
+                //在插入
+                JArray ja = (JArray)JsonConvert.DeserializeObject(Request["productconsume"]);
+                for (int j = 0; j < ja.Count; j++)
+                {
+                    sql = @"insert into SYS_PRODUCTCONSUME(ID,RECORDINFOID,ITEMNO,ITEMNO_CONSUME,ITEMNO_COMMODITYNAME,ITEMNO_SPECIFICATIONSMODEL,ITEMNO_UNIT,
                                         ITEMNO_UNITNAME,CONSUME,ATTRITIONRATE,CREATEMAN,CREATEDATE,RID) 
                                     values(SYS_PRODUCTCONSUME_id.Nextval,'{0}','{1}','{2}','{3}','{4}','{5}'
                                     ,'{6}','{7}','{8}','{9}',sysdate,'{10}')";
-                sql = string.Format(sql, json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), ja[j].Value<string>("ITEMNO_CONSUME"), ja[j].Value<string>("ITEMNO_COMMODITYNAME"), ja[j].Value<string>("ITEMNO_SPECIFICATIONSMODEL"), ja[j].Value<string>("ITEMNO_UNIT")
-                    , ja[j].Value<string>("ITEMNO_UNITNAME"), ja[j].Value<string>("CONSUME"), ja[j].Value<string>("ATTRITIONRATE"), json_user.Value<string>("ID"), id
-                    );
-                DBMgr.ExecuteNonQuery(sql);
+                    sql = string.Format(sql, json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), ja[j].Value<string>("ITEMNO_CONSUME"), ja[j].Value<string>("ITEMNO_COMMODITYNAME"), ja[j].Value<string>("ITEMNO_SPECIFICATIONSMODEL"), ja[j].Value<string>("ITEMNO_UNIT")
+                        , ja[j].Value<string>("ITEMNO_UNITNAME"), ja[j].Value<string>("CONSUME"), ja[j].Value<string>("ATTRITIONRATE"), json_user.Value<string>("ID"), id
+                        );
+                    DBMgr.ExecuteNonQuery(sql);
+                }
             }
             return "success";
         }
