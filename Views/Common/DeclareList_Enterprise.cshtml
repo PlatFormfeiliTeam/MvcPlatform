@@ -15,7 +15,7 @@
     //传参示例 /Common/DeclareList?busitypeid=11&module=ddzx&role=customer
 
     var pgbar; var store_sbfs; var store_bgfs; var store_busitype;
-    var common_data_jydw = [], common_data_sbfs = [], common_data_bgfs = [];
+    var common_data_jydw = [], common_data_sbfs = [], common_data_bgfs = [], common_data_sbgq=[];
 
     Ext.onReady(function () {
         Ext.Ajax.request({
@@ -25,6 +25,7 @@
                 common_data_jydw = commondata.jydw;//申报单位  查询区要用
                 common_data_sbfs = commondata.sbfs_all ;//申报方式  这个基础数据调取出来的目的就是为了列表页字段显示时render处理
                 common_data_bgfs = commondata.bgfs;//报关方式  这个基础数据调取出来的目的就是为了列表页字段显示时render处理
+                common_data_sbgq = commondata.sbgq;//申报关区 进口口岸
 
                 initSearch();  //查询区域
                 store_sbfs = Ext.create('Ext.data.JsonStore', {
@@ -59,8 +60,10 @@
                             store.getProxy().extraParams = {
                                 CONDITION1: Ext.getCmp('CONDITION1').getValue(), VALUE1: Ext.getCmp("CONDITION1_1").getValue(),
                                 CONDITION2: Ext.getCmp('CONDITION2').getValue(), VALUE2: Ext.getCmp("CONDITION2_1").getValue(),
-                                CONDITION3: Ext.getCmp('CONDITION3').getValue(), VALUE3: Ext.getCmp("CONDITION3_1").getValue(),
-                                CONDITION4: Ext.getCmp('CONDITION4').getValue(), VALUE4_1: Ext.Date.format(Ext.getCmp("CONDITION4_1").getValue(), 'Y-m-d H:i:s'), VALUE4_2: Ext.Date.format(Ext.getCmp("CONDITION4_2").getValue(), 'Y-m-d H:i:s'),
+                                CONDITION3: Ext.getCmp('CONDITION3').getValue(), VALUE3_1: Ext.Date.format(Ext.getCmp("CONDITION3_1").getValue(), 'Y-m-d H:i:s'), VALUE3_2: Ext.Date.format(Ext.getCmp("CONDITION3_2").getValue(), 'Y-m-d H:i:s'),
+                                CONDITION4: Ext.getCmp('CONDITION4').getValue(), VALUE4: Ext.getCmp("CONDITION4_1").getValue(),
+                                CONDITION5: Ext.getCmp('CONDITION5').getValue(), VALUE5: Ext.getCmp("CONDITION5_1").getValue(),
+                                CONDITION6: Ext.getCmp('CONDITION6').getValue(), VALUE6_1: Ext.Date.format(Ext.getCmp("CONDITION6_1").getValue(), 'Y-m-d H:i:s'), VALUE6_2: Ext.Date.format(Ext.getCmp("CONDITION6_2").getValue(), 'Y-m-d H:i:s'),
                             }
                         }
                     }
@@ -80,15 +83,15 @@
                     columns: [
                     { xtype: 'rownumberer', width: 35 },
                     { header: 'ID', dataIndex: 'ID', sortable: true, hidden: true },
-                    { header: '海关状态', dataIndex: 'CUSTOMSSTATUS', width: 90, locked: true, renderer: render },
+                    { header: '海关状态', dataIndex: 'CUSTOMSSTATUS', width: 90, locked: true },
                     { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 140, locked: true, renderer: render },
                     { header: '申报单位', dataIndex: 'REPUNITNAME', width: 200 },
                     { header: '合同发票号', dataIndex: 'CONTRACTNOORDER', width: 140, locked: true, },
-                    { header: '打印标志', dataIndex: 'ISPRINT', width: 70, renderer: render },
+                    //{ header: '打印标志', dataIndex: 'ISPRINT', width: 70, renderer: render },
                     { header: '申报完成时间', dataIndex: 'REPFINISHTIME', width: 140 },
                     { header: '运输工具名称', dataIndex: 'DECLTYPE', width: 150, renderer: render },
                     { header: '业务类型', dataIndex: 'BUSITYPE', width: 90, renderer: render },// 业务类型
-                    { header: '出口口岸', dataIndex: 'PORTCODE', width: 80 },
+                    { header: '进出口岸', dataIndex: 'PORTCODE', width: 80 },
                     { header: '提运单号', dataIndex: 'BLNO', width: 180 },
                     { header: '申报方式', dataIndex: 'REPWAYNAME', width: 100, renderer: render },
                     { header: '报关方式', dataIndex: 'DECLWAYNAME', width: 100, renderer: render },
@@ -98,10 +101,10 @@
                     { header: '重量', dataIndex: 'GOODSNW', width: 60 },
                     { header: '张数', dataIndex: 'SHEETNUM', width: 60 },
                     { header: '订单编号', dataIndex: 'ORDERCODE', width: 100 },
-                    { header: '客户编号', dataIndex: 'CUSNO', width: 125 },
-                    { header: '进/出', dataIndex: 'IETYPE', width: 80},
-                    { header: '两单关联号', dataIndex: 'ASSOCIATENO', width: 110 },//两单关联号
-                    { header: '多单关联号', dataIndex: 'CORRESPONDNO', width: 100}//多单关联号
+                    { header: '客户编号', dataIndex: 'CUSNO', width: 125 }
+                    //,{ header: '进/出', dataIndex: 'IETYPE', width: 80},
+                    //{ header: '两单关联号', dataIndex: 'ASSOCIATENO', width: 110 },//两单关联号
+                    //{ header: '多单关联号', dataIndex: 'CORRESPONDNO', width: 100}//多单关联号
                     ],
                     viewConfig: {
                         enableTextSelection: true
@@ -114,9 +117,9 @@
     function render(value, cellmeta, record, rowIndex, columnIndex, store) {
         var rtn = "";
         var dataindex = cellmeta.column.dataIndex;
-        if (dataindex == "CUSTOMSSTATUS" && value) {
-            rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='showcustoms_receipt(\"" + record.get("CODE") + "\")'>" + value + "</div>";
-        }
+        //if (dataindex == "CUSTOMSSTATUS" && value) {
+        //    rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='showcustoms_receipt(\"" + record.get("CODE") + "\")'>" + value + "</div>";
+        //}
         if (dataindex == "DECLARATIONCODE" && value) {
             rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='FileConsult(\"" + record.get("ORDERCODE") + "\",\"" + escape(record.get("BUSITYPE")) + "\",\"" + record.get("CODE") + "\")'>" + value + "</div>";
         }
@@ -171,40 +174,40 @@
         opencenterwin("/Common/FileConsult_E?source=declare&ORDERCODE=" + recs[0].get("ORDERCODE") + "&BUSITYPE=" + recs[0].get("BUSITYPE") + "&PREDECLCODE=" + recs[0].get("CODE"), 1200, 900);
     }
 
-    //显示海关状态回执记录
-    function showcustoms_receipt(code_bgd) {
-        var store_customs = Ext.create('Ext.data.JsonStore', {
-            fields: ['TIMES', 'DECLSTATUS'],
-            proxy: {
-                type: 'ajax',
-                url: '/Common/LoadCustomsReceipt?bgdcode=' + code_bgd,
-                reader: {
-                    root: 'rows',
-                    type: 'json'
-                }
-            },
-            autoLoad: true
-        })
-        var grid_customs = Ext.create('Ext.grid.Panel', {
-            title: '海关状态回执',
-            store: store_customs,
-            height: 100,
-            columns: [
-                { xtype: 'rownumberer', width: 35 },
-                { header: '时间', dataIndex: 'TIMES', width: 130 },
-                { header: '海关状态', dataIndex: 'DECLSTATUS', flex: 1 }
-            ]
-        })
-        var win_customs_status = Ext.create("Ext.window.Window", {
-            title: "",
-            width: 400,
-            height: 400,
-            layout: "fit",
-            modal: true,
-            items: [grid_customs]
-        });
-        win_customs_status.show();
-    }
+    ////显示海关状态回执记录
+    //function showcustoms_receipt(code_bgd) {
+    //    var store_customs = Ext.create('Ext.data.JsonStore', {
+    //        fields: ['TIMES', 'DECLSTATUS'],
+    //        proxy: {
+    //            type: 'ajax',
+    //            url: '/Common/LoadCustomsReceipt?bgdcode=' + code_bgd,
+    //            reader: {
+    //                root: 'rows',
+    //                type: 'json'
+    //            }
+    //        },
+    //        autoLoad: true
+    //    })
+    //    var grid_customs = Ext.create('Ext.grid.Panel', {
+    //        title: '海关状态回执',
+    //        store: store_customs,
+    //        height: 100,
+    //        columns: [
+    //            { xtype: 'rownumberer', width: 35 },
+    //            { header: '时间', dataIndex: 'TIMES', width: 130 },
+    //            { header: '海关状态', dataIndex: 'DECLSTATUS', flex: 1 }
+    //        ]
+    //    })
+    //    var win_customs_status = Ext.create("Ext.window.Window", {
+    //        title: "",
+    //        width: 400,
+    //        height: 400,
+    //        layout: "fit",
+    //        modal: true,
+    //        items: [grid_customs]
+    //    });
+    //    win_customs_status.show();
+    //}
 
 
     function ExportDecl() {

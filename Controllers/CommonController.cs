@@ -1276,14 +1276,23 @@ namespace MvcPlatform.Controllers
                     {
                         switch (entrusttypeid)
                         {
+                            //case "01":
+                            //    result += "[{id:'declare',typename:'报关'}]";
+                            //    break;
+                            //case "02":
+                            //    result += "[{id:'declare',typename:'报检'}]";
+                            //    break;
+                            //case "03":
+                            //    result += "[{id:'declare',typename:'报关'},{id:'inspect',typename:'报检'}]";
+                            //    break;
                             case "01":
-                                result += "[{id:'declare',typename:'报关'}]";
+                                result += "[{id:'order',typename:'委托',leaf:false},{id:'declare',typename:'报关'}]";
                                 break;
                             case "02":
-                                result += "[{id:'declare',typename:'报检'}]";
+                                result += "[{id:'order',typename:'委托',leaf:false}]";
                                 break;
                             case "03":
-                                result += "[{id:'declare',typename:'报关'},{id:'inspect',typename:'报检'}]";
+                                result += "[{id:'order',typename:'委托',leaf:false},{id:'declare',typename:'报关'}]";
                                 break;
                         }
                     }
@@ -1338,20 +1347,36 @@ namespace MvcPlatform.Controllers
                 result += "[";
                 foreach (DataRow dr in dt.Rows)
                 {
-                    if (i != dt.Rows.Count - 1)
+                    if (role == "enterprise")
                     {
-                        result += "{id:'44_" + (i + 1) + "',typename:'订单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'},";
+                       if (i != dt.Rows.Count - 1)
+                        {
+                            result += "{id:'44_" + (i + 1) + "',typename:'订单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'},";
+                        }
+                        else
+                        {
+                            result += "{id:'44_" + (i + 1) + "',typename:'订单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'}";
+                        }
                     }
                     else
                     {
-                        result += "{id:'44_" + (i + 1) + "',typename:'订单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'}";
+                        if (i != dt.Rows.Count - 1)
+                        {
+                            result += "{id:'44_" + (i + 1) + "',typename:'订单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'},";
+                        }
+                        else
+                        {
+                            result += "{id:'44_" + (i + 1) + "',typename:'订单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'}";
+                        }
+                    
                     }
+                   
                     i++;
                 }
                 result += "]";
                 return result;
             }
-            if (id.LastIndexOf("44_") >= 0)
+            if (id.LastIndexOf("44_") >= 0 && role != "enterprise")
             {
                 int i = 0;
                 sql = @"select t.*,f.FILETYPENAME,t.rowid from list_attachmentdetail t left join  sys_filetype f on t.filetypeid=f.filetypeid
@@ -3068,7 +3093,6 @@ namespace MvcPlatform.Controllers
         public string QueryConditionDecl_E()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-
             string where = "";
             if (!string.IsNullOrEmpty(Request["VALUE1"]))//判断查询条件1是否有值
             {
@@ -3076,6 +3100,27 @@ namespace MvcPlatform.Controllers
                 {
                     case "REPUNITCODE"://申报单位
                         where += " and ort.REPUNITCODE='" + Request["VALUE1"] + "' ";
+                        break;
+                    case "BUSITYPE"://业务类型
+                        where += " and ort.BUSITYPE='" + Request["VALUE1"] + "' ";
+                        break;
+                    case "PORTCODE"://进出口岸
+                        where += " and ort.PORTCODE='" + Request["VALUE1"] + "' ";
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(Request["VALUE4"]))//判断查询条件1是否有值
+            {
+                switch (Request["CONDITION4"])
+                {
+                    case "REPUNITCODE"://申报单位
+                        where += " and ort.REPUNITCODE='" + Request["VALUE4"] + "' ";
+                        break;
+                    case "BUSITYPE"://业务类型
+                        where += " and ort.BUSITYPE='" + Request["VALUE4"] + "' ";
+                        break;
+                    case "PORTCODE"://进出口岸
+                        where += " and ort.PORTCODE='" + Request["VALUE4"] + "' ";
                         break;
                 }
             }
@@ -3109,35 +3154,79 @@ namespace MvcPlatform.Controllers
                         break;
                 }
             }
-            if (!string.IsNullOrEmpty(Request["VALUE3"]))//判断查询条件3是否有值
+            if (!string.IsNullOrEmpty(Request["VALUE5"]))//判断查询条件2是否有值
             {
-                switch (Request["CONDITION3"])
+                switch (Request["CONDITION5"])
                 {
-                    case "DYBZ"://打印标志
-                        where += " and det.ISPRINT='" + Request["VALUE3"] + "' ";
+                    case "REPNO"://对应号
+                        where += " and instr(ort.REPNO,'" + Request["VALUE5"] + "')>0 ";
+                        break;
+                    case "BLNO"://提运单号
+                        where += " and instr(det.BLNO,'" + Request["VALUE5"] + "')>0 ";
+                        break;
+                    case "ORDERCODE"://订单编号
+                        where += " and instr(det.ORDERCODE,'" + Request["VALUE5"] + "')>0 ";
+                        break;
+                    case "DECLCARNO"://报关车号
+                        where += " and instr(ort.DECLCARNO,'" + Request["VALUE5"] + "')>0 ";
+                        break;
+                    case "TRANSNAME"://运输工具名称
+                        where += " and instr(det.TRANSNAME,'" + Request["VALUE5"] + "')>0 ";
+                        break;
+                    case "DECLNO"://报关单号
+                        where += " and instr(det.DECLARATIONCODE,'" + Request["VALUE5"] + "')>0 ";
+                        break;
+                    case "CONTRACTNO"://合同协议号
+                        where += " and instr(det.CONTRACTNO,'" + Request["VALUE5"] + "')>0 ";
+                        break;
+                    case "CONTRACTNOORDER"://合同发票号
+                        where += " and instr(ort.CONTRACTNO,'" + Request["VALUE5"] + "')>0 ";
                         break;
                 }
             }
-            switch (Request["CONDITION4"])
+            switch (Request["CONDITION3"])
             {
                 case "SUBMITTIME"://订单委托日期 
-                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    if (!string.IsNullOrEmpty(Request["VALUE3_1"]))//如果开始时间有值
                     {
-                        where += " and ort.SUBMITTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                        where += " and ort.SUBMITTIME>=to_date('" + Request["VALUE3_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
                     }
-                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    if (!string.IsNullOrEmpty(Request["VALUE3_2"]))//如果结束时间有值
                     {
-                        where += " and ort.SUBMITTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                        where += " and ort.SUBMITTIME<=to_date('" + Request["VALUE3_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
                     }
                     break;
                 case "REPTIME"://申报完成时间
-                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    if (!string.IsNullOrEmpty(Request["VALUE3_1"]))//如果开始时间有值
                     {
-                        where += " and det.REPENDTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
+                        where += " and det.REPENDTIME>=to_date('" + Request["VALUE3_1"] + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
                     }
-                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    if (!string.IsNullOrEmpty(Request["VALUE3_2"]))//如果结束时间有值
                     {
-                        where += " and det.REPENDTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
+                        where += " and det.REPENDTIME<=to_date('" + Request["VALUE3_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
+                    }
+                    break;
+            }
+            switch (Request["CONDITION6"])
+            {
+                case "SUBMITTIME"://订单委托日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE6_1"]))//如果开始时间有值
+                    {
+                        where += " and ort.SUBMITTIME>=to_date('" + Request["VALUE6_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE6_2"]))//如果结束时间有值
+                    {
+                        where += " and ort.SUBMITTIME<=to_date('" + Request["VALUE6_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "REPTIME"://申报完成时间
+                    if (!string.IsNullOrEmpty(Request["VALUE6_1"]))//如果开始时间有值
+                    {
+                        where += " and det.REPENDTIME>=to_date('" + Request["VALUE6_1"] + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE6_2"]))//如果结束时间有值
+                    {
+                        where += " and det.REPENDTIME<=to_date('" + Request["VALUE6_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
                     }
                     break;
             }
