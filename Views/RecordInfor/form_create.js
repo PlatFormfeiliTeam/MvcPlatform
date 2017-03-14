@@ -508,7 +508,7 @@ function form_ini_btn() {
                         + '<button type="button" onclick="create_save(\'submit\')" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交申请</button></div>'
 
     var bbar_l = '<div class="btn-group">'
-                + '<button type="button" onclick="create_cancel()" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤回</button>'               
+                + '<button type="button" onclick="cancel()" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤回</button>'
             + '</div>';
     var bbar = Ext.create('Ext.toolbar.Toolbar', {
         items: [bbar_l, '->', bbar_r]
@@ -519,33 +519,6 @@ function form_ini_btn() {
         border: 0,
         bbar: bbar
     });
-}
-
-function create_cancel() {   
-    var status = Ext.getCmp('combo_STATUS').getValue();
-    var msg = "";
-    if (status > 10) { msg = "当前状态为已受理，确认要执行撤回操作吗？"; }
-    else { msg = "确定要执行撤单操作吗？"; }
-
-    Ext.MessageBox.confirm("提示", msg, function (btn) {
-        if (btn == "yes") {
-            Ext.Ajax.request({
-                url: '/RecordInfor/cancel_create',
-                params: { id: id },
-                success: function (response, options) {
-                    var json = Ext.decode(response.responseText);
-                    if (json.success == true) {
-                        Ext.MessageBox.alert("提示", "撤单成功！");
-                    }
-                    else {
-                        Ext.MessageBox.alert("提示", "撤单失败,订单状态已发生变化！");
-                    }
-                    loadform_record();
-                }
-            });
-        }
-    });
-
 }
 
 function create_save(action) {
@@ -597,7 +570,9 @@ function create_save(action) {
                     });
                 }
                 else {
-                    if (data.isrepeate == "Y") { Ext.MessageBox.alert("提示", "项号重复!"); }
+                    //if (data.isrepeate == "Y") { Ext.MessageBox.alert("提示", "项号重复!"); }
+
+                    if (data.ismax == "Y") { Ext.MessageBox.alert("提示", "项号不是最大值!"); }
                     else {
                         Ext.MessageBox.alert("提示", action == 'submit' ? "提交失败！" : "保存失败！");
                     }

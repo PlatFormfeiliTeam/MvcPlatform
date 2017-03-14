@@ -407,7 +407,7 @@ function Open(type) {
             Ext.Msg.alert("提示", "请选择一笔变更申请的记录!");
             return;
         }       
-        opencenterwin("/RecordInfor/Change?zid=" + recs[0].get("ID"), 1600, 900);
+        opencenterwin("/RecordInfor/Change?rid=" + recs[0].get("ID"), 1600, 900);
     }
 }
 
@@ -484,6 +484,33 @@ function print_task(Compentid) {
 }
 
 //-----------------------------------------------------------------------------create or change-----------------------------------------------------------
+function cancel() {
+    var status = Ext.getCmp('combo_STATUS').getValue();
+    var msg = "";
+    if (status > 10) { msg = "当前状态为已受理，确认要执行撤回操作吗？"; }
+    else { msg = "确定要执行撤单操作吗？"; }
+
+    Ext.MessageBox.confirm("提示", msg, function (btn) {
+        if (btn == "yes") {
+            Ext.Ajax.request({
+                url: '/RecordInfor/cancel',
+                params: { id: id },
+                success: function (response, options) {
+                    var json = Ext.decode(response.responseText);
+                    if (json.success == true) {
+                        Ext.MessageBox.alert("提示", "撤单成功！");
+                    }
+                    else {
+                        Ext.MessageBox.alert("提示", "撤单失败,订单状态已发生变化！");
+                    }
+                    loadform_record();
+                }
+            });
+        }
+    });
+
+}
+
 function Element_ini() {//61034200、52115100、85011099、74101100、41041111  
 
     if (Ext.getCmp('panel_ele_2')) {

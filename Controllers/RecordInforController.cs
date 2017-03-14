@@ -192,6 +192,25 @@ namespace MvcPlatform.Controllers
 
         #region Recorninfo_Common
 
+        public string cancel()
+        {
+            string id = Request["id"];
+            string result = "{success:false}"; string sql = "";
+
+            sql = "select * from sys_recordinfo_detail_task where id ='" + id + "'";
+            DataTable dt = DBMgr.GetDataTable(sql);
+
+            if (Convert.ToInt32(dt.Rows[0]["STATUS"] + "") == 0)
+            {
+                return result;
+            }
+
+            sql = "update sys_recordinfo_detail_task set STATUS = 0,SUBMITID=null,SUBMITTIME=null,SUBMITNAME=null where id ='" + id + "'";
+            DBMgr.ExecuteNonQuery(sql);
+
+            result = "{success:true}";
+            return result;
+        }
         public string GetElements()
         {
             string customarea = Request["customarea"].ToString(); string hscode = Request["hscode"].ToString(); 
@@ -285,26 +304,6 @@ namespace MvcPlatform.Controllers
 
         #region form_create
 
-        public string cancel_create()
-        {
-            string id = Request["id"];
-            string result = "{success:false}"; string sql = "";
-
-            sql = "select * from sys_recordinfo_detail_task where id ='" + id + "'";
-            DataTable dt = DBMgr.GetDataTable(sql);
-
-            if (Convert.ToInt32(dt.Rows[0]["STATUS"] + "") == 0)
-            {
-                return result;
-            }
-
-            sql = "update sys_recordinfo_detail_task set STATUS = 0,SUBMITID=null,SUBMITTIME=null,SUBMITNAME=null where id ='" + id + "'";
-            DBMgr.ExecuteNonQuery(sql);
-
-            result = "{success:true}";
-            return result;
-        }
-
         public string loadrecord_create()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
@@ -350,6 +349,7 @@ namespace MvcPlatform.Controllers
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
 
             string sql = ""; string resultmsg = "{success:false}";
+            /*
             //验证项号是否重复----------------------------------------------------------------------------------------
             if (json.Value<string>("ITEMNO") != null)
             {
@@ -363,7 +363,18 @@ namespace MvcPlatform.Controllers
                 if (dt_itemno.Rows.Count > 0) { resultmsg = "{success:false,isrepeate:'Y'}"; return resultmsg; }
             }           
             //-----------------------------------------------------------------------------------------------------------
+            */
 
+            //验证项号是否是最大值----------------------------------------------------------------------------------------
+            sql = "select itemno from SYS_RECORDINFO_DETAIL_TASK where STATUS<50 and RECORDINFOID='{0}' and ITEMNO>to_number('{1}') and ITEMNOATTRIBUTE='{2}'";
+            if (!string.IsNullOrEmpty(Request["id"])) { sql = sql + " and ID!='{3}'"; }
+            sql += " union select itemno from cusdoc.SYS_RECORDINFO_DETAIL where enabled=1 and RECORDINFOID='{0}' and ITEMNO>to_number('{1}') and ITEMNOATTRIBUTE='{2}'";
+
+            sql = string.Format(sql, json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), json.Value<string>("ITEMNOATTRIBUTE"), Request["id"]);
+            DataTable dt_itemno = new DataTable();
+            dt_itemno = DBMgr.GetDataTable(sql);
+            if (dt_itemno.Rows.Count > 0) { resultmsg = "{success:false,ismax:'Y'}"; return resultmsg; }
+            //-----------------------------------------------------------------------------------------------------------
 
             string id = string.Empty;
             if (Request["action"] + "" == "submit")
@@ -437,19 +448,23 @@ namespace MvcPlatform.Controllers
         public string loadrecord_change()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            string id = Request["id"]; string zid = Request["zid"];
-            string sql = "";
+            string id = Request["id"]; string rid = Request["rid"];
+            string sql = ""; DataTable dt = new DataTable();
             string result = "{}"; string formdata = "{}"; string productsonsumedata = "[]";
             if (string.IsNullOrEmpty(id))
             {
-                if (!string.IsNullOrEmpty(zid))//如果是变动申请
+                if (!string.IsNullOrEmpty(rid))//如果是变动申请
                 {
                     IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
                     iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
-                    sql = @"select RECORDINFOID,ITEMNO,HSCODE,ADDITIONALNO,ITEMNOATTRIBUTE,COMMODITYNAME,SPECIFICATIONSMODEL,UNIT 
-                            from sys_recordinfo_detail where id='" + zid + "'";
-                    formdata = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql), iso).TrimStart('[').TrimEnd(']');
+                    sql = @"select '{0}' RID,RECORDINFOID,ITEMNO,ITEMNOATTRIBUTE
+                                ,HSCODE,ADDITIONALNO,COMMODITYNAME,SPECIFICATIONSMODEL,UNIT
+                                ,HSCODE HSCODE_LEFT,ADDITIONALNO ADDITIONALNO_LEFT,COMMODITYNAME COMMODITYNAME_LEFT,SPECIFICATIONSMODEL SPECIFICATIONSMODEL_LEFT,UNIT UNIT_LEFT   
+                            from sys_recordinfo_detail where id='{0}'";
+                    sql = string.Format(sql, rid);
+                    dt = DBMgrBase.GetDataTable(sql);
+                    formdata = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
                 }
             }
             else
@@ -458,7 +473,9 @@ namespace MvcPlatform.Controllers
                 iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
                 sql = @"select * from sys_recordinfo_detail_task where id='" + id + "'";
-                formdata = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso).TrimStart('[').TrimEnd(']');
+                dt = DBMgr.GetDataTable(sql);
+
+                formdata = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
 
                 //成品单耗
                 sql = "select * from SYS_PRODUCTCONSUME where rid='" + id + "' order by id desc";
@@ -468,8 +485,85 @@ namespace MvcPlatform.Controllers
             result = "{formdata:" + formdata + ",productsonsumedata:" + productsonsumedata + "}";
             return result;
         }
-        #endregion
 
+        public string Change_Save()
+        {
+            string action = Request["action"];
+            JObject json = (JObject)JsonConvert.DeserializeObject(Request["formdata"]);
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            string sql = ""; string resultmsg = "{success:false}";
+
+            string id = string.Empty;
+            if (Request["action"] + "" == "submit")
+            {
+                json.Remove("STATUS"); json.Add("STATUS", 10);
+                json.Remove("SUBMITTIME"); json.Add("SUBMITTIME", "sysdate");
+                json.Remove("SUBMITNAME"); json.Add("SUBMITNAME", json_user.Value<string>("REALNAME"));
+                json.Remove("SUBMITID"); json.Add("SUBMITID", json_user.Value<string>("ID"));
+            }
+            else
+            {
+                json.Remove("SUBMITTIME"); //委托时间  
+                json.Add("SUBMITTIME", "null");
+            }
+
+            if (string.IsNullOrEmpty(Request["id"]))//新增
+            {
+                sql = "select SYS_RECORDINFO_DETAIL_TASK_ID.Nextval from dual";
+                id = DBMgr.GetDataTable(sql).Rows[0][0] + "";//获取ID
+                sql = @"INSERT INTO SYS_RECORDINFO_DETAIL_TASK (ID
+                        ,RECORDINFOID,ITEMNO,HSCODE,ADDITIONALNO,ITEMNOATTRIBUTE
+                        ,COMMODITYNAME,SPECIFICATIONSMODEL,UNIT,REMARK,MODIFYREASON
+                        ,CREATEID,CREATENAME,CREATEDATE,OPTIONS,STATUS,CUSTOMERCODE
+                        ,CUSTOMERNAME,SUBMITID,SUBMITNAME,SUBMITTIME,CUSTOMAREA
+                        ,HSCODE_LEFT,ADDITIONALNO_LEFT,COMMODITYNAME_LEFT,SPECIFICATIONSMODEL_LEFT,UNIT_LEFT
+                        ,RID                       
+                        ) VALUES ('{0}'
+                            ,'{1}','{2}','{3}','{4}','{5}'
+                            ,'{6}','{7}','{8}','{9}','{10}'
+                            ,'{11}','{12}',sysdate,'{13}','{14}','{15}'
+                            ,'{16}','{17}','{18}',{19},'{20}'
+                            ,'{21}','{22}','{23}','{24}','{25}'
+                            ,'{26}'
+                            )";
+                sql = string.Format(sql, id
+                    , json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), json.Value<string>("HSCODE"), json.Value<string>("ADDITIONALNO"), json.Value<string>("ITEMNOATTRIBUTE")
+                    , json.Value<string>("COMMODITYNAME"), json.Value<string>("SPECIFICATIONSMODEL"), json.Value<string>("UNIT"), json.Value<string>("REMARK"), json.Value<string>("MODIFYREASON")
+                    , json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"), 'U', json.Value<string>("STATUS"), json.Value<string>("CUSTOMERCODE")
+                    , json.Value<string>("CUSTOMERNAME"), json.Value<string>("SUBMITID"), json.Value<string>("SUBMITNAME"), json.Value<string>("SUBMITTIME"), json.Value<string>("CUSTOMAREA")
+                    , json.Value<string>("HSCODE_LEFT"), json.Value<string>("ADDITIONALNO_LEFT"), json.Value<string>("COMMODITYNAME_LEFT"), json.Value<string>("SPECIFICATIONSMODEL_LEFT"), json.Value<string>("UNIT_LEFT")
+                    , json.Value<string>("RID")
+                    );
+            }
+            else//修改
+            {
+                id = Request["id"];
+                sql = @"UPDATE SYS_RECORDINFO_DETAIL_TASK SET HSCODE='{1}',ADDITIONALNO='{2}',COMMODITYNAME='{3}',SPECIFICATIONSMODEL='{4}',UNIT='{5}'
+                            ,CUSTOMERCODE='{6}',CUSTOMERNAME='{7}',CUSTOMAREA='{8}',REMARK='{9}',MODIFYREASON='{10}'
+                            ,OPTIONS='{11}',STATUS='{12}',SUBMITID='{13}',SUBMITNAME='{14}',SUBMITTIME={15}
+                        WHERE ID={0}";
+                sql = string.Format(sql, id
+                    , json.Value<string>("HSCODE"), json.Value<string>("ADDITIONALNO"), json.Value<string>("COMMODITYNAME"), json.Value<string>("SPECIFICATIONSMODEL"), json.Value<string>("UNIT")
+                    , json.Value<string>("CUSTOMERCODE"), json.Value<string>("CUSTOMERNAME"), json.Value<string>("CUSTOMAREA"), json.Value<string>("REMARK"), json.Value<string>("MODIFYREASON")
+                    , 'U', json.Value<string>("STATUS"), json.Value<string>("SUBMITID"), json.Value<string>("SUBMITNAME"), json.Value<string>("SUBMITTIME")                    
+                    );
+            }
+            if (sql != "")
+            {
+                int result = DBMgr.ExecuteNonQuery(sql);
+                if (result == 1)
+                {
+                    update_elements(json, json_user, id);//申报要素  
+                    update_productconsume(json, json_user, id);//成品单耗
+
+                    resultmsg = "{success:true,id:'" + id + "'}";
+                }
+            }
+            return resultmsg;
+        }
+
+        #endregion
 
         private string GetPageSql(string tempsql, string order, string asc)
         {
