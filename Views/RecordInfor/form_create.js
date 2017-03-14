@@ -631,13 +631,23 @@ function formpanelcontrol() {
     document.getElementById("btn_submitorder").disabled = status >= 10;//提交申请
     document.getElementById("btn_print").disabled = status < 10;//打印
 
-    Ext.Array.each(Ext.getCmp("formpanel_id").getForm().getFields().items, function (item) {
-        if (item.id != "combo_OPTIONS" && item.id != "combo_STATUS" && item.id != "combo_ISPRINT_APPLY"
+    /*item.id != "combo_OPTIONS" && item.id != "combo_STATUS" && item.id != "combo_ISPRINT_APPLY"
              && item.id != "CREATEDATE" && item.id != "CREATENAME" && item.id != "SUBMITTIME" && item.id != "SUBMITNAME"
-             && item.id != "ACCEPTTIME" && item.id != "ACCEPTNAME" && item.id != "PRETIME" && item.id != "PRENAME") {
+             && item.id != "ACCEPTTIME" && item.id != "ACCEPTNAME" && item.id != "PRETIME" && item.id != "PRENAME"*/  
+    
+
+    Ext.Array.each(Ext.getCmp("formpanel_id").getForm().getFields().items, function (item) {
+        if (item.fieldStyle != 'background-color: #CECECE; background-image: none;') {
             item.setReadOnly(status >= 10);
         }
     });
+
+    if (Ext.getCmp('panel_ele_2')) {
+        var id_pm = Ext.getCmp('id_pinming').getValue();
+        if (id_pm != "") {
+            if (Ext.getCmp(id_pm)) { Ext.getCmp(id_pm).setReadOnly(true); }
+        }
+    }
 
 
     //下面是表单控件涉及的弹窗选择按钮

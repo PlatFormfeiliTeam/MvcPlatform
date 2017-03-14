@@ -91,6 +91,118 @@
         fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
 
+    //变动状态
+    var store_OPTIONS = Ext.create('Ext.data.JsonStore', {
+        fields: ['CODE', 'NAME'],
+        data: optionstatus_js_data
+    });
+    var combo_OPTIONS = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_OPTIONS',
+        name: 'OPTIONS',
+        store: store_OPTIONS,
+        fieldLabel: '<font color=red>变动状态</font>',
+        displayField: 'NAME',
+        valueField: 'CODE',
+        triggerAction: 'all',
+        queryMode: 'local',
+        readOnly: true,
+        editable: false,
+        value: 'U',
+        fieldStyle: 'background-color: #CECECE; background-image: none;'
+    });
+
+    //状态
+    var store_STATUS = Ext.create('Ext.data.JsonStore', {
+        fields: ['CODE', 'NAME'],
+        data: status_js_data
+    });
+    var combo_STATUS = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_STATUS',
+        name: 'STATUS',
+        store: store_STATUS,
+        fieldLabel: '状态',
+        displayField: 'NAME',
+        valueField: 'CODE',
+        triggerAction: 'all',
+        queryMode: 'local',
+        readOnly: true,
+        editable: false,
+        value: 0,
+        fieldStyle: 'background-color: #CECECE; background-image: none;'
+    });
+    //打印状态
+    var store_ISPRINT_APPLY = Ext.create('Ext.data.JsonStore', {
+        fields: ['CODE', 'NAME'],
+        data: [{ "CODE": 0, "NAME": "未打印" }, { "CODE": 1, "NAME": "已打印" }]
+    });
+    var combo_ISPRINT_APPLY = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_ISPRINT_APPLY',
+        name: 'ISPRINT_APPLY',
+        store: store_ISPRINT_APPLY,
+        fieldLabel: '打印状态',
+        displayField: 'NAME',
+        valueField: 'CODE',
+        triggerAction: 'all',
+        queryMode: 'local',
+        readOnly: true,
+        editable: false,
+        value: 0,
+        fieldStyle: 'background-color: #CECECE; background-image: none;'
+    });
+
+    //报关行
+    var store_CUSTOMER = Ext.create('Ext.data.JsonStore', {  //报关行combostore
+        fields: ['CODE', 'NAME'],
+        data: common_data_jydw
+    })
+    var combo_CUSTOMER = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_CUSTOMER',
+        name: 'CUSTOMERCODE',
+        store: store_CUSTOMER,
+        displayField: 'NAME',
+        valueField: 'CODE',
+        queryMode: 'local',
+        margin: 0,
+        minChars: 4,
+        forceSelection: true,
+        anyMatch: true,
+        hideTrigger: true,
+        listeners: {
+            focus: function (cb) {
+                cb.clearInvalid();
+            },
+            select: function (records) {
+                field_CUSTOMERNAME.setValue(records.rawValue.substr(0, records.rawValue.lastIndexOf('(')));
+            }
+        },
+        flex: .85,
+        allowBlank: false,
+        blankText: '报关行不能为空!',
+        listConfig: {
+            maxHeight: 110,
+            getInnerTpl: function () {
+                return '<div>{NAME}</div>';
+            }
+        }
+    })
+    var field_CUSTOMERNAME = Ext.create('Ext.form.field.Hidden', {
+        name: 'CUSTOMERNAME'
+    })
+
+
+    //报关行
+    var field_CUSTOMER = {
+        xtype: 'fieldcontainer',
+        fieldLabel: '报关行',
+        layout: 'hbox', flex: .5,
+        items: [combo_CUSTOMER, {
+            id: 'CUSTOMER_btn', xtype: 'button', handler: function () {
+                selectjydw(combo_CUSTOMER, field_CUSTOMERNAME);
+            },
+            text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
+        }]
+    }
+
     //备案关区
     var store_CUSTOMAREA = Ext.create('Ext.data.JsonStore', {
         fields: ['ID', 'NAME', 'CUSTOMAREA', 'CUSTOMAREANAME'],
@@ -106,7 +218,8 @@
         triggerAction: 'all',
         forceSelection: true,
         queryMode: 'local',
-        anyMatch: true, 
+        anyMatch: true,
+        value: store_CUSTOMAREA.getCount() > 0 ? store_CUSTOMAREA.getAt(0).get("ID") : '',
         listeners: {
             focus: function (cb) {
                 if (!cb.getValue()) {
@@ -127,16 +240,16 @@
 
     //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //HS编码left
-    var field_HSCODE_left = Ext.create('Ext.form.field.Text', { id: 'HSCODE_left', name: 'HSCODE_left', readOnly: true, fieldLabel: 'HS编码', flex: .5 });
+    var field_HSCODE_left = Ext.create('Ext.form.field.Text', { id: 'HSCODE_left', name: 'HSCODE_left', readOnly: true, fieldLabel: 'HS编码', flex: .5, fieldStyle: 'background-color: #CECECE; background-image: none;' });
     //附加码left
-    var field_ADDITIONALNO_left = Ext.create('Ext.form.field.Text', { id: 'ADDITIONALNO_left', name: 'ADDITIONALNO_left', readOnly: true, fieldLabel: 'HS附加码', flex: .5});
+    var field_ADDITIONALNO_left = Ext.create('Ext.form.field.Text', { id: 'ADDITIONALNO_left', name: 'ADDITIONALNO_left', readOnly: true, fieldLabel: 'HS附加码', flex: .5, fieldStyle: 'background-color: #CECECE; background-image: none;' });
 
     var field_1_left = { columnWidth: 1, layout: 'hbox', border: 0, items: [field_HSCODE_left, field_ADDITIONALNO_left] };
 
     //商品名称
-    var field_COMMODITYNAME_left = Ext.create('Ext.form.field.Text', { id: 'COMMODITYNAME_left', name: 'COMMODITYNAME_left', fieldLabel: '商品名称', flex: .5 });
+    var field_COMMODITYNAME_left = Ext.create('Ext.form.field.Text', { id: 'COMMODITYNAME_left', name: 'COMMODITYNAME_left', fieldLabel: '商品名称', readOnly: true, flex: .5, fieldStyle: 'background-color: #CECECE; background-image: none;' });
     //规格型号
-    var field_SPECIFICATIONSMODEL_left = Ext.create('Ext.form.field.Text', { id: 'SPECIFICATIONSMODEL_left', name: 'SPECIFICATIONSMODEL_left', fieldLabel: '规格型号', flex: .5});
+    var field_SPECIFICATIONSMODEL_left = Ext.create('Ext.form.field.Text', { id: 'SPECIFICATIONSMODEL_left', name: 'SPECIFICATIONSMODEL_left', fieldLabel: '规格型号', readOnly: true, flex: .5, fieldStyle: 'background-color: #CECECE; background-image: none;' });
 
     var field_2_left = { columnWidth: 1, layout: 'hbox', border: 0, items: [field_COMMODITYNAME_left, field_SPECIFICATIONSMODEL_left] };
 
@@ -157,7 +270,7 @@
         forceSelection: true,
         queryMode: 'local',
         anyMatch: true,
-        readOnly: true,flex: .5,
+        readOnly: true, flex: .5, fieldStyle: 'background-color: #CECECE; background-image: none;',
         listeners: {
             focus: function (cb) {
                 if (!cb.getValue()) {
@@ -169,10 +282,8 @@
         }
     });
 
-    //报关行
-    var field_CUSTOMER_left = Ext.create('Ext.form.field.Text', { id: 'CUSTOMER_left', name: 'CUSTOMER_left', fieldLabel: '报关行', flex: .5 });
 
-    var field_3_left = { columnWidth: 1, layout: 'hbox', border: 0, items: [combo_UNIT_left, field_CUSTOMER_left] };
+    var field_3_left = { columnWidth: 0.5, layout: 'hbox', border: 0, items: [combo_UNIT_left] };//columnWidth:1
 
     var panel_left = Ext.create('Ext.panel.Panel', {
         id: 'panel_left',
@@ -276,61 +387,9 @@
         allowBlank: false,
         blankText: '成交单位不能为空!'
     });
+    
 
-    //报关行
-    var store_CUSTOMER = Ext.create('Ext.data.JsonStore', {  //报关行combostore
-        fields: ['CODE', 'NAME'],
-        data: common_data_jydw
-    })
-    var combo_CUSTOMER = Ext.create('Ext.form.field.ComboBox', {
-        id: 'combo_CUSTOMER',
-        name: 'CUSTOMERCODE',
-        store: store_CUSTOMER,
-        displayField: 'NAME',
-        valueField: 'CODE',
-        queryMode: 'local',
-        margin: 0,
-        minChars: 4,
-        forceSelection: true,
-        anyMatch: true,
-        hideTrigger: true,
-        listeners: {
-            focus: function (cb) {
-                cb.clearInvalid();
-            },
-            select: function (records) {
-                field_CUSTOMERNAME.setValue(records.rawValue.substr(0, records.rawValue.lastIndexOf('(')));
-            }
-        },
-        flex: .85,
-        allowBlank: false,
-        blankText: '报关行不能为空!',
-        listConfig: {
-            maxHeight: 110,
-            getInnerTpl: function () {
-                return '<div>{NAME}</div>';
-            }
-        }
-    })
-    var field_CUSTOMERNAME = Ext.create('Ext.form.field.Hidden', {
-        name: 'CUSTOMERNAME'
-    })
-
-
-    //报关行
-    var field_CUSTOMER = {
-        xtype: 'fieldcontainer',
-        fieldLabel: '报关行',
-        layout: 'hbox', flex: .5,
-        items: [combo_CUSTOMER, {
-            id: 'CUSTOMER_btn', xtype: 'button', handler: function () {
-                selectjydw(combo_CUSTOMER, field_CUSTOMERNAME);
-            },
-            text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
-        }]
-    }
-
-    var field_3_right = { columnWidth: 1, layout: 'hbox', border: 0, items: [combo_UNIT, field_CUSTOMER] };
+    var field_3_right = { columnWidth: 0.5, layout: 'hbox', border: 0, items: [combo_UNIT] };//columnWidth: 1
 
     var panel_right = Ext.create('Ext.panel.Panel', {
         id: 'panel_right',
@@ -355,81 +414,13 @@
         columnWidth: 1,
         border: 0,
         items: [
-            { layout: 'column', border: 0, items: [panel_left, panel_right] },
+            { layout: 'column', border: 0, margin: '5 0 15 0', items: [panel_left, panel_right] },
             { layout: 'column', border: 0, items: [panel_ele] }
         ]
     });
 
     //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    //变动状态
-    var store_OPTIONS = Ext.create('Ext.data.JsonStore', {
-        fields: ['CODE', 'NAME'],
-        data: optionstatus_js_data
-    });
-    var combo_OPTIONS = Ext.create('Ext.form.field.ComboBox', {
-        id: 'combo_OPTIONS',
-        name: 'OPTIONS',
-        store: store_OPTIONS,
-        fieldLabel: '<font color=red>变动状态</font>',
-        displayField: 'NAME',
-        valueField: 'CODE',
-        triggerAction: 'all',
-        queryMode: 'local',
-        readOnly: true,
-        editable: false,
-        flex: .33,
-        value: 'A',
-        fieldStyle: 'background-color: #CECECE; background-image: none;'
-    });
-
-    //状态
-    var store_STATUS = Ext.create('Ext.data.JsonStore', {
-        fields: ['CODE', 'NAME'],
-        data: status_js_data
-    });
-    var combo_STATUS = Ext.create('Ext.form.field.ComboBox', {
-        id: 'combo_STATUS',
-        name: 'STATUS',
-        store: store_STATUS,
-        fieldLabel: '状态',
-        displayField: 'NAME',
-        valueField: 'CODE',
-        triggerAction: 'all',
-        queryMode: 'local',
-        readOnly: true,
-        editable: false,
-        flex: .33,
-        value: 0,
-        fieldStyle: 'background-color: #CECECE; background-image: none;'
-    });
-    //打印状态
-    var store_ISPRINT_APPLY = Ext.create('Ext.data.JsonStore', {
-        fields: ['CODE', 'NAME'],
-        data: [{ "CODE": 0, "NAME": "未打印" }, { "CODE": 1, "NAME": "已打印" }]
-    });
-    var combo_ISPRINT_APPLY = Ext.create('Ext.form.field.ComboBox', {
-        id: 'combo_ISPRINT_APPLY',
-        name: 'ISPRINT_APPLY',
-        store: store_ISPRINT_APPLY,
-        fieldLabel: '打印状态',
-        displayField: 'NAME',
-        valueField: 'CODE',
-        triggerAction: 'all',
-        queryMode: 'local',
-        readOnly: true,
-        editable: false,
-        flex: .33,
-        value: 0,
-        fieldStyle: 'background-color: #CECECE; background-image: none;'
-    });
-
-
-    var combo_container = {
-        columnWidth: .50,
-        xtype: 'fieldcontainer',
-        layout: 'hbox', margin: 0,
-        items: [combo_OPTIONS, combo_STATUS, combo_ISPRINT_APPLY]
-    }
+    
     //备注
     var field_REMARK = Ext.create('Ext.form.field.Text', {
         id: 'REMARK',
@@ -531,12 +522,12 @@
     var field_SUBMITID = Ext.create('Ext.form.field.Hidden', { name: 'SUBMITID' });
     var field_PREID = Ext.create('Ext.form.field.Hidden', { name: 'PREID' });
     var field_FINISHID = Ext.create('Ext.form.field.Hidden', { name: 'FINISHID' });
-
+    
     var configItem = [
-        { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_RECORDINFOID, field_ITEMNO, combo_ITEMNOATTRIBUTE, combo_CUSTOMAREA] },
+        { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_RECORDINFOID, field_ITEMNO, combo_ITEMNOATTRIBUTE, combo_OPTIONS] },
+        { layout: 'column', height: 42, border: 0, items: [combo_STATUS, combo_ISPRINT_APPLY, field_CUSTOMER, combo_CUSTOMAREA] },
         { layout: 'column', border: 0, items: [panel_compare] },
         { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [textarea_container] },
-        { layout: 'column', height: 42, border: 0, items: [combo_container] },
         { layout: 'column', height: 42, border: 0, items: [field_CREATEDATE, field_CREATENAME, field_SUBMITTIME, field_SUBMITNAME] },
         { layout: 'column', height: 42, border: 0, items: [field_ACCEPTTIME, field_ACCEPTNAME, field_PRETIME, field_PRENAME] },
         field_CREATEID, field_SUBMITID, field_PREID, field_FINISHID//field_CUSTOMERNAME, 
@@ -567,8 +558,8 @@ function form_ini_btn() {
 
     var bbar_r = '<div class="btn-group" role="group">'
                         + '<button type="button" onclick="" id="btn_print" class="btn btn-primary btn-sm"><i class="fa fa-print"></i>&nbsp;申请表打印</button>'
-                        + '<button type="button" onclick="" id="btn_save" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
-                        + '<button type="button" onclick="" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交申请</button></div>'
+                        + '<button type="button" onclick="create_save(\'save\')" id="btn_save" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
+                        + '<button type="button" onclick="create_save(\'submit\')" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交申请</button></div>'
 
     var bbar_l = '<div class="btn-group">'
             + '<button type="button" onclick="" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤回</button>'               
@@ -584,8 +575,114 @@ function form_ini_btn() {
     });
 }
 
+function create_save(action) {
+
+    //if (action == 'submit') {
+
+    //    if (!Ext.getCmp('formpanel_id').getForm().isValid()) {
+    //        return;
+    //    }
+
+    //    var validate = "";
+    //    if (!Ext.getCmp('panel_ele_2')) {
+    //        validate += "申报要素不存在，请重新输入HS编码、备案关区！<br />";
+    //    }
+
+    //    if (Ext.getCmp('combo_ITEMNOATTRIBUTE').getValue() == "成品") {
+    //        if (Ext.data.StoreManager.lookup('store_PRODUCTCONSUME').data.items.length <= 0) {
+    //            validate += "成品单耗信息为空！<br />";
+    //        }
+    //    }
+
+    //    if (validate) {
+    //        Ext.MessageBox.alert("提示", validate);
+    //        return;
+    //    }
+
+    //}
+
+    //var formdata = Ext.encode(Ext.getCmp('formpanel_id').getForm().getValues());
+    //var productconsume = [];
+    //if (Ext.getCmp('combo_ITEMNOATTRIBUTE').getValue() == "成品") {
+    //    productconsume = Ext.encode(Ext.pluck(Ext.data.StoreManager.lookup('store_PRODUCTCONSUME').data.items, 'data'));
+    //}
+
+    //var mask = new Ext.LoadMask(Ext.get(Ext.getBody()), { msg: "数据保存中，请稍等..." });
+
+    //mask.show();
+    //Ext.Ajax.request({
+    //    url: "/RecordInfor/Create_Save",
+    //    params: { id: id, formdata: formdata, productconsume: productconsume, action: action },
+    //    success: function (response, option) {
+    //        if (response.responseText) {
+    //            mask.hide();
+    //            var data = Ext.decode(response.responseText);
+    //            if (data.success) {
+    //                id = data.id;
+    //                Ext.MessageBox.alert("提示", action == 'submit' ? "提交成功！" : "保存成功！", function () {
+    //                    loadform_record();
+    //                });
+    //            }
+    //            else {
+    //                if (data.isrepeate == "Y") { Ext.MessageBox.alert("提示", "项号重复!"); }
+    //                else {
+    //                    Ext.MessageBox.alert("提示", action == 'submit' ? "提交失败！" : "保存失败！");
+    //                }
+    //            }
+    //        }
+    //    }
+    //});
+}
+
 
 function loadform_record() {
-   
+    Ext.Ajax.request({
+        url: "/RecordInfor/loadrecord_change",
+        params: { id: id, zid: zid },
+        success: function (response, opts) {
+            var data = Ext.decode(response.responseText);
+            Ext.getCmp("formpanel_id").getForm().setValues(data.formdata);
+
+            Ext.getCmp("HSCODE_left").setValue(data.formdata.HSCODE); Ext.getCmp("ADDITIONALNO_left").setValue(data.formdata.ADDITIONALNO);
+            Ext.getCmp("COMMODITYNAME_left").setValue(data.formdata.COMMODITYNAME); Ext.getCmp("SPECIFICATIONSMODEL_left").setValue(data.formdata.SPECIFICATIONSMODEL);
+            Ext.getCmp("combo_UNIT_left").setValue(data.formdata.UNIT);
+
+
+            if (Ext.getCmp('gridpanel_PRODUCTCONSUME')) {
+                Ext.getCmp('gridpanel_PRODUCTCONSUME').store.loadData(data.productsonsumedata);
+            }
+
+            formpanelcontrol();//表单字段控制
+        }
+    });
+}
+
+function formpanelcontrol() {
+    var status = Ext.getCmp('combo_STATUS').getValue();
+    document.getElementById("btn_save").disabled = status >= 10; //保存 
+    document.getElementById("btn_cancelsubmit").disabled = status == 0;//撤回:只有草稿才不可以撤回  
+    document.getElementById("btn_submitorder").disabled = status >= 10;//提交申请
+    document.getElementById("btn_print").disabled = status < 10;//打印
+
+    Ext.Array.each(Ext.getCmp("formpanel_id").getForm().getFields().items, function (item) {
+        if (item.fieldStyle != 'background-color: #CECECE; background-image: none;') {
+            item.setReadOnly(status >= 10);
+        }
+    });
+
+    if (Ext.getCmp('panel_ele_2')) {
+        var id_pm = Ext.getCmp('id_pinming').getValue();
+        if (id_pm != "") {
+            if (Ext.getCmp(id_pm)) { Ext.getCmp(id_pm).setReadOnly(true); }
+        }
+    }
+
+    //下面是表单控件涉及的弹窗选择按钮
+    Ext.getCmp('CUSTOMER_btn').setDisabled(status >= 10); //报关行     
+    if (Ext.getCmp("ITEMNO_CONSUME_btn")) { Ext.getCmp("ITEMNO_CONSUME_btn").setDisabled(status >= 10) }//对应料件序号
+
+    //成品单耗 保存删除按钮
+    if (Ext.getCmp("btn_pro_save")) { Ext.getCmp("btn_pro_save").setDisabled(status >= 10); }
+    if (Ext.getCmp("btn_pro_del")) { Ext.getCmp("btn_pro_del").setDisabled(status >= 10); }
 }
 

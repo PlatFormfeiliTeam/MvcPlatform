@@ -155,7 +155,42 @@ namespace MvcPlatform.Controllers
             return "{rows:" + json + ",total:" + totalProperty + "}";
         }
 
+        public string Delete_Task()
+        {
+            string ids = Request["ids"];
+            string result = "{success:false}"; string sql = "";
+
+            bool bf = false;
+            sql = "select * from sys_recordinfo_detail_task where id in(" + ids + ")";
+            DataTable dt = DBMgr.GetDataTable(sql);
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                if (Convert.ToInt32(dt.Rows[0]["STATUS"] + "") != 0)
+                {
+                    bf = true;
+                    break;
+                }
+            }
+
+            if (bf) { return result; }
+
+            sql = "delete from SYS_ELEMENTS where rid in(" + ids + ")";
+            DBMgr.ExecuteNonQuery(sql);
+
+            sql = "delete from SYS_PRODUCTCONSUME where rid in(" + ids + ")";
+            DBMgr.ExecuteNonQuery(sql);
+
+            sql = "delete from sys_recordinfo_detail_task where id in(" + ids + ")";
+            DBMgr.ExecuteNonQuery(sql);
+
+            result = "{success:true}";
+
+            return result;
+        }
+
         #endregion
+
+        #region Recorninfo_Common
 
         public string GetElements()
         {
@@ -192,6 +227,63 @@ namespace MvcPlatform.Controllers
 
             return "{elements:" + json + "}";
         }
+
+        //申报要素  
+        public string update_elements(JObject json, JObject json_user, string id)
+        {
+            string sql = "";
+            //先清空
+            sql = @"delete SYS_ELEMENTS where RID='" + id + "'";
+            DBMgr.ExecuteNonQuery(sql);
+
+            if (json.Value<string>("jsonEle") != null)
+            {
+                //在插入
+                string jsonEle = json.Value<string>("jsonEle").Substring(("{elements:").Length);
+                jsonEle = jsonEle.Substring(0, jsonEle.Length - 1);
+                JArray je = (JArray)JsonConvert.DeserializeObject(jsonEle);
+                for (int i = 0; i < je.Count; i++)
+                {
+                    sql = @"insert into SYS_ELEMENTS(ID,RECORDINFOID,ITEMNO,ITEMNOATTRIBUTE,SNO,FUNCTIONTYPE,DESCRIPTIONS,CREATEMAN,CREATEDATE,RID) 
+                            values(SYS_ELEMENTS_id.Nextval,'{0}','{1}','{2}','{3}','{4}','{5}','{6}',sysdate,'{7}')";
+                    sql = string.Format(sql, json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), json.Value<string>("ITEMNOATTRIBUTE"), i, je[i].Value<string>("ELEMENTS")
+                        , json.Value<string>("field_ele_" + i), json_user.Value<string>("ID"), id);
+                    DBMgr.ExecuteNonQuery(sql);
+                }
+            }
+            return "success";
+        }
+
+        //成品单耗
+        public string update_productconsume(JObject json, JObject json_user, string id)
+        {
+            string sql = "";
+            //先清空
+            sql = @"delete SYS_PRODUCTCONSUME where RID='" + id + "'";
+            DBMgr.ExecuteNonQuery(sql);
+
+            if (json.Value<string>("ITEMNOATTRIBUTE") == "成品")
+            {
+                //在插入
+                JArray ja = (JArray)JsonConvert.DeserializeObject(Request["productconsume"]);
+                for (int j = 0; j < ja.Count; j++)
+                {
+                    sql = @"insert into SYS_PRODUCTCONSUME(ID,RECORDINFOID,ITEMNO,ITEMNO_CONSUME,ITEMNO_COMMODITYNAME,ITEMNO_SPECIFICATIONSMODEL,ITEMNO_UNIT,
+                                        ITEMNO_UNITNAME,CONSUME,ATTRITIONRATE,CREATEMAN,CREATEDATE,RID) 
+                                    values(SYS_PRODUCTCONSUME_id.Nextval,'{0}','{1}','{2}','{3}','{4}','{5}'
+                                    ,'{6}','{7}','{8}','{9}',sysdate,'{10}')";
+                    sql = string.Format(sql, json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), ja[j].Value<string>("ITEMNO_CONSUME"), ja[j].Value<string>("ITEMNO_COMMODITYNAME"), ja[j].Value<string>("ITEMNO_SPECIFICATIONSMODEL"), ja[j].Value<string>("ITEMNO_UNIT")
+                        , ja[j].Value<string>("ITEMNO_UNITNAME"), ja[j].Value<string>("CONSUME"), ja[j].Value<string>("ATTRITIONRATE"), json_user.Value<string>("ID"), id
+                        );
+                    DBMgr.ExecuteNonQuery(sql);
+                }
+            }
+            return "success";
+        }
+        
+        #endregion
+
+        #region form_create
 
         public string cancel_create()
         {
@@ -338,91 +430,45 @@ namespace MvcPlatform.Controllers
             return resultmsg;
         }
 
-        //申报要素  
-        public string update_elements(JObject json, JObject json_user, string id)
+        #endregion
+
+        #region form_change
+
+        public string loadrecord_change()
         {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string id = Request["id"]; string zid = Request["zid"];
             string sql = "";
-            //先清空
-            sql = @"delete SYS_ELEMENTS where RID='" + id + "'";
-            DBMgr.ExecuteNonQuery(sql);
-
-            if (json.Value<string>("jsonEle") != null)
+            string result = "{}"; string formdata = "{}"; string productsonsumedata = "[]";
+            if (string.IsNullOrEmpty(id))
             {
-                //在插入
-                string jsonEle = json.Value<string>("jsonEle").Substring(("{elements:").Length);
-                jsonEle = jsonEle.Substring(0, jsonEle.Length - 1);
-                JArray je = (JArray)JsonConvert.DeserializeObject(jsonEle);
-                for (int i = 0; i < je.Count; i++)
+                if (!string.IsNullOrEmpty(zid))//如果是变动申请
                 {
-                    sql = @"insert into SYS_ELEMENTS(ID,RECORDINFOID,ITEMNO,ITEMNOATTRIBUTE,SNO,FUNCTIONTYPE,DESCRIPTIONS,CREATEMAN,CREATEDATE,RID) 
-                            values(SYS_ELEMENTS_id.Nextval,'{0}','{1}','{2}','{3}','{4}','{5}','{6}',sysdate,'{7}')";
-                    sql = string.Format(sql, json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), json.Value<string>("ITEMNOATTRIBUTE"), i, je[i].Value<string>("ELEMENTS")
-                        , json.Value<string>("field_ele_" + i), json_user.Value<string>("ID"), id);
-                    DBMgr.ExecuteNonQuery(sql);
-                }
-            }           
-            return "success";
-        }
+                    IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+                    iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
-        //成品单耗
-        public string update_productconsume(JObject json, JObject json_user, string id)
-        {
-            string sql = "";
-            //先清空
-            sql = @"delete SYS_PRODUCTCONSUME where RID='" + id + "'";
-            DBMgr.ExecuteNonQuery(sql);
-
-            if (json.Value<string>("ITEMNOATTRIBUTE") == "成品") 
-            {
-                //在插入
-                JArray ja = (JArray)JsonConvert.DeserializeObject(Request["productconsume"]);
-                for (int j = 0; j < ja.Count; j++)
-                {
-                    sql = @"insert into SYS_PRODUCTCONSUME(ID,RECORDINFOID,ITEMNO,ITEMNO_CONSUME,ITEMNO_COMMODITYNAME,ITEMNO_SPECIFICATIONSMODEL,ITEMNO_UNIT,
-                                        ITEMNO_UNITNAME,CONSUME,ATTRITIONRATE,CREATEMAN,CREATEDATE,RID) 
-                                    values(SYS_PRODUCTCONSUME_id.Nextval,'{0}','{1}','{2}','{3}','{4}','{5}'
-                                    ,'{6}','{7}','{8}','{9}',sysdate,'{10}')";
-                    sql = string.Format(sql, json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), ja[j].Value<string>("ITEMNO_CONSUME"), ja[j].Value<string>("ITEMNO_COMMODITYNAME"), ja[j].Value<string>("ITEMNO_SPECIFICATIONSMODEL"), ja[j].Value<string>("ITEMNO_UNIT")
-                        , ja[j].Value<string>("ITEMNO_UNITNAME"), ja[j].Value<string>("CONSUME"), ja[j].Value<string>("ATTRITIONRATE"), json_user.Value<string>("ID"), id
-                        );
-                    DBMgr.ExecuteNonQuery(sql);
+                    sql = @"select RECORDINFOID,ITEMNO,HSCODE,ADDITIONALNO,ITEMNOATTRIBUTE,COMMODITYNAME,SPECIFICATIONSMODEL,UNIT 
+                            from sys_recordinfo_detail where id='" + zid + "'";
+                    formdata = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql), iso).TrimStart('[').TrimEnd(']');
                 }
             }
-            return "success";
-        }
-
-        public string Delete_Task()
-        {
-            string ids = Request["ids"];
-            string result = "{success:false}"; string sql = "";
-
-            bool bf = false;
-            sql = "select * from sys_recordinfo_detail_task where id in(" + ids + ")";
-            DataTable dt = DBMgr.GetDataTable(sql);
-            for (int i = 0; i < dt.Rows.Count; i++)
+            else
             {
-                if (Convert.ToInt32(dt.Rows[0]["STATUS"] + "") != 0)
-                {
-                    bf = true;
-                    break;
-                }
+                IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+                iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+                sql = @"select * from sys_recordinfo_detail_task where id='" + id + "'";
+                formdata = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso).TrimStart('[').TrimEnd(']');
+
+                //成品单耗
+                sql = "select * from SYS_PRODUCTCONSUME where rid='" + id + "' order by id desc";
+                productsonsumedata = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso);
+
             }
-
-            if (bf) { return result; }
-
-            sql = "delete from SYS_ELEMENTS where rid in(" + ids + ")";
-            DBMgr.ExecuteNonQuery(sql);
-
-            sql = "delete from SYS_PRODUCTCONSUME where rid in(" + ids + ")";
-            DBMgr.ExecuteNonQuery(sql);
-
-            sql = "delete from sys_recordinfo_detail_task where id in(" + ids + ")";
-            DBMgr.ExecuteNonQuery(sql);
-
-            result = "{success:true}";
-
+            result = "{formdata:" + formdata + ",productsonsumedata:" + productsonsumedata + "}";
             return result;
         }
+        #endregion
 
 
         private string GetPageSql(string tempsql, string order, string asc)
@@ -436,8 +482,9 @@ namespace MvcPlatform.Controllers
             return pageSql;
         }
 
-        //================================================================================================//
-        public ActionResult PrintRecordDetail()//备案信息 change
+        
+        #region recordinfo print
+        public ActionResult PrintRecordDetail()
         {
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
@@ -473,8 +520,7 @@ namespace MvcPlatform.Controllers
             return "{jsonrows:" + json + ",json_recordinfo:" + json_recordinfo + "}";
 
 
-        }
-        //================================================================================================//
-
+        }        
+        #endregion
     }
 }
