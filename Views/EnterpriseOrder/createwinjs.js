@@ -17,13 +17,23 @@ function addwin(ID) {
 }
 
 function form_ini() {
-    //统一编号
+    //载入模板名称
+    Ext.Ajax.request({
+        url: "/EnterPriseOrder/Ini_Base_Data_TEMPLATENAME",
+        success: function (response, opts) {
+            var commondata = Ext.decode(response.responseText);
+            json_templatename = commondata.templatename;
+            store_TEMPLATENAME.loadData(json_templatename);
+        }
+    });
+
+    //委托编号
     var field_UNITCODE = Ext.create('Ext.form.field.Text', {
         id: 'UNITCODE',
-        fieldLabel: '统一编号',
+        fieldLabel: '委托编号',
         name: 'UNITCODE',
         readOnly: true,
-        emptyText: '统一编号自动生成'
+        emptyText: '委托编号自动生成'
     });
 
     //生成方式
@@ -202,16 +212,40 @@ function form_ini() {
         fieldLabel: '企业编号',
         name: 'CODE'
     });
-    //
-    var field_TEMPLATENAME = Ext.create('Ext.form.field.Text', {
+    //模板名称
+    var store_TEMPLATENAME = Ext.create('Ext.data.JsonStore', {
+        fields: ['ID', 'TEMPLATENAME']
+    })
+    var field_TEMPLATENAME = Ext.create('Ext.form.field.ComboBox', {
         fieldLabel: '模板名称',
-        readOnly: true,
-        name: 'TEMPLATENAME'
+        store: store_TEMPLATENAME,
+        name: 'TEMPLATENAME',
+        displayField: 'TEMPLATENAME',
+        valueField: 'ID',
+        triggerAction: 'all',
+        queryMode: 'local',
+        anyMatch: true,
+        //listeners: {
+        //    focus: function (cb) {
+        //        if (!cb.getValue()) {
+        //            cb.clearInvalid();
+        //            cb.store.clearFilter();
+        //            cb.expand()
+        //        };
+        //    }
+        //}
     });
     var field_ISREADPDF = Ext.create('Ext.form.field.Text', {
         fieldLabel: '解析标志',
         readOnly: true,
-        name: 'ISREADPDF'
+        name: 'ISREADPDF',
+        fieldStyle: 'background-color: #CECECE; background-image: none;'
+    });
+    var field_STATUS = Ext.create('Ext.form.field.Text', {
+        fieldLabel: '状态',
+        readOnly: true,
+        name: 'STATUS',
+        fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
     var bbar_l = '<div class="btn-group">'
            + '<button type="button" class="btn btn-primary btn-sm" id="pickfiles"><i class="fa fa-upload"></i>&nbsp;上传文件</button>'
@@ -243,9 +277,9 @@ function form_ini() {
             { layout: 'column', height: 42, border: 0, margin: '5 0 0 0', items: [field_UNITCODE, combo_CREATEMODE] },
             { layout: 'column', height: 42, border: 0, items: [cont_wjjsdw, cont_wjsbdw] },
             { layout: 'column', height: 42, border: 0, items: [combo_BUSITYPE, combo_REPWAYNAME] },
-            { layout: 'column', height: 42, border: 0, items: [combo_CUSTOMDISTRICTNAME, field_CODE] },
-            { layout: 'column', height: 42, border: 0, items: [field_TEMPLATENAME, field_ISREADPDF] },
-            { layout: 'column', height: 42, border: 0, items: [field_REMARK] },
+            { layout: 'column', height: 42, border: 0, items: [combo_CUSTOMDISTRICTNAME,field_TEMPLATENAME ] },
+            { layout: 'column', height: 42, border: 0, items: [field_REMARK,field_CODE, ] },
+            { layout: 'column', height: 42, border: 0, items: [field_ISREADPDF, field_STATUS] },
             field_CUSTOMDISTRICTNAME, field_ID, field_ORIGINALFILEIDS
         ]
     })
