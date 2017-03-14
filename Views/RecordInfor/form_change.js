@@ -24,7 +24,16 @@
         forceSelection: true,
         queryMode: 'local',
         anyMatch: true,
-        readOnly: true, 
+        readOnly: true,
+        listeners: {
+            focus: function (cb) {
+                if (!cb.getValue()) {
+                    cb.clearInvalid();
+                    cb.store.clearFilter();
+                    cb.expand()
+                }
+            }
+        },
         fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
 
@@ -54,6 +63,31 @@
         queryMode: 'local',
         anyMatch: true,
         readOnly: true,
+        listeners: {
+            focus: function (cb) {
+                if (!cb.getValue()) {
+                    cb.clearInvalid();
+                    cb.store.clearFilter();
+                    cb.expand()
+                }
+            },
+            change: function (field_paste, newValue, oldValue, eOpts) {
+                if (newValue == "成品") {
+                    //$("#div_form_con").show();
+                    if (!Ext.getCmp('gridpanel_PRODUCTCONSUME') && !Ext.getCmp('gridpanel_PRODUCTCONSUME')) {
+                        form_ini_con();
+                    }
+                } else {
+                    if (Ext.getCmp('formpanel_con')) {
+                        Ext.getCmp('formpanel_con').destroy();
+                    }
+                    if (Ext.getCmp('gridpanel_PRODUCTCONSUME')) {
+                        Ext.getCmp('gridpanel_PRODUCTCONSUME').destroy();
+                    }
+                    //$("#div_form_con").hide();
+                }
+            }
+        },
         fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
 
@@ -82,9 +116,9 @@
                 }
             },
             change: function (field_paste, newValue, oldValue, eOpts) {
-                //if (newValue != oldValue) {
-                //    Element_ini();
-                //}
+                if (newValue != oldValue) {
+                    Element_ini();
+                }
             }
         },
         allowBlank: false,
@@ -95,30 +129,71 @@
     //HS编码left
     var field_HSCODE_left = Ext.create('Ext.form.field.Text', { id: 'HSCODE_left', name: 'HSCODE_left', readOnly: true, fieldLabel: 'HS编码', flex: .5 });
     //附加码left
-    var field_ADDITIONALNO_left = Ext.create('Ext.form.field.Text', { id: 'ADDITIONALNO_left', name: 'ADDITIONALNO_left', readOnly: true, fieldLabel: 'HS附加码', flex: .5, margin: 0 });
+    var field_ADDITIONALNO_left = Ext.create('Ext.form.field.Text', { id: 'ADDITIONALNO_left', name: 'ADDITIONALNO_left', readOnly: true, fieldLabel: 'HS附加码', flex: .5});
 
-    var field_1_left = { columnWidth: 1, xtype: 'fieldcontainer', layout: 'hbox', margin: 0, items: [field_HSCODE_left, field_ADDITIONALNO_left] };
+    var field_1_left = { columnWidth: 1, layout: 'hbox', border: 0, items: [field_HSCODE_left, field_ADDITIONALNO_left] };
 
+    //商品名称
+    var field_COMMODITYNAME_left = Ext.create('Ext.form.field.Text', { id: 'COMMODITYNAME_left', name: 'COMMODITYNAME_left', fieldLabel: '商品名称', flex: .5 });
+    //规格型号
+    var field_SPECIFICATIONSMODEL_left = Ext.create('Ext.form.field.Text', { id: 'SPECIFICATIONSMODEL_left', name: 'SPECIFICATIONSMODEL_left', fieldLabel: '规格型号', flex: .5});
 
+    var field_2_left = { columnWidth: 1, layout: 'hbox', border: 0, items: [field_COMMODITYNAME_left, field_SPECIFICATIONSMODEL_left] };
 
+    //成交单位
+    var store_UNIT_left = Ext.create('Ext.data.JsonStore', {
+        fields: ['CODE', 'NAME', 'CODENAME'],
+        data: common_data_unit
+    });
+    var combo_UNIT_left = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_UNIT_left',
+        name: 'UNIT_left',
+        store: store_UNIT_left,
+        fieldLabel: '成交单位',
+        displayField: 'CODENAME',
+        valueField: 'CODE',
+        hideTrigger: true,
+        triggerAction: 'all',
+        forceSelection: true,
+        queryMode: 'local',
+        anyMatch: true,
+        readOnly: true,flex: .5,
+        listeners: {
+            focus: function (cb) {
+                if (!cb.getValue()) {
+                    cb.clearInvalid();
+                    cb.store.clearFilter();
+                    cb.expand();
+                }
+            }
+        }
+    });
 
-    var con_container_left = {
-        columnWidth: .5,
-        xtype: 'fieldcontainer',
-        layout: 'column',
+    //报关行
+    var field_CUSTOMER_left = Ext.create('Ext.form.field.Text', { id: 'CUSTOMER_left', name: 'CUSTOMER_left', fieldLabel: '报关行', flex: .5 });
+
+    var field_3_left = { columnWidth: 1, layout: 'hbox', border: 0, items: [combo_UNIT_left, field_CUSTOMER_left] };
+
+    var panel_left = Ext.create('Ext.panel.Panel', {
+        id: 'panel_left',
+        columnWidth: 0.50, margin: '0 2 0 0',
+        border: 1, title: '<font style="font-weight:200px; font-size:14px;color:blue;"><center>变动前</center><font>',
         items: [
-            { columnWidth: 1, layout: 'column', border: 0, height: 42, margin: '5 0 0 0', items: [field_1_left] }
+            { columnWidth: 1, layout: 'column', border: 0, height: 42, margin: '5 0 0 0', items: [field_1_left] },
+            { columnWidth: 1, layout: 'column', border: 0, height: 42, items: [field_2_left] },
+            { columnWidth: 1, layout: 'column', border: 0, height: 42, items: [field_3_left] }
         ]
-    }
+    });
+
 
     //HS编码right
     var field_HSCODE = Ext.create('Ext.form.field.Text', {
         id: 'HSCODE', name: 'HSCODE', fieldLabel: 'HS编码', flex: .5,
         listeners: {
             change: function (field_paste, newValue, oldValue, eOpts) {
-                //if (newValue != Ext.getCmp('HSCODE_left').getValue()) {
-                //    Element_ini();
-                //}
+                if (newValue != oldValue) {//newValue != Ext.getCmp('HSCODE_left').getValue()
+                    Element_ini();
+                }
             }
         },
         allowBlank: false, blankText: 'HS编码不能为空!'
@@ -126,30 +201,148 @@
 
     //附加码right
     var field_ADDITIONALNO = Ext.create('Ext.form.field.Text', {
-        id: 'ADDITIONALNO', name: 'ADDITIONALNO', fieldLabel: 'HS附加码', flex: .5, margin: 0,
+        id: 'ADDITIONALNO', name: 'ADDITIONALNO', fieldLabel: 'HS附加码', flex: .5,
         maxLength: 2, minLength: 2, enforceMaxLength: true, minLengthText: '附加码为2位！',
         listeners: {
             change: function (field_paste, newValue, oldValue, eOpts) {
-                //if (newValue != Ext.getCmp('ADDITIONALNO_left').getValue()) {
-                //    Element_ini();
-                //}
+                if (newValue != oldValue) {//newValue != Ext.getCmp('ADDITIONALNO_left').getValue()
+                    Element_ini();
+                }
             }
         },
         allowBlank: false, blankText: '附加码不能为空!'
     });
 
-    var field_1_right = { columnWidth: 1, xtype: 'fieldcontainer', layout: 'hbox', margin: 0, items: [field_HSCODE, field_ADDITIONALNO] };
+    var field_1_right = { columnWidth: 1, layout: 'hbox', border: 0, items: [field_HSCODE, field_ADDITIONALNO] };
 
 
-    var con_container_right = {
-        columnWidth: .5,
+    //商品名称
+    var field_COMMODITYNAME = Ext.create('Ext.form.field.Text', {
+        id: 'COMMODITYNAME',
+        name: 'COMMODITYNAME',
+        fieldLabel: '商品名称', flex: .5,
+        listeners: {
+            change: function (field_paste, newValue, oldValue, eOpts) {
+                if (Ext.getCmp('panel_ele_2')) {
+                    var id_pm = Ext.getCmp('id_pinming').getValue();
+                    if (id_pm != "") {
+                        if (Ext.getCmp(id_pm)) { Ext.getCmp(id_pm).setValue(newValue); }
+                    }
+                }
+            }
+        },
+        allowBlank: false,
+        blankText: '商品名称不能为空!'
+    });
+
+    //规格型号
+    var field_SPECIFICATIONSMODEL = Ext.create('Ext.form.field.Text', {
+        id: 'SPECIFICATIONSMODEL',
+        name: 'SPECIFICATIONSMODEL',
+        fieldLabel: '规格型号', flex: .5
+    });
+
+    var field_2_right = { columnWidth: 1, layout: 'hbox', border: 0, items: [field_COMMODITYNAME, field_SPECIFICATIONSMODEL] };
+
+    //成交单位
+    var store_UNIT = Ext.create('Ext.data.JsonStore', {
+        fields: ['CODE', 'NAME', 'CODENAME'],
+        data: common_data_unit
+    });
+    var combo_UNIT = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_UNIT',
+        name: 'UNIT',
+        store: store_UNIT,
+        fieldLabel: '成交单位',
+        displayField: 'CODENAME',
+        valueField: 'CODE',
+        hideTrigger: true,
+        triggerAction: 'all',
+        forceSelection: true,
+        queryMode: 'local',
+        anyMatch: true,flex: .5,
+        listeners: {
+            focus: function (cb) {
+                if (!cb.getValue()) {
+                    cb.clearInvalid();
+                    cb.store.clearFilter();
+                    cb.expand();
+                }
+            }
+        },
+        listConfig: {
+            maxHeight: 130
+        },
+        allowBlank: false,
+        blankText: '成交单位不能为空!'
+    });
+
+    //报关行
+    var store_CUSTOMER = Ext.create('Ext.data.JsonStore', {  //报关行combostore
+        fields: ['CODE', 'NAME'],
+        data: common_data_jydw
+    })
+    var combo_CUSTOMER = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_CUSTOMER',
+        name: 'CUSTOMERCODE',
+        store: store_CUSTOMER,
+        displayField: 'NAME',
+        valueField: 'CODE',
+        queryMode: 'local',
+        margin: 0,
+        minChars: 4,
+        forceSelection: true,
+        anyMatch: true,
+        hideTrigger: true,
+        listeners: {
+            focus: function (cb) {
+                cb.clearInvalid();
+            },
+            select: function (records) {
+                field_CUSTOMERNAME.setValue(records.rawValue.substr(0, records.rawValue.lastIndexOf('(')));
+            }
+        },
+        flex: .85,
+        allowBlank: false,
+        blankText: '报关行不能为空!',
+        listConfig: {
+            maxHeight: 110,
+            getInnerTpl: function () {
+                return '<div>{NAME}</div>';
+            }
+        }
+    })
+    var field_CUSTOMERNAME = Ext.create('Ext.form.field.Hidden', {
+        name: 'CUSTOMERNAME'
+    })
+
+
+    //报关行
+    var field_CUSTOMER = {
         xtype: 'fieldcontainer',
-        layout: 'column',
-        items: [
-            { columnWidth: 1, layout: 'column', border: 0, height: 42, margin: '5 0 0 0', items: [field_1_right] }
-        ]
+        fieldLabel: '报关行',
+        layout: 'hbox', flex: .5,
+        items: [combo_CUSTOMER, {
+            id: 'CUSTOMER_btn', xtype: 'button', handler: function () {
+                selectjydw(combo_CUSTOMER, field_CUSTOMERNAME);
+            },
+            text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
+        }]
     }
 
+    var field_3_right = { columnWidth: 1, layout: 'hbox', border: 0, items: [combo_UNIT, field_CUSTOMER] };
+
+    var panel_right = Ext.create('Ext.panel.Panel', {
+        id: 'panel_right',
+        columnWidth: 0.50,
+        border: 1, title: '<font style="font-weight:200px; font-size:14px;color:blue;"><center>变动后</center><font>',
+        items: [
+            { columnWidth: 1, layout: 'column', border: 0, margin: '5 0 0 0', height: 42, items: [field_1_right] },
+            { columnWidth: 1, layout: 'column', border: 0, height: 42, items: [field_2_right] },
+            { columnWidth: 1, layout: 'column', border: 0, height: 42, items: [field_3_right] }
+        ]
+    });
+    
     var panel_ele = Ext.create('Ext.panel.Panel', {//申报要素
         id: 'panel_ele',
         columnWidth: 1,
@@ -160,9 +353,9 @@
     var panel_compare = Ext.create('Ext.panel.Panel', {
         id: 'panel_compare',
         columnWidth: 1,
-        border: 1,
+        border: 0,
         items: [
-            { layout: 'column', border: 0, items: [con_container_left, con_container_right] },
+            { layout: 'column', border: 0, items: [panel_left, panel_right] },
             { layout: 'column', border: 0, items: [panel_ele] }
         ]
     });
@@ -373,12 +566,12 @@
 function form_ini_btn() {
 
     var bbar_r = '<div class="btn-group" role="group">'
-                        + '<button type="button" onclick="" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤回</button>'
+                        + '<button type="button" onclick="" id="btn_print" class="btn btn-primary btn-sm"><i class="fa fa-print"></i>&nbsp;申请表打印</button>'
                         + '<button type="button" onclick="" id="btn_save" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
                         + '<button type="button" onclick="" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交申请</button></div>'
 
     var bbar_l = '<div class="btn-group">'
-               + '<button type="button" onclick="" id="btn_print" class="btn btn-primary btn-sm"><i class="fa fa-print"></i>&nbsp;申请表打印</button>'
+            + '<button type="button" onclick="" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤回</button>'               
            + '</div>';
     var bbar = Ext.create('Ext.toolbar.Toolbar', {
         items: [bbar_l, '->', bbar_r]

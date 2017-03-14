@@ -231,6 +231,16 @@
         id: 'COMMODITYNAME',
         name: 'COMMODITYNAME',
         fieldLabel: '商品名称',
+        listeners: {
+            change: function (field_paste, newValue, oldValue, eOpts) {
+                if (Ext.getCmp('panel_ele_2')) {
+                    var id_pm = Ext.getCmp('id_pinming').getValue();
+                    if (id_pm != "") {
+                        if (Ext.getCmp(id_pm)) { Ext.getCmp(id_pm).setValue(newValue); }
+                    }                    
+                }
+            }
+        },
         allowBlank: false,
         blankText: '商品名称不能为空!'
     });
@@ -492,13 +502,14 @@
 function form_ini_btn() {
 
     var bbar_r = '<div class="btn-group" role="group">'
-                        + '<button type="button" onclick="create_cancel()" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤回</button>'
+                        + '<button type="button" onclick="printitemno(' + id + ')" id="btn_print" class="btn btn-primary btn-sm"><i class="fa fa-print"></i>&nbsp;申请表打印</button>'
+                        + '<button type="button" onclick="copyadd_save()" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;新增</button>'
                         + '<button type="button" onclick="create_save(\'save\')" id="btn_save" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
                         + '<button type="button" onclick="create_save(\'submit\')" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交申请</button></div>'
 
     var bbar_l = '<div class="btn-group">'
-               + '<button type="button" onclick="printitemno(' + id + ')" id="btn_print" class="btn btn-primary btn-sm"><i class="fa fa-print"></i>&nbsp;申请表打印</button>'
-           + '</div>';
+                + '<button type="button" onclick="create_cancel()" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤回</button>'               
+            + '</div>';
     var bbar = Ext.create('Ext.toolbar.Toolbar', {
         items: [bbar_l, '->', bbar_r]
     })
@@ -599,7 +610,7 @@ function create_save(action) {
 function loadform_record() {
     Ext.Ajax.request({
         url: "/RecordInfor/loadrecord_create",
-        params: { id: id },
+        params: { id: id, copyid: copyid },
         success: function (response, opts) {
             var data = Ext.decode(response.responseText);
             Ext.getCmp("formpanel_id").getForm().setValues(data.formdata);
@@ -607,7 +618,7 @@ function loadform_record() {
             if (Ext.getCmp('gridpanel_PRODUCTCONSUME')) {
                 Ext.getCmp('gridpanel_PRODUCTCONSUME').store.loadData(data.productsonsumedata);
             }
-                     
+
             formpanelcontrol();//表单字段控制
         }
     });
@@ -636,4 +647,11 @@ function formpanelcontrol() {
     //成品单耗 保存删除按钮
     if (Ext.getCmp("btn_pro_save")) { Ext.getCmp("btn_pro_save").setDisabled(status >= 10); }
     if (Ext.getCmp("btn_pro_del")) { Ext.getCmp("btn_pro_del").setDisabled(status >= 10); }
+}
+
+function copyadd_save() {
+    if (id) {
+        window.location.href = "/RecordInfor/Create?copyid=" + id;
+    }
+    
 }

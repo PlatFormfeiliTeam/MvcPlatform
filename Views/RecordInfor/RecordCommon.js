@@ -221,15 +221,15 @@ function itemsbind() {
     var tbar_lj_Go = Ext.create('Ext.toolbar.Toolbar', {
         items: [
             {
-                text: '<span class="icon iconfont" style="font-size:12px">&#xe632;</span>&nbsp;修 改',
+                text: '<span class="icon iconfont" style="font-size:12px;color:#3071A9;">&#xe632;</span>&nbsp;<font color="#3071A9">修 改</font>',
                 handler: function () { edit_task('gridpanel_lj_Go'); }
             },
                {
-                   text: '<span class="icon iconfont" style="font-size:12px">&#xe6d3;</span>&nbsp;删 除',
+                   text: '<span class="icon iconfont" style="font-size:12px;color:#3071A9;">&#xe6d3;</span>&nbsp;<font color="#3071A9">删 除</font>',
                    handler: function () { delete_task('gridpanel_lj_Go', 'pgbar_lj_Go'); }
                },
                {
-                   text: '<span class="icon iconfont" style="font-size:12px">&#xe601;</span>&nbsp;申请表打印',
+                   text: '<span class="icon iconfont" style="font-size:12px;color:#3071A9;">&#xe601;</span>&nbsp;<font color="#3071A9">申请表打印</font>',
                    handler: function () { print_task('gridpanel_lj_Go'); }
                }]
 
@@ -302,15 +302,15 @@ function itemsbind() {
     var tbar_cp_Go = Ext.create('Ext.toolbar.Toolbar', {
         items: [
             {
-                text: '<span class="icon iconfont" style="font-size:12px">&#xe632;</span>&nbsp;修 改',
+                text: '<span class="icon iconfont" style="font-size:12px;color:#3071A9;">&#xe632;</span>&nbsp;<font color="#3071A9">修 改</font>',
                 handler: function () { edit_task('gridpanel_cp_Go'); }
             },
                {
-                   text: '<span class="icon iconfont" style="font-size:12px">&#xe6d3;</span>&nbsp;删 除',
+                   text: '<span class="icon iconfont" style="font-size:12px;color:#3071A9;">&#xe6d3;</span>&nbsp;<font color="#3071A9">删 除</font>',
                    handler: function () { delete_task('gridpanel_cp_Go', 'pgbar_cp_Go'); }
                },
                {
-                   text: '<span class="icon iconfont" style="font-size:12px">&#xe601;</span>&nbsp;申请表打印',
+                   text: '<span class="icon iconfont" style="font-size:12px;color:#3071A9;">&#xe601;</span>&nbsp;<font color="#3071A9">申请表打印</font>',
                    handler: function () { print_task('gridpanel_cp_Go'); }
                }]
 
@@ -519,8 +519,23 @@ function Element_ini() {//61034200、52115100、85011099、74101100、41041111
             if (json.elements.length > 0) {
                 configItem.push({ layout: 'column', height: 42, margin: '0 0 15 0', border: 0, items: [label_busiinfo] });
 
-                var items_i;
+                var items_i; var id_pinming = "";
                 for (var i = 0; i < json.elements.length; i = i + 4) {
+
+                    //----------------------------------------------------------------------------------------------------------------------------------
+                    if (id_pinming=="" && json.elements[i].ELEMENTS.indexOf(':') > 0) {
+                        if (json.elements[i].ELEMENTS.substr(json.elements[i].ELEMENTS.indexOf(':') + 1) == "品名") { id_pinming = "field_ele_" + (i); }
+                    }
+                    if (id_pinming == "" && json.elements[i + 1].ELEMENTS.indexOf(':') > 0) {
+                        if (json.elements[i + 1].ELEMENTS.substr(json.elements[i + 1].ELEMENTS.indexOf(':') + 1) == "品名") { id_pinming = "field_ele_" + (i + 1); }
+                    }
+                    if (id_pinming == "" && json.elements[i + 2].ELEMENTS.indexOf(':') > 0) {
+                        if (json.elements[i + 2].ELEMENTS.substr(json.elements[i + 2].ELEMENTS.indexOf(':') + 1) == "品名") { id_pinming = "field_ele_" + (i + 2); }
+                    }
+                    if (id_pinming == "" && json.elements[i + 3].ELEMENTS.indexOf(':') > 0) {
+                        if (json.elements[i + 3].ELEMENTS.substr(json.elements[i + 3].ELEMENTS.indexOf(':') + 1) == "品名") { id_pinming = "field_ele_" + (i + 3); }
+                    }
+                    //----------------------------------------------------------------------------------------------------------------------------
 
                     items_i = [];
                     items_i.push(Ext.create('Ext.form.Label', { id: 'label_ele_' + (i), name: 'label_ele_' + (i), text: json.elements[i].ELEMENTS, cls: "lab" }));
@@ -542,8 +557,14 @@ function Element_ini() {//61034200、52115100、85011099、74101100、41041111
                     configItem.push({ layout: 'column', margin: '0 0 0 50', border: 0, items: items_i });
                 }
 
-                configItem.push({ layout: 'column', height: 42, margin: '0 0 0 0', border: 0, items: [label_busiinfo_end] }, Ext.create('Ext.form.field.Hidden', { id: 'jsonEle', name: 'jsonEle' }));
+                configItem.push({ layout: 'column', height: 42, margin: '0 0 0 0', border: 0, items: [label_busiinfo_end] }, Ext.create('Ext.form.field.Hidden', { id: 'jsonEle', name: 'jsonEle' })
+                    , Ext.create('Ext.form.field.Hidden', { id: 'id_pinming', name: 'id_pinming', value: id_pinming })
+                    );
                 Ext.getCmp('jsonEle').setValue(response.responseText);//json.elements
+                if (Ext.getCmp(id_pinming)) {
+                    Ext.getCmp(id_pinming).setValue(Ext.getCmp('COMMODITYNAME').getValue());
+                    Ext.getCmp(id_pinming).setReadOnly(true);
+                }
 
                 Ext.getCmp('panel_ele').add(Ext.create('Ext.panel.Panel', { id: 'panel_ele_2', columnWidth: 1, border: 0, items: configItem }));
             }

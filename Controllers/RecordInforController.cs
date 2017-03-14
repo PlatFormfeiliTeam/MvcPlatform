@@ -216,24 +216,38 @@ namespace MvcPlatform.Controllers
         public string loadrecord_create()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            string id = Request["id"];
+            string id = Request["id"]; string copyid = Request["copyid"];
             string sql = "";
-            string result = "{}";
-            if (!string.IsNullOrEmpty(id))
+            string result = "{}"; string formdata = "{}"; string productsonsumedata = "[]";
+            if (string.IsNullOrEmpty(id))
+            {
+                if (string.IsNullOrEmpty(copyid))//如果是复制新增
+                {
+                    formdata = "{ITEMNOATTRIBUTE:'料件',STATUS:0,OPTIONS:'A',ISPRINT_APPLY:0}";
+                }
+                else
+                {
+                    IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+                    iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+                    sql = @"select RECORDINFOID,CUSTOMAREA,CUSTOMERCODE,CUSTOMERNAME,ITEMNOATTRIBUTE from sys_recordinfo_detail_task where id='" + copyid + "'";
+                    formdata = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso).TrimStart('[').TrimEnd(']');
+                }
+            }
+            else
             {
                 IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
                 iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
                 sql = @"select * from sys_recordinfo_detail_task where id='" + id + "'";
-                string formdata = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso).TrimStart('[').TrimEnd(']');
+                formdata = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso).TrimStart('[').TrimEnd(']');
 
                 //成品单耗
                 sql = "select * from SYS_PRODUCTCONSUME where rid='" + id + "' order by id desc";
-                string productsonsumedata = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso);
+                productsonsumedata = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso);
 
-                result = "{formdata:" + formdata + ",productsonsumedata:" + productsonsumedata + "}";
             }
-
+            result = "{formdata:" + formdata + ",productsonsumedata:" + productsonsumedata + "}";
             return result;            
         }
 
