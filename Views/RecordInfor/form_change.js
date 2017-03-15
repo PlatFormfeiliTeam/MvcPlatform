@@ -660,7 +660,7 @@ function create_save(action) {
                     });
                 }
                 else {
-                    if (data.isrepeate == "Y") { Ext.MessageBox.alert("提示", "项号重复!"); }
+                    if (data.isgoing == "Y") { Ext.MessageBox.alert("提示", "此项号正在申请中!"); }
                     else {
                         Ext.MessageBox.alert("提示", action == 'submit' ? "提交失败！" : "保存失败！");
                     }

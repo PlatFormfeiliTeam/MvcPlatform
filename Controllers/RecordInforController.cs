@@ -554,6 +554,17 @@ namespace MvcPlatform.Controllers
 
             if (string.IsNullOrEmpty(Request["id"]))//新增
             {
+                //验证是否存在同比的记录正在申请中--------------------------------------------------------------
+                sql = "select * from sys_recordinfo_detail_task where status<50 and rid='" + json.Value<string>("RID") + "'";
+                DataTable dt = DBMgr.GetDataTable(sql);
+                if (dt.Rows.Count > 0)
+                {
+                    resultmsg = "{success:false,isgoing:'Y'}";
+                    return resultmsg;
+                }
+                //-------------------------------------------------------------------------------------------------
+
+
                 sql = "select SYS_RECORDINFO_DETAIL_TASK_ID.Nextval from dual";
                 id = DBMgr.GetDataTable(sql).Rows[0][0] + "";//获取ID
                 sql = @"INSERT INTO SYS_RECORDINFO_DETAIL_TASK (ID
@@ -591,6 +602,132 @@ namespace MvcPlatform.Controllers
                     , json.Value<string>("HSCODE"), json.Value<string>("ADDITIONALNO"), json.Value<string>("COMMODITYNAME"), json.Value<string>("SPECIFICATIONSMODEL"), json.Value<string>("UNIT")
                     , json.Value<string>("CUSTOMERCODE"), json.Value<string>("CUSTOMERNAME"), json.Value<string>("CUSTOMAREA"), json.Value<string>("REMARK"), json.Value<string>("MODIFYREASON")
                     , 'U', json.Value<string>("STATUS"), json.Value<string>("SUBMITID"), json.Value<string>("SUBMITNAME"), json.Value<string>("SUBMITTIME")                    
+                    );
+            }
+            if (sql != "")
+            {
+                int result = DBMgr.ExecuteNonQuery(sql);
+                if (result == 1)
+                {
+                    update_elements(json, json_user, id);//申报要素  
+                    update_productconsume(json, json_user, id);//成品单耗
+
+                    resultmsg = "{success:true,id:'" + id + "'}";
+                }
+            }
+            return resultmsg;
+        }
+
+        #endregion
+
+        #region form_delete
+
+        public string loadrecord_delete()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string id = Request["id"]; string rid = Request["rid"];
+            string sql = ""; DataTable dt = new DataTable();
+            string result = "{}"; string formdata = "{}"; string productsonsumedata = "[]";
+            if (string.IsNullOrEmpty(id))
+            {
+                if (!string.IsNullOrEmpty(rid))//如果是删除申请
+                {
+                    IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+                    iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+                    sql = @"select '{0}' RID,RECORDINFOID,ITEMNO,ITEMNOATTRIBUTE,HSCODE,ADDITIONALNO,COMMODITYNAME,SPECIFICATIONSMODEL,UNIT  
+                            from sys_recordinfo_detail where id='{0}'";
+                    sql = string.Format(sql, rid);
+                    dt = DBMgrBase.GetDataTable(sql);
+                    formdata = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
+                }
+            }
+            else
+            {
+                IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+                iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+                sql = @"select * from sys_recordinfo_detail_task where id='" + id + "'";
+                dt = DBMgr.GetDataTable(sql);
+
+                formdata = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
+
+                //成品单耗
+                sql = "select * from SYS_PRODUCTCONSUME where rid='" + id + "' order by id desc";
+                productsonsumedata = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso);
+
+            }
+            result = "{formdata:" + formdata + ",productsonsumedata:" + productsonsumedata + "}";
+            return result;
+        }
+
+        public string Delete_Save()
+        {
+            string action = Request["action"];
+            JObject json = (JObject)JsonConvert.DeserializeObject(Request["formdata"]);
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            string sql = ""; string resultmsg = "{success:false}";
+
+            string id = string.Empty;
+            if (Request["action"] + "" == "submit")
+            {
+                json.Remove("STATUS"); json.Add("STATUS", 10);
+                json.Remove("SUBMITTIME"); json.Add("SUBMITTIME", "sysdate");
+                json.Remove("SUBMITNAME"); json.Add("SUBMITNAME", json_user.Value<string>("REALNAME"));
+                json.Remove("SUBMITID"); json.Add("SUBMITID", json_user.Value<string>("ID"));
+            }
+            else
+            {
+                json.Remove("SUBMITTIME"); //委托时间  
+                json.Add("SUBMITTIME", "null");
+            }
+
+            if (string.IsNullOrEmpty(Request["id"]))//新增
+            {
+                //验证是否存在同比的记录正在申请中--------------------------------------------------------------
+                sql = "select * from sys_recordinfo_detail_task where status<50 and rid='" + json.Value<string>("RID") + "'";
+                DataTable dt = DBMgr.GetDataTable(sql);
+                if (dt.Rows.Count > 0)
+                {
+                    resultmsg = "{success:false,isgoing:'Y'}";
+                    return resultmsg;
+                }
+                //-------------------------------------------------------------------------------------------------
+
+
+                sql = "select SYS_RECORDINFO_DETAIL_TASK_ID.Nextval from dual";
+                id = DBMgr.GetDataTable(sql).Rows[0][0] + "";//获取ID
+                sql = @"INSERT INTO SYS_RECORDINFO_DETAIL_TASK (ID
+                        ,RECORDINFOID,ITEMNO,HSCODE,ADDITIONALNO,ITEMNOATTRIBUTE
+                        ,COMMODITYNAME,SPECIFICATIONSMODEL,UNIT,REMARK,MODIFYREASON
+                        ,CREATEID,CREATENAME,CREATEDATE,OPTIONS,STATUS,CUSTOMERCODE
+                        ,CUSTOMERNAME,SUBMITID,SUBMITNAME,SUBMITTIME,CUSTOMAREA
+                        ,RID                       
+                        ) VALUES ('{0}'
+                            ,'{1}','{2}','{3}','{4}','{5}'
+                            ,'{6}','{7}','{8}','{9}','{10}'
+                            ,'{11}','{12}',sysdate,'{13}','{14}','{15}'
+                            ,'{16}','{17}','{18}',{19},'{20}'
+                            ,'{21}'
+                            )";
+                sql = string.Format(sql, id
+                    , json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), json.Value<string>("HSCODE"), json.Value<string>("ADDITIONALNO"), json.Value<string>("ITEMNOATTRIBUTE")
+                    , json.Value<string>("COMMODITYNAME"), json.Value<string>("SPECIFICATIONSMODEL"), json.Value<string>("UNIT"), json.Value<string>("REMARK"), json.Value<string>("MODIFYREASON")
+                    , json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"), 'D', json.Value<string>("STATUS"), json.Value<string>("CUSTOMERCODE")
+                    , json.Value<string>("CUSTOMERNAME"), json.Value<string>("SUBMITID"), json.Value<string>("SUBMITNAME"), json.Value<string>("SUBMITTIME"), json.Value<string>("CUSTOMAREA")
+                    , json.Value<string>("RID")
+                    );
+            }
+            else//修改
+            {
+                id = Request["id"];
+                sql = @"UPDATE SYS_RECORDINFO_DETAIL_TASK SET CUSTOMERCODE='{1}',CUSTOMERNAME='{2}',CUSTOMAREA='{3}',REMARK='{4}',MODIFYREASON='{5}'
+                            ,OPTIONS='{6}',STATUS='{7}',SUBMITID='{8}',SUBMITNAME='{9}',SUBMITTIME={10} 
+                        WHERE ID={0}";
+                sql = string.Format(sql, id                    
+                    , json.Value<string>("CUSTOMERCODE"), json.Value<string>("CUSTOMERNAME"), json.Value<string>("CUSTOMAREA"), json.Value<string>("REMARK"), json.Value<string>("MODIFYREASON")
+                    , 'D', json.Value<string>("STATUS"), json.Value<string>("SUBMITID"), json.Value<string>("SUBMITNAME"), json.Value<string>("SUBMITTIME")
                     );
             }
             if (sql != "")

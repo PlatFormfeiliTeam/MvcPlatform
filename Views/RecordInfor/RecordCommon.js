@@ -437,11 +437,14 @@ function edit_task(Compentid) {
         return;
     }
 
-    if (recs[0].get("OPTIONS") == "A" || recs[0].get("OPTIONS") == "D") {
+    if (recs[0].get("OPTIONS") == "A") {
         opencenterwin("/RecordInfor/Create?id=" + recs[0].get("ID"), 1600, 900);
     }
     if (recs[0].get("OPTIONS") == "U") {
         opencenterwin("/RecordInfor/Change?id=" + recs[0].get("ID"), 1600, 900);
+    }
+    if (recs[0].get("OPTIONS") == "D") {
+        opencenterwin("/RecordInfor/Delete?id=" + recs[0].get("ID"), 1600, 900);
     }
 }
 
