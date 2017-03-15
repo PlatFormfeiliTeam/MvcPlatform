@@ -396,19 +396,38 @@ function Reset() {
 function Open(type) {
     if (type == 'A') {//新增申请
         opencenterwin("/RecordInfor/Create", 1600, 900);
-    }
-    if (type == 'U') {//变更申请
-        var Compentid = ""; 
+    } else {
+        var Compentid = "";
         if (Ext.getCmp("tabpanel").getActiveTab().id == "tab_0") { Compentid = "gridpanel_lj"; }
         if (Ext.getCmp("tabpanel").getActiveTab().id == "tab_1") { Compentid = "gridpanel_cp"; }
-        
-        var recs = Ext.getCmp(Compentid).getSelectionModel().getSelection(); 
+
+        var recs = Ext.getCmp(Compentid).getSelectionModel().getSelection();
         if (recs.length != 1) {
-            Ext.Msg.alert("提示", "请选择一笔变更申请的记录!");
+            Ext.Msg.alert("提示", "请选择一笔记录!");
             return;
-        }       
-        opencenterwin("/RecordInfor/Change?rid=" + recs[0].get("ID"), 1600, 900);
-    }
+        }
+
+        Ext.Ajax.request({
+            url: '/RecordInfor/Repeat_Task',
+            params: { id: recs[0].get("ID") },
+            success: function (response, success, option) {
+                var res = Ext.decode(response.responseText);
+
+                if (res.success) {//判断是否存在正在申请的记录
+                    Ext.MessageBox.alert('提示', "此项号正在申请中！");
+                }
+                else {
+                    if (type == 'U') {//变更申请                   
+                        opencenterwin("/RecordInfor/Change?rid=" + recs[0].get("ID"), 1600, 900);
+                    }
+                    if (type == 'D') {//删除申请
+                        opencenterwin("/RecordInfor/Delete?rid=" + recs[0].get("ID"), 1600, 900);
+                    }
+                }
+
+            }
+        });        
+    }    
 }
 
 function edit_task(Compentid) {

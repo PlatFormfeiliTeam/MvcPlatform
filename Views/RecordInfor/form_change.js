@@ -593,7 +593,7 @@
 function form_ini_btn() {
 
     var bbar_r = '<div class="btn-group" role="group">'
-                        + '<button type="button" onclick="" id="btn_print" class="btn btn-primary btn-sm"><i class="fa fa-print"></i>&nbsp;申请表打印</button>'
+                        + '<button type="button" onclick="printitemno(' + id + ')" id="btn_print" class="btn btn-primary btn-sm"><i class="fa fa-print"></i>&nbsp;申请表打印</button>'
                         + '<button type="button" onclick="create_save(\'save\')" id="btn_save" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
                         + '<button type="button" onclick="create_save(\'submit\')" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交申请</button></div>'
 
@@ -690,7 +690,7 @@ function loadform_record() {
 function formpanelcontrol() {
     var status = Ext.getCmp('combo_STATUS').getValue();
     document.getElementById("btn_save").disabled = status >= 10; //保存 
-    document.getElementById("btn_cancelsubmit").disabled = status == 0;//撤回:只有草稿才不可以撤回  
+    document.getElementById("btn_cancelsubmit").disabled = (status == 0 || status == 50);//撤回:只有草稿才不可以撤回  
     document.getElementById("btn_submitorder").disabled = status >= 10;//提交申请
     document.getElementById("btn_print").disabled = status < 10;//打印
 

@@ -36,6 +36,20 @@ namespace MvcPlatform.Controllers
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
+
+        public ActionResult Delete()//备案信息 delete
+        {
+            ViewBag.navigator = "备案管理>>备案信息";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
+
+        public ActionResult PrintRecordDetail()//打印界面
+        {
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
+
         public ActionResult Recordinfo_Detail_SUMNUM()//申报数量
         {
             ViewBag.navigator = "备案管理>>申报数量";
@@ -185,6 +199,20 @@ namespace MvcPlatform.Controllers
 
             result = "{success:true}";
 
+            return result;
+        }
+
+        public string Repeat_Task()//判断是否存在正在申请的记录
+        {
+            string id = Request["id"];
+            string result = "{success:false}"; string sql = "";
+
+            sql = "select * from sys_recordinfo_detail_task where status<50 and rid='" + id + "'";
+            DataTable dt = DBMgr.GetDataTable(sql);
+            if (dt.Rows.Count > 0)
+            {
+                result = "{success:true}";
+            }
             return result;
         }
 
@@ -366,14 +394,30 @@ namespace MvcPlatform.Controllers
             */
 
             //验证项号是否是最大值----------------------------------------------------------------------------------------
-            sql = "select itemno from SYS_RECORDINFO_DETAIL_TASK where STATUS<50 and RECORDINFOID='{0}' and ITEMNO>to_number('{1}') and ITEMNOATTRIBUTE='{2}'";
-            if (!string.IsNullOrEmpty(Request["id"])) { sql = sql + " and ID!='{3}'"; }
-            sql += " union select itemno from cusdoc.SYS_RECORDINFO_DETAIL where enabled=1 and RECORDINFOID='{0}' and ITEMNO>to_number('{1}') and ITEMNOATTRIBUTE='{2}'";
 
-            sql = string.Format(sql, json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), json.Value<string>("ITEMNOATTRIBUTE"), Request["id"]);
-            DataTable dt_itemno = new DataTable();
-            dt_itemno = DBMgr.GetDataTable(sql);
-            if (dt_itemno.Rows.Count > 0) { resultmsg = "{success:false,ismax:'Y'}"; return resultmsg; }
+            //新增无条件；修改：先判断项号是否修改，若没修改，不做验证；若修改，除去本笔记录做验证；
+
+            bool bf = false;
+            if (!string.IsNullOrEmpty(Request["id"]))
+            {
+                sql = "select itemno from SYS_RECORDINFO_DETAIL_TASK where ID='{0}'"; sql = string.Format(sql, Request["id"]);
+                DataTable dt_itemno_e = new DataTable(); dt_itemno_e = DBMgr.GetDataTable(sql);
+                if (dt_itemno_e.Rows[0][0].ToString() == json.Value<string>("ITEMNO"))
+                {
+                    bf = true;//修改：先判断项号是否修改，若没修改，不做验证；
+                }
+            }
+            if (bf == false)
+            {
+                sql = "select itemno from SYS_RECORDINFO_DETAIL_TASK where STATUS<50 and RECORDINFOID='{0}' and ITEMNO>to_number('{1}') and ITEMNOATTRIBUTE='{2}'";
+                if (!string.IsNullOrEmpty(Request["id"])) { sql = sql + " and ID!='{3}'"; }
+                sql += " union select itemno from cusdoc.SYS_RECORDINFO_DETAIL where enabled=1 and RECORDINFOID='{0}' and ITEMNO>to_number('{1}') and ITEMNOATTRIBUTE='{2}'";
+
+                sql = string.Format(sql, json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), json.Value<string>("ITEMNOATTRIBUTE"), Request["id"]);
+                DataTable dt_itemno = new DataTable();
+                dt_itemno = DBMgr.GetDataTable(sql);
+                if (dt_itemno.Rows.Count > 0) { resultmsg = "{success:false,ismax:'Y'}"; return resultmsg; }
+            }
             //-----------------------------------------------------------------------------------------------------------
 
             string id = string.Empty;
@@ -578,11 +622,7 @@ namespace MvcPlatform.Controllers
 
         
         #region recordinfo print
-        public ActionResult PrintRecordDetail()
-        {
-            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
-            return View();
-        }
+
         public string GetPrintDetail()
         {
             string ids = Request["id"];

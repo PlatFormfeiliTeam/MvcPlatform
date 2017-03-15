@@ -22,7 +22,7 @@
         displayField: 'NAME',
         valueField: 'ID',
         triggerAction: 'all',
-        value: store_RECORDINFOID.getCount() > 0 ? store_RECORDINFOID.getAt(0).get("ID") : '',
+        readOnly: true,
         forceSelection: true,
         queryMode: 'local',
         anyMatch: true,
@@ -35,8 +35,7 @@
                 }
             }
         },
-        allowBlank: false,
-        blankText: '账册号不能为空!'
+        fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
 
     //备案关区
@@ -167,7 +166,7 @@
                     //$("#div_form_con").show();
                     if (!Ext.getCmp('gridpanel_PRODUCTCONSUME') && !Ext.getCmp('gridpanel_PRODUCTCONSUME')) {
                         form_ini_con();
-                    } 
+                    }
                 } else {
                     if (Ext.getCmp('formpanel_con')) {
                         Ext.getCmp('formpanel_con').destroy();
@@ -182,7 +181,7 @@
         allowBlank: false,
         blankText: '项号属性不能为空!'
     });
-    
+
     //HS编码
     var field_HSCODE = Ext.create('Ext.form.field.Text', {
         id: 'HSCODE',
@@ -237,7 +236,7 @@
                     var id_pm = Ext.getCmp('id_pinming').getValue();
                     if (id_pm != "") {
                         if (Ext.getCmp(id_pm)) { Ext.getCmp(id_pm).setValue(newValue); }
-                    }                    
+                    }
                 }
             }
         },
@@ -285,7 +284,7 @@
         blankText: '成交单位不能为空!'
     });
 
-    
+
     //变动状态
     var store_OPTIONS = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
@@ -303,7 +302,7 @@
         readOnly: true,
         editable: false,
         flex: .33,
-        value:'A',
+        value: 'A',
         fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
 
@@ -325,12 +324,12 @@
         editable: false,
         flex: .33,
         value: 0,
-        fieldStyle: 'background-color: #CECECE; background-image: none;'        
+        fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
     //打印状态
     var store_ISPRINT_APPLY = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
-        data:  [{ "CODE": 0, "NAME": "未打印" }, { "CODE": 1, "NAME": "已打印" }]
+        data: [{ "CODE": 0, "NAME": "未打印" }, { "CODE": 1, "NAME": "已打印" }]
     });
     var combo_ISPRINT_APPLY = Ext.create('Ext.form.field.ComboBox', {
         id: 'combo_ISPRINT_APPLY',
@@ -347,10 +346,10 @@
         value: 0,
         fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
-    
+
 
     var combo_container = {
-        columnWidth: .50, 
+        columnWidth: .50,
         xtype: 'fieldcontainer',
         layout: 'hbox', margin: 0,
         items: [combo_OPTIONS, combo_STATUS, combo_ISPRINT_APPLY]
@@ -463,7 +462,7 @@
     var panel_ele = Ext.create('Ext.panel.Panel', {
         id: 'panel_ele',
         columnWidth: 1,
-        border: 0, 
+        border: 0,
         items: []
     });
 
@@ -474,12 +473,12 @@
         { layout: 'column', border: 0, items: [panel_ele] },
         { layout: 'column', height: 42, border: 0, items: [textarea_container] },
         { layout: 'column', height: 42, border: 0, items: [field_CREATEDATE, field_CREATENAME, field_SUBMITTIME, field_SUBMITNAME] },
-        { layout: 'column', height: 42, border: 0, items: [field_ACCEPTTIME, field_ACCEPTNAME, field_PRETIME, field_PRENAME] },        
+        { layout: 'column', height: 42, border: 0, items: [field_ACCEPTTIME, field_ACCEPTNAME, field_PRETIME, field_PRENAME] },
         field_CUSTOMERNAME, field_CREATEID, field_SUBMITID, field_PREID, field_FINISHID
     ];
-    
-     var formpanel = Ext.create('Ext.form.Panel', {
-        id:'formpanel_id',
+
+    var formpanel = Ext.create('Ext.form.Panel', {
+        id: 'formpanel_id',
         renderTo: 'div_form',
         minHeight: 250,
         border: 0,
@@ -503,13 +502,11 @@ function form_ini_btn() {
 
     var bbar_r = '<div class="btn-group" role="group">'
                         + '<button type="button" onclick="printitemno(' + id + ')" id="btn_print" class="btn btn-primary btn-sm"><i class="fa fa-print"></i>&nbsp;申请表打印</button>'
-                        + '<button type="button" onclick="copyadd_save()" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;新增</button>'
-                        + '<button type="button" onclick="create_save(\'save\')" id="btn_save" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
-                        + '<button type="button" onclick="create_save(\'submit\')" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交申请</button></div>'
+                        + '<button type="button" onclick="" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交申请</button></div>'
 
     var bbar_l = '<div class="btn-group">'
-                + '<button type="button" onclick="cancel()" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤回</button>'
-            + '</div>';
+            + '<button type="button" onclick="cancel()" id="btn_cancelsubmit" class="btn btn-primary btn-sm"><i class="fa fa-angle-double-left"></i>&nbsp;撤回</button>'
+           + '</div>';
     var bbar = Ext.create('Ext.toolbar.Toolbar', {
         items: [bbar_l, '->', bbar_r]
     })
@@ -521,122 +518,30 @@ function form_ini_btn() {
     });
 }
 
-function create_save(action) {
 
-    if (action == 'submit') {
-
-        if (!Ext.getCmp('formpanel_id').getForm().isValid()) {
-            return;
-        }
-
-        var validate = ""; 
-        if (!Ext.getCmp('panel_ele_2')) {
-            validate += "申报要素不存在，请重新输入HS编码、备案关区！<br />";
-        }
-
-        if (Ext.getCmp('combo_ITEMNOATTRIBUTE').getValue() == "成品") {
-            if (Ext.data.StoreManager.lookup('store_PRODUCTCONSUME').data.items.length <= 0) {
-                validate += "成品单耗信息为空！<br />";
-            } 
-        }
-       
-        if (validate) {
-            Ext.MessageBox.alert("提示", validate);
-            return;
-        }
-
-    }
-
-    var formdata = Ext.encode(Ext.getCmp('formpanel_id').getForm().getValues());
-    var productconsume = [];
-    if (Ext.getCmp('combo_ITEMNOATTRIBUTE').getValue() == "成品") {
-        productconsume = Ext.encode(Ext.pluck(Ext.data.StoreManager.lookup('store_PRODUCTCONSUME').data.items, 'data'));
-    }
-     
-    var mask = new Ext.LoadMask(Ext.get(Ext.getBody()), { msg: "数据保存中，请稍等..." });
-
-    mask.show();
-    Ext.Ajax.request({
-        url: "/RecordInfor/Create_Save",
-        params: { id: id, formdata: formdata, productconsume: productconsume, action: action },
-        success: function (response, option) {
-            if (response.responseText) {
-                mask.hide();
-                var data = Ext.decode(response.responseText);
-                if (data.success) {
-                    id = data.id;
-                    Ext.MessageBox.alert("提示", action == 'submit' ? "提交成功！" : "保存成功！", function () {
-                        loadform_record();
-                    });
-                }
-                else {
-                    //if (data.isrepeate == "Y") { Ext.MessageBox.alert("提示", "项号重复!"); }
-
-                    if (data.ismax == "Y") { Ext.MessageBox.alert("提示", "项号不是最大值!"); }
-                    else {
-                        Ext.MessageBox.alert("提示", action == 'submit' ? "提交失败！" : "保存失败！");
-                    }
-                }
-            }
-        }
-    });
-}
 
 function loadform_record() {
-    Ext.Ajax.request({
-        url: "/RecordInfor/loadrecord_create",
-        params: { id: id, copyid: copyid },
-        success: function (response, opts) {
-            var data = Ext.decode(response.responseText);
-            Ext.getCmp("formpanel_id").getForm().setValues(data.formdata);
+    //Ext.Ajax.request({
+    //    url: "/RecordInfor/loadrecord_change",
+    //    params: { id: id, rid: rid },
+    //    success: function (response, opts) {
+    //        var data = Ext.decode(response.responseText);
+    //        Ext.getCmp("formpanel_id").getForm().setValues(data.formdata);
+            
+    //        if (Ext.getCmp('gridpanel_PRODUCTCONSUME')) {
+    //            Ext.getCmp('gridpanel_PRODUCTCONSUME').store.loadData(data.productsonsumedata);
+    //        }
 
-            if (Ext.getCmp('gridpanel_PRODUCTCONSUME')) {
-                Ext.getCmp('gridpanel_PRODUCTCONSUME').store.loadData(data.productsonsumedata);
-            }
-
-            formpanelcontrol();//表单字段控制
-        }
-    });
+    //        formpanelcontrol();//表单字段控制
+    //    }
+    //});
 }
 
 function formpanelcontrol() {
-    var status = Ext.getCmp('combo_STATUS').getValue();
-    document.getElementById("btn_save").disabled = status >= 10; //保存 
-    document.getElementById("btn_cancelsubmit").disabled = (status == 0 || status==50);//撤回:只有草稿、确认完成 才不可以撤回  
-    document.getElementById("btn_submitorder").disabled = status >= 10;//提交申请
-    document.getElementById("btn_print").disabled = status < 10;//打印
+    //var status = Ext.getCmp('combo_STATUS').getValue();
+    //document.getElementById("btn_cancelsubmit").disabled = (status == 0 || status == 50);//撤回:只有草稿才不可以撤回  
+    //document.getElementById("btn_submitorder").disabled = status >= 10;//提交申请
+    //document.getElementById("btn_print").disabled = status < 10;//打印
 
-    /*item.id != "combo_OPTIONS" && item.id != "combo_STATUS" && item.id != "combo_ISPRINT_APPLY"
-             && item.id != "CREATEDATE" && item.id != "CREATENAME" && item.id != "SUBMITTIME" && item.id != "SUBMITNAME"
-             && item.id != "ACCEPTTIME" && item.id != "ACCEPTNAME" && item.id != "PRETIME" && item.id != "PRENAME"*/  
-    
-
-    Ext.Array.each(Ext.getCmp("formpanel_id").getForm().getFields().items, function (item) {
-        if (item.fieldStyle != 'background-color: #CECECE; background-image: none;') {
-            item.setReadOnly(status >= 10);
-        }
-    });
-
-    if (Ext.getCmp('panel_ele_2')) {
-        var id_pm = Ext.getCmp('id_pinming').getValue();
-        if (id_pm != "") {
-            if (Ext.getCmp(id_pm)) { Ext.getCmp(id_pm).setReadOnly(true); }
-        }
-    }
-
-
-    //下面是表单控件涉及的弹窗选择按钮
-    Ext.getCmp('CUSTOMER_btn').setDisabled(status >= 10); //报关行     
-    if (Ext.getCmp("ITEMNO_CONSUME_btn")) { Ext.getCmp("ITEMNO_CONSUME_btn").setDisabled(status >= 10) }//对应料件序号
-
-    //成品单耗 保存删除按钮
-    if (Ext.getCmp("btn_pro_save")) { Ext.getCmp("btn_pro_save").setDisabled(status >= 10); }
-    if (Ext.getCmp("btn_pro_del")) { Ext.getCmp("btn_pro_del").setDisabled(status >= 10); }
 }
 
-function copyadd_save() {
-    if (id) {
-        window.location.href = "/RecordInfor/Create?copyid=" + id;
-    }
-    
-}
