@@ -12,7 +12,7 @@ function addwin(ID) {
         items: [Ext.getCmp('formpanel_u'), Ext.getCmp('panelfile')],
     });
     win.show();
-    loadform(ID);
+   // loadform(ID);
     upload_ini();
 }
 
@@ -235,16 +235,33 @@ function form_ini() {
         //    }
         //}
     });
-    var field_ISREADPDF = Ext.create('Ext.form.field.Text', {
+    var store_ISREADPDF= Ext.create('Ext.data.JsonStore', {
+        fields: ['CODE', 'NAME'],
+        data: [{ "CODE": 0, "NAME": "未解析" }, { "CODE": 1, "NAME": "已解析" }]
+    });
+    var field_ISREADPDF = Ext.create('Ext.form.field.ComboBox', {
         fieldLabel: '解析标志',
+        store: store_ISREADPDF,
+        displayField: 'NAME',
+        valueField: 'CODE',
+        value:0,
         readOnly: true,
         name: 'ISREADPDF',
         fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
-    var field_STATUS = Ext.create('Ext.form.field.Text', {
+
+    var com_STATUS = Ext.create('Ext.form.field.ComboBox', {
         fieldLabel: '状态',
+        store: store_STATUS,
         readOnly: true,
         name: 'STATUS',
+        displayField: 'NAME',
+        valueField: 'CODE',
+        value:5,
+        triggerAction: 'all',
+        queryMode: 'local',
+        anyMatch: true,
+        editable: false,
         fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
     var bbar_l = '<div class="btn-group">'
@@ -279,7 +296,7 @@ function form_ini() {
             { layout: 'column', height: 42, border: 0, items: [combo_BUSITYPE, combo_REPWAYNAME] },
             { layout: 'column', height: 42, border: 0, items: [combo_CUSTOMDISTRICTNAME,field_TEMPLATENAME ] },
             { layout: 'column', height: 42, border: 0, items: [field_REMARK,field_CODE, ] },
-            { layout: 'column', height: 42, border: 0, items: [field_ISREADPDF, field_STATUS] },
+            { layout: 'column', height: 42, border: 0, items: [field_ISREADPDF, com_STATUS] },
             field_CUSTOMDISTRICTNAME, field_ID, field_ORIGINALFILEIDS
         ]
     })
@@ -313,6 +330,7 @@ function form_ini() {
         items: [fileview]
     })
 }
+/*
 function loadform(ID) {
     Ext.Ajax.request({
         url: "/EnterpriseOrder/loadform",
@@ -340,7 +358,7 @@ function loadform(ID) {
         }
     });
 }
-
+*/
 function upload_ini() {
     var uploader = new plupload.Uploader({
         runtimes: 'html5,flash,silverlight,html4',

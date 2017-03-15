@@ -64,7 +64,18 @@ namespace MvcPlatform.Controllers
                 return combin.Substring(start + 1, end - start - 1);
             }
         }
-
+        public string GetName(string combin)
+        {
+            if (string.IsNullOrEmpty(combin))
+            {
+                return "";
+            }
+            else
+            {
+                int index = combin.LastIndexOf("(");
+                return combin.Substring(0, index);
+            }
+        }
 
         private string GetPageSql(string tempsql, string order, string asc)
         {
@@ -250,6 +261,142 @@ namespace MvcPlatform.Controllers
                 }
                 MemoryStream ms = new MemoryStream(bytes);
                 return File(ms, "application/octet-stream", Path.GetFileName(filename));
+            }
+
+            public string Save()
+            {
+                try
+                {
+                    JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+                    JObject json_data = (JObject)JsonConvert.DeserializeObject(Request["data"]);
+                    string filedata = Request["filedata"] + "";
+                    string insert_sql = "";
+                    string update_sql = "";
+                    string sql = "";
+                    string ent_id = "";
+                    if (string.IsNullOrEmpty(json_data.Value<string>("ID")))//新增
+                    {
+                        insert_sql = @"insert into ENT_ORDER (id,createtime, unitcode,filerecevieunitcode, filerecevieunitname,
+                    filedeclareunitcode,filedeclareunitname, busitypeid,customdistrictcode,customdistrictname,repwayid, 
+                    createid, createname,enterprisecode, enterprisename,remark,code,createmode,status,isreadpdf) 
+                    values ('{0}',sysdate,(select fun_AutoQYBH(sysdate) from dual),'{1}','{2}','{3}','{4}','{5}',
+                     '{6}','{7}','{8}','{9}','{10}', '{11}','{12}','{13}','{14}','{15}','{16}',{17})";
+                        if (json_data.Value<string>("CREATEMODE") == "按批次")
+                        {
+                            sql = "select ENT_ORDER_ID.Nextval from dual";
+                            ent_id = DBMgr.GetDataTable(sql).Rows[0][0] + "";//获取ID
+                            sql = string.Format(insert_sql, ent_id, GetCode(json_data.Value<string>("FILERECEVIEUNITNAME")), GetName(json_data.Value<string>("FILERECEVIEUNITNAME")),
+                                  GetCode(json_data.Value<string>("FILEDECLAREUNITNAME")), GetName(json_data.Value<string>("FILEDECLAREUNITNAME")),
+                                  json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"), json_data.Value<string>("CUSTOMDISTRICTNAME"),
+                                  json_data.Value<string>("REPWAYID"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),
+                                  json_user.Value<string>("CUSTOMERHSCODE"), json_user.Value<string>("CUSTOMERNAME"), json_data.Value<string>("REMARK"),
+                                  json_data.Value<string>("CODE"), json_data.Value<string>("CREATEMODE"), json_data.Value<string>("STATUS"), json_data.Value<string>("ISREADPDF"));
+                            DBMgr.ExecuteNonQuery(sql);
+                            //更新随附文件
+                            Extension.Update_Attachment_ForEnterprise(ent_id, filedata, json_data.Value<string>("ORIGINALFILEIDS"), json_user);
+                        }
+                        if (json_data.Value<string>("CREATEMODE") == "按文件")
+                        {
+                            JArray jarry = JsonConvert.DeserializeObject<JArray>(filedata);
+                            foreach (JObject json in jarry)
+                            {
+                                sql = "select ENT_ORDER_ID.Nextval from dual";
+                                ent_id = DBMgr.GetDataTable(sql).Rows[0][0] + "";//获取ID
+                                sql = string.Format(insert_sql, ent_id, GetCode(json_data.Value<string>("FILERECEVIEUNITNAME")), GetName(json_data.Value<string>("FILERECEVIEUNITNAME")),
+                                      GetCode(json_data.Value<string>("FILEDECLAREUNITNAME")), GetName(json_data.Value<string>("FILEDECLAREUNITNAME")),
+                                      json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"), json_data.Value<string>("CUSTOMDISTRICTNAME"),
+                                      json_data.Value<string>("REPWAYID"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),
+                                      json_user.Value<string>("CUSTOMERHSCODE"), json_user.Value<string>("CUSTOMERNAME"), json_data.Value<string>("REMARK"),
+                                      json_data.Value<string>("CODE"), json_data.Value<string>("CREATEMODE"),json_data.Value<string>("STATUS"), json_data.Value<string>("ISREADPDF"));
+                                DBMgr.ExecuteNonQuery(sql);
+                                //更新随附文件
+                                Extension.Update_Attachment_ForEnterprise(ent_id, "[" + JsonConvert.SerializeObject(json) + "]", json_data.Value<string>("ORIGINALFILEIDS"), json_user);
+                            }
+                        }
+                    }
+                    else//修改单独页面做
+                    {
+                        update_sql = @"update ENT_ORDER  set filerecevieunitcode='{1}',filerecevieunitname='{2}',filedeclareunitcode='{3}',
+                    filedeclareunitname='{4}',busitypeid='{5}',customdistrictcode='{6}', customdistrictname='{7}',
+                    repwayid='{8}',remark='{9}',code='{10}' where id='{0}'";
+                        sql = string.Format(update_sql, json_data.Value<string>("ID"), GetCode(json_data.Value<string>("FILERECEVIEUNITNAME")),
+                        GetName(json_data.Value<string>("FILERECEVIEUNITNAME")), GetCode(json_data.Value<string>("FILEDECLAREUNITNAME")),
+                        GetName(json_data.Value<string>("FILEDECLAREUNITNAME")), json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"),
+                        json_data.Value<string>("CUSTOMDISTRICTNAME"), json_data.Value<string>("REPWAYID"), json_data.Value<string>("REMARK"), json_data.Value<string>("CODE"));
+                        DBMgr.ExecuteNonQuery(sql);
+                        //更新随附文件
+                        Extension.Update_Attachment_ForEnterprise(json_data.Value<string>("ID"), filedata, json_data.Value<string>("ORIGINALFILEIDS"), json_user);
+                    }
+                    return "{success:true}";
+                }
+                catch (Exception ex)
+                {
+                    return "{success:false}";
+                }
+            }
+
+            public string Delete()
+            {
+                string id = Request["id"].ToString();
+                string json = "{success:false}"; string sql = "";
+
+                //删除订单随附文件
+                System.Uri Uri = new Uri("ftp://" + ConfigurationManager.AppSettings["FTPServer"] + ":" + ConfigurationManager.AppSettings["FTPPortNO"]);
+                string UserName = ConfigurationManager.AppSettings["FTPUserName"];
+                string Password = ConfigurationManager.AppSettings["FTPPassword"];
+                FtpHelper ftp = new FtpHelper(Uri, UserName, Password);
+                sql = "select * from list_attachment where entid='" + id + "'";
+                DataTable dt = DBMgr.GetDataTable(sql);
+                foreach (DataRow dr in dt.Rows)
+                {
+                    ftp.DeleteFile(dr["FILENAME"] + "");
+                }
+
+                sql = "delete from list_attachment where entid='" + id + "'";
+                DBMgr.ExecuteNonQuery(sql);
+
+                sql = "delete from ENT_ORDER where id = '" + id + "'";
+                DBMgr.ExecuteNonQuery(sql);
+
+                json = "{success:true}";
+                return json;
+            }
+            public string loadOrderList()
+            {
+                JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+                string enterprisecode=json_user.Value<string>("CUSTOMERHSCODE");
+                string sql="select t.*,l.FILENUM ,(case printstatus when '1' then 15 else (case when status is null then 10 else status end) end) as newstatus "+
+                           "from ENT_ORDER t left join (select entid,count(1) as FILENUM from list_attachment where entid is not null group by entid) l on t.ID=l.entid "+
+                           "where t.enterprisecode="+enterprisecode;
+                string where = "";
+                if (!string.IsNullOrEmpty(Request["FILERECEVIEUNIT"]))
+                {
+                    where += " and t.filerecevieunitcode='" + Request["FILERECEVIEUNIT"] + "'";
+                }
+                if (!string.IsNullOrEmpty(Request["FILEDECLAREUNIT"]))
+                {
+                    where += " and t.filedeclareunitcode='" + Request["FILEDECLAREUNIT"] + "'";
+                }
+                if (!string.IsNullOrEmpty(Request["CODE"]))
+                {
+                    where += " and instr(t.CODE,'"+Request["CODE"]+"')>0";
+                }
+                if (!string.IsNullOrEmpty(Request["STARTDATE"]))
+                {
+                    where += " and t.ENTERPRISECODE='"+ Request["ENTERPRISENAME"] + "'";
+                }
+                if (!string.IsNullOrEmpty(Request["ENDDATE"]))
+                {
+                    where += " and t.ENTERPRISECODE='"+ Request["ENTERPRISENAME"] + "'";
+                }
+                sql += where;
+                IsoDateTimeConverter iso = new IsoDateTimeConverter();
+                iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
+                var json = JsonConvert.SerializeObject(dt, iso);
+                return "{rows:" + json + ",total:" + totalProperty + "}";
+            
+            
             }
         public FileResult ExportStu2()
         {
