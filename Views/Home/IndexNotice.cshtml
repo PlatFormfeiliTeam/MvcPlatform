@@ -1,6 +1,79 @@
-﻿@{
+﻿@model IDictionary<string, System.Data.DataTable>
+@{
+    string type = "";
+    int count = 0;
+}
+
+@{
     ViewBag.Title = "IndexNotice";
     Layout = "~/Views/Shared/_Layout_home.cshtml";
 }
+<link href="~/Content/outindex/indexnotice.css" rel="stylesheet" />
 
-<h2>IndexNotice</h2>
+<script type="text/javascript">
+    // JS实现选项卡切换
+    window.onload = function () {
+        var myTab = document.getElementById("tab");    //整个div
+        var myUl = myTab.getElementsByTagName("ul")[0];//一个节点
+        var myLi = myUl.getElementsByTagName("li");    //数组
+        var myDiv = myTab.getElementsByTagName("div"); //数组
+
+        for (var i = 0; i < myLi.length; i++) {
+            myLi[i].index = i;
+            myLi[i].onclick = function () {
+                for (var j = 0; j < myLi.length; j++) {
+                    myLi[j].className = "off";
+                    myDiv[j].className = "hide";
+                }
+                this.className = "on";
+                myDiv[this.index].className = "show";
+            }
+        }
+    }
+    function shownotice(id) {
+        window.location.href = "/Home/IndexNoticeDetail?id=" + id;
+    }
+</script>
+
+<img src="/Images/zxdt_header.png" alt="" />
+
+<div class="container" style="min-height: 600px;margin-top:1px">
+   
+        <div id="tab">
+            <ul>
+                @for (int i = 0; i < Model["dt_type"].Rows.Count; i++)
+                {
+                    if (i == 0)
+                    {
+                        <li class="on">@Model["dt_type"].Rows[i]["type"]</li>
+                    }
+                    else
+                    {
+                        <li class="off">@Model["dt_type"].Rows[i]["type"]</li>
+                    }
+                }
+            </ul>
+            <div class="show">
+                @if (Model["dt_notice"].Rows.Count > 0)
+                {
+                    type = Model["dt_notice"].Rows[0]["type"].ToString();
+                }                
+                <table class="tablestyle">
+                    @for (; count < Model["dt_notice"].Rows.Count; count++)
+                    {
+                        if (type != Model["dt_notice"].Rows[count]["type"].ToString())
+                        {
+                            type = Model["dt_notice"].Rows[count]["type"].ToString();
+                            @Html.Raw("</table></div><div class='hide'><table class='tablestyle'>");
+                        }
+                        <tr class="tr_hr" onclick=shownotice(@Model["dt_notice"].Rows[count]["id"])>
+                            <td class="td_1">@Model["dt_notice"].Rows[count]["title"]</td>
+                            <td class="td_2">@Model["dt_notice"].Rows[count]["updatetime"].ToString().Substring(0, 16)</td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+
+    
+</div>
