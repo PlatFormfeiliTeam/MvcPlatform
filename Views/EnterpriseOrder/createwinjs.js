@@ -302,7 +302,7 @@ function form_ini() {
     })
 
     var storefile = Ext.create('Ext.data.JsonStore', {
-        fields: ['ID', 'FILENAME', 'NEWNAME', 'ORIGINALNAME', 'UPLOADTIME', 'SIZES']
+        fields: ['ID', 'FILENAME', 'NEWNAME', 'ORIGINALNAME', 'UPLOADTIME', 'SIZES', 'FILETYPE']
     });
 
     var tmp = new Ext.XTemplate(
@@ -383,7 +383,7 @@ function upload_ini() {
         var timestamp = Ext.Date.now();  //1351666679575  这个方法只是获取的时间戳
         var date = new Date(timestamp);
         Ext.getCmp('fileview1').store.insert(Ext.getCmp('fileview1').store.data.length
-            , { FILENAME: '/FileUpload/file/' + file.target_name, NEWNAME: file.target_name, ORIGINALNAME: file.name, SIZES: file.size, UPLOADTIME: Ext.Date.format(date, 'Y-m-d H:i:s') });
+            , { FILENAME: '/FileUpload/file/' + file.target_name, NEWNAME: file.target_name, ORIGINALNAME: file.name, SIZES: file.size, UPLOADTIME: Ext.Date.format(date, 'Y-m-d H:i:s'),FILETYPE:44});
     });
 }
 

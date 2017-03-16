@@ -208,13 +208,15 @@ namespace MvcPlatform.Common
         {
             if (!string.IsNullOrEmpty(filedata))
             {
+                string webFilePath = ConfigurationManager.AppSettings["WebFilePath"];
                 System.Uri Uri = new Uri("ftp://" + ConfigurationManager.AppSettings["FTPServer"] + ":" + ConfigurationManager.AppSettings["FTPPortNO"]);
                 string UserName = ConfigurationManager.AppSettings["FTPUserName"];
                 string Password = ConfigurationManager.AppSettings["FTPPassword"];
                 FtpHelper ftp = new FtpHelper(Uri, UserName, Password);
                 JArray jarry = JsonConvert.DeserializeObject<JArray>(filedata);
                 string sql = "";
-                string remote = DateTime.Now.ToString("yyyy-MM-dd"); 
+                string remote = DateTime.Now.ToString("yyyy-MM-dd");
+                IDatabase db = SeRedis.redis.GetDatabase(); 
                 foreach (JObject json in jarry)
                 {
                     if (string.IsNullOrEmpty(json.Value<string>("ID")))
@@ -223,11 +225,48 @@ namespace MvcPlatform.Common
                         string sizes = json.Value<string>("SIZES");
                         string filetypename = json.Value<string>("FILETYPENAME");
                         string extname = json.Value<string>("ORIGINALNAME").ToString().Substring(json.Value<string>("ORIGINALNAME").ToString().LastIndexOf('.') + 1);
+
+                        try
+                        {
+
+                            string[] split = json.Value<string>("NEWNAME").Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries);
+                            string oldName = webFilePath + json.Value<string>("NEWNAME");
+                            string newName = webFilePath+split[0]+"_0."+split[1];
+
+                            FileInfo fi = new FileInfo(oldName);
+                            fi.MoveTo(Path.Combine(newName));
+                            StreamReader sr = new StreamReader(newName, Encoding.GetEncoding("BIG5"));
+                            String line;
+                            FileStream fs = new FileStream(oldName, FileMode.Create);
+                            while ((line = sr.ReadLine()) != null)
+                            {
+                                byte[] dst = Encoding.UTF8.GetBytes(line);
+                                fs.Write(dst, 0, dst.Length);
+                                fs.WriteByte(13);
+                                fs.WriteByte(10);
+                            }
+                            fs.Flush();
+                            fs.Close();
+                        }
+                        catch (Exception)
+                        {
+                            
+                            throw;
+                        }
+
+
+
                         sql = @"insert into LIST_ATTACHMENT (id,filename,originalname,filetype,uploadtime,uploaduserid,customercode,entid,
                         sizes,filetypename,filesuffix) values(List_Attachment_Id.Nextval,'{0}','{1}','{2}',sysdate,{3},'{4}','{5}','{6}','{7}','{8}')";
                         sql = string.Format(sql, filename, json.Value<string>("ORIGINALNAME"), json.Value<string>("FILETYPE"), json_user.Value<string>("ID"), 
                         json_user.Value<string>("CUSTOMERCODE"), entorder_id, sizes, filetypename, extname);
                         DBMgr.ExecuteNonQuery(sql);
+
+                        if (json.Value<string>("ORIGINALNAME").IndexOf(".txt") > 0 || json.Value<string>("ORIGINALNAME").IndexOf(".TXT") > 0)
+                        {
+                            db.ListRightPush("compal_sheet_topdf_queen", "{ENTID:'" + entorder_id + "',FILENAME:'" + filename + "'}");
+                        }
+                       
                     }
                     else//如果ID已经存在  说明是已经存在的记录,不需要做任何处理
                     {
@@ -246,6 +285,8 @@ namespace MvcPlatform.Common
                     }
                     sql = @"delete from LIST_ATTACHMENT where ID='" + id + "'";
                     DBMgr.ExecuteNonQuery(sql);
+                   //移除转PDF的缓存
+                    db.ListRemove("compal_sheet_topdf_queen", "{ENTID:'" + id + "',FILENAME:'" + dt.Rows[0]["FILENAME"].ToString()+ "'}");
                 }
             }
         }

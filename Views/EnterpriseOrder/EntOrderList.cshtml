@@ -11,7 +11,7 @@
     var store_busitype;
     var store_STATUS = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
-        data: [{ "CODE": 5, "NAME": "草稿" }, { "CODE": 10, "NAME": "提交" }, { "CODE": 15, "NAME": "受理" }]
+        data: [{ "CODE": 5, "NAME": "草稿" },{ "CODE": 10, "NAME": "已提交" },{ "CODE": 15, "NAME": "已受理" }]
     });
     Ext.onReady(function () {
         store_busitype = Ext.create('Ext.data.JsonStore', {

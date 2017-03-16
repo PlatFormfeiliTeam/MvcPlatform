@@ -16,6 +16,7 @@ using System.Drawing;
 using System.Drawing.Printing;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
+using StackExchange.Redis;
 
 namespace MvcPlatform.Controllers
 {
@@ -274,6 +275,7 @@ namespace MvcPlatform.Controllers
                     string update_sql = "";
                     string sql = "";
                     string ent_id = "";
+                   
                     if (string.IsNullOrEmpty(json_data.Value<string>("ID")))//新增
                     {
                         insert_sql = @"insert into ENT_ORDER (id,createtime, unitcode,filerecevieunitcode, filerecevieunitname,
@@ -297,7 +299,7 @@ namespace MvcPlatform.Controllers
                         }
                         if (json_data.Value<string>("CREATEMODE") == "按文件")
                         {
-                            JArray jarry = JsonConvert.DeserializeObject<JArray>(filedata);
+                             JArray jarry = JsonConvert.DeserializeObject<JArray>(filedata);
                             foreach (JObject json in jarry)
                             {
                                 sql = "select ENT_ORDER_ID.Nextval from dual";
@@ -313,6 +315,9 @@ namespace MvcPlatform.Controllers
                                 Extension.Update_Attachment_ForEnterprise(ent_id, "[" + JsonConvert.SerializeObject(json) + "]", json_data.Value<string>("ORIGINALFILEIDS"), json_user);
                             }
                         }
+
+
+                      
                     }
                     else//修改单独页面做
                     {
