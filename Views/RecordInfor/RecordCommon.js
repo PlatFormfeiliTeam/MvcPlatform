@@ -110,7 +110,8 @@ function itemsbind() {
                 store_RecrodDetail_lj.getProxy().extraParams = {
                     ITEMNOATTRIBUTE: '料件',
                     RECORDINFORID: Ext.getCmp('s_combo_recordid').getValue(), ITEMNO: Ext.getCmp("field_ITEMNO").getValue(), HSCODE: Ext.getCmp('field_HSCODE').getValue(),
-                    OPTIONS: Ext.getCmp('s_combo_optionstatus').getValue(), STATUS: Ext.getCmp("s_combo_status").getValue(), ERROR: Ext.getCmp('chk_error').getValue()
+                    OPTIONS: Ext.getCmp('s_combo_optionstatus').getValue(), STATUS: Ext.getCmp("s_combo_status").getValue(),
+                    ERROR: Ext.getCmp('chk_error').getValue() == true ? "1" : "0"
                 }
             },
             load: function () {
@@ -172,7 +173,8 @@ function itemsbind() {
                 store_RecrodDetail_cp.getProxy().extraParams = {
                     ITEMNOATTRIBUTE: '成品',
                     RECORDINFORID: Ext.getCmp('s_combo_recordid').getValue(), ITEMNO: Ext.getCmp("field_ITEMNO").getValue(), HSCODE: Ext.getCmp('field_HSCODE').getValue(),
-                    OPTIONS: Ext.getCmp('s_combo_optionstatus').getValue(), STATUS: Ext.getCmp("s_combo_status").getValue(), ERROR: Ext.getCmp('chk_error').getValue()
+                    OPTIONS: Ext.getCmp('s_combo_optionstatus').getValue(), STATUS: Ext.getCmp("s_combo_status").getValue(),
+                    ERROR: Ext.getCmp('chk_error').getValue() == true ? "1" : "0"
                 }
             },
             load: function () {
@@ -252,7 +254,8 @@ function itemsbind() {
                 store_RecrodDetail_lj_Go.getProxy().extraParams = {
                     ITEMNOATTRIBUTE: '料件',
                     RECORDINFORID: Ext.getCmp('s_combo_recordid').getValue(), ITEMNO: Ext.getCmp("field_ITEMNO").getValue(), HSCODE: Ext.getCmp('field_HSCODE').getValue(),
-                    OPTIONS: Ext.getCmp('s_combo_optionstatus').getValue(), STATUS: Ext.getCmp("s_combo_status").getValue(), ERROR: Ext.getCmp('chk_error').getValue()
+                    OPTIONS: Ext.getCmp('s_combo_optionstatus').getValue(), STATUS: Ext.getCmp("s_combo_status").getValue(),
+                    ERROR: Ext.getCmp('chk_error').getValue() == true ? "1" : "0"
                 }
             },
             load: function () {
@@ -334,7 +337,8 @@ function itemsbind() {
                 store_RecrodDetail_cp_Go.getProxy().extraParams = {
                     ITEMNOATTRIBUTE: '成品',
                     RECORDINFORID: Ext.getCmp('s_combo_recordid').getValue(), ITEMNO: Ext.getCmp("field_ITEMNO").getValue(), HSCODE: Ext.getCmp('field_HSCODE').getValue(),
-                    OPTIONS: Ext.getCmp('s_combo_optionstatus').getValue(), STATUS: Ext.getCmp("s_combo_status").getValue(), ERROR: Ext.getCmp('chk_error').getValue()
+                    OPTIONS: Ext.getCmp('s_combo_optionstatus').getValue(), STATUS: Ext.getCmp("s_combo_status").getValue(),
+                    ERROR: Ext.getCmp('chk_error').getValue() == true ? "1" : "0"
                 }
             },
             load: function () {
@@ -460,7 +464,7 @@ function delete_task(Compentid, Compentid_pgbar) {
         ids += rec.get("ID") + ",";
     });
     if (bf) {
-        Ext.Msg.alert("提示", "只能删除草稿的记录，请重新选择需要删除的记录!");
+        Ext.Msg.alert("提示", "只能删除状态为草稿的记录!");
         return;
     }
     ids = ids.substr(0, ids.length - 1);
@@ -503,6 +507,21 @@ function print_task(Compentid) {
     ids = ids.substr(0, ids.length - 1);
     printitemno(ids);
     
+}
+
+function Export() {
+    var recordid = Ext.getCmp('s_combo_recordid').getValue(); recordid = recordid == null ? "" : recordid;
+    var itemno = Ext.getCmp('field_ITEMNO').getValue(); var hscode = Ext.getCmp('field_HSCODE').getValue();
+    var options = Ext.getCmp('s_combo_optionstatus').getValue(); options = options == null ? "" : options;
+    var status = Ext.getCmp('s_combo_status').getValue(); status = status == null ? "" : status;
+    var error = Ext.getCmp('chk_error').getValue() == true ? "1" : "0";
+
+    $('#e_options').val(JSON.stringify(optionstatus_js_data));
+    $('#e_status').val(JSON.stringify(status_js_data));
+    $('#e_unit').val(JSON.stringify(common_data_unit));
+
+    var path = '/RecordInfor/Export?RECORDINFORID=' + recordid + '&ITEMNO=' + itemno + '&HSCODE=' + hscode + '&OPTIONS=' + options + '&STATUS=' + status + '&ERROR=' + error;
+    $('#exportform').attr("action", path).submit();
 }
 
 //-----------------------------------------------------------------------------create or change-----------------------------------------------------------
