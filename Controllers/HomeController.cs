@@ -14,12 +14,23 @@ namespace MvcPlatform.Controllers
         [AllowAnonymous]
         public ActionResult Index()
         {
+            string sql = "";
             Dictionary<string, DataTable> dic = new Dictionary<string, DataTable>();//新建字典
             DataTable dt_type = new DataTable();
             DataTable dt_notice = new DataTable();
 
-            dt_type = DBMgr.GetDataTable("select distinct type from web_notice where isinvalid=0 order by type");
-            dt_notice = DBMgr.GetDataTable("select id,type,title,to_char(updatetime,'yyyy/mm/dd hh24:mi:ss') as updatetime from web_notice where isinvalid=0 order by type");           
+            sql = "select distinct type from web_notice where isinvalid=0 order by type";
+            dt_type = DBMgr.GetDataTable(sql);
+
+            sql = @"select a.* 
+                    from (
+                          select row_number() over (partition by type order by type,updatetime desc) numid
+                                 ,id,type,title,to_char(updatetime,'yyyy/mm/dd hh24:mi:ss') as updatetime 
+                          from web_notice where isinvalid=0 
+                          order by type,updatetime desc
+                          ) a
+                    where numid<=6";
+            dt_notice = DBMgr.GetDataTable(sql);           
             
             dic.Add("dt_type", dt_type);
             dic.Add("dt_notice", dt_notice);
@@ -27,6 +38,13 @@ namespace MvcPlatform.Controllers
             //ViewBag.navigator = "关务云>>首页";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View(dic);
+        }
+
+        public ActionResult IndexNotice()
+        {
+            //ViewBag.navigator = "关务云>>首页";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
         }
 
         public ActionResult IndexNoticeDetail(string ID)

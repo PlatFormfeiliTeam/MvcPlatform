@@ -33,3 +33,6 @@ a {
 .topRec_List li div:last-child {
 	width: 10%;text-align: right; 
 }
+.more {
+    font-size: 16px; text-align: right; font-weight: 800;font-family:'Microsoft YaHei'
+}

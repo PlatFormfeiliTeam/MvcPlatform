@@ -77,7 +77,7 @@ a:hover,a:visited,a:active,a:focus{text-decoration: none;}
 
 /*首页 手风琴切换*/
 .index-accordion {
-    width:1278px;margin:0px auto;margin-top:50px; position:relative;
+    width:1278px;margin:0px auto;margin-top:30px; position:relative;margin-bottom:50px;
 }
 .index-accordion div,.index-accordion img,.index-accordion input,.index-accordion dl,.index-accordion dd,.index-accordion p,.index-accordion form ol,.index-accordion ul {margin:0; padding:0;}
 .index-accordion li { list-style: none;}

@@ -16,7 +16,7 @@
 .lanrenzhijia .title-list li.on{ color: #ff6600; font-weight: bold;}
 .lanrenzhijia .title-list p{position:absolute;top:33px;left:0px;width:146px;border-top: 3px solid #ff6600; overflow: hidden; text-align: center;}
 .lanrenzhijia .title-list b{display:inline-block;width:0;height:0;margin-top:-3px;border-style:solid dashed dashed dashed;border-width:9px;border-color: #ff6600 #fff #fff #fff;overflow: hidden;zoom: 1;font-size: 0;}
-.product{ height: 268px; position: relative; overflow: hidden; display: none; margin-top: 20px;}
+.product{ height: 238px; position: relative; overflow: hidden; display: none; margin-top: 20px;}
 .product ul{ position: absolute; left: 0px;}
 .product-wrap .showfirst{ display: block;}
 .product-wrap .product li {

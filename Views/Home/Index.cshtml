@@ -38,11 +38,86 @@
     </div>
 </div>
 
+<!---TAB-->
+<script src="~/js/OutJs/zxdt.js"></script>
+<link href="~/Content/outindex/zxdt.css" rel="stylesheet" />
+<div class="lanrenzhijia">
+    <div class="title cf">
+        <h2 class="fl">资讯动态</h2>
+        <ul class="title-list fr cf ">
+            @for (int i = 0; i < Model["dt_type"].Rows.Count; i++)
+            {
+                if (i == 0)
+                {
+                    <li class="on">@Model["dt_type"].Rows[i]["type"]</li>
+                }
+                else
+                {
+                    <li>@Model["dt_type"].Rows[i]["type"]</li>
+                }
+            }
+            <p><b></b></p>
+        </ul>
+    </div>
+    <div class="product-wrap">
+        @if (Model["dt_notice"].Rows.Count > 0)
+        {
+            type = Model["dt_notice"].Rows[0]["type"].ToString();
+        }   
+        <div class="product showfirst">
+            <div class="topRec_List">
+            <div class="maquee">
+                <ul>
+                    @for (; count < Model["dt_notice"].Rows.Count; count++)
+                        {
+                            if (type != Model["dt_notice"].Rows[count]["type"].ToString())
+                            {
+                               type = Model["dt_notice"].Rows[count]["type"].ToString();
+                               @Html.Raw("</ul></div></div></div><div class='product'><div class='topRec_List'><div class='maquee'><ul>");
+                            }
+                        <li onclick=shownotice(@Model["dt_notice"].Rows[count]["id"])>
+                            <div>@Model["dt_notice"].Rows[count]["title"]</div>
+                            <div>@Model["dt_notice"].Rows[count]["updatetime"].ToString().Substring(0,16)</div>
+                        </li>                           
+                       }
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="more">
+            <a href="/Home/IndexNotice">更多<i class="iconfont" style="font-size: 16px;">&#xe61f;</i></a>
+        </div>
+        
+    </div>
+
+</div>
+<script type="text/javascript">
+    function shownotice(id) {
+        window.location.href = "/Home/IndexNoticeDetail?id=" + id;
+    }
+
+    /***滚动
+    function autoScroll(obj) {
+        $(obj).find("ul").animate({
+            marginTop: "-39px"
+        }, 500, function () {
+            $(this).css({ marginTop: "0px" }).find("li:first").appendTo(this);
+        })
+    }
+    $(function () {
+        setInterval('autoScroll(".maquee")', 3000);
+        setInterval('autoScroll(".apple")', 2000);
+
+    })
+    */
+</script>
+
+
 <link href="~/Content/outindex/zhongjian.css" rel="stylesheet" />
 <link href="~/Content/outindex/zhongjian2.css" rel="stylesheet" />
 <link href="~/Content/outindex/zhongjian3.css" rel="stylesheet" />
 <link href="~/Content/outindex/zhongjian4.css" rel="stylesheet" />
-<script src="~/js/OutJs/zxdt.js"></script>
+
 
 @*中间层*@
 <div class="index-accordion">
@@ -59,7 +134,7 @@
     <div class="flash4">
         <ul id="accordion">
             <li class="bor-red" id="haokuaiji" style="width: 534px;">
-                @*<p class="p-mid">新手上路</p>*@
+                @*<p class="p-mid">新手上路</p>*@<p class="p-mid"></p>
                 <div class="imgfl">
                     <h2 style="color:red;">新手上路</h2>
                     <a href="#" target="_blank">
@@ -81,7 +156,7 @@
                 </div>
             </li>
             <li class="bor-g" id="haoshengyi" style="width: 248px;">
-                @*<p class="p-mid">常见问题</p>*@
+                @*<p class="p-mid">常见问题</p>*@<p class="p-mid"></p>
                 <div class="imgfl">
                     <h2 style="color:red;">常见问题</h2>
                     <a href="#" target="_blank">
@@ -103,7 +178,7 @@
                 <div class="btn-sy mt-xlg center"> <a href="#" target="_blank" class="btn btn-default btn-orange btn-md btn-radius fz12">更多详情</a> </div>
             </li>
             <li class="bor-g" id="workGroup" style="width: 248px;">
-                @*<p class="p-mid">业务流程</p>*@
+                @*<p class="p-mid">业务流程</p>*@<p class="p-mid"></p>
                 <div class="imgfl">
                     <h2 style="color:red;">业务流程</h2>
                     <a href="#" target="_blank">
@@ -125,7 +200,7 @@
                 <div class="btn-sy mt-xlg center"> <a href="#" target="_blank" class="btn btn-default btn-orange btn-md btn-radius fz12">更多详情</a> </div>
             </li>
             <li class="fast bor-g" id="crm" style="width: 248px;">
-                @*<p class="p-mid">预约培训</p>*@
+                @*<p class="p-mid">预约培训</p>*@<p class="p-mid"></p>
                 <div class="imgfl">
                     <h2 style="color:red;">预约培训</h2>
                     <a href="#" target="_blank">
@@ -182,72 +257,6 @@
     });
 </script>
 
-<!---TAB-->
-<link href="~/Content/outindex/zxdt.css" rel="stylesheet" />
-<div class="lanrenzhijia">
-    <div class="title cf">
-        <h2 class="fl">资讯动态</h2>
-        <ul class="title-list fr cf ">
-            @for (int i = 0; i < Model["dt_type"].Rows.Count; i++)
-            {
-                if (i == 0)
-                {
-                    <li class="on">@Model["dt_type"].Rows[i]["type"]</li>
-                }
-                else
-                {
-                    <li>@Model["dt_type"].Rows[i]["type"]</li>
-                }
-            }
-            <p><b></b></p>
-        </ul>
-    </div>
-    <div class="product-wrap">
-        @if (Model["dt_notice"].Rows.Count > 0)
-        {
-            type = Model["dt_notice"].Rows[0]["type"].ToString();
-        }   
-        <div class="product showfirst">
-            <div class="topRec_List">
-            <div class="maquee">
-                <ul>
-                    @for (; count < Model["dt_notice"].Rows.Count; count++)
-                        {
-                            if (type != Model["dt_notice"].Rows[count]["type"].ToString())
-                            {
-                               type = Model["dt_notice"].Rows[count]["type"].ToString();
-                               @Html.Raw("</ul></div></div></div><div class='product'><div class='topRec_List'><div class='maquee'><ul>");
-                            }
-                        <li onclick=shownotice(@Model["dt_notice"].Rows[count]["id"])>
-                            <div>@Model["dt_notice"].Rows[count]["title"]</div>
-                            <div>@Model["dt_notice"].Rows[count]["updatetime"].ToString().Substring(0,16)</div>
-                        </li>                           
-                       }
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
-</div>
-<script type="text/javascript">
-    function shownotice(id) {
-        window.location.href = "/Home/IndexNoticeDetail?id=" + id;
-    }
-    function autoScroll(obj) {
-        $(obj).find("ul").animate({
-            marginTop: "-39px"
-        }, 500, function () {
-            $(this).css({ marginTop: "0px" }).find("li:first").appendTo(this);
-        })
-    }
-    $(function () {
-        setInterval('autoScroll(".maquee")', 3000);
-        setInterval('autoScroll(".apple")', 2000);
-
-    })
-
-</script>
 
 
 @*常用信息*@
