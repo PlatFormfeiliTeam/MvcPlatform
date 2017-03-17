@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="zh" style="overflow: scroll; ">
+<html lang="zh">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta charset="utf-8" />
@@ -15,7 +15,7 @@
     <script src="~/js/superfish.js"></script>
     <link href="~/Content/iconfont/iconfont.css" rel="stylesheet" />
 </head>
-<body>
+<body style="overflow: scroll;">
     <div class="container">
         <div style="margin:10px 0px">
             <img src="~/Images/fld_logo.png" />
@@ -84,7 +84,7 @@
     <div class="floating_ck">
         <div class="kfleft" title="点击查看联系方式"></div>
         <dl>
-            
+
             <dd class="return">
                 <span onclick="gotoTop();return false;">返回顶部</span>
             </dd>
@@ -93,7 +93,7 @@
                 <div class="floating_left  floating_ewm2">
                     <p class="qrcord_p01">扫描或点击下方二维码<br></p>
                     <p class="qrcord_p02"><b>加入我们的QQ群<b></p>
-                   <a href="#"><img src="/Images/float/erweima.png" /></a>
+                    <a href="#"><img src="/Images/float/erweima.png" /></a>
                     <p class="qrcord_p02"><b><b></p>
                 </div>
             </dd>
@@ -138,7 +138,7 @@
             $(function () {
                 $(".showtip1").popover({
                     trigger: 'manual',
-                    placement: 'top', 
+                    placement: 'top',
                     title: '<div style="text-align:center; color:red; text-decoration:underline; font-size:12px;"> 点击或扫描二维码<br>联系我们</div>',
                     html: 'true', //needed to show html of course
                     content: '<div id="popOverBox" align="center"><img src="/Images/float/qq.jpg" /></div>',
@@ -208,4 +208,5 @@
         });
     </script>
 </body>
+
 </html>
