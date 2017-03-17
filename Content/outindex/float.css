@@ -1,13 +1,16 @@
-﻿    dl, dd, dt {
+﻿   dd, dt {
         margin: 0;
         padding: 0;
     }
-
+dl {
+      float:left;
+}
 
     .floating_ck {
         position: fixed;
-        right: 20px;
+        right: -82px;
         top: 30%;
+        width: 112px;
     }
 
         .floating_ck dl dd {
@@ -101,4 +104,11 @@
 
         .floating_ewm .qrcord_p02 {
             font-size: 18px;
+        }
+         .kfleft {
+            width: 32px;
+            height: 168px;
+            background: url(/images/float/zk.png) no-repeat;
+            cursor: pointer;
+            float: left;
         }

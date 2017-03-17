@@ -23,6 +23,12 @@ namespace MvcPlatform.Controllers
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
+        public ActionResult DownList()
+        {
+            ViewBag.navigator = "其它信息 > 常用下载";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
 
         public ActionResult BaseCommodityHSDetail(string id)//HS编码 详细界面
         {

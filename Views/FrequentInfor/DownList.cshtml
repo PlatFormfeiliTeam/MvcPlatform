@@ -1,0 +1,343 @@
+﻿@{
+    ViewBag.Title = "DownList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+    <style type="text/css">
+        .container {
+            margin-top: 10px;
+            width: 990px;
+            position: relative;
+        }
+
+        b, p {
+            font-family: SimSun !important;
+        }
+
+        li, ul {
+            list-style: none;
+        }
+
+        .box > ul > li, .box-title, .browser-box > ul > li > a {
+            text-align: center;
+        }
+
+        .container > h1 > span, .sprite {
+            vertical-align: middle;
+        }
+
+        .box-title > b, .browser-box > ul > li > a > b {
+            font-weight: 400;
+        }
+
+        .box > ul {
+            overflow: hidden;
+            padding-top: 30px;
+            padding-left: 0px;
+        }
+
+            .box > ul > li {
+                float: left;
+                display: inline;
+                *zoom: 1;
+                width: 240px;
+                height: 230px;
+            }
+
+                .box > ul > li.seperator {
+                    width: 1px;
+                    border-right: 1px solid #ffffff;
+                    border-left: 1px solid #e9f3e1;
+                }
+
+        .box-title > b {
+            display: block;
+            font-size: 22px;
+            line-height: 90px;
+        }
+
+        .box-title > .arrow {
+            border-width: 15px 12px;
+            border-style: solid;
+            border-color: transparent;
+            _border-color: pink;
+            _filter: chroma(color=pink);
+            border-left-color: #87c308;
+            position: absolute;
+            right: -24px;
+            top: 50%;
+            margin-top: -12px;
+            width: 0;
+            height: 0;
+            line-height: 0;
+            font-size: 0;
+            left: 230px;
+        }
+
+        em, i {
+            font-style: normal;
+        }
+
+        .box {
+            height: 260px;
+            margin-top: 10px;
+            position: relative;
+            background-color: #f0f7ed;
+            padding-left: 260px;
+        }
+
+        .box-title {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            height: 260px;
+            width: 230px;
+            background-color: #87c308;
+            color: #ffffff;
+        }
+
+        .sprite.browser {
+            background-position: -347px 0;
+            width: 122px;
+            height: 110px;
+        }
+
+        .sprite.ie9_x86 {
+            background-position: -177px 0;
+            width: 112px;
+            height: 112px;
+            margin-top: -10px;
+        }
+
+        .sprite.ie9_x64 {
+            background-position: -177px 0;
+            width: 112px;
+            height: 112px;
+            margin-top: -12px;
+        }
+
+        .sprite.AdbeRdr {
+            background-position: -725px 0;
+            width: 150px;
+            height: 180px;
+            margin-top: -12px;
+            margin-left: 110px;
+            margin-bottom: 10px;
+        }
+
+        .sprite.AdobeAcrobat {
+            background-position: -935px 0;
+            width: 150px;
+            height: 180px;
+            margin-top: -12px;
+            margin-left: 80px;
+            margin-bottom: 8px;
+        }
+
+        .box-title > i {
+            margin-top: 46px;
+        }
+
+        .sprite {
+            background: url('/Images/downList.gif') center center no-repeat;
+            background-size: 1134px 198px;
+            display: inline-block;
+            image-rendering: pixelated;
+        }
+
+        .chrome-item {
+            color: #87c308;
+        }
+
+        .ie9_x86-item {
+            color: #34acf2;
+        }
+
+        .ie9_x64-item {
+            color: #34acf2;
+        }
+
+        .browser-box > ul > li > a {
+            display: inline-block;
+            *display: inline;
+            *zoom: 1;
+            width: 168px;
+            height: 40px;
+            line-height: 40px;
+            color: #FFF;
+            background-color: #87c308;
+            position: relative;
+            font-size: 18px;
+        }
+
+            .browser-box > ul > li > a > em, .browser-box > ul > li > a > i {
+                border-width: 7px 6px;
+                border-style: solid;
+                border-color: transparent;
+                _border-color: pink;
+                _filter: chroma(color=pink);
+                border-left-color: #41901a;
+                position: absolute;
+                right: 18px;
+                top: 13px;
+                width: 0;
+                height: 0;
+                line-height: 0;
+                font-size: 0;
+            }
+
+            .browser-box > ul > li > a > i {
+                border-left-color: #87c308;
+                right: 20px;
+            }
+
+        .sprite.chrome {
+            background-position: -33px 0;
+            width: 100px;
+            height: 100px;
+        }
+
+        .sprite.pdf {
+            background-position: -533px 0;
+            width: 100px;
+            height: 130px;
+            margin-top: 20px;
+        }
+
+        a {
+            outline: 0;
+            text-decoration: none !important;
+        }
+
+            a:hover > em {
+                right: 16px !important;
+            }
+
+            a:hover > i {
+                right: 18px !important;
+            }
+
+        .browser-box > ul > li > p {
+            margin-top: 28px;
+            margin-bottom: 8px;
+        }
+
+        .browser-box li.ie9_x86-item a em {
+            border-left-color: #1777b3;
+        }
+
+        .browser-box li.ie9_x86-item a i {
+            border-left-color: #34acf2;
+        }
+
+        .browser-box li.ie9_x64-item a em {
+            border-left-color: #1777b3;
+        }
+
+        .browser-box li.ie9_x64-item a i {
+            border-left-color: #34acf2;
+        }
+
+        .browser-box li.ie9_x86-item a {
+            background-color: #34acf2;
+        }
+
+        .browser-box li.ie9_x64-item a {
+            background-color: #34acf2;
+        }
+
+        .pdf-box > .box-title {
+            height: 240px;
+            background-color: #f88c0d;
+        }
+
+            .pdf-box > .box-title > .arrow {
+                border-left-color: #f88c0d;
+            }
+
+        .box > ul > li.AdbeRdr-item {
+            width: 50%;
+        }
+
+        .box > ul > li.AdobeAcrobat-item {
+            width: 50%;
+        }
+
+        .AdbeRdr-item > a, .AdobeAcrobat-item > a {
+            width: 200px;
+            font-size: 16px;
+            margin-left: 90px;
+            color: #ff0000;
+            margin-top: 150px;
+        }
+
+        .AdobeAcrobat-item > a {
+        }
+    </style>
+
+    <div id="body" style="min-height:500px">
+        <section class="content-wrapper main-content clear-fix">
+            <div class="container">
+
+                <div class="box browser-box">
+                    <span class="box-title">
+                        <i class="sprite browser"></i>
+                        <b>推荐使用浏览器</b>
+                        <em class="arrow"></em>
+                    </span>
+                    <ul>
+                        <li class="chrome-item">
+                            <i class="sprite chrome"></i>
+                            <p>推荐使用</p>
+                            <a href="javascript:void(0);" onclick="window.location.href = '/FileUpload/chrome.exe'; return false;">
+                                <b>谷歌浏览器</b>
+                                <em></em>
+                                <i></i>
+                            </a>
+                        </li>
+                        <li class="seperator"></li>
+                        <li class="ie9_x86-item">
+                            <i class="sprite ie9_x86"></i>
+                            <p>推荐使用</p>
+                            <a href="javascript:void(0);" onclick="window.location.href = '/FileUpload/IE9-x86.EXE'; return false;">
+                                <b>IE9(32位)</b>
+                                <em></em>
+                                <i></i>
+                            </a>
+                        </li>
+                        <li class="seperator"></li>
+                        <li class="ie9_x64-item">
+                            <i class="sprite ie9_x64"></i>
+                            <p>推荐使用</p>
+                            <a href="javascript:void(0);" onclick="window.location.href = '/FileUpload/IE9-x64.exe'; return false;">
+                                <b>IE9(64位)</b>
+                                <em></em>
+                                <i></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="box pdf-box">
+                    <span class="box-title">
+                        <i class="sprite pdf"></i>
+                        <b>PDF打印、预览工具</b>
+                        <em class="arrow"></em>
+                    </span>
+                    <ul>
+                        <li class="AdbeRdr-item">
+                            <i class="sprite AdbeRdr"></i>
+                            <a href="javascript:void(0);" onclick="window.location.href = '/FileUpload/AdobeAcrobat.rar'; return false;">
+                                <b>ADOBE ACROBAT</b>
+                            </a>
+                        </li>
+                        <li class="AdobeAcrobat-item">
+                            <i class="sprite AdobeAcrobat"></i>
+                            <a href="javascript:void(0);" onclick="window.location.href = '/FileUpload/AdbeRdr.exe'; return false;">
+                                <b>ADOBE READER</b>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
