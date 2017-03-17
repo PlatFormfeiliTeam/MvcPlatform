@@ -1,7 +1,7 @@
 ﻿@model IDictionary<string, System.Data.DataTable>
 @{
     string type = "";
-    int count = 0;
+    int count = 0; int typenum = 1;
 }
 
 @{
@@ -33,6 +33,49 @@
     function shownotice(id) {
         window.location.href = "/Home/IndexNoticeDetail?id=" + id;
     }
+
+    function GetInfor(cate, type, typenum) {
+        var curpage = $('#cur_page_' + typenum).text();
+
+        $.ajax({
+            type: 'Post',
+            url: "/Home/GetInfor",
+            dataType: "text",
+            data: { cate: cate, curpage: curpage, type: type },
+            async: false,
+            success: function (data) {
+                var obj = eval("(" + data + ")");//将字符串转为json
+
+                if (obj.resultdata.length > 0) {
+
+                    $('#table_' + typenum).html(''); var tbBody = "";
+                    for (var i = 0; i < obj.resultdata.length; i++) {
+                        tbBody = '<tr class="tr_hr" onclick=shownotice(' + obj.resultdata[i]["ID"] + ')>'
+                               + '<td class="td_1">' + obj.resultdata[i]["TITLE"] + '</td>'
+                               + '<td class="td_2">' + obj.resultdata[i]["UPDATETIME"].substr(0, 16) + '</td>'
+                            + '</tr>';
+                        $('#table_' + typenum).append(tbBody);
+                        tbBody = "";
+                    }
+
+                    tbBody = '<tr><td colspan="2" style="text-align:center">'
+                                    + '<i class="iconfont" style="font-size: 16px; cursor: pointer;" onclick=GetInfor("first","' + type + '",' + typenum + ')>&#xe609;</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+                                    + '<i class="iconfont" style="font-size: 16px; cursor: pointer;" onclick=GetInfor("pre","' + type + '",' + typenum + ')>&#xe604;</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+                                    + '总页数：' + obj.totalpage + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;当前页：<span id="cur_page_' + typenum + '">' + obj.newpage + '</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+                                    + '<i class="iconfont" style="font-size: 16px;cursor:pointer;" onclick=GetInfor("next","' + type + '",' + typenum + ')>&#xe603;</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+                                    + '<i class="iconfont" style="font-size: 16px; cursor: pointer;" onclick=GetInfor("last","' + type + '",' + typenum + ')>&#xe605;</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+                        + '</td></tr>';
+                    $('#table_' + typenum).append(tbBody);
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {//请求失败处理函数
+                //alert(XMLHttpRequest.status);
+                //alert(XMLHttpRequest.readyState);
+                //alert(textStatus);
+            }
+        });
+    }
+
 </script>
 
 <img src="/Images/zxdt_header.png" alt="" />
@@ -58,19 +101,38 @@
                 {
                     type = Model["dt_notice"].Rows[0]["type"].ToString();
                 }                
-                <table class="tablestyle">
+                <table class="tablestyle" id="table_1">
                     @for (; count < Model["dt_notice"].Rows.Count; count++)
                     {
                         if (type != Model["dt_notice"].Rows[count]["type"].ToString())
                         {
-                            type = Model["dt_notice"].Rows[count]["type"].ToString();
-                            @Html.Raw("</table></div><div class='hide'><table class='tablestyle'>");
+                            <tr>
+                                <td colspan="2" style="text-align:center">
+                                    @Html.Raw("<i class='iconfont' style='font-size: 16px; cursor: pointer;' onclick=GetInfor('first','" + type + "','" + typenum + "')'>&#xe609;</i>")&nbsp;&nbsp;&nbsp;&nbsp;
+                                    @Html.Raw("<i class='iconfont' style='font-size: 16px; cursor: pointer;' onclick=GetInfor('pre','" + type + "','" + typenum + "')'>&#xe604;</i>")&nbsp;&nbsp;&nbsp;&nbsp;
+                                    @Html.Raw("总页数：" + Model["dt_type"].Rows[typenum - 1]["totalpage"] + "&nbsp;&nbsp;&nbsp;&nbsp;当前页：<span id='cur_page_" + typenum + "'>1</span>")&nbsp;&nbsp;&nbsp;&nbsp;
+                                    @Html.Raw("<i class='iconfont' style='font-size: 16px; cursor: pointer;' onclick=GetInfor('next','" + type + "','" + typenum + "')>&#xe603;</i>")&nbsp;&nbsp;&nbsp;&nbsp;
+                                    @Html.Raw("<i class='iconfont' style='font-size: 16px; cursor: pointer;' onclick=GetInfor('last','" + type + "','" + typenum + "')>&#xe605;</i>")&nbsp;&nbsp;&nbsp;&nbsp;
+                                </td>
+                            </tr>
+                            type = Model["dt_notice"].Rows[count]["type"].ToString(); typenum++;
+                            
+                            @Html.Raw("</table></div><div class='hide'><table class='tablestyle' id='table_" + typenum + "'>");
                         }
                         <tr class="tr_hr" onclick=shownotice(@Model["dt_notice"].Rows[count]["id"])>
                             <td class="td_1">@Model["dt_notice"].Rows[count]["title"]</td>
                             <td class="td_2">@Model["dt_notice"].Rows[count]["updatetime"].ToString().Substring(0, 16)</td>
                         </tr>
                     }
+                    <tr>
+                        <td colspan="2" style="text-align:center">
+                            @Html.Raw("<i class='iconfont' style='font-size: 16px; cursor: pointer;' onclick=GetInfor('first','" + type + "','" + typenum + "')>&#xe609;</i>")&nbsp;&nbsp;&nbsp;&nbsp;
+                            @Html.Raw("<i class='iconfont' style='font-size: 16px; cursor: pointer;' onclick=GetInfor('pre','" + type + "','" + typenum + "')>&#xe604;</i>")&nbsp;&nbsp;&nbsp;&nbsp;
+                            @Html.Raw("总页数：" + Model["dt_type"].Rows[typenum - 1]["totalpage"] + "&nbsp;&nbsp;&nbsp;&nbsp;当前页：<span id='cur_page_" + typenum + "'>1</span>")&nbsp;&nbsp;&nbsp;&nbsp;
+                            @Html.Raw("<i class='iconfont' style='font-size: 16px;cursor:pointer;' onclick=GetInfor('next','" + type + "','" + typenum + "')>&#xe603;</i>")&nbsp;&nbsp;&nbsp;&nbsp;
+                            @Html.Raw("<i class='iconfont' style='font-size: 16px;cursor:pointer;' onclick=GetInfor('last','" + type + "','" + typenum + "')>&#xe605;</i>")&nbsp;&nbsp;&nbsp;&nbsp;
+                        </td>
+                    </tr>
                 </table>
             </div>
         </div>

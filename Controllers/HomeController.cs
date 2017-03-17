@@ -1,4 +1,5 @@
 ﻿using MvcPlatform.Common;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,8 @@ namespace MvcPlatform.Controllers
 {
     public class HomeController : Controller
     {
+        int pagenum = 15;//每页数量
+
         [AllowAnonymous]
         public ActionResult Index()
         {
@@ -47,8 +50,12 @@ namespace MvcPlatform.Controllers
             DataTable dt_type = new DataTable();
             DataTable dt_notice = new DataTable();
 
-            sql = "select distinct type from web_notice where isinvalid=0 order by type";
+            sql = "select distinct type,'' totalpage from web_notice where isinvalid=0 order by type";
             dt_type = DBMgr.GetDataTable(sql);
+            for (int i = 0; i < dt_type.Rows.Count; i++)
+			{
+                dt_type.Rows[i]["totalpage"] = GetTotalPage(dt_type.Rows[i]["type"].ToString());
+			}
 
             sql = @"select a.* 
                     from (
@@ -57,14 +64,62 @@ namespace MvcPlatform.Controllers
                           from web_notice where isinvalid=0 
                           order by type,updatetime desc
                           ) a
-                     where numid<=3";
-            dt_notice = DBMgr.GetDataTable(sql);
+                     where numid<={0}";
+            dt_notice = DBMgr.GetDataTable(string.Format(sql, pagenum));
 
             dic.Add("dt_type", dt_type);
             dic.Add("dt_notice", dt_notice);
+
             ViewBag.navigator = "首页>>资讯动态";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View(dic);
+        }
+
+        public int GetTotalPage(string type)
+        {
+            int totalpage = 0;
+            string sql = @"select max(numid) 
+                            from (
+                                  select row_number() over (partition by type order by type,updatetime desc) numid
+                                         ,id,type,title,to_char(updatetime,'yyyy/mm/dd hh24:mi:ss') as updatetime 
+                                  from web_notice where isinvalid=0 and type='{0}'
+                                  order by type,updatetime desc
+                                  ) a ";
+            sql = string.Format(sql, type);
+            DataTable dt_id = DBMgr.GetDataTable(sql);
+            int maxid = Convert.ToInt32(dt_id.Rows[0][0].ToString());
+            if (maxid % pagenum == 0) { totalpage = maxid / pagenum; }
+            else { totalpage = (maxid / pagenum) + 1; }
+            return totalpage;
+        }
+
+        public string GetInfor()
+        {
+            string cate = Request["cate"]; int curpage = Convert.ToInt32(Request["curpage"]); string type = Request["type"];
+            int startnum = 0; int endnum = 0; string sql = ""; 
+            int newpage = 0; int totalpage = 0;
+
+            totalpage = GetTotalPage(type);
+
+            if (cate == "pre") { startnum = (curpage - 2) * pagenum; endnum = (curpage - 1) * pagenum; newpage = (Convert.ToInt32(curpage) - 1); }
+            if (cate == "next") { startnum = curpage * pagenum; endnum = (curpage + 1) * pagenum; newpage = (Convert.ToInt32(curpage) + 1); }
+            if (cate == "first") { startnum = 0; endnum = 1 * pagenum; newpage = 1; }
+            if (cate == "last") { startnum = (totalpage - 1) * pagenum; endnum = totalpage * pagenum; newpage = totalpage; }
+            
+
+            sql = @"select a.* 
+                            from (
+                                  select row_number() over (partition by type order by type,updatetime desc) numid
+                                         ,id,type,title,to_char(updatetime,'yyyy/mm/dd hh24:mi:ss') as updatetime 
+                                  from web_notice where isinvalid=0 and type='{0}'
+                                  order by type,updatetime desc
+                                  ) a 
+                            where numid>{1} and numid<={2}";
+            sql = string.Format(sql, type, startnum, endnum);
+            DataTable dt = DBMgr.GetDataTable(sql);
+            string result = JsonConvert.SerializeObject(dt);
+
+            return "{\"resultdata\":" + result + ",\"newpage\":'" + newpage + "',\"totalpage\":'" + totalpage + "'}";
         }
 
         public ActionResult IndexNoticeDetail(string ID)

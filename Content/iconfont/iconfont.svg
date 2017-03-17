@@ -2,7 +2,7 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <svg xmlns="http://www.w3.org/2000/svg">
 <metadata>
-Created by FontForge 20120731 at Thu Mar 16 12:54:38 2017
+Created by FontForge 20120731 at Thu Mar 16 17:06:47 2017
  By admin
 </metadata>
 <defs>
@@ -38,6 +38,14 @@ t9.5 -10.5t21.5 -4h37h67h81h80h64h36q23 0 34 12t2 38q-5 13 -9.5 30.5t-9.5 34.5q-
     <glyph glyph-name="dayin" unicode="&#xe601;" 
 d="M845 634h-56v195h-556v-195h-56q-46 0 -78.5 -32.5t-32.5 -78.5v-362h167v-222h556v222h167v362q0 46 -32.5 78.5t-78.5 32.5zM289 773h445v-139h-445v139zM734 -5h-445v250h445v-250zM900 217h-111v83h-556v-83h-111v306q0 23 16 39.5t39 16.5h668q23 0 39 -16.5
 t16 -39.5v-306zM511 495h-250q-12 0 -20 -8t-8 -19.5t8 -20t20 -8.5h250q12 0 20 8.5t8 20t-8 19.5t-20 8z" />
+    <glyph glyph-name="fenyexiayiye" unicode="&#xe603;" 
+d="M184 -143v845q0 10 8 14t15 0l675 -423q7 -5 7 -13.5t-7 -12.5l-675 -423q-7 -5 -15 -0.5t-8 13.5v0z" />
+    <glyph glyph-name="fenyeshangyiye" unicode="&#xe604;" 
+d="M889 -143q0 -9 -8 -13.5t-15 0.5l-675 423q-7 4 -7 12.5t7 13.5l675 423q7 4 15 0t8 -14v-845v0z" />
+    <glyph glyph-name="fenyezuihouye" unicode="&#xe605;" 
+d="M794 750q0 7 4.5 11.5t11.5 4.5h151q7 0 11.5 -4.5t4.5 -11.5v-865q0 -6 -4.5 -10.5t-11.5 -4.5h-151q-7 0 -11.5 4.5t-4.5 10.5v865zM81 -103q0 -9 7.5 -13t15.5 0l673 421q7 4 7 12.5t-7 13.5l-673 420q-8 5 -15.5 0.5t-7.5 -13.5v-841z" />
+    <glyph glyph-name="fenyezuiqianye" unicode="&#xe609;" 
+d="M280 326q-8 -4 -8 -12.5t8 -13.5l671 -420q8 -4 16 0t8 13v840q0 9 -8 13.5t-16 -0.5zM80 745q0 7 4.5 11.5t10.5 4.5h150q7 0 11.5 -4.5t4.5 -11.5v-863q0 -6 -4.5 -10.5t-11.5 -4.5h-150q-6 0 -10.5 4.5t-4.5 10.5v863z" />
     <glyph glyph-name="QQ" unicode="&#xe608;" 
 d="M971 143l-2 18l-3 17l-3 9l-2 9l-3 9l-4 10l-3 10l-4 9l-8 16l-6 14l-7 13l-5 11l-7 11l-5 9l-10 15l-12 19l-3 5l-1 2v1l2 7l3 6l2 11l2 6v6v5v5v6l-1 4l-2 10l-2 9l-3 8l-3 8l-4 7l-3 7l-3 6l-6 9l-2 3v2l-3 18l-1 11l-2 14l-3 15l-4 17l-3 9l-2 8l-3 9l-3 10l-3 9
 l-4 10l-8 19l-5 9l-6 10l-5 9l-6 10l-7 10l-7 8l-8 10l-8 8l-8 8l-9 9l-5 3l-5 4l-11 7l-12 8l-12 7l-13 7l-13 6l-13 6l-14 4l-15 4l-13 4l-15 3l-13 4l-15 1l-14 2l-15 2h-15h-14h-14l-14 -1l-14 -2l-14 -2l-13 -2l-14 -3l-13 -3l-13 -4l-12 -4l-12 -4l-12 -6l-12 -5
