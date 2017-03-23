@@ -77,7 +77,7 @@
                             }
                         <li onclick=shownotice(@Model["dt_notice"].Rows[count]["id"])>
                             <div>@Model["dt_notice"].Rows[count]["title"]</div>
-                            <div>@Model["dt_notice"].Rows[count]["updatetime"].ToString().Substring(0,16)</div>
+                            <div>@Model["dt_notice"].Rows[count]["publishdate"].ToString()</div>
                         </li>                           
                        }
                     </ul>
