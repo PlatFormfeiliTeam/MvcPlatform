@@ -53,8 +53,9 @@ namespace MvcPlatform.Controllers
             //ViewBag.navigator = "关务云>>首页";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View(dic);
-        }        
+        }
 
+        #region 更多IndexNotice
         public ActionResult IndexNotice()
         {
             string sql = "";
@@ -133,6 +134,17 @@ namespace MvcPlatform.Controllers
 
             return "{\"resultdata\":" + result + ",\"newpage\":'" + newpage + "',\"totalpage\":'" + totalpage + "'}";
         }
+
+        #endregion
+
+        #region IndexNotice_M
+        public ActionResult IndexNotice_M()
+        {
+            //ViewBag.navigator = "关务云>>首页";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
+        #endregion
 
         public ActionResult IndexNoticeDetail(string ID)
         {
