@@ -27,7 +27,7 @@ namespace MvcPlatform.Models
 
 
         [Display(Name = "发布日期")]
-        public DateTime PublishDate { get; set; }
+        public string PublishDate { get; set; }
 
         
         [Display(Name = "本文来源")]

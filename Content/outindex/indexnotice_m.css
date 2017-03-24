@@ -1,0 +1,17 @@
+
+.tablestyle {
+    margin:5px 0px 5px 0px; width:100%; line-height:40px;
+}
+    .tr_hr {
+        border-bottom-width: 1px;
+        border-bottom-color: gray;
+        border-bottom-style: dashed;cursor: pointer;
+    }
+    .td_1 {
+        width:85%;
+        text-align:left;
+    }
+    .td_2 {
+        width: 15%;
+        text-align: right;
+    }

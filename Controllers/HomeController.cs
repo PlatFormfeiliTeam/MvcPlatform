@@ -145,25 +145,40 @@ namespace MvcPlatform.Controllers
             //ViewBag.navigator = "关务云>>首页";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
 
+            int startIndex = (id - 1) * pagenum;
+            int endIndex = id * pagenum;
+            string sql = @"select * from (
+                                    select row_number() over (order by publishdate) numid,t.id
+                                         ,case when length(t.title)>50 then substr(t.title,1,50)||'...' else t.title end title
+                                         ,to_char(t.publishdate,'yyyy-mm-dd') as publishdate ,to_char(t.updatetime,'yyyy-mm-dd hh24:mi') as updatetime  
+                                    from web_notice t
+                                    ) a where numid>" + startIndex + " and numid<=" + endIndex;
 
-            string sql = "select * from web_notice";
+
             DataTable dt = DBMgr.GetDataTable(sql);
-            List<Web_Notice> list_notice=new List<Web_Notice>();
+            List<Web_Notice> list_notice = new List<Web_Notice>();
             foreach (DataRow dr in dt.Rows)
             {
                 Web_Notice web_notice = new Web_Notice();
-                web_notice.ID =Int32.Parse(dr["ID"].ToString());
-                web_notice.Title = dr["Title"].ToString();
-                //web_notice.PublishDate = Convert.ToDateTime(dr["PublishDate"].ToString());
-                web_notice.ReferenceSource = dr["ReferenceSource"].ToString();
+                web_notice.ID = Int32.Parse(dr["id"].ToString());
+                web_notice.Title = dr["title"].ToString();
+                web_notice.PublishDate = dr["publishdate"].ToString();
                 list_notice.Add(web_notice);
-                
+
             }
-                var model =list_notice.ToPagedList(id, 5);
-                if (Request.IsAjaxRequest())
-                    return PartialView("_ArticleList", model);
-                return View(model);
-            
+
+            sql = "select count(*) from web_notice";
+            DataTable dt_count = DBMgr.GetDataTable(sql);
+            int totalnum = Convert.ToInt32(dt_count.Rows[0][0].ToString());
+
+            var model = new PagedList<Web_Notice>(list_notice, id, pagenum, totalnum);
+
+            if (Request.IsAjaxRequest())
+            {
+                return PartialView("IndexNotice_M_Part", model);
+            }
+            return View(model);
+
         }
 
 

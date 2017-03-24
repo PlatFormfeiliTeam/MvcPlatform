@@ -1,0 +1,27 @@
+﻿@using Webdiyer.WebControls.Mvc;
+@using MvcPlatform.Models;
+@model PagedList<Web_Notice>
+<link href="~/Content/outindex/indexnotice_m.css" rel="stylesheet" />
+<script>
+    function shownotice(id) {
+        window.location.href = "/Home/IndexNoticeDetail?id=" + id;
+    }
+</script>
+
+<table class="tablestyle">
+    @foreach (var item in Model)
+{
+    <tr class="tr_hr">
+        <td class="td_1" onclick=shownotice(@item.ID)>
+            @Html.DisplayFor(modelItem => item.Title)
+        </td>
+        <td class="td_2">
+            @Html.DisplayFor(modelItem => item.PublishDate)
+        </td>
+    </tr>
+}
+</table>
+
+<div class="text-center">
+    @Ajax.Pager(Model, new PagerOptions { PageIndexParameterName = "id", ContainerTagName = "ul", CssClass = "pagination", CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>", DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>", PagerItemTemplate = "<li>{0}</li>" }).AjaxOptions(a => a.SetUpdateTargetId("articles"))
+</div>
