@@ -201,6 +201,31 @@ namespace MvcPlatform.Controllers
 
         }
 
+        public string GetChildrenType(string id)
+        {
+            string sql = string.Empty;
+
+            string children = "[";
+            sql = @"select t.* from NEWSCATEGORY t where  t.PID ='" + id + "' order by sortindex";
+
+            DataTable dt = DBMgr.GetDataTable(sql);
+            int i = 0;
+            foreach (DataRow dr in dt.Rows)
+            {
+                string tmp_children = GetChildrenType(dr["id"].ToString());
+
+                children += "{ID:'" + dr["id"] + "',NAME:'" + dr["NAME"] + "',PID:'" + dr["PID"] + "',leaf:'" + dr["ISLEAF"] + "',checked:false,children:" + tmp_children + "}";
+
+                if (i != dt.Rows.Count - 1)
+                {
+                    children += ",";
+                }
+                i++;
+            }
+            children += "]";
+            return children;
+        }
+
         #endregion
 
         public ActionResult IndexNoticeDetail(string ID)
