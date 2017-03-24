@@ -11,15 +11,13 @@
 <script src="/js/Extjs42/bootstrap.js" type="text/javascript"></script>
 
 <script type="text/javascript">
-    // JS实现选项卡切换
-    window.onload = function () {
-
-
+    var treepanelstore;
+    Ext.onReady(function () {
         $.ajax({
             type: 'Post',
             url: "/Home/GetParentType",
             dataType: "text",
-            data: { },
+            data: {},
             async: false,
             success: function (data) {
                 var obj = eval("(" + data + ")");//将字符串转为json
@@ -33,6 +31,9 @@
             }
         });
 
+        west();
+
+        // JS实现选项卡切换
         var myTab = document.getElementById("tab");    //整个div
         var myUl = myTab.getElementsByTagName("ul")[0];//一个节点
         var myLi = myUl.getElementsByTagName("li");    //数组
@@ -46,27 +47,45 @@
                 }
                 this.className = "on";
                 $('#typeid').val(this.id);
-                $('#searchForm').submit();
-                west(this.id);
+
+                $('#searchForm').submit();//默认触发第一个选择
+
+                var proxys = treepanelstore.proxy;
+                proxys.extraParams.id = this.id;
+                treepanelstore.load();
             }
         }
-        if (myLi.length>0) {
+        if (myLi.length > 0) {
             myLi[0].click();
         }
-    }
 
-    function west(id) {
-        var treepanelstore = Ext.create('Ext.data.TreeStore', {
+        
+    });
+
+    function west() {
+        treepanelstore = Ext.create('Ext.data.TreeStore', {
             fields: ["ID", "NAME", "leaf", "PID"],
             proxy: {
                 type: 'ajax',
                 url: '/Home/GetChildrenType',
-                reader: 'json',
-                params: id
+                reader: 'json'
             },
             root: {
                 expanded: true,
                 text: "my root"
+            },
+            listeners: {
+                load: function () {
+                    var read = treepanelstore.getProxy().getReader();
+                    if (read.jsonData.length>0) {
+                        Ext.getCmp('treepanel').show();
+                        $('#div_east').css("width", "84%");
+                    } else {
+                        Ext.getCmp('treepanel').hide();
+                        $('#div_east').css("width", "100%");
+                    }
+                    
+                }
             }
         });
 
@@ -78,6 +97,7 @@
             renderTo: "div_west",
             store: treepanelstore,
             height: 550,
+            border: 0,hideHeaders:true ,
             columns: [
             { text: 'ID', dataIndex: 'ID', width: 500, hidden: true },
             { text: 'leaf', dataIndex: 'leaf', width: 100, hidden: true },
@@ -85,13 +105,12 @@
             { text: 'PID', dataIndex: 'PID', width: 100, hidden: true }
             ],
             listeners: {
-                'checkchange': function (node, checked, eOpts) {
-                    setChildChecked(node, checked);
+                itemclick: function (thisTree, record, item, index, e, eOpts) {
+                    $('#typeid').val(record.data.ID);
+                    $('#searchForm').submit();
                 }
             }
         });
-
-
     }
 
     //选择子节点
@@ -119,7 +138,7 @@
     <div>
         <div id="div_west" style="float: left; width: 15%">
         </div>
-        <div id="div_east" style="float: left; width: 85%">
+        <div id="div_east" style="float: left; width: 84%; margin-left:1%">
             <fieldset>
                 @using (Html.BeginForm("IndexNotice_M", ViewContext.RouteData.GetRequiredString("controller"), new { id = "" }, FormMethod.Post, new { id = "searchForm" }))
                 {
