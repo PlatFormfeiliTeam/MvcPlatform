@@ -140,19 +140,41 @@ namespace MvcPlatform.Controllers
         #endregion
 
         #region IndexNotice_M
-        public ActionResult IndexNotice_M(int id = 1)
+
+        public string GetParentType()
+        {
+            DataTable dt_type = new DataTable();
+            string sql = "select id,name type from newscategory where pid is null order by sortindex,id";
+            dt_type = DBMgr.GetDataTable(sql);
+            string result = JsonConvert.SerializeObject(dt_type);
+            return "{\"Ptypedata\":" + result + "}";
+        }
+
+        //[HttpPost]
+        public ActionResult IndexNotice_M(string typeid,string title, int id = 1)
         {
             //ViewBag.navigator = "关务云>>首页";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
 
+            string strwhere = " 1=1";
+            if (!string.IsNullOrWhiteSpace(typeid))
+            {
+                strwhere += " and (type='" + typeid + "' or type in(select id  from newscategory START WITH pid ='" + typeid + "' connect by prior id=pid))";
+            }
+            if (!string.IsNullOrWhiteSpace(title))
+            {
+                strwhere += " and title like '%" + title + "%'";
+            }
+
             int startIndex = (id - 1) * pagenum;
             int endIndex = id * pagenum;
+
             string sql = @"select * from (
                                     select row_number() over (order by publishdate) numid,t.id
                                          ,case when length(t.title)>50 then substr(t.title,1,50)||'...' else t.title end title
                                          ,to_char(t.publishdate,'yyyy-mm-dd') as publishdate ,to_char(t.updatetime,'yyyy-mm-dd hh24:mi') as updatetime  
-                                    from web_notice t
-                                    ) a where numid>" + startIndex + " and numid<=" + endIndex;
+                                    from web_notice t where " + strwhere + ") a where numid>{0} and numid<={1}";
+            sql = string.Format(sql, startIndex, endIndex);
 
 
             DataTable dt = DBMgr.GetDataTable(sql);
@@ -167,20 +189,17 @@ namespace MvcPlatform.Controllers
 
             }
 
-            sql = "select count(*) from web_notice";
+            sql = "select count(*) from web_notice where" + strwhere;
             DataTable dt_count = DBMgr.GetDataTable(sql);
             int totalnum = Convert.ToInt32(dt_count.Rows[0][0].ToString());
 
             var model = new PagedList<Web_Notice>(list_notice, id, pagenum, totalnum);
 
             if (Request.IsAjaxRequest())
-            {
                 return PartialView("IndexNotice_M_Part", model);
-            }
             return View(model);
 
         }
-
 
         #endregion
 

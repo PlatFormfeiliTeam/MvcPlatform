@@ -8,6 +8,12 @@
     }
 </script>
 
+<div class="well well-sm">
+    当前查询条件：
+    标题：<span class="emph">@Request.Form["title"]</span>
+</div>
+
+
 <table class="tablestyle">
     @foreach (var item in Model)
 {
@@ -23,5 +29,13 @@
 </table>
 
 <div class="text-center">
-    @Ajax.Pager(Model, new PagerOptions { PageIndexParameterName = "id", ContainerTagName = "ul", CssClass = "pagination", CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>", DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>", PagerItemTemplate = "<li>{0}</li>" }).AjaxOptions(a => a.SetUpdateTargetId("articles"))
+    @Ajax.Pager(Model, new PagerOptions
+{
+    PageIndexParameterName = "id",
+    ContainerTagName = "ul",
+    CssClass = "pagination"
+    ,CurrentPagerItemTemplate = "<li class=\"active\"><a href=\"#\">{0}</a></li>"
+    ,DisabledPagerItemTemplate = "<li class=\"disabled\"><a>{0}</a></li>"
+    , PagerItemTemplate = "<li>{0}</li>"
+}, new MvcAjaxOptions { UpdateTargetId = "articles", HttpMethod = "Post", DataFormId = "searchForm" })
 </div>

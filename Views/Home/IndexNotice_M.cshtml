@@ -6,12 +6,69 @@
     ViewBag.Title = "IndexNotice_M";
     Layout = "~/Views/Shared/_Layout_home.cshtml";
 }
+<script type="text/javascript">
+    // JS实现选项卡切换
+    window.onload = function () {
+
+
+        $.ajax({
+            type: 'Post',
+            url: "/Home/GetParentType",
+            dataType: "text",
+            data: { },
+            async: false,
+            success: function (data) {
+                var obj = eval("(" + data + ")");//将字符串转为json
+                var Ptypedata = obj.Ptypedata;
+
+                $("#tab_ul").html('');
+                for (var i = 0; i < Ptypedata.length; i++) {
+                    $("<li id='" + Ptypedata[i]["ID"] + "'>" + Ptypedata[i]["TYPE"] + "</li>").appendTo("#tab_ul");
+                }
+
+            }
+        });
+
+        var myTab = document.getElementById("tab");    //整个div
+        var myUl = myTab.getElementsByTagName("ul")[0];//一个节点
+        var myLi = myUl.getElementsByTagName("li");    //数组
+        var myDiv = myTab.getElementsByTagName("div"); //数组
+
+        for (var i = 0; i < myLi.length; i++) {
+            myLi[i].index = i;
+            myLi[i].onclick = function () {
+                for (var j = 0; j < myLi.length; j++) {
+                    myLi[j].className = "off";
+                }
+                this.className = "on";
+                $('#typeid').val(this.id);
+                $('#searchForm').submit();
+            }
+        }
+        if (myLi.length>0) {
+            myLi[0].click();
+        }
+    }
+</script>
 
 <img src="/Images/zxdt_header.png" alt="" />
 
 <div class="container" style="min-height: 600px;margin-top:1px">
+    <div id="tab">
+        <ul id="tab_ul">
+            @*<li class="on" id="1">公司新闻</li>
+            <li>政策法规</li>
+            <li>行业动态</li>*@
+        </ul>
+    </div>
 
-
+    <fieldset>
+    @using (Html.BeginForm("IndexNotice_M", ViewContext.RouteData.GetRequiredString("controller"), new { id = "" }, FormMethod.Post, new { id = "searchForm" }))
+    {
+        <span>标题：</span><input type="text" name="title" id="title" style="width:300px" />
+        <input type="submit" value="搜索(S)" accesskey="S" />
+        <input type="text" id="typeid" name="typeid" hidden="hidden" />
+    }</fieldset>
 
     <div id="articles">
         @Html.Partial("IndexNotice_M_Part", Model)
