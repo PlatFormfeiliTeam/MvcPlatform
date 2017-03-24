@@ -1,10 +1,12 @@
-﻿@{
+﻿@using Webdiyer.WebControls.Mvc;
+@using MvcPlatform.Models;
+@{
     ViewBag.Title = "IndexNotice_M";
     Layout = "~/Views/Shared/_Layout_home.cshtml";
 }
 
-<img src="/Images/zxdt_header.png" alt="" />
-<div class="container" style="min-height: 600px;margin-top:1px">
-
-
+@model PagedList<Web_Notice>
+<div id="articles">
+    @Html.Partial("_ArticleList", Model)
 </div>
+@section Scripts{@{Html.RegisterMvcPagerScriptResource();}}

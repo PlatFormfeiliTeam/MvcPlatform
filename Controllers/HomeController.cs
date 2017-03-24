@@ -4,9 +4,11 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using MvcPlatform.Models;
+using Webdiyer.WebControls.Mvc;
+
 
 namespace MvcPlatform.Controllers
 {
@@ -138,12 +140,33 @@ namespace MvcPlatform.Controllers
         #endregion
 
         #region IndexNotice_M
-        public ActionResult IndexNotice_M()
+        public ActionResult IndexNotice_M(int id = 1)
         {
             //ViewBag.navigator = "关务云>>首页";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
-            return View();
+
+
+            string sql = "select * from web_notice";
+            DataTable dt = DBMgr.GetDataTable(sql);
+            List<Web_Notice> list_notice=new List<Web_Notice>();
+            foreach (DataRow dr in dt.Rows)
+            {
+                Web_Notice web_notice = new Web_Notice();
+                web_notice.ID =Int32.Parse(dr["ID"].ToString());
+                web_notice.Title = dr["Title"].ToString();
+                //web_notice.PublishDate = Convert.ToDateTime(dr["PublishDate"].ToString());
+                web_notice.ReferenceSource = dr["ReferenceSource"].ToString();
+                list_notice.Add(web_notice);
+                
+            }
+                var model =list_notice.ToPagedList(id, 5);
+                if (Request.IsAjaxRequest())
+                    return PartialView("_ArticleList", model);
+                return View(model);
+            
         }
+
+
         #endregion
 
         public ActionResult IndexNoticeDetail(string ID)
