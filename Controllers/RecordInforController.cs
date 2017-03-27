@@ -564,18 +564,19 @@ namespace MvcPlatform.Controllers
             bool bf = false;
             if (!string.IsNullOrEmpty(Request["id"]))
             {
-                sql = "select itemno from SYS_RECORDINFO_DETAIL_TASK where ID='{0}'"; sql = string.Format(sql, Request["id"]);
-                DataTable dt_itemno_e = new DataTable(); dt_itemno_e = DBMgr.GetDataTable(sql);
-                if (dt_itemno_e.Rows[0][0].ToString() == json.Value<string>("ITEMNO"))
+                sql = "select itemno,ITEMNOATTRIBUTE,RECORDINFOID from SYS_RECORDINFO_DETAIL_TASK where ID='{0}'"; sql = string.Format(sql, Request["id"]);
+                DataTable dt_itemno_e = DBMgr.GetDataTable(sql);
+                if (dt_itemno_e.Rows[0][0].ToString() == json.Value<string>("ITEMNO") && dt_itemno_e.Rows[0][1].ToString() == json.Value<string>("ITEMNOATTRIBUTE")
+                     && dt_itemno_e.Rows[0][2].ToString() == json.Value<string>("RECORDINFOID"))
                 {
-                    bf = true;//修改：先判断项号是否修改，若没修改，不做验证；
+                    bf = true;//修改：先判断项号、项号属性、账册号是否修改，若没修改，不做验证；
                 }
             }
             if (bf == false)
             {
-                sql = "select itemno from SYS_RECORDINFO_DETAIL_TASK where STATUS<50 and RECORDINFOID='{0}' and ITEMNO>to_number('{1}') and ITEMNOATTRIBUTE='{2}'";
+                sql = "select itemno from SYS_RECORDINFO_DETAIL_TASK where STATUS<50 and RECORDINFOID='{0}' and ITEMNO>=to_number('{1}') and ITEMNOATTRIBUTE='{2}'";
                 if (!string.IsNullOrEmpty(Request["id"])) { sql = sql + " and ID!='{3}'"; }
-                sql += " union select itemno from cusdoc.SYS_RECORDINFO_DETAIL where enabled=1 and RECORDINFOID='{0}' and ITEMNO>to_number('{1}') and ITEMNOATTRIBUTE='{2}'";
+                sql += " union select itemno from cusdoc.SYS_RECORDINFO_DETAIL where enabled=1 and RECORDINFOID='{0}' and ITEMNO>=to_number('{1}') and ITEMNOATTRIBUTE='{2}'";
 
                 sql = string.Format(sql, json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), json.Value<string>("ITEMNOATTRIBUTE"), Request["id"]);
                 DataTable dt_itemno = new DataTable();

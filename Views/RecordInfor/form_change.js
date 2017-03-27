@@ -73,18 +73,20 @@
             },
             change: function (field_paste, newValue, oldValue, eOpts) {
                 if (newValue == "成品") {
-                    //$("#div_form_con").show();
-                    if (!Ext.getCmp('gridpanel_PRODUCTCONSUME') && !Ext.getCmp('gridpanel_PRODUCTCONSUME')) {
+                    if (!Ext.getCmp('formpanel_con') && !Ext.getCmp('gridpanel_PRODUCTCONSUME')) {
                         form_ini_con();
                     }
+                    Ext.getCmp('formpanel_con').show();
+                    Ext.getCmp('gridpanel_PRODUCTCONSUME').show();
                 } else {
-                    if (Ext.getCmp('formpanel_con')) {
-                        Ext.getCmp('formpanel_con').destroy();
-                    }
-                    if (Ext.getCmp('gridpanel_PRODUCTCONSUME')) {
-                        Ext.getCmp('gridpanel_PRODUCTCONSUME').destroy();
-                    }
-                    //$("#div_form_con").hide();
+                    /*if (Ext.getCmp('formpanel_con')) {
+                       Ext.getCmp('formpanel_con').destroy();
+                   }
+                   if (Ext.getCmp('gridpanel_PRODUCTCONSUME')) {
+                       Ext.getCmp('gridpanel_PRODUCTCONSUME').destroy();
+                   }*/
+                    Ext.getCmp('formpanel_con').hide();
+                    Ext.getCmp('gridpanel_PRODUCTCONSUME').hide();
                 }
             }
         },
