@@ -14,7 +14,7 @@ namespace MvcPlatform.Controllers
 {
     public class HomeController : Controller
     {
-        int pagenum = 15;//每页数量
+        int pagenum = 10;//每页数量
 
         [AllowAnonymous]
         public ActionResult Index()

@@ -32,7 +32,7 @@
 
 
 .tablestyle {
-    margin:5px 0px 5px 0px; width:100%; line-height:40px;
+    margin:5px 0px 5px 0px; width:100%; line-height:35px;
 }
     .tr_hr {
         border-bottom-width: 1px;
@@ -40,10 +40,10 @@
         border-bottom-style: dashed;cursor: pointer;
     }
     .td_1 {
-        width:85%;
+        width:90%;
         text-align:left;
     }
     .td_2 {
-        width: 15%;
-        text-align: right;
+        width: 10%;
+        text-align: left;
     }
