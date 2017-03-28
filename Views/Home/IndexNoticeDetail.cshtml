@@ -27,11 +27,22 @@
 
     <div style="border-top-width:1px; border-top-color:gray; border-top-style:dashed; height:5px;"></div>
 
-    <p style="text-align:right;">
-        发布时间：@Model["dt_notice"].Rows[0]["updatetime"].ToString().Substring(0, 16)
-    </p>
+    @if (@Model["dt_notice"].Rows[0]["publishdate"].ToString() != "")
+    {
+        <p style="text-align:right;">
+            发布日期：@Model["dt_notice"].Rows[0]["publishdate"].ToString()
+        </p>
+    }
 
     @Html.Raw(Model["dt_notice"].Rows[0]["content"])
+
+    @if (@Model["dt_notice"].Rows[0]["REFERENCESOURCE"].ToString()!="")
+    {
+        <p>
+            本文来源：@Model["dt_notice"].Rows[0]["REFERENCESOURCE"].ToString()
+        </p>
+    }
+    
 
     @if (jarry.Count > 0)
     {
@@ -55,6 +66,7 @@
 
         </p>
     }
+    
     <div style="border-top-width:1px; border-top-color:gray; border-top-style:dashed; height:5px;"></div>
     <p>
         上一篇：

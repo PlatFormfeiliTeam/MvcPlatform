@@ -161,18 +161,22 @@
             },
             change: function (field_paste, newValue, oldValue, eOpts) {
                 if (newValue == "成品") {
-                    //$("#div_form_con").show();
-                    if (!Ext.getCmp('gridpanel_PRODUCTCONSUME') && !Ext.getCmp('gridpanel_PRODUCTCONSUME')) {
+                    if (!Ext.getCmp('formpanel_con') && !Ext.getCmp('gridpanel_PRODUCTCONSUME')) {
                         form_ini_con();
                     }
+                    Ext.getCmp('formpanel_con').show();
+                    Ext.getCmp('gridpanel_PRODUCTCONSUME').show();
+
+                    SetItemno_consume(Ext.getCmp('combo_RECORDINFOID').getValue());//对应料件序号下拉
                 } else {
                     if (Ext.getCmp('formpanel_con')) {
-                        Ext.getCmp('formpanel_con').destroy();
+                        //Ext.getCmp('formpanel_con').destroy();
+                        Ext.getCmp('formpanel_con').hide();
                     }
                     if (Ext.getCmp('gridpanel_PRODUCTCONSUME')) {
-                        Ext.getCmp('gridpanel_PRODUCTCONSUME').destroy();
+                        //Ext.getCmp('gridpanel_PRODUCTCONSUME').destroy();
+                        Ext.getCmp('gridpanel_PRODUCTCONSUME').hide();
                     }
-                    //$("#div_form_con").hide();
                 }
             }
         },

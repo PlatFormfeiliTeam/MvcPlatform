@@ -235,7 +235,8 @@ namespace MvcPlatform.Controllers
             DataTable dt_notice_pre = new DataTable(); DataTable dt_notice_next = new DataTable();
             string type = "", typename = "", sql = "";
 
-            sql = @"select type,(select name from newscategory where id=a.type) typename,title,content,attachment,to_char(updatetime,'yyyy/mm/dd hh24:mi:ss') as updatetime 
+            sql = @"select type,(select name from newscategory where id=a.type) typename,title,content,attachment,to_char(a.publishdate,'yyyy-mm-dd') as publishdate 
+                        ,to_char(updatetime,'yyyy/mm/dd hh24:mi:ss') as updatetime,REFERENCESOURCE 
                     from web_notice a where isinvalid=0 and id='" + ID + "'";
             dt_notice = DBMgr.GetDataTable(sql);
             dic.Add("dt_notice", dt_notice);

@@ -295,6 +295,12 @@ function itemsbind() {
         { header: '报关行', dataIndex: 'CUSTOMERNAME', width: 250 },
         { header: '备注', dataIndex: 'REMARK', width: 150 }
         ],
+        listeners:
+        {
+            'itemdblclick': function (view, record, item, index, e) {
+                edit_task('gridpanel_lj_Go');
+            }
+        },
         viewConfig: {
             enableTextSelection: true
         },
@@ -378,6 +384,12 @@ function itemsbind() {
         { header: '报关行', dataIndex: 'CUSTOMERNAME', width: 250 },
         { header: '备注', dataIndex: 'REMARK', width: 150 }
         ],
+        listeners:
+        {
+            'itemdblclick': function (view, record, item, index, e) {
+                edit_task('gridpanel_cp_Go');
+            }
+        },
         viewConfig: {
             enableTextSelection: true
         },
@@ -654,22 +666,56 @@ function form_ini_con() {
 
 
     //对应料件序号
-    var field_ITEMNO_CONSUME = Ext.create('Ext.form.field.Text', {
-        id: 'ITEMNO_CONSUME',
+    var store_ITEMNO_CONSUME = Ext.create('Ext.data.JsonStore', {  //报关行combostore
+        storeId: 'myStore',
+        fields: ['ITEMNO', 'COMMODITYNAME', 'SPECIFICATIONSMODEL', 'UNIT', 'UNITNAME']
+    })
+
+    var combo_ITEMNO_CONSUME = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_ITEMNO_CONSUME',
         name: 'ITEMNO_CONSUME',
-        flex: .85, margin: 0,
+        store: store_ITEMNO_CONSUME,
+        displayField: 'ITEMNO',
+        valueField: 'ITEMNO',
+        queryMode: 'local',
+        margin: 0,
+        minChars: 1,
+        forceSelection: true,
+        anyMatch: true,
+        hideTrigger: true,
+        listeners: {
+            focus: function (cb) {
+                cb.clearInvalid();
+            },
+            select: function (combo, records) {
+                combo_ITEMNO_CONSUME.setValue(records[0].data.ITEMNO);
+                field_ITEMNO_COMMODITYNAME.setValue(records[0].data.COMMODITYNAME);
+                field_ITEMNO_SPECIFICATIONSMODEL.setValue(records[0].data.SPECIFICATIONSMODEL);
+                field_ITEMNO_UNIT.setValue(records[0].data.UNIT);
+                field_ITEMNO_UNITNAME.setValue(records[0].data.UNITNAME)
+            }
+        },
+        flex: .85,
         allowBlank: false,
         blankText: '对应料件序号不能为空!'
-    });
+    })
+
+    //var field_ITEMNO_CONSUME = Ext.create('Ext.form.field.Text', {
+    //    id: 'ITEMNO_CONSUME',
+    //    name: 'ITEMNO_CONSUME',
+    //    flex: .85, margin: 0,
+    //    allowBlank: false,
+    //    blankText: '对应料件序号不能为空!'
+    //});
 
     var field_ITEMNO_LJ = {
         xtype: 'fieldcontainer',
         layout: 'hbox',
         fieldLabel: '对应料件序号',
-        items: [field_ITEMNO_CONSUME,
+        items: [combo_ITEMNO_CONSUME,
             {
                 id: 'ITEMNO_CONSUME_btn', xtype: 'button', handler: function () {
-                    selectitemno(Ext.getCmp('combo_RECORDINFOID').getValue(), field_ITEMNO_CONSUME, field_ITEMNO_COMMODITYNAME, field_ITEMNO_SPECIFICATIONSMODEL, field_ITEMNO_UNITNAME, field_ITEMNO_UNIT);
+                    selectitemno(Ext.getCmp('combo_RECORDINFOID').getValue(), combo_ITEMNO_CONSUME, field_ITEMNO_COMMODITYNAME, field_ITEMNO_SPECIFICATIONSMODEL, field_ITEMNO_UNITNAME, field_ITEMNO_UNIT);
                 },
                 text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
             }
@@ -833,4 +879,25 @@ function form_ini_con() {
 
 function printitemno(ids) {
     opencenterwin("/RecordInfor/PrintRecordDetail?ids=" + ids, 1600, 900);
+}
+
+function SetItemno_consume(recordid) {
+    if (Ext.getCmp('formpanel_con')) {
+
+        //清空成品对应信息
+        Ext.each(Ext.getCmp('formpanel_con').getForm().getFields().items, function (field) {
+            field.reset();
+        });
+
+        Ext.getCmp('gridpanel_PRODUCTCONSUME').store.removeAll();
+
+        Ext.Ajax.request({
+            url: "/RecordInfor/Ini_Base_Data_Itemno_Consume",
+            params: { RECORDINFOID: recordid },
+            success: function (response, opts) {
+                var commondata = Ext.decode(response.responseText);
+                Ext.getCmp('combo_ITEMNO_CONSUME').store.loadData(commondata.itemno_consume);//对应料件序号
+            }
+        });
+    }
 }

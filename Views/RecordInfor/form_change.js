@@ -32,6 +32,9 @@
                     cb.store.clearFilter();
                     cb.expand()
                 }
+            },
+            change: function (combo, newValue, oldValue, eOpts) {
+                SetItemno_consume(newValue);
             }
         },
         fieldStyle: 'background-color: #CECECE; background-image: none;'
@@ -78,15 +81,17 @@
                     }
                     Ext.getCmp('formpanel_con').show();
                     Ext.getCmp('gridpanel_PRODUCTCONSUME').show();
+
+                    SetItemno_consume(Ext.getCmp('combo_RECORDINFOID').getValue());//对应料件序号下拉
                 } else {
-                    /*if (Ext.getCmp('formpanel_con')) {
-                       Ext.getCmp('formpanel_con').destroy();
+                   if (Ext.getCmp('formpanel_con')) {
+                       //Ext.getCmp('formpanel_con').destroy();
+                       Ext.getCmp('formpanel_con').hide();
                    }
                    if (Ext.getCmp('gridpanel_PRODUCTCONSUME')) {
-                       Ext.getCmp('gridpanel_PRODUCTCONSUME').destroy();
-                   }*/
-                    Ext.getCmp('formpanel_con').hide();
-                    Ext.getCmp('gridpanel_PRODUCTCONSUME').hide();
+                       //Ext.getCmp('gridpanel_PRODUCTCONSUME').destroy();
+                       Ext.getCmp('gridpanel_PRODUCTCONSUME').hide();
+                   }
                 }
             }
         },

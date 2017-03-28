@@ -384,6 +384,21 @@ namespace MvcPlatform.Controllers
 
         #region Recorninfo_Common
 
+        public string Ini_Base_Data_Itemno_Consume()
+        {
+            string sql = "";
+            string json_itemno_consume = "[]";//对应料件序号
+
+            sql = @"select a.*,b.name as unitname from sys_recordinfo_detail a 
+                        left join base_declproductunit b on a.unit=b.code WHERE a.recordinfoid={0} and a.itemnoattribute='料件'
+                    order by a.itemno";
+            sql = string.Format(sql, Request["RECORDINFOID"] + "");
+
+            json_itemno_consume = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+
+            return "{itemno_consume:" + json_itemno_consume + "}";
+        }
+
         public string cancel()
         {
             string id = Request["id"];
