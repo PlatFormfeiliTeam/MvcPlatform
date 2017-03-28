@@ -700,14 +700,6 @@ function form_ini_con() {
         blankText: '对应料件序号不能为空!'
     })
 
-    //var field_ITEMNO_CONSUME = Ext.create('Ext.form.field.Text', {
-    //    id: 'ITEMNO_CONSUME',
-    //    name: 'ITEMNO_CONSUME',
-    //    flex: .85, margin: 0,
-    //    allowBlank: false,
-    //    blankText: '对应料件序号不能为空!'
-    //});
-
     var field_ITEMNO_LJ = {
         xtype: 'fieldcontainer',
         layout: 'hbox',

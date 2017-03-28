@@ -1793,7 +1793,7 @@ function Export(busitypeid) {
 }
 
 //对应料件项号
-function selectitemno(RECORDINFOID,txt_itemno, field_name, field_spec,field_unitname, field_unit) {//传入需要赋值的控件
+function selectitemno(RECORDINFOID,combo_itemno, field_name, field_spec,field_unitname, field_unit) {//传入需要赋值的控件
     var tb_itemno = Ext.create('Ext.toolbar.Toolbar', {
         items: [
            { xtype: 'textfield', fieldLabel: '商品名称', labelWidth: 100, labelAlign: 'right', id: 'NAME_itemno_s' },
@@ -1850,7 +1850,9 @@ function selectitemno(RECORDINFOID,txt_itemno, field_name, field_spec,field_unit
         ],
         listeners: {
             itemdblclick: function (gd, record, item, index, e, eOpts) {
-                txt_itemno.setValue(record.get("ITEMNO"));
+                combo_itemno.reset();//重置，也就是绑定所有下拉值，否则只能选择之前输入的项目
+
+                combo_itemno.setValue(record.get("ITEMNO"));
                 field_name.setValue(record.get("COMMODITYNAME")); 
                 field_spec.setValue(record.get("SPECIFICATIONSMODEL"));
                 field_unit.setValue(record.get("UNIT"));
@@ -1871,7 +1873,9 @@ function selectitemno(RECORDINFOID,txt_itemno, field_name, field_spec,field_unit
             text: '<i class="fa fa-check-square-o"></i>&nbsp;确定', handler: function () {
                 var recs = grid_itemno.getSelectionModel().getSelection();
                 if (recs.length > 0) {
-                    txt_itemno.setValue(recs[0].get("ITEMNO"));
+                    combo_itemno.reset();//重置，也就是绑定所有下拉值，否则只能选择之前输入的项目
+
+                    combo_itemno.setValue(recs[0].get("ITEMNO"));
                     field_name.setValue(recs[0].get("COMMODITYNAME"));
                     field_spec.setValue(recs[0].get("SPECIFICATIONSMODEL"));
                     field_unit.setValue(recs[0].get("UNIT"));
