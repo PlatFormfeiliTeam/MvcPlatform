@@ -57,6 +57,10 @@ namespace MvcPlatform.Controllers
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
+        public ActionResult BatchMaintain()
+        {
+            return View();
+        }
 
         public string GetCode(string combin)
         {
@@ -311,38 +315,69 @@ namespace MvcPlatform.Controllers
                 try
                 {
                     JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+                    JObject json_data = (JObject)JsonConvert.DeserializeObject(Request["data"]);
                     string filedata = Request["filedata"] + "";
-                    string action = Request["action"] + "";
                     string insert_sql = "";
+                    string update_sql = "";
                     string sql = "";
                     string ent_id = "";
 
-                    insert_sql = @"insert into ENT_ORDER (id,createtime, unitcode,createid, createname,enterprisecode, enterprisename,status) 
-                                     values ('{0}',sysdate,(select fun_AutoQYBH(sysdate) from dual),'{1}','{2}','{3}','{4}','5')";
-                        if (action.Trim() == "按批次")
+                    if (string.IsNullOrEmpty(json_data.Value<string>("ID")))//新增
+                    {
+                        insert_sql = @"insert into ENT_ORDER (id,createtime, unitcode,filerecevieunitcode, filerecevieunitname,
+                    filedeclareunitcode,filedeclareunitname, busitypeid,customdistrictcode,customdistrictname,repwayid, 
+                    createid, createname,enterprisecode, enterprisename,remark,code,createmode,status,isreadpdf) 
+                    values ('{0}',sysdate,(select fun_AutoQYBH(sysdate) from dual),'{1}','{2}','{3}','{4}','{5}',
+                     '{6}','{7}','{8}','{9}','{10}', '{11}','{12}','{13}','{14}','{15}','{16}',{17})";
+                        if (json_data.Value<string>("CREATEMODE") == "按批次")
                         {
                             sql = "select ENT_ORDER_ID.Nextval from dual";
                             ent_id = DBMgr.GetDataTable(sql).Rows[0][0] + "";//获取ID
-                            sql = string.Format(insert_sql, ent_id,json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),
-                                  json_user.Value<string>("CUSTOMERHSCODE"), json_user.Value<string>("CUSTOMERNAME"));
+                            sql = string.Format(insert_sql, ent_id, GetCode(json_data.Value<string>("FILERECEVIEUNITNAME")), GetName(json_data.Value<string>("FILERECEVIEUNITNAME")),
+                                  GetCode(json_data.Value<string>("FILEDECLAREUNITNAME")), GetName(json_data.Value<string>("FILEDECLAREUNITNAME")),
+                                  json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"), json_data.Value<string>("CUSTOMDISTRICTNAME"),
+                                  json_data.Value<string>("REPWAYID"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),
+                                  json_user.Value<string>("CUSTOMERHSCODE"), json_user.Value<string>("CUSTOMERNAME"), json_data.Value<string>("REMARK"),
+                                  json_data.Value<string>("CODE"), json_data.Value<string>("CREATEMODE"), json_data.Value<string>("STATUS"), json_data.Value<string>("ISREADPDF"));
                             DBMgr.ExecuteNonQuery(sql);
                             //更新随附文件
-                            Extension.Update_Attachment_ForEnterprise(ent_id, filedata,"", json_user);
+                            Extension.Update_Attachment_ForEnterprise(ent_id, filedata, json_data.Value<string>("ORIGINALFILEIDS"), json_user);
                         }
-                        if (action.Trim() == "按文件")
+                        if (json_data.Value<string>("CREATEMODE") == "按文件")
                         {
-                             JArray jarry = JsonConvert.DeserializeObject<JArray>(filedata);
+                            JArray jarry = JsonConvert.DeserializeObject<JArray>(filedata);
                             foreach (JObject json in jarry)
                             {
                                 sql = "select ENT_ORDER_ID.Nextval from dual";
                                 ent_id = DBMgr.GetDataTable(sql).Rows[0][0] + "";//获取ID
-                                sql = string.Format(insert_sql, ent_id,json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),
-                                      json_user.Value<string>("CUSTOMERHSCODE"), json_user.Value<string>("CUSTOMERNAME"));
+                                sql = string.Format(insert_sql, ent_id, GetCode(json_data.Value<string>("FILERECEVIEUNITNAME")), GetName(json_data.Value<string>("FILERECEVIEUNITNAME")),
+                                      GetCode(json_data.Value<string>("FILEDECLAREUNITNAME")), GetName(json_data.Value<string>("FILEDECLAREUNITNAME")),
+                                      json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"), json_data.Value<string>("CUSTOMDISTRICTNAME"),
+                                      json_data.Value<string>("REPWAYID"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),
+                                      json_user.Value<string>("CUSTOMERHSCODE"), json_user.Value<string>("CUSTOMERNAME"), json_data.Value<string>("REMARK"),
+                                      json_data.Value<string>("CODE"), json_data.Value<string>("CREATEMODE"), json_data.Value<string>("STATUS"), json_data.Value<string>("ISREADPDF"));
                                 DBMgr.ExecuteNonQuery(sql);
                                 //更新随附文件
-                                Extension.Update_Attachment_ForEnterprise(ent_id, "[" + JsonConvert.SerializeObject(json) + "]","", json_user);
+                                Extension.Update_Attachment_ForEnterprise(ent_id, "[" + JsonConvert.SerializeObject(json) + "]", json_data.Value<string>("ORIGINALFILEIDS"), json_user);
                             }
                         }
+
+
+
+                    }
+                    else//修改单独页面做
+                    {
+                        update_sql = @"update ENT_ORDER  set filerecevieunitcode='{1}',filerecevieunitname='{2}',filedeclareunitcode='{3}',
+                    filedeclareunitname='{4}',busitypeid='{5}',customdistrictcode='{6}', customdistrictname='{7}',
+                    repwayid='{8}',remark='{9}',code='{10}' where id='{0}'";
+                        sql = string.Format(update_sql, json_data.Value<string>("ID"), GetCode(json_data.Value<string>("FILERECEVIEUNITNAME")),
+                        GetName(json_data.Value<string>("FILERECEVIEUNITNAME")), GetCode(json_data.Value<string>("FILEDECLAREUNITNAME")),
+                        GetName(json_data.Value<string>("FILEDECLAREUNITNAME")), json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"),
+                        json_data.Value<string>("CUSTOMDISTRICTNAME"), json_data.Value<string>("REPWAYID"), json_data.Value<string>("REMARK"), json_data.Value<string>("CODE"));
+                        DBMgr.ExecuteNonQuery(sql);
+                        //更新随附文件
+                        Extension.Update_Attachment_ForEnterprise(json_data.Value<string>("ID"), filedata, json_data.Value<string>("ORIGINALFILEIDS"), json_user);
+                    }
                     return "{success:true}";
                 }
                 catch (Exception ex)

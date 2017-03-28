@@ -1,0 +1,499 @@
+﻿@{
+    ViewBag.Title = "BatchMaintain";
+    Layout = "~/Views/Shared/Empty.cshtml";
+}
+<link href="/js/Extjs42/resources/css/ext-all-gray.css" rel="stylesheet" type="text/css" />
+<script src="/js/Extjs42/bootstrap.js" type="text/javascript"></script>
+<script src="/js/pan.js" type="text/javascript"></script>
+<script src="~/js/commondata.js"></script>
+<script type="text/javascript" src="/js/upload/plupload.full.min.js"></script>
+<script type="text/javascript">
+    
+    var common_data_sbgq = [], common_data_sbfs = [], common_data_adminurl = "";
+    var store_STATUS = Ext.create('Ext.data.JsonStore', {
+        fields: ['CODE', 'NAME'],
+        data: [{ "CODE": 5, "NAME": "草稿" }, { "CODE": 10, "NAME": "已提交" }, { "CODE": 15, "NAME": "已受理" }]
+    });
+    Ext.onReady(function () {
+        var ids = getQueryString("ids");
+        var id_array = ids.split(",");
+        var unitcodes = getQueryString("unitcodes");
+        var unitcode_array = unitcodes.split(",");
+       
+        
+        var radio_FileID = Ext.create('Ext.form.RadioGroup', {
+            id: 'radio_FileID',
+            labelAlign: "right",
+            fieldLabel: '列表',
+            width: '100%',
+            columns: 4,
+            margin: 10,
+            vertical: false,
+            items: [],
+            listeners: {
+                change: function (rb, newValue, oldValue, eOpts) {
+                    loadform(newValue.CREATEMODE);
+
+                }
+            }
+        });
+
+
+        for (var i = 0; i < id_array.length; i++) {
+            radio_FileID.insert({ boxLabel: unitcode_array[i], name: 'CREATEMODE', inputValue: id_array[i], id: id_array[i] });
+        }
+
+        Ext.Ajax.request({
+            url: "/Common/Ini_Base_Data",
+            success: function (response, opts) {
+                var commondata = Ext.decode(response.responseText);
+                common_data_sbgq = commondata.sbgq;//申报关区
+                common_data_sbfs = commondata.sbfs;//申报方式
+                common_data_adminurl = commondata.adminurl;//文件服务器URL 
+                form_ini();
+
+                var Npanel = Ext.create('Ext.panel.Panel', {
+                    title: '委托文件->批量维护',
+                    region: 'north',
+                    height: 120, overflowY: 'scroll',
+                    items: [radio_FileID]
+                });
+
+                var Cpanel = Ext.create('Ext.panel.Panel', {
+                    region: 'center',
+                    items: [{
+                        html: "<div id='fileViewDiv'><embed id='pdf' width='100%' height='100%' src='/FileUpload/file/o_1bca2310mt2o7lnn531bna113m7.pdf'></embed>'</div>"
+                    }]
+                });
+                var Epanel = Ext.create('Ext.form.Panel', {
+                    region: 'east',
+                    width: 500,
+                    items: [Ext.getCmp('form_panel'), Ext.getCmp('panelfile')]
+                });
+
+                
+                var viewport = Ext.create('Ext.container.Viewport', {
+                    layout: 'border',
+                    items: [Npanel, Cpanel, Epanel]
+                });
+               //loadform(id_array[0]);
+                Ext.getCmp('radio_FileID').getComponent(0).setValue(true);
+
+                upload_ini();
+
+                $('#fileViewDiv').css('height',($(document).height() - 120 - 60));
+
+                
+            }
+        });
+
+       
+    });
+
+
+    function loadform(ID) {
+        Ext.Ajax.request({
+            url: "/EnterpriseOrder/loadform",
+            params: { ID: ID },
+            success: function (response, opts) {
+                var data = Ext.decode(response.responseText);
+                repwayidcode = data.data.REPWAYID;//二次联动，前一个赋值后，调用此值 
+                Ext.getCmp('form_panel').getForm().setValues(data.data);
+                //文件接收单位
+                if (Ext.getCmp('field_FILERECEVIEUNIT').getValue()) {
+                    Ext.getCmp('field_FILERECEVIEUNIT').setValue(Ext.getCmp('field_FILERECEVIEUNIT').getValue() + '(' + data.data.FILERECEVIEUNITCODE + ')');
+                }
+                //文件申报单位
+                if (Ext.getCmp('field_FILEDECLAREUNIT').getValue()) {
+                    Ext.getCmp('field_FILEDECLAREUNIT').setValue(Ext.getCmp('field_FILEDECLAREUNIT').getValue() + '(' + data.data.FILEDECLAREUNITCODE + ')');
+                }
+                //文件明细
+                Ext.getCmp('fileview1').store.loadData(data.filedata);//加载附件列表数据
+                //如果是修改需要将随附文件的ID拼接成字符串 赋值到
+                var fileids = "";
+                Ext.each(Ext.getCmp('fileview1').store.getRange(), function (rec) {
+                    fileids += rec.get("ID") + ",";
+                });
+                Ext.getCmp('field_ORIGINALFILEIDS').setValue(fileids);
+            }
+        });
+    }
+    
+
+    function form_ini() {
+        //载入模板名称
+        Ext.Ajax.request({
+            url: "/EnterPriseOrder/Ini_Base_Data_TEMPLATENAME",
+            success: function (response, opts) {
+                var commondata = Ext.decode(response.responseText);
+                json_templatename = commondata.templatename;
+                store_TEMPLATENAME.loadData(json_templatename);
+            }
+        });
+
+        //委托编号
+        var field_UNITCODE = Ext.create('Ext.form.field.Text', {
+            id: 'UNITCODE',
+            fieldLabel: '委托编号',
+            name: 'UNITCODE',
+            readOnly: true,
+            emptyText: '委托编号自动生成',
+            fieldStyle: 'background-color: #CECECE; background-image: none;'
+        });
+
+        //生成方式
+        var store_createmode = Ext.create('Ext.data.JsonStore', {
+            fields: ['CODE', 'NAME'],
+            data: [{ "CODE": "按批次", "NAME": "按批次" }, { "CODE": "按文件", "NAME": "按文件" }]
+        });
+        var combo_CREATEMODE = Ext.create('Ext.form.field.ComboBox', {
+            id: 'combo_CREATEMODE',
+            name: 'CREATEMODE',
+            store: store_createmode,
+            fieldLabel: '生成方式',
+            displayField: 'NAME',
+            queryMode: 'local',
+            valueField: 'CODE',
+            triggerAction: 'all',
+            value: '按批次',
+            readOnly: true,
+            editable: false,
+            fieldStyle: 'background-color: #CECECE; background-image: none;'
+        });
+
+
+        //文件接收单位
+        var field_FILERECEVIEUNIT = Ext.create('Ext.form.field.Text', {
+            id: 'field_FILERECEVIEUNIT',
+            readOnly: true,
+            name: 'FILERECEVIEUNITNAME',
+            margin: 0,
+            flex: .90
+        })
+        var cont_wjjsdw = Ext.create('Ext.form.FieldContainer', {
+            fieldLabel: '文件接收单位',
+            layout: 'hbox',
+            items: [field_FILERECEVIEUNIT,
+                {
+                    xtype: 'button', id: 'btn_filerecevieunit', handler: function () {
+                        bgsbdw_win(field_FILERECEVIEUNIT);
+                    }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .10, margin: 0
+                }
+            ]
+        })
+
+        //文件申报单位
+        var field_FILEDECLAREUNIT = Ext.create('Ext.form.field.Text', {
+            id: 'field_FILEDECLAREUNIT',
+            name: 'FILEDECLAREUNITNAME',
+            readOnly: true,
+            margin: 0,
+            flex: .90,
+        });
+        var field_ID = Ext.create('Ext.form.field.Hidden', {
+            name: 'ID'
+        })
+        var field_ORIGINALFILEIDS = Ext.create('Ext.form.field.Hidden', {
+            id: 'field_ORIGINALFILEIDS',
+            name: 'ORIGINALFILEIDS'
+        });
+        var cont_wjsbdw = Ext.create('Ext.form.FieldContainer', {
+            fieldLabel: '文件申报单位',
+            layout: 'hbox',
+            items: [field_FILEDECLAREUNIT,
+                {
+                    xtype: 'button', id: 'btn_filedeclareunit', handler: function () {
+                        bgsbdw_win(field_FILEDECLAREUNIT);
+                    }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .10, margin: 0
+                }
+            ]
+        })
+
+        //业务类型
+        var store_busitype = Ext.create('Ext.data.JsonStore', {
+            fields: ['CODE', 'NAME'],
+            data: common_data_busitype
+        });
+        var combo_BUSITYPE = Ext.create('Ext.form.field.ComboBox', {
+            id: 'combo_BUSITYPE',
+            name: 'BUSITYPEID',
+            store: store_busitype,
+            fieldLabel: '业务类型',
+            displayField: 'NAME',
+            valueField: 'CODE',
+            triggerAction: 'all',
+            editable: false,
+            queryMode: 'local',
+            listeners: {
+                change: function (combo, records) {
+                    combo_REPWAYNAME.reset();
+                    Ext.Ajax.request({
+                        url: "/EnterPriseOrder/Ini_Base_Data_REPWAY",
+                        params: { busitype: combo_BUSITYPE.getRawValue() },
+                        success: function (response, opts) {
+                            var commondata = Ext.decode(response.responseText);
+                            common_data_sbfs = commondata.sbfs;//申报方式
+                            store_REPWAYNAME.loadData(common_data_sbfs);
+
+                            var rec = store_REPWAYNAME.findRecord('CODE', repwayidcode);
+                            if (!rec) {
+                                repwayidcode = "";//找不到为空
+                            }
+                            combo_REPWAYNAME.setValue(repwayidcode);//编辑页赋值
+                        }
+                    });
+                }
+            }
+        });
+
+        //申报关区
+        var store_CUSTOMDISTRICTNAME = Ext.create('Ext.data.JsonStore', {
+            fields: ['CODE', 'NAME'],
+            data: common_data_sbgq
+        })
+        var combo_CUSTOMDISTRICTNAME = Ext.create('Ext.form.field.ComboBox', {//申报关区 这个数据比较多需要根据输入字符到后台动态模糊匹配
+            name: 'CUSTOMDISTRICTCODE',
+            store: store_CUSTOMDISTRICTNAME,
+            fieldLabel: '申报关区',
+            displayField: 'NAME',
+            valueField: 'CODE',
+            queryMode: 'local',
+            minChars: 2,
+            hideTrigger: true,
+            anyMatch: true,
+            listeners: {
+                focus: function (cb) {
+                    if (!cb.getValue()) {
+                        cb.clearInvalid();
+                        cb.store.clearFilter();
+                    }
+                },
+                select: function (cb, records, eOpts) {
+                    field_CUSTOMDISTRICTNAME.setValue(cb.getRawValue().substr(0, cb.getRawValue().lastIndexOf('(')));
+                }
+            },
+            listConfig: {
+                maxHeight: 110,
+                getInnerTpl: function () {
+                    return '<div>{NAME}</div>';
+                }
+            }
+        })
+        var field_CUSTOMDISTRICTNAME = Ext.create('Ext.form.field.Hidden', {
+            name: 'CUSTOMDISTRICTNAME'
+        })
+
+        //申报方式
+        var store_REPWAYNAME = Ext.create('Ext.data.JsonStore', {
+            fields: ['CODE', 'NAME'],
+        })
+        var combo_REPWAYNAME = Ext.create('Ext.form.field.ComboBox', {
+            name: 'REPWAYID',
+            store: store_REPWAYNAME,
+            fieldLabel: '申报方式',
+            displayField: 'NAME',
+            valueField: 'CODE',
+            triggerAction: 'all',
+            queryMode: 'local',
+            anyMatch: true,
+            listeners: {
+                focus: function (cb) {
+                    if (!cb.getValue()) {
+                        cb.clearInvalid();
+                        cb.store.clearFilter();
+                        cb.expand()
+                    };
+                }
+            }
+        })
+        //备注
+        var field_REMARK = Ext.create('Ext.form.field.Text', {
+            id: 'field_REMARK1',
+            fieldLabel: '备注',
+            name: 'REMARK'
+        });
+
+        //企业编号
+        var field_CODE = Ext.create('Ext.form.field.Text', {
+            fieldLabel: '企业编号',
+            name: 'CODE'
+        });
+        //模板名称
+        var store_TEMPLATENAME = Ext.create('Ext.data.JsonStore', {
+            fields: ['ID', 'TEMPLATENAME']
+        })
+        var field_TEMPLATENAME = Ext.create('Ext.form.field.ComboBox', {
+            fieldLabel: '模板名称',
+            store: store_TEMPLATENAME,
+            name: 'TEMPLATENAME',
+            displayField: 'TEMPLATENAME',
+            valueField: 'ID',
+            triggerAction: 'all',
+            queryMode: 'local',
+            anyMatch: true
+        });
+        var store_ISREADPDF = Ext.create('Ext.data.JsonStore', {
+            fields: ['CODE', 'NAME'],
+            data: [{ "CODE": 0, "NAME": "未解析" }, { "CODE": 1, "NAME": "已解析" }]
+        });
+        var field_ISREADPDF = Ext.create('Ext.form.field.ComboBox', {
+            fieldLabel: '解析标志',
+            store: store_ISREADPDF,
+            displayField: 'NAME',
+            valueField: 'CODE',
+            value: 0,
+            readOnly: true,
+            name: 'ISREADPDF',
+            fieldStyle: 'background-color: #CECECE; background-image: none;'
+        });
+
+        var com_STATUS = Ext.create('Ext.form.field.ComboBox', {
+            fieldLabel: '状态',
+            store: store_STATUS,
+            readOnly: true,
+            name: 'STATUS',
+            displayField: 'NAME',
+            valueField: 'CODE',
+            value: 5,
+            triggerAction: 'all',
+            queryMode: 'local',
+            anyMatch: true,
+            editable: false,
+            fieldStyle: 'background-color: #CECECE; background-image: none;'
+        });
+        var bbar_l = '<div class="btn-group">'
+               + '<button type="button" class="btn btn-primary btn-sm" id="pickfiles"><i class="fa fa-upload"></i>&nbsp;上传文件</button>'
+               + '<button type="button" onclick="browsefile()" class="btn btn-primary btn-sm"><i class="fa fa-exchange fa-fw"></i>&nbsp;浏览文件</button>'
+               + '<button type="button" onclick="removeFile()" class="btn btn-primary btn-sm" id="deletefile"><i class="fa fa-trash-o"></i>&nbsp;删除文件</button>'
+           + '</div>';
+        var bbar_r = '<div class="btn-group">'
+        + '<button type="button" onclick="save()" class="btn btn-primary btn-sm" id="btn_saveorder"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
+        + '</div>';
+
+        var buttombar = Ext.create('Ext.toolbar.Toolbar', {
+            items: [bbar_l, '->', bbar_r]
+        })
+
+        var form_panel = Ext.create('Ext.form.Panel', {
+            title:'<center>委托信息</center>',
+            id: 'form_panel',
+            bbar: buttombar,
+            border: 0,
+            fieldDefaults: {
+                margin: '0 5 10 10',
+                labelWidth: 80,
+                columnWidth:1,
+                labelSeparator: '',
+                msgTarget: 'under',
+                labelAlign: 'left'
+            },
+            items: [
+                { layout: 'column', height: 42, border: 0, items: [field_CODE] },
+                { layout: 'column', height: 42, border: 0, items: [cont_wjjsdw] },
+                { layout: 'column', height: 42, border: 0, items: [cont_wjsbdw] },
+                { layout: 'column', height: 42, border: 0, items: [combo_CUSTOMDISTRICTNAME] },
+                { layout: 'column', height: 42, border: 0, items: [combo_BUSITYPE] },
+                { layout: 'column', height: 42, border: 0, items: [combo_REPWAYNAME] },    
+                { layout: 'column', height: 42, border: 0, items: [field_TEMPLATENAME] },
+                { layout: 'column', height: 42, border: 0, items: [field_REMARK] },
+                { layout: 'column', height: 42, border: 0, items: [field_UNITCODE] },
+                { layout: 'column', height: 42, border: 0, items: [com_STATUS] },
+                { layout: 'column', height: 42, border: 0, items: [combo_CREATEMODE] },         
+                { layout: 'column', height: 42, border: 0, items: [field_ISREADPDF] },               
+                field_CUSTOMDISTRICTNAME, field_ID, field_ORIGINALFILEIDS
+            ]
+        })
+
+        var storefile = Ext.create('Ext.data.JsonStore', {
+            fields: ['ID', 'FILENAME', 'NEWNAME', 'ORIGINALNAME', 'UPLOADTIME', 'SIZES', 'FILETYPE']
+        });
+
+        var tmp = new Ext.XTemplate(
+            '<tpl for=".">',
+            '<div class="panel panel-default thumb-wrap fl" style="margin-top:5px;margin-left:5px;width:240px">',
+            //'<div class="panel-heading" style="padding-left:5px;padding-right:5px">{[values.ORIGINALNAME.substr(0,23)]}<div class="fr"><span class="glyphicon glyphicon-paperclip"></span></div></div>',
+            '<div class="panel-heading" style="padding-left:5px;padding-right:5px">{[values.ORIGINALNAME.substr(0,23)]}<div class="fr"><a href="/EnterpriseOrder/DownFile?filename={[values.FILENAME]}&ID={[values.ID]}" style="cursor:pointer"><span class="glyphicon glyphicon-download-alt"></span></a></div></div>',
+            '<div class="panel-body" style="padding-left:5px;">',
+            '<tpl>{[values.SIZES/1024 > 1024?Math.round(values.SIZES/(1024*1024))+"M":Math.round(values.SIZES/1024)+"K"]}</tpl>',
+            '|{[values.UPLOADTIME]}</div></div>',
+            '</tpl>'
+            )
+        var fileview = Ext.create('Ext.view.View', {
+            id: 'fileview1',
+            store: storefile,
+            tpl: tmp,
+            itemSelector: 'div.thumb-wrap',
+            multiSelect: true
+        })
+        var panelfile = Ext.create('Ext.panel.Panel', {
+            id: 'panelfile',
+            border: 0,
+            width: '100%',
+            minHeight: 500,
+            items: [fileview]
+        })
+    }
+
+
+    function browsefile() {
+
+        var fileview = Ext.getCmp('fileview1');
+        var records = fileview.getSelectionModel().getSelection();
+        if (records.length == 0) {
+            Ext.MessageBox.alert("提示", "请选择要浏览的记录！");
+            return
+        }
+        alert(records[0].get("ID"));
+        if (records[0].get("ID")) {
+            document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + common_data_adminurl + '\/file' + records[0].get("FILENAME") + '"></embed>';
+        }
+        else {
+            document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + records[0].get("FILENAME") + '"></embed>';
+        }
+        
+    }
+
+    function upload_ini() {
+        var uploader = new plupload.Uploader({
+            runtimes: 'html5,flash,silverlight,html4',
+            browse_button: 'pickfiles', // you can pass an id... 
+            url: '/EnterpriseOrder/Upload_WebServer',
+            flash_swf_url: '/js/upload/Moxie.swf',
+            silverlight_xap_url: '/js/upload/Moxie.xap',
+            unique_names: true,
+            filters: {
+                max_file_size: '500mb',
+                mime_types: [
+                    { title: "Image files", extensions: "*" },
+                    { title: "Zip files", extensions: "zip,rar" }
+                ]
+            }
+        });
+        uploader.init();
+        uploader.bind('FilesAdded', function (up, files) {
+            uploader.start();
+        });
+        uploader.bind('FileUploaded', function (up, file) {
+            var timestamp = Ext.Date.now();  //1351666679575  这个方法只是获取的时间戳
+            var date = new Date(timestamp);
+            Ext.getCmp('fileview1').store.insert(Ext.getCmp('fileview1').store.data.length
+                , { FILENAME: '/FileUpload/file/' + file.target_name, NEWNAME: file.target_name, ORIGINALNAME: file.name, SIZES: file.size, UPLOADTIME: Ext.Date.format(date, 'Y-m-d H:i:s'), FILETYPE: 44 });
+        });
+    }
+
+    function removeFile() {
+        var fileview = Ext.getCmp('fileview1');
+        var records = fileview.getSelectionModel().getSelection();
+        if (records.length == 0) {
+            Ext.MessageBox.alert("提示", "请选择要删除的记录！");
+            return
+        }
+        Ext.MessageBox.confirm('提示', '确定要删除选择的记录吗？', function (btn) {
+            if (btn == 'yes') {
+                var records = fileview.getSelectionModel().getSelection();
+                fileview.store.remove(records);
+            }
+        })
+    }
+
+</script>

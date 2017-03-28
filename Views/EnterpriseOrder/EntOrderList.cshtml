@@ -82,12 +82,12 @@
                     { header: '生成方式', dataIndex: 'CREATEMODE', width: 120 },
                     { header: '备注', dataIndex: 'REMARK', width: 150 }
                     ],
-                    listeners:
-                    {
-                        'itemdblclick': function (view, record, item, index, e) {
-                            addwin(record.data.ID);
-                        }
-                    },
+                    //listeners:
+                    //{
+                    //    'itemdblclick': function (view, record, item, index, e) {
+                    //        addwin(record.data.ID);
+                    //    }
+                    //},
                     viewConfig: {
                         enableTextSelection: true
                     }
@@ -238,6 +238,25 @@
             }
         });
     }
+
+    function openBatchWin() {
+        var recs = gridpanel.getSelectionModel().getSelection();
+        if (recs.length == 0) {
+            Ext.MessageBox.alert('提示', '请选择需要维护的记录！');
+            return;
+        }
+        var plwhids = "";
+        for (var i = 0; i < recs.length; i++) {
+            plwhids += recs[i].data.ID + ',';
+        }
+        var unitcodes = "";
+        for (var i = 0; i < recs.length; i++) {
+            unitcodes += recs[i].data.UNITCODE + ',';
+        }
+        plwhids = plwhids.substr(0, plwhids.length - 1);
+        unitcodes = unitcodes.substr(0, unitcodes.length - 1);
+        opencenterwin("/EnterpriseOrder/BatchMaintain?ids=" + plwhids + "&unitcodes=" + unitcodes, 1200, 800);
+    }
 </script>
 
 <div class="container">
@@ -245,7 +264,8 @@
     <div>
         <div class="btn-group" role="group">
             <button onclick="Open()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;添加</button>
-            <button onclick="Delete()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-trash-o"></i>&nbsp;删除</button>
+            <button onclick="openBatchWin()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-trash-o"></i>&nbsp;批量维护</button>
+            <button onclick="Delete()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-trash-o"></i>&nbsp;删除</button>   
         </div>
         <div class="btn-group fr" role="group">
             <button onclick="Select()" class="btn btn-primary btn-sm"><i class="fa fa-search"></i>&nbsp;查询</button>
