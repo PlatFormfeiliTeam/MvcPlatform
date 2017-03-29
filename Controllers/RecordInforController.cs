@@ -19,28 +19,41 @@ namespace MvcPlatform.Controllers
         //
         // GET: /RecordInfor/
         int totalProperty = 0;
-        public ActionResult Recordinfo_Detail()//备案信息
+        public ActionResult Recordinfo_Detail()//账册信息
         {
-            ViewBag.navigator = "备案管理>>备案信息";
+            ViewBag.navigator = "备案管理>>账册信息";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
-        public ActionResult Create()//备案信息 create
+        public ActionResult Create()//账册信息 create
         {
-            ViewBag.navigator = "备案管理>>备案信息";
+            ViewBag.navigator = "备案管理>>账册信息";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
-        public ActionResult Change()//备案信息 change
+        public ActionResult Change()//账册信息 change
         {
-            ViewBag.navigator = "备案管理>>备案信息";
+            ViewBag.navigator = "备案管理>>账册信息";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
 
-        public ActionResult Delete()//备案信息 delete
+        public ActionResult Delete()//账册信息 delete
         {
-            ViewBag.navigator = "备案管理>>备案信息";
+            ViewBag.navigator = "备案管理>>账册信息";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
+        public ActionResult Recordinfo_Detail_SUMNUM()//申报数量
+        {
+            ViewBag.navigator = "备案管理>>申报数量";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
+
+        public ActionResult Recordinfo_Detail_Audit()//账册审核
+        {
+            ViewBag.navigator = "客户服务>>账册审核";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
@@ -51,12 +64,6 @@ namespace MvcPlatform.Controllers
             return View();
         }
 
-        public ActionResult Recordinfo_Detail_SUMNUM()//申报数量
-        {
-            ViewBag.navigator = "备案管理>>申报数量";
-            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
-            return View();
-        }
 
         #region Recordinfo_Detail
         public string Query_RecordInfor(string type)
@@ -925,6 +932,109 @@ namespace MvcPlatform.Controllers
         }
 
         #endregion
+
+        #region Recordinfor_Audit
+        public string GetRecordidByEnterprise()
+        {
+            string json_recordid = "[]";//账册号
+            string sql = @"select id,code,code||'('||bookattribute||')' as name from sys_recordinfo where busiunit= '" + Request["EnterpriseHSCOCDE"] + "'";
+            json_recordid = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+            return "{recordid:" + json_recordid + "}";
+        }
+
+        public string Query_RecordInfor_Audit(string type)
+        {
+            string where = "";
+            if (!string.IsNullOrEmpty(Request["ENTERPRISECODE"]))
+            {
+                where += " and a.busiunit='" + Request["ENTERPRISECODE"] + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["RECORDINFORID"]))
+            {
+                where += " and a.CODE='" + Request["RECORDINFORID"] + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["ITEMNO"]))
+            {
+                where += " and  b.ITEMNO='" + Request["ITEMNO"] + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["HSCODE"]))
+            {
+                where += " and  b.HSCODE='" + Request["HSCODE"] + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["ITEMNOATTRIBUTE"]))
+            {
+                where += " and  b.ITEMNOATTRIBUTE='" + Request["ITEMNOATTRIBUTE"] + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["OPTIONS"]) && type == "go")
+            {
+                where += " and  b.OPTIONS='" + Request["OPTIONS"] + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["STATUS"]) && type == "go")
+            {
+                where += " and  b.STATUS='" + Request["STATUS"] + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["DATE_START"]) && type == "go")//如果开始时间有值
+            {
+                where += " and b.SUBMITTIME>=to_date('" + Request["DATE_START"] + "','yyyy-mm-dd hh24:mi:ss') ";
+            }
+            if (!string.IsNullOrEmpty(Request["DATE_END"]) && type == "go")//如果结束时间有值
+            {
+                where += " and b.SUBMITTIME<=to_date('" + Request["DATE_END"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+            }
+            return where;
+        }
+
+        public string loadRecordDetail_Audit()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string where = Query_RecordInfor_Audit("");
+
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+            string sql = @"select a.code,a.busiunit,b.*,c.name busiunitname 
+                            from cusdoc.sys_recordinfo a
+                                 inner join (
+                                         select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
+                                                ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark 
+                                                ,null options,null status,null customercode,null customername, null submittime 
+                                         from cusdoc.sys_recordinfo_detail aa
+                                    ) b on a.id=b.recordinfoid 
+                                left join (select code,name from cusdoc.base_company where code is not null and enabled=1) c on a.busiunit=c.code";
+            sql = sql + " where 1=1" + where;
+
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "recordinfoid,itemno", "asc"));
+            var json = JsonConvert.SerializeObject(dt, iso);
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
+        public string loadRecordDetail_Audit_Go()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string where = Query_RecordInfor_Audit("go");
+
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+            string sql = @"select a.code,a.busiunit,b.*,c.name busiunitname 
+                            from cusdoc.sys_recordinfo a
+                                 inner join (  
+                                         select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
+                                                ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark
+                                                ,aa.options,aa.status,aa.customercode,aa.customername,aa.submittime 
+                                         from sys_recordinfo_detail_task aa 
+                                    ) b on a.id=b.recordinfoid 
+                                left join (select code,name from cusdoc.base_company where code is not null and enabled=1) c on a.busiunit=c.code";
+            sql = sql + " where b.customercode='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where;
+
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "b.id", "desc"));
+            var json = JsonConvert.SerializeObject(dt, iso);
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
+
+        #endregion
+
 
         private string GetPageSql(string tempsql, string order, string asc)
         {
