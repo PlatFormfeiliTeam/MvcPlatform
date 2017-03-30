@@ -143,152 +143,12 @@
 function itemsbind_Audit() {
     Ext.regModel('RecrodDetail', {
         fields: ['ID', 'OPTIONS', 'STATUS', 'RECORDINFOID', 'CODE', 'ITEMNO', 'HSCODE', 'ADDITIONALNO', 'ITEMNOATTRIBUTE', 'COMMODITYNAME'
-            , 'SPECIFICATIONSMODEL', 'UNIT', 'REMARK', 'BUSIUNIT', 'BUSIUNITNAME']
+            , 'SPECIFICATIONSMODEL', 'UNIT', 'REMARK', 'BUSIUNIT', 'BUSIUNITNAME','SUBMITTIME']
     });
+    Ext.tip.QuickTipManager.init();
 
-    var store_RecrodDetail_lj = Ext.create('Ext.data.JsonStore', {
-        model: 'RecrodDetail',
-        pageSize: 20,
-        proxy: {
-            type: 'ajax',
-            url: '/RecordInfor/loadRecordDetail_Audit',
-            reader: {
-                root: 'rows',
-                type: 'json',
-                totalProperty: 'total'
-            }
-        },
-        autoLoad: true,
-        listeners: {
-            beforeload: function () {
-                store_RecrodDetail_lj.getProxy().extraParams = {
-                    ITEMNOATTRIBUTE: '料件',
-                    ENTERPRISECODE: Ext.getCmp('s_combo_recordid').getValue(), RECORDINFORID: Ext.getCmp('s_combo_enterprise').getValue(),
-                    ITEMNO: Ext.getCmp("field_ITEMNO").getValue(), HSCODE: Ext.getCmp('field_HSCODE').getValue(),
-                    OPTIONS: Ext.getCmp('s_combo_optionstatus').getValue(), STATUS: Ext.getCmp("s_combo_status").getValue(),
-                    DATE_START: Ext.Date.format(Ext.getCmp("date_start").getValue(), 'Y-m-d H:i:s'), DATE_END: Ext.Date.format(Ext.getCmp("date_end").getValue(), 'Y-m-d H:i:s')
-                }
-            },
-            load: function () {
-                var total_lj = store_RecrodDetail_lj.getProxy().getReader().rawData.total;
-                Ext.getCmp("tabpanel").items.items[0].setTitle("料件(" + total_lj + ")");
-            }
-        }
-    });
-
-    var pgbar_lj = Ext.create('Ext.toolbar.Paging', {
-        id: 'pgbar_lj',
-        displayMsg: '显示 {0} - {1} 条,共计 {2} 条',
-        store: store_RecrodDetail_lj,
-        displayInfo: true
-    })
-    gridpanel_lj = Ext.create('Ext.grid.Panel', {
-        id: "gridpanel_lj",
-        store: store_RecrodDetail_lj,
-        height: 500,
-        selModel: { selType: 'checkboxmodel' },
-        bbar: pgbar_lj,
-        enableColumnHide: false,
-        columns: [
-        { xtype: 'rownumberer', width: 35 },
-        { header: 'ID', dataIndex: 'ID', hidden: true },
-        { header: '账册号', dataIndex: 'CODE', width: 130 },
-        { header: '项号', dataIndex: 'ITEMNO', width: 80 },
-        { header: 'HS编码', dataIndex: 'HSCODE', width: 130 },
-        { header: '附加码', dataIndex: 'ADDITIONALNO', width: 80 },
-        { header: '项号属性', dataIndex: 'ITEMNOATTRIBUTE', width: 80 },
-        { header: '商品名称', dataIndex: 'COMMODITYNAME', width: 200 },
-        { header: '规格型号', dataIndex: 'SPECIFICATIONSMODEL', width: 200 },
-        { header: '成交单位', dataIndex: 'UNIT', width: 80, renderer: renderOrder },
-        { header: '企业名称', dataIndex: 'BUSIUNITNAME', width: 250 },
-        { header: '备注', dataIndex: 'REMARK', width: 150 }
-        ],
-        viewConfig: {
-            enableTextSelection: true
-        },
-        forceFit: true
-    });
-    var store_RecrodDetail_cp = Ext.create('Ext.data.JsonStore', {
-        model: 'RecrodDetail',
-        pageSize: 20,
-        proxy: {
-            type: 'ajax',
-            url: '/RecordInfor/loadRecordDetail_Audit',
-            reader: {
-                root: 'rows',
-                type: 'json',
-                totalProperty: 'total'
-            }
-        },
-        autoLoad: true,
-        listeners: {
-            beforeload: function () {
-                store_RecrodDetail_cp.getProxy().extraParams = {
-                    ITEMNOATTRIBUTE: '成品',
-                    ENTERPRISECODE: Ext.getCmp('s_combo_recordid').getValue(), RECORDINFORID: Ext.getCmp('s_combo_enterprise').getValue(),
-                    ITEMNO: Ext.getCmp("field_ITEMNO").getValue(), HSCODE: Ext.getCmp('field_HSCODE').getValue(),
-                    OPTIONS: Ext.getCmp('s_combo_optionstatus').getValue(), STATUS: Ext.getCmp("s_combo_status").getValue(),
-                    DATE_START: Ext.Date.format(Ext.getCmp("date_start").getValue(), 'Y-m-d H:i:s'), DATE_END: Ext.Date.format(Ext.getCmp("date_end").getValue(), 'Y-m-d H:i:s')
-                }
-            },
-            load: function () {
-                var total_cp = store_RecrodDetail_cp.getProxy().getReader().rawData.total;
-                Ext.getCmp("tabpanel").items.items[1].setTitle("成品(" + total_cp + ")");
-            }
-        }
-    });
-
-    var pgbar_cp = Ext.create('Ext.toolbar.Paging', {
-        id: 'pgbar_cp',
-        displayMsg: '显示 {0} - {1} 条,共计 {2} 条',
-        store: store_RecrodDetail_cp,
-        displayInfo: true
-    })
-    gridpanel_cp = Ext.create('Ext.grid.Panel', {
-        id: "gridpanel_cp",
-        store: store_RecrodDetail_cp,
-        height: 500,
-        selModel: { selType: 'checkboxmodel' },
-        bbar: pgbar_cp,
-        enableColumnHide: false,
-        columns: [
-        { xtype: 'rownumberer', width: 35 },
-        { header: 'ID', dataIndex: 'ID', hidden: true },
-        { header: '账册号', dataIndex: 'CODE', width: 130 },
-        { header: '项号', dataIndex: 'ITEMNO', width: 80 },
-        { header: 'HS编码', dataIndex: 'HSCODE', width: 130 },
-        { header: '附加码', dataIndex: 'ADDITIONALNO', width: 80 },
-        { header: '项号属性', dataIndex: 'ITEMNOATTRIBUTE', width: 80 },
-        { header: '商品名称', dataIndex: 'COMMODITYNAME', width: 200 },
-        { header: '规格型号', dataIndex: 'SPECIFICATIONSMODEL', width: 200 },
-        { header: '成交单位', dataIndex: 'UNIT', width: 80, renderer: renderOrder },
-        { header: '企业名称', dataIndex: 'BUSIUNITNAME', width: 250 },
-        { header: '备注', dataIndex: 'REMARK', width: 150 }
-        ],
-        viewConfig: {
-            enableTextSelection: true
-        },
-        forceFit: true
-    });
-
+    
     //====================================================================Go==================================================================
-    var tbar_lj_Go = Ext.create('Ext.toolbar.Toolbar', {
-        items: [
-            //{
-            //    text: '<span class="icon iconfont" style="font-size:12px;color:#3071A9;">&#xe632;</span>&nbsp;<font color="#3071A9">修 改</font>',
-            //    handler: function () { edit_task('gridpanel_lj_Go'); }
-            //},
-            //   {
-            //       text: '<span class="icon iconfont" style="font-size:12px;color:#3071A9;">&#xe6d3;</span>&nbsp;<font color="#3071A9">删 除</font>',
-            //       handler: function () { delete_task('gridpanel_lj_Go', 'pgbar_lj_Go'); }
-            //   },
-            //   {
-            //       text: '<span class="icon iconfont" style="font-size:12px;color:#3071A9;">&#xe601;</span>&nbsp;<font color="#3071A9">申请表打印</font>',
-            //       handler: function () { print_task('gridpanel_lj_Go'); }
-            //   }
-        ]
-
-    });
     var store_RecrodDetail_lj_Go = Ext.create('Ext.data.JsonStore', {
         model: 'RecrodDetail',
         pageSize: 20,
@@ -306,7 +166,7 @@ function itemsbind_Audit() {
             beforeload: function () {
                 store_RecrodDetail_lj_Go.getProxy().extraParams = {
                     ITEMNOATTRIBUTE: '料件',
-                    ENTERPRISECODE: Ext.getCmp('s_combo_recordid').getValue(), RECORDINFORID: Ext.getCmp('s_combo_enterprise').getValue(),
+                    ENTERPRISECODE: Ext.getCmp('s_combo_enterprise').getValue(), RECORDINFORID: Ext.getCmp('s_combo_recordid').getValue(),
                     ITEMNO: Ext.getCmp("field_ITEMNO").getValue(), HSCODE: Ext.getCmp('field_HSCODE').getValue(),
                     OPTIONS: Ext.getCmp('s_combo_optionstatus').getValue(), STATUS: Ext.getCmp("s_combo_status").getValue(),
                     DATE_START: Ext.Date.format(Ext.getCmp("date_start").getValue(), 'Y-m-d H:i:s'), DATE_END: Ext.Date.format(Ext.getCmp("date_end").getValue(), 'Y-m-d H:i:s')
@@ -314,7 +174,7 @@ function itemsbind_Audit() {
             },
             load: function () {
                 var total_lj_Go = store_RecrodDetail_lj_Go.getProxy().getReader().rawData.total;
-                Ext.getCmp("tabpanel").items.items[2].setTitle("料件_申请中(" + total_lj_Go + ")");
+                Ext.getCmp("tabpanel").items.items[0].setTitle("料件_申请(" + total_lj_Go + ")");
             }
         }
     });
@@ -330,48 +190,28 @@ function itemsbind_Audit() {
         store: store_RecrodDetail_lj_Go,
         height: 500,
         selModel: { selType: 'checkboxmodel' },
-        tbar: tbar_lj_Go,
         bbar: pgbar_lj_Go,
         enableColumnHide: false,
         columns: [
         { xtype: 'rownumberer', width: 35 },
         { header: 'ID', dataIndex: 'ID', hidden: true },
-        { header: '变动状态', dataIndex: 'OPTIONS', width: 110, renderer: renderOrder },
-        { header: '申请状态', dataIndex: 'STATUS', width: 110, renderer: renderOrder },
+        { header: '变动状态', dataIndex: 'OPTIONS', width: 80, renderer: renderOrder },
+        { header: '申请状态', dataIndex: 'STATUS', width: 80, renderer: renderOrder },
         { header: '账册号', dataIndex: 'CODE', width: 130 },
         { header: '项号', dataIndex: 'ITEMNO', width: 80 },
-        { header: 'HS编码', dataIndex: 'HSCODE', width: 130 },
-        { header: '附加码', dataIndex: 'ADDITIONALNO', width: 80 },
+        { header: 'HS编码', dataIndex: 'HSCODE', width: 100 },
+        { header: '附加码', dataIndex: 'ADDITIONALNO', width: 60 },
         { header: '项号属性', dataIndex: 'ITEMNOATTRIBUTE', width: 80 },
-        { header: '商品名称', dataIndex: 'COMMODITYNAME', width: 150 },
-        { header: '规格型号', dataIndex: 'SPECIFICATIONSMODEL', width: 200 },
+        { header: '商品名称', dataIndex: 'COMMODITYNAME', width: 150, renderer: ViewAll },
+        { header: '规格型号', dataIndex: 'SPECIFICATIONSMODEL', width: 150, renderer: ViewAll },
         { header: '成交单位', dataIndex: 'UNIT', width: 80, renderer: renderOrder },
-        { header: '委托企业', dataIndex: 'BUSIUNITNAME', width: 250 },
-        { header: '备注', dataIndex: 'REMARK', width: 150 }
+        { header: '委托企业', dataIndex: 'BUSIUNITNAME', width: 200, renderer: ViewAll },
+        { header: '提交时间', dataIndex: 'SUBMITTIME', width: 150 }
         ],
         viewConfig: {
             enableTextSelection: true
         },
         forceFit: true
-    });
-
-
-    var tbar_cp_Go = Ext.create('Ext.toolbar.Toolbar', {
-        items: [
-            //{
-            //    text: '<span class="icon iconfont" style="font-size:12px;color:#3071A9;">&#xe632;</span>&nbsp;<font color="#3071A9">修 改</font>',
-            //    handler: function () { edit_task('gridpanel_cp_Go'); }
-            //},
-            //   {
-            //       text: '<span class="icon iconfont" style="font-size:12px;color:#3071A9;">&#xe6d3;</span>&nbsp;<font color="#3071A9">删 除</font>',
-            //       handler: function () { delete_task('gridpanel_cp_Go', 'pgbar_cp_Go'); }
-            //   },
-            //   {
-            //       text: '<span class="icon iconfont" style="font-size:12px;color:#3071A9;">&#xe601;</span>&nbsp;<font color="#3071A9">申请表打印</font>',
-            //       handler: function () { print_task('gridpanel_cp_Go'); }
-            //   }
-        ]
-
     });
 
     var store_RecrodDetail_cp_Go = Ext.create('Ext.data.JsonStore', {
@@ -391,7 +231,7 @@ function itemsbind_Audit() {
             beforeload: function () {
                 store_RecrodDetail_cp_Go.getProxy().extraParams = {
                     ITEMNOATTRIBUTE: '成品',
-                    ENTERPRISECODE: Ext.getCmp('s_combo_recordid').getValue(), RECORDINFORID: Ext.getCmp('s_combo_enterprise').getValue(),
+                    ENTERPRISECODE: Ext.getCmp('s_combo_enterprise').getValue(), RECORDINFORID: Ext.getCmp('s_combo_recordid').getValue(),
                     ITEMNO: Ext.getCmp("field_ITEMNO").getValue(), HSCODE: Ext.getCmp('field_HSCODE').getValue(),
                     OPTIONS: Ext.getCmp('s_combo_optionstatus').getValue(), STATUS: Ext.getCmp("s_combo_status").getValue(),
                     DATE_START: Ext.Date.format(Ext.getCmp("date_start").getValue(), 'Y-m-d H:i:s'), DATE_END: Ext.Date.format(Ext.getCmp("date_end").getValue(), 'Y-m-d H:i:s')
@@ -399,7 +239,7 @@ function itemsbind_Audit() {
             },
             load: function () {
                 var total_cp_Go = store_RecrodDetail_cp_Go.getProxy().getReader().rawData.total;
-                Ext.getCmp("tabpanel").items.items[3].setTitle("成品_申请中(" + total_cp_Go + ")");
+                Ext.getCmp("tabpanel").items.items[1].setTitle("成品_申请(" + total_cp_Go + ")");
             }
         }
     });
@@ -415,24 +255,23 @@ function itemsbind_Audit() {
         store: store_RecrodDetail_cp_Go,
         height: 500,
         selModel: { selType: 'checkboxmodel' },
-        tbar: tbar_cp_Go,
         bbar: pgbar_cp_Go,
         enableColumnHide: false,
         columns: [
         { xtype: 'rownumberer', width: 35 },
         { header: 'ID', dataIndex: 'ID', hidden: true },
-        { header: '变动状态', dataIndex: 'OPTIONS', width: 110, renderer: renderOrder },
-        { header: '申请状态', dataIndex: 'STATUS', width: 110, renderer: renderOrder },
+        { header: '变动状态', dataIndex: 'OPTIONS', width: 80, renderer: renderOrder },
+        { header: '申请状态', dataIndex: 'STATUS', width: 80, renderer: renderOrder },
         { header: '账册号', dataIndex: 'CODE', width: 130 },
         { header: '项号', dataIndex: 'ITEMNO', width: 80 },
-        { header: 'HS编码', dataIndex: 'HSCODE', width: 130 },
-        { header: '附加码', dataIndex: 'ADDITIONALNO', width: 80 },
+        { header: 'HS编码', dataIndex: 'HSCODE', width: 100 },
+        { header: '附加码', dataIndex: 'ADDITIONALNO', width: 60 },
         { header: '项号属性', dataIndex: 'ITEMNOATTRIBUTE', width: 80 },
-        { header: '商品名称', dataIndex: 'COMMODITYNAME', width: 150 },
-        { header: '规格型号', dataIndex: 'SPECIFICATIONSMODEL', width: 200 },
+        { header: '商品名称', dataIndex: 'COMMODITYNAME', width: 150, renderer: ViewAll },
+        { header: '规格型号', dataIndex: 'SPECIFICATIONSMODEL', width: 150, renderer: ViewAll },
         { header: '成交单位', dataIndex: 'UNIT', width: 80, renderer: renderOrder },
-        { header: '委托企业', dataIndex: 'BUSIUNITNAME', width: 250 },
-        { header: '备注', dataIndex: 'REMARK', width: 150 }
+        { header: '委托企业', dataIndex: 'BUSIUNITNAME', width: 200, renderer: ViewAll },
+        { header: '提交时间', dataIndex: 'SUBMITTIME', width: 150 }
         ],
         viewConfig: {
             enableTextSelection: true
@@ -447,7 +286,31 @@ function Select() {
 }
 
 function Reset() {
-    Ext.each(Ext.getCmp('formpanel').getForm().getFields().items, function (field) {
-        field.reset();
-    });
+    Ext.getCmp("s_combo_enterprise").setValue("");
+    Ext.getCmp("s_combo_recordid").setValue("");
+    Ext.getCmp("field_ITEMNO").setValue("");
+    Ext.getCmp("field_HSCODE").setValue("");
+    Ext.getCmp("s_combo_optionstatus").setValue("");
+    Ext.getCmp("s_combo_status").setValue("");
+    Ext.getCmp("date_start").setValue("");
+    Ext.getCmp("date_end").setValue("");
+}
+
+function Export_Audit() {
+    var enterprisecode = Ext.getCmp('s_combo_enterprise').getValue(); enterprisecode = enterprisecode == null ? "" : enterprisecode;
+    var recordid = Ext.getCmp('s_combo_recordid').getValue(); recordid = recordid == null ? "" : recordid;
+    var itemno = Ext.getCmp('field_ITEMNO').getValue(); var hscode = Ext.getCmp('field_HSCODE').getValue();
+    var options = Ext.getCmp('s_combo_optionstatus').getValue(); options = options == null ? "" : options;
+    var status = Ext.getCmp('s_combo_status').getValue(); status = status == null ? "" : status;
+    var date_start = Ext.Date.format(Ext.getCmp("date_start").getValue(), 'Y-m-d H:i:s'); var date_end = Ext.Date.format(Ext.getCmp("date_end").getValue(), 'Y-m-d H:i:s');
+
+    $('#e_options').val(JSON.stringify(optionstatus_js_data));
+    $('#e_status').val(JSON.stringify(status_js_data));
+    $('#e_unit').val(JSON.stringify(common_data_unit));
+
+    var path = '/RecordInfor/Export_Audit?ENTERPRISECODE=' + enterprisecode + '&RECORDINFORID=' + recordid + '&ITEMNO=' + itemno
+        + '&HSCODE=' + hscode + '&OPTIONS=' + options + '&STATUS=' + status + '&DATE_START=' + date_start + '&DATE_END=' + date_end;
+    $('#exportform').attr("action", path).submit();
+
+   
 }

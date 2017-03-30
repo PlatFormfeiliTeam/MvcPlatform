@@ -355,3 +355,9 @@ function SetItemno_consume(recordid) {
         });
     }
 }
+
+
+function ViewAll(value, meta, record) {
+    meta.tdAttr = 'data-qtip="' + value + '"';
+    return value;
+}

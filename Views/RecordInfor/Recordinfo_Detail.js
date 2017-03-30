@@ -259,7 +259,7 @@ function itemsbind() {
             },
             load: function () {
                 var total_lj_Go = store_RecrodDetail_lj_Go.getProxy().getReader().rawData.total;
-                Ext.getCmp("tabpanel").items.items[2].setTitle("料件_申请中(" + total_lj_Go + ")");
+                Ext.getCmp("tabpanel").items.items[2].setTitle("料件_申请(" + total_lj_Go + ")");
             }
         }
     });
@@ -348,7 +348,7 @@ function itemsbind() {
             },
             load: function () {
                 var total_cp_Go = store_RecrodDetail_cp_Go.getProxy().getReader().rawData.total;
-                Ext.getCmp("tabpanel").items.items[3].setTitle("成品_申请中(" + total_cp_Go + ")");
+                Ext.getCmp("tabpanel").items.items[3].setTitle("成品_申请(" + total_cp_Go + ")");
             }
         }
     });

@@ -68,7 +68,9 @@ namespace MvcPlatform.Controllers
         #region Recordinfo_Detail
         public string Query_RecordInfor(string type)
         {
-            string where = "";
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            string sql="",where = "";
             if (!string.IsNullOrEmpty(Request["RECORDINFORID"]))
             {
                 where += " and a.CODE='" + Request["RECORDINFORID"] + "'";
@@ -93,7 +95,41 @@ namespace MvcPlatform.Controllers
             {
                 where += " and  b.ITEMNOATTRIBUTE='" + Request["ITEMNOATTRIBUTE"] + "'";
             }
-            return where;
+            if (type == "go")
+            {
+                sql = @"select a.code,b.*
+                            from cusdoc.sys_recordinfo a
+                                 inner join (  
+                                         select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
+                                                ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark
+                                                ,aa.options,aa.status,aa.customercode,aa.customername
+                                         from sys_recordinfo_detail_task aa 
+                                    ) b on a.id=b.recordinfoid ";
+            }
+            else
+            {
+                sql = @"select a.code,b.*
+                            from cusdoc.sys_recordinfo a
+                                 inner join (
+                                         select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
+                                                ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark 
+                                                ,null options,null status,null customercode,null customername
+                                         from cusdoc.sys_recordinfo_detail aa
+                                    ) b on a.id=b.recordinfoid ";                
+            }
+
+            if (Request["ERROR"].ToString() == "1")
+            {
+                sql = sql + " left join (select hscode from cusdoc.BASE_COMMODITYHS where enabled=1) c on b.hscode=c.hscode";
+            }
+            sql = sql + " where a.busiunit='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where;
+
+            if (Request["ERROR"].ToString() == "1")
+            {
+                sql = sql + " and c.hscode is null";
+            }
+
+            return sql;
         }
 
         /*all sql
@@ -114,65 +150,24 @@ namespace MvcPlatform.Controllers
                                 ) b on a.id=b.recordinfoid ";*/
         public string loadRecordDetail()
         {
-            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            string where = Query_RecordInfor("");
-
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
-            string sql = @"select a.code,b.*
-                            from cusdoc.sys_recordinfo a
-                                 inner join (
-                                         select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
-                                                ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark 
-                                                ,null options,null status,null customercode,null customername
-                                         from cusdoc.sys_recordinfo_detail aa
-                                    ) b on a.id=b.recordinfoid ";
-            if (Request["ERROR"].ToString() == "1")
-            {
-                sql = sql + " left join (select hscode from cusdoc.BASE_COMMODITYHS where enabled=1) c on b.hscode=c.hscode";
-            }
-            sql = sql + " where a.busiunit='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where;
-
-            if (Request["ERROR"].ToString() == "1")
-            {
-                sql = sql + " and c.hscode is null";
-            }
-
+            string sql = Query_RecordInfor("");
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "recordinfoid,itemno", "asc"));
+
             var json = JsonConvert.SerializeObject(dt, iso);
             return "{rows:" + json + ",total:" + totalProperty + "}";
         }
 
         public string loadRecordDetail_Go()
         {
-            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            string where = Query_RecordInfor("go");
-
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
-            string sql = @"select a.code,b.*
-                            from cusdoc.sys_recordinfo a
-                                 inner join (  
-                                         select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
-                                                ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark
-                                                ,aa.options,aa.status,aa.customercode,aa.customername
-                                         from sys_recordinfo_detail_task aa 
-                                    ) b on a.id=b.recordinfoid ";
-
-            if (Request["ERROR"].ToString() == "1")
-            {
-                sql = sql + " left join (select hscode from cusdoc.BASE_COMMODITYHS where enabled=1) c on b.hscode=c.hscode";
-            }
-            sql = sql + " where a.busiunit='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where;
-
-            if (Request["ERROR"].ToString() == "1")
-            {
-                sql = sql + " and c.hscode is null";
-            }
-
+            string sql = Query_RecordInfor("go");
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "b.id", "desc"));
+
             var json = JsonConvert.SerializeObject(dt, iso);
             return "{rows:" + json + ",total:" + totalProperty + "}";
         }
@@ -226,32 +221,13 @@ namespace MvcPlatform.Controllers
 
         public FileResult Export()
         {
-            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            string sql = "", where = "";string e_options=Request["e_options"];string e_status=Request["e_status"];string e_unit=Request["e_unit"];
+            string sql = "";string e_options=Request["e_options"];string e_status=Request["e_status"];string e_unit=Request["e_unit"];
             //创建Excel文件的对象
             NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();
-            string filename = "备案信息.xls";
+            string filename = "账册信息.xls";
 
             //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-            where = Query_RecordInfor("");
-            sql = @"select a.code,b.*
-                            from cusdoc.sys_recordinfo a
-                                 inner join (
-                                         select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
-                                                ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark 
-                                                ,null options,null status,null customercode,null customername
-                                         from cusdoc.sys_recordinfo_detail aa
-                                    ) b on a.id=b.recordinfoid ";
-            if (Request["ERROR"].ToString() == "1")
-            {
-                sql = sql + " left join (select hscode from cusdoc.BASE_COMMODITYHS where enabled=1) c on b.hscode=c.hscode";
-            }
-            sql = sql + " where a.busiunit='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where;
-
-            if (Request["ERROR"].ToString() == "1")
-            {
-                sql = sql + " and c.hscode is null";
-            }
+            sql = Query_RecordInfor("");
             sql = sql + " order by recordinfoid,itemno";
 
             DataTable dt = DBMgr.GetDataTable(sql);
@@ -298,26 +274,7 @@ namespace MvcPlatform.Controllers
             }
 
             //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-            where = Query_RecordInfor("go");
-            sql = @"select a.code,b.*
-                            from cusdoc.sys_recordinfo a
-                                 inner join (  
-                                         select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
-                                                ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark
-                                                ,aa.options,aa.status,aa.customercode,aa.customername
-                                         from sys_recordinfo_detail_task aa 
-                                    ) b on a.id=b.recordinfoid ";
-
-            if (Request["ERROR"].ToString() == "1")
-            {
-                sql = sql + " left join (select hscode from cusdoc.BASE_COMMODITYHS where enabled=1) c on b.hscode=c.hscode";
-            }
-            sql = sql + " where a.busiunit='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where;
-
-            if (Request["ERROR"].ToString() == "1")
-            {
-                sql = sql + " and c.hscode is null";
-            }
+            sql = Query_RecordInfor("go");
             sql = sql + " order by b.id desc";
 
             DataTable dt_go = DBMgr.GetDataTable(sql);
@@ -372,19 +329,6 @@ namespace MvcPlatform.Controllers
             book.Write(ms);
             ms.Seek(0, SeekOrigin.Begin);
             return File(ms, "application/vnd.ms-excel", filename);
-        }
-
-        public string GetName(string value, string datasource)
-        {
-            string name = "";
-
-            JArray jarray = JArray.Parse(datasource);
-            foreach (JObject json in jarray)
-            {
-                if (json.Value<string>("CODE") == value) { name = json.Value<string>("NAME"); break; }
-            }
-
-            return name;
         }
 
         #endregion
@@ -942,9 +886,11 @@ namespace MvcPlatform.Controllers
             return "{recordid:" + json_recordid + "}";
         }
 
-        public string Query_RecordInfor_Audit(string type)
+        public string Query_RecordInfor_Audit()
         {
-            string where = "";
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            string sql = ""; string where = "";
             if (!string.IsNullOrEmpty(Request["ENTERPRISECODE"]))
             {
                 where += " and a.busiunit='" + Request["ENTERPRISECODE"] + "'";
@@ -965,58 +911,23 @@ namespace MvcPlatform.Controllers
             {
                 where += " and  b.ITEMNOATTRIBUTE='" + Request["ITEMNOATTRIBUTE"] + "'";
             }
-            if (!string.IsNullOrEmpty(Request["OPTIONS"]) && type == "go")
+            if (!string.IsNullOrEmpty(Request["OPTIONS"]))
             {
                 where += " and  b.OPTIONS='" + Request["OPTIONS"] + "'";
             }
-            if (!string.IsNullOrEmpty(Request["STATUS"]) && type == "go")
+            if (!string.IsNullOrEmpty(Request["STATUS"]))
             {
                 where += " and  b.STATUS='" + Request["STATUS"] + "'";
             }
-            if (!string.IsNullOrEmpty(Request["DATE_START"]) && type == "go")//如果开始时间有值
+            if (!string.IsNullOrEmpty(Request["DATE_START"]))//如果开始时间有值
             {
                 where += " and b.SUBMITTIME>=to_date('" + Request["DATE_START"] + "','yyyy-mm-dd hh24:mi:ss') ";
             }
-            if (!string.IsNullOrEmpty(Request["DATE_END"]) && type == "go")//如果结束时间有值
+            if (!string.IsNullOrEmpty(Request["DATE_END"]))//如果结束时间有值
             {
                 where += " and b.SUBMITTIME<=to_date('" + Request["DATE_END"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
             }
-            return where;
-        }
-
-        public string loadRecordDetail_Audit()
-        {
-            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            string where = Query_RecordInfor_Audit("");
-
-            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
-            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-
-            string sql = @"select a.code,a.busiunit,b.*,c.name busiunitname 
-                            from cusdoc.sys_recordinfo a
-                                 inner join (
-                                         select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
-                                                ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark 
-                                                ,null options,null status,null customercode,null customername, null submittime 
-                                         from cusdoc.sys_recordinfo_detail aa
-                                    ) b on a.id=b.recordinfoid 
-                                left join (select code,name from cusdoc.base_company where code is not null and enabled=1) c on a.busiunit=c.code";
-            sql = sql + " where 1=1" + where;
-
-            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "recordinfoid,itemno", "asc"));
-            var json = JsonConvert.SerializeObject(dt, iso);
-            return "{rows:" + json + ",total:" + totalProperty + "}";
-        }
-
-        public string loadRecordDetail_Audit_Go()
-        {
-            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            string where = Query_RecordInfor_Audit("go");
-
-            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
-            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-
-            string sql = @"select a.code,a.busiunit,b.*,c.name busiunitname 
+            sql = @"select a.code,a.busiunit,b.*,c.name busiunitname 
                             from cusdoc.sys_recordinfo a
                                  inner join (  
                                          select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
@@ -1026,15 +937,106 @@ namespace MvcPlatform.Controllers
                                     ) b on a.id=b.recordinfoid 
                                 left join (select code,name from cusdoc.base_company where code is not null and enabled=1) c on a.busiunit=c.code";
             sql = sql + " where b.customercode='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where;
+            return sql;
+        }
 
+        public string loadRecordDetail_Audit_Go()
+        {
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+            string sql = Query_RecordInfor_Audit();
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "b.id", "desc"));
+
             var json = JsonConvert.SerializeObject(dt, iso);
             return "{rows:" + json + ",total:" + totalProperty + "}";
         }
 
+        public FileResult Export_Audit()
+        {
+            string sql = ""; string e_options = Request["e_options"]; string e_status = Request["e_status"]; string e_unit = Request["e_unit"];
+            //创建Excel文件的对象
+            NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();
+            string filename = "账册信息.xls";            
+
+            //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            sql = Query_RecordInfor_Audit();         
+            sql = sql + " order by b.id desc";
+
+            DataTable dt_go = DBMgr.GetDataTable(sql);
+            DataRow[] dr_lj_go = dt_go.Select("itemnoattribute='料件'"); DataRow[] dr_cp_go = dt_go.Select("itemnoattribute='成品'");
+
+            NPOI.SS.UserModel.ISheet sheet_lj_go = book.CreateSheet("料件_申请");
+            NPOI.SS.UserModel.IRow row3 = sheet_lj_go.CreateRow(0);
+            row3.CreateCell(0).SetCellValue("变动状态"); row3.CreateCell(1).SetCellValue("申请状态"); row3.CreateCell(2).SetCellValue("账册号"); row3.CreateCell(3).SetCellValue("项号");
+            row3.CreateCell(4).SetCellValue("HS编码"); row3.CreateCell(5).SetCellValue("附加码"); row3.CreateCell(6).SetCellValue("项号属性"); row3.CreateCell(7).SetCellValue("商品名称");
+            row3.CreateCell(8).SetCellValue("规格型号"); row3.CreateCell(9).SetCellValue("成交单位"); row3.CreateCell(10).SetCellValue("委托企业"); row3.CreateCell(11).SetCellValue("提交时间");
+            row3.CreateCell(12).SetCellValue("备注");
+
+            for (int i = 0; i < dr_lj_go.Length; i++)
+            {
+                NPOI.SS.UserModel.IRow rowtemp = sheet_lj_go.CreateRow(i + 1);
+                rowtemp.CreateCell(0).SetCellValue(GetName(dr_lj_go[i]["OPTIONS"].ToString(), e_options));
+                rowtemp.CreateCell(1).SetCellValue(GetName(dr_lj_go[i]["STATUS"].ToString(), e_status));
+                rowtemp.CreateCell(2).SetCellValue(dr_lj_go[i]["CODE"].ToString());
+                rowtemp.CreateCell(3).SetCellValue(dr_lj_go[i]["ITEMNO"].ToString());
+                rowtemp.CreateCell(4).SetCellValue(dr_lj_go[i]["HSCODE"].ToString());
+                rowtemp.CreateCell(5).SetCellValue(dr_lj_go[i]["ADDITIONALNO"].ToString());
+                rowtemp.CreateCell(6).SetCellValue(dr_lj_go[i]["ITEMNOATTRIBUTE"].ToString());
+                rowtemp.CreateCell(7).SetCellValue(dr_lj_go[i]["COMMODITYNAME"].ToString());
+                rowtemp.CreateCell(8).SetCellValue(dr_lj_go[i]["SPECIFICATIONSMODEL"].ToString());
+                rowtemp.CreateCell(9).SetCellValue(GetName(dr_lj_go[i]["UNIT"].ToString(), e_unit));
+                rowtemp.CreateCell(10).SetCellValue(dr_lj_go[i]["BUSIUNITNAME"].ToString());
+                rowtemp.CreateCell(11).SetCellValue(dr_lj_go[i]["SUBMITTIME"].ToString());
+                rowtemp.CreateCell(12).SetCellValue(dr_lj_go[i]["REMARK"].ToString());
+            }
+
+            NPOI.SS.UserModel.ISheet sheet_cp_go = book.CreateSheet("成品_申请");
+            NPOI.SS.UserModel.IRow row4 = sheet_cp_go.CreateRow(0);
+            row4.CreateCell(0).SetCellValue("变动状态"); row4.CreateCell(1).SetCellValue("申请状态"); row4.CreateCell(2).SetCellValue("账册号"); row4.CreateCell(3).SetCellValue("项号");
+            row4.CreateCell(4).SetCellValue("HS编码"); row4.CreateCell(5).SetCellValue("附加码"); row4.CreateCell(6).SetCellValue("项号属性"); row4.CreateCell(7).SetCellValue("商品名称");
+            row4.CreateCell(8).SetCellValue("规格型号"); row4.CreateCell(9).SetCellValue("成交单位"); row4.CreateCell(10).SetCellValue("委托企业"); row4.CreateCell(11).SetCellValue("提交时间");
+            row4.CreateCell(12).SetCellValue("备注");
+
+            for (int i = 0; i < dr_cp_go.Length; i++)
+            {
+                NPOI.SS.UserModel.IRow rowtemp = sheet_cp_go.CreateRow(i + 1);
+                rowtemp.CreateCell(0).SetCellValue(GetName(dr_cp_go[i]["OPTIONS"].ToString(), e_options));
+                rowtemp.CreateCell(1).SetCellValue(GetName(dr_cp_go[i]["STATUS"].ToString(), e_status));
+                rowtemp.CreateCell(2).SetCellValue(dr_cp_go[i]["CODE"].ToString());
+                rowtemp.CreateCell(3).SetCellValue(dr_cp_go[i]["ITEMNO"].ToString());
+                rowtemp.CreateCell(4).SetCellValue(dr_cp_go[i]["HSCODE"].ToString());
+                rowtemp.CreateCell(5).SetCellValue(dr_cp_go[i]["ADDITIONALNO"].ToString());
+                rowtemp.CreateCell(6).SetCellValue(dr_cp_go[i]["ITEMNOATTRIBUTE"].ToString());
+                rowtemp.CreateCell(7).SetCellValue(dr_cp_go[i]["COMMODITYNAME"].ToString());
+                rowtemp.CreateCell(8).SetCellValue(dr_cp_go[i]["SPECIFICATIONSMODEL"].ToString());
+                rowtemp.CreateCell(9).SetCellValue(GetName(dr_cp_go[i]["UNIT"].ToString(), e_unit));
+                rowtemp.CreateCell(10).SetCellValue(dr_cp_go[i]["BUSIUNITNAME"].ToString());
+                rowtemp.CreateCell(11).SetCellValue(dr_cp_go[i]["SUBMITTIME"].ToString());
+                rowtemp.CreateCell(12).SetCellValue(dr_cp_go[i]["REMARK"].ToString());
+            }
+            //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            // 写入到客户端 
+            System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            book.Write(ms);
+            ms.Seek(0, SeekOrigin.Begin);
+            return File(ms, "application/vnd.ms-excel", filename);
+        }
 
         #endregion
+        
+        public string GetName(string value, string datasource)
+        {
+            string name = "";
 
+            JArray jarray = JArray.Parse(datasource);
+            foreach (JObject json in jarray)
+            {
+                if (json.Value<string>("CODE") == value) { name = json.Value<string>("NAME"); break; }
+            }
+
+            return name;
+        }
 
         private string GetPageSql(string tempsql, string order, string asc)
         {
