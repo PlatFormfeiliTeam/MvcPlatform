@@ -62,6 +62,14 @@ namespace MvcPlatform.Controllers
             return View();
         }
 
+        public ActionResult ListOrder_Index()  //文件委托
+        {
+            //ViewBag.navigator = "企业服务>>委托任务";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
+        
+
         public string GetCode(string combin)
         {
             if (string.IsNullOrEmpty(combin))
@@ -730,5 +738,122 @@ namespace MvcPlatform.Controllers
         }
         #endregion
 
+        public string LoadList_index()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string where = QueryCondition();
+
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+            string sql = @"select * from LIST_ORDER where instr('" + Request["busitypeid"] + "',BUSITYPE)>0 and BUSIUNITCODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "' " + where;
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "createtime", "desc"));
+            var json = JsonConvert.SerializeObject(dt, iso);
+
+            return "{rows:" + json + ",total:" + totalProperty +"}";
+        }
+
+        public string QueryCondition()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            string where = "";
+
+            if (!string.IsNullOrEmpty(Request["VALUE1"]))//判断查询条件1是否有值
+            {
+                switch (Request["CONDITION1"])
+                {
+                    case "DECLSTATUS":
+                        if ((Request["VALUE1"] + "") == "草稿")  //草稿=草稿
+                        {
+                            where += " and DECLSTATUS=0 ";
+                        }
+                        if ((Request["VALUE1"] + "") == "已委托")  //已委托=已委托
+                        {
+                            where += " and DECLSTATUS=10 ";
+                        }
+                        if ((Request["VALUE1"] + "") == "申报中")  //申报中=申报中
+                        {
+                            where += " and DECLSTATUS=100 ";
+                        }
+                        if ((Request["VALUE1"] + "") == "申报完结")  //申报完结=申报完结
+                        {
+                            where += " and DECLSTATUS=130 ";
+                        }
+                        if ((Request["VALUE1"] + "") == "未完结")  //未完结
+                        {
+                            where += " and DECLSTATUS<130 ";
+                        }
+                        break;
+                    case "INSPSTATUS":
+                        if ((Request["VALUE1"] + "") == "草稿")  //草稿=草稿
+                        {
+                            where += " and INSPSTATUS=0 ";
+                        }
+                        if ((Request["VALUE1"] + "") == "已委托")  //已委托=已委托
+                        {
+                            where += " and INSPSTATUS=10 ";
+                        }
+                        if ((Request["VALUE1"] + "") == "申报中")  //申报中=申报中
+                        {
+                            where += " and INSPSTATUS=100 ";
+                        }
+                        if ((Request["VALUE1"] + "") == "申报完结")  //申报完结=申报完结
+                        {
+                            where += " and INSPSTATUS=130 ";
+                        }
+                        if ((Request["VALUE1"] + "") == "未完结")  //未完结
+                        {
+                            where += " and INSPSTATUS<130 ";
+                        }
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(Request["VALUE2"]))//判断查询条件2是否有值
+            {
+                switch (Request["CONDITION2"])
+                {
+                    case "CONTRACTNO":
+                        where += " and CONTRACTNO like '%" + Request["VALUE2"] + "%' ";
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(Request["VALUE3"]))//判断查询条件3是否有值
+            {
+                switch (Request["CONDITION3"])
+                {
+                    case "REPNO":
+                        where += " and REPNO like '%" + Request["VALUE3"] + "%' ";
+                        break;
+                    case "DIVIDENO":
+                        where += " and DIVIDENO like '%" + Request["VALUE3"] + "%' ";
+                        break;
+                    case "MANIFEST":
+                        where += " and MANIFEST like '%" + Request["VALUE3"] + "%' ";
+                        break;
+                    case "SECONDLADINGBILLNO":
+                        where += " and SECONDLADINGBILLNO like '%" + Request["VALUE3"] + "%' ";
+                        break;
+                }
+            }
+
+              if (!string.IsNullOrEmpty(Request["VALUE4"]))//判断查询条件2是否有值
+            {
+                switch (Request["CONDITION4"])
+                {
+                    case "CUSTOMAREACODE":
+                        where += " and CUSTOMAREACODE = '" + Request["VALUE4"] + "' ";
+                        break;
+                    case "REPWAYID":
+                        where += " and REPWAYID = '" + Request["VALUE4"] + "' ";
+                        break;
+                    case "PORTCODE":
+                        where += " and PORTCODE = '" + Request["VALUE4"] + "' ";
+                        break;
+                }
+            }
+            where += " and ISINVALID=0 ";//?是否需要
+            return where;
+        }
     }
 }
