@@ -2,6 +2,10 @@
     ViewBag.Title = "BatchMaintain";
     Layout = "~/Views/Shared/Empty.cshtml";
 }
+@using System.Configuration;
+@{
+    string url = ConfigurationManager.AppSettings["AdminUrl"];
+    }
 <link href="/js/Extjs42/resources/css/ext-all-gray.css" rel="stylesheet" type="text/css" />
 <script src="/js/Extjs42/bootstrap.js" type="text/javascript"></script>
 <script src="/js/pan.js" type="text/javascript"></script>
@@ -24,7 +28,7 @@
         var radio_FileID = Ext.create('Ext.form.RadioGroup', {
             id: 'radio_FileID',
             labelAlign: "right",
-            fieldLabel: '列表',
+            fieldLabel: '批量维护',
             width: '100%',
             columns: 4,
             margin: 10,
@@ -40,7 +44,7 @@
 
 
         for (var i = 0; i < id_array.length; i++) {
-            radio_FileID.insert({ boxLabel: unitcode_array[i], name: 'CREATEMODE', inputValue: id_array[i], id: id_array[i] });
+            radio_FileID.insert({ boxLabel: unitcode_array[i], name: 'CREATEMODE', inputValue: id_array[i], id: id_array[i], width: '90%' });//width:'85%'兼容ie8boxlabel与点对齐
         }
 
         Ext.Ajax.request({
@@ -49,7 +53,7 @@
                 var commondata = Ext.decode(response.responseText);
                 common_data_sbgq = commondata.sbgq;//申报关区
                 common_data_sbfs = commondata.sbfs;//申报方式
-                common_data_adminurl = commondata.adminurl;//文件服务器URL 
+                //common_data_adminurl = commondata.adminurl;//文件服务器URL 
                 form_ini();
 
                 var Npanel = Ext.create('Ext.panel.Panel', {
@@ -60,14 +64,21 @@
                 });
 
                 var Cpanel = Ext.create('Ext.panel.Panel', {
+                    id:'cpanel',
                     region: 'center',
+                    height: 1200,
                     items: [{
-                        html: "<div id='fileViewDiv'><embed id='pdf' width='100%' height='100%' src='/FileUpload/file/o_1bca2310mt2o7lnn531bna113m7.pdf'></embed>'</div>"
-                    }]
+                        html: "<div id='fileViewDiv'></div>"
+                    }],
+                    listeners: {
+                        render: function () {                        
+                                $("#fileViewDiv").height($(document).height() - 120);                            
+                        }
+                    }
                 });
                 var Epanel = Ext.create('Ext.form.Panel', {
                     region: 'east',
-                    width: 500,
+                    width: 510,
                     items: [Ext.getCmp('form_panel'), Ext.getCmp('panelfile')]
                 });
 
@@ -80,16 +91,18 @@
                 Ext.getCmp('radio_FileID').getComponent(0).setValue(true);
 
                 upload_ini();
-
-                $('#fileViewDiv').css('height',($(document).height() - 120 - 60));
-
+                
+                $(window).resize(function () {
+                    $("#fileViewDiv").height($(document).height() - 120);
+                });
+                
                 
             }
         });
-
        
     });
 
+    $(window).unload(function () { window.opener.pgbar.moveFirst();  });
 
     function loadform(ID) {
         Ext.Ajax.request({
@@ -109,13 +122,25 @@
                 }
                 //文件明细
                 Ext.getCmp('fileview1').store.loadData(data.filedata);//加载附件列表数据
+
+
+                var filedata_Array =Ext.pluck(Ext.getCmp('fileview1').store.data.items, 'data');
+                if (filedata_Array.length > 0) {
+                    document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="@url' + '\/file' + filedata_Array[0]["FILENAME"] + '"></embed>';
+                }
+
+
                 //如果是修改需要将随附文件的ID拼接成字符串 赋值到
                 var fileids = "";
                 Ext.each(Ext.getCmp('fileview1').store.getRange(), function (rec) {
                     fileids += rec.get("ID") + ",";
+
                 });
                 Ext.getCmp('field_ORIGINALFILEIDS').setValue(fileids);
+                formpanelcontrol();
             }
+
+
         });
     }
     
@@ -155,7 +180,6 @@
             queryMode: 'local',
             valueField: 'CODE',
             triggerAction: 'all',
-            value: '按批次',
             readOnly: true,
             editable: false,
             fieldStyle: 'background-color: #CECECE; background-image: none;'
@@ -173,11 +197,17 @@
         var cont_wjjsdw = Ext.create('Ext.form.FieldContainer', {
             fieldLabel: '文件接收单位',
             layout: 'hbox',
+            columnWidth: 1, 
             items: [field_FILERECEVIEUNIT,
                 {
                     xtype: 'button', id: 'btn_filerecevieunit', handler: function () {
-                        bgsbdw_win(field_FILERECEVIEUNIT);
-                    }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .10, margin: 0
+                        Ext.getCmp('cpanel').hide();
+                        var win = bgsbdw_win(field_FILERECEVIEUNIT);
+                        win.on("close", function () {
+                            Ext.getCmp('cpanel').show();
+                        });
+
+                    }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .10
                 }
             ]
         })
@@ -189,6 +219,8 @@
             readOnly: true,
             margin: 0,
             flex: .90,
+            allowBlank: false,
+            blankText: '申报单位不能为空!'
         });
         var field_ID = Ext.create('Ext.form.field.Hidden', {
             name: 'ID'
@@ -200,11 +232,17 @@
         var cont_wjsbdw = Ext.create('Ext.form.FieldContainer', {
             fieldLabel: '文件申报单位',
             layout: 'hbox',
+            columnWidth: 1,
             items: [field_FILEDECLAREUNIT,
                 {
                     xtype: 'button', id: 'btn_filedeclareunit', handler: function () {
-                        bgsbdw_win(field_FILEDECLAREUNIT);
-                    }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .10, margin: 0
+                        Ext.getCmp('cpanel').hide();
+                        var win = bgsbdw_win(field_FILEDECLAREUNIT);
+                        win.on("close", function () {
+
+                            Ext.getCmp('cpanel').show();
+                        });
+                    }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .10
                 }
             ]
         })
@@ -261,6 +299,8 @@
             minChars: 2,
             hideTrigger: true,
             anyMatch: true,
+            allowBlank: false,
+            blankText: '申报关区不能为空!',
             listeners: {
                 focus: function (cb) {
                     if (!cb.getValue()) {
@@ -309,29 +349,47 @@
         //备注
         var field_REMARK = Ext.create('Ext.form.field.Text', {
             id: 'field_REMARK1',
-            fieldLabel: '备注',
+            //fieldLabel: '备注',
+            flex: 1,margin:0,
             name: 'REMARK'
         });
+        var REMARK_container = {
+            columnWidth: 1,
+            xtype: 'fieldcontainer',
+            layout: 'hbox',
+            fieldLabel: '备注',
+            items: [field_REMARK]
+        }
 
         //企业编号
         var field_CODE = Ext.create('Ext.form.field.Text', {
             fieldLabel: '企业编号',
-            name: 'CODE'
+            name: 'CODE',
+            allowBlank: false,
+            blankText: '企业编号不能为空!'
         });
         //模板名称
         var store_TEMPLATENAME = Ext.create('Ext.data.JsonStore', {
             fields: ['ID', 'TEMPLATENAME']
         })
         var field_TEMPLATENAME = Ext.create('Ext.form.field.ComboBox', {
-            fieldLabel: '模板名称',
+            //fieldLabel: '模板名称',
             store: store_TEMPLATENAME,
             name: 'TEMPLATENAME',
             displayField: 'TEMPLATENAME',
             valueField: 'ID',
             triggerAction: 'all',
-            queryMode: 'local',
+            queryMode: 'local', flex: 1, margin: 0,
             anyMatch: true
         });
+        var TEMPLATENAME_container = {
+            columnWidth: 1,
+            xtype: 'fieldcontainer',
+            layout: 'hbox',
+            fieldLabel: '模板名称',
+            items: [field_TEMPLATENAME]
+        }
+
         var store_ISREADPDF = Ext.create('Ext.data.JsonStore', {
             fields: ['CODE', 'NAME'],
             data: [{ "CODE": 0, "NAME": "未解析" }, { "CODE": 1, "NAME": "已解析" }]
@@ -341,20 +399,19 @@
             store: store_ISREADPDF,
             displayField: 'NAME',
             valueField: 'CODE',
-            value: 0,
             readOnly: true,
             name: 'ISREADPDF',
             fieldStyle: 'background-color: #CECECE; background-image: none;'
         });
 
         var com_STATUS = Ext.create('Ext.form.field.ComboBox', {
+            id:'com_STATUS',
             fieldLabel: '状态',
             store: store_STATUS,
             readOnly: true,
             name: 'STATUS',
             displayField: 'NAME',
             valueField: 'CODE',
-            value: 5,
             triggerAction: 'all',
             queryMode: 'local',
             anyMatch: true,
@@ -368,6 +425,7 @@
            + '</div>';
         var bbar_r = '<div class="btn-group">'
         + '<button type="button" onclick="save()" class="btn btn-primary btn-sm" id="btn_saveorder"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
+        + '<button type="button" onclick="save(\'delegate\')" class="btn btn-primary btn-sm" id="btn_delegate"><i class="fa fa-floppy-o"></i>&nbsp;确认委托</button>'
         + '</div>';
 
         var buttombar = Ext.create('Ext.toolbar.Toolbar', {
@@ -382,24 +440,20 @@
             fieldDefaults: {
                 margin: '0 5 10 10',
                 labelWidth: 80,
-                columnWidth:1,
+                columnWidth:0.5,
                 labelSeparator: '',
                 msgTarget: 'under',
                 labelAlign: 'left'
             },
             items: [
-                { layout: 'column', height: 42, border: 0, items: [field_CODE] },
+                { layout: 'column', height: 42, border: 0, margin: '5 0 0 0', items: [field_CODE, combo_CUSTOMDISTRICTNAME] },
                 { layout: 'column', height: 42, border: 0, items: [cont_wjjsdw] },
                 { layout: 'column', height: 42, border: 0, items: [cont_wjsbdw] },
-                { layout: 'column', height: 42, border: 0, items: [combo_CUSTOMDISTRICTNAME] },
-                { layout: 'column', height: 42, border: 0, items: [combo_BUSITYPE] },
-                { layout: 'column', height: 42, border: 0, items: [combo_REPWAYNAME] },    
-                { layout: 'column', height: 42, border: 0, items: [field_TEMPLATENAME] },
-                { layout: 'column', height: 42, border: 0, items: [field_REMARK] },
-                { layout: 'column', height: 42, border: 0, items: [field_UNITCODE] },
-                { layout: 'column', height: 42, border: 0, items: [com_STATUS] },
-                { layout: 'column', height: 42, border: 0, items: [combo_CREATEMODE] },         
-                { layout: 'column', height: 42, border: 0, items: [field_ISREADPDF] },               
+                { layout: 'column', height: 42, border: 0, items: [combo_BUSITYPE,combo_REPWAYNAME] },
+                { layout: 'column', height: 42, border: 0, items: [TEMPLATENAME_container] },
+                { layout: 'column', height: 42, border: 0, items: [REMARK_container] },
+                { layout: 'column', height: 42, border: 0, items: [field_UNITCODE, com_STATUS] },
+                { layout: 'column', height: 42, border: 0, items: [combo_CREATEMODE, field_ISREADPDF] },
                 field_CUSTOMDISTRICTNAME, field_ID, field_ORIGINALFILEIDS
             ]
         })
@@ -411,7 +465,6 @@
         var tmp = new Ext.XTemplate(
             '<tpl for=".">',
             '<div class="panel panel-default thumb-wrap fl" style="margin-top:5px;margin-left:5px;width:240px">',
-            //'<div class="panel-heading" style="padding-left:5px;padding-right:5px">{[values.ORIGINALNAME.substr(0,23)]}<div class="fr"><span class="glyphicon glyphicon-paperclip"></span></div></div>',
             '<div class="panel-heading" style="padding-left:5px;padding-right:5px">{[values.ORIGINALNAME.substr(0,23)]}<div class="fr"><a href="/EnterpriseOrder/DownFile?filename={[values.FILENAME]}&ID={[values.ID]}" style="cursor:pointer"><span class="glyphicon glyphicon-download-alt"></span></a></div></div>',
             '<div class="panel-body" style="padding-left:5px;">',
             '<tpl>{[values.SIZES/1024 > 1024?Math.round(values.SIZES/(1024*1024))+"M":Math.round(values.SIZES/1024)+"K"]}</tpl>',
@@ -424,12 +477,14 @@
             tpl: tmp,
             itemSelector: 'div.thumb-wrap',
             multiSelect: true
+            
+     
         })
         var panelfile = Ext.create('Ext.panel.Panel', {
             id: 'panelfile',
             border: 0,
             width: '100%',
-            minHeight: 500,
+            height: 300,overflowY: 'scroll',
             items: [fileview]
         })
     }
@@ -443,9 +498,8 @@
             Ext.MessageBox.alert("提示", "请选择要浏览的记录！");
             return
         }
-        alert(records[0].get("ID"));
         if (records[0].get("ID")) {
-            document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + common_data_adminurl + '\/file' + records[0].get("FILENAME") + '"></embed>';
+            document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="@url'+ '\/file' + records[0].get("FILENAME") + '"></embed>';
         }
         else {
             document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + records[0].get("FILENAME") + '"></embed>';
@@ -494,6 +548,61 @@
                 fileview.store.remove(records);
             }
         })
+    }
+
+    function save(action) {
+
+            if (action == "delegate"&&!Ext.getCmp('form_panel').getForm().isValid()) {
+                return;
+            }  
+            if (Ext.getCmp('fileview1').store.data.items.length == 0 && action == "delegate") { //如果是提交,必须上传文件
+                Ext.MessageBox.alert('提示', '随附文件不能为空！');
+                return;
+            }
+            var data = Ext.encode(Ext.getCmp('form_panel').getForm().getValues());
+            var filedata = Ext.encode(Ext.pluck(Ext.getCmp('fileview1').store.data.items, 'data'));
+            var mask = new Ext.LoadMask(Ext.getBody(), { msg: "数据保存中，请稍等..." });
+            mask.show();
+            Ext.Ajax.request({
+                url: "/EnterpriseOrder/Save",
+                params: { data: data, filedata: filedata,action:action },
+                success: function (response, option) {
+                    mask.hide();
+                    var data = Ext.decode(response.responseText);
+                    if (data.success) {
+                        Ext.MessageBox.alert("提示", "保存成功！");
+                    }
+                    else {
+                        if (data.isrepeate=='Y') {
+                            Ext.MessageBox.alert("提示", "企业编号重复！");
+                        }
+                        else {
+                            Ext.MessageBox.alert("提示", "保存失败！");
+                        }
+                       
+                    }
+                }
+
+            });
+    }
+
+    function formpanelcontrol() {
+        var status = Ext.getCmp('com_STATUS').getValue();
+        document.getElementById("pickfiles").disabled = status >= 10;
+        document.getElementById("deletefile").disabled = status >= 10;
+        document.getElementById("btn_saveorder").disabled = status >= 10;
+        document.getElementById("btn_delegate").disabled = status >= 10;
+
+        Ext.Array.each(Ext.getCmp("form_panel").getForm().getFields().items, function (item) {
+            if (item.fieldStyle != 'background-color: #CECECE; background-image: none;') {
+                item.setReadOnly(status >= 10);
+            }
+        });
+
+        Ext.getCmp('btn_filerecevieunit').setDisabled(status >= 10);
+        Ext.getCmp('btn_filedeclareunit').setDisabled(status >= 10);
+
+
     }
 
 </script>

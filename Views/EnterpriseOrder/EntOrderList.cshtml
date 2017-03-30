@@ -7,6 +7,7 @@
 <script src="~/Views/EnterpriseOrder/createwinjs.js"></script>
 <script type="text/javascript">
     var gridpanel;
+    var pgbar;
     var common_data_sbgq = [], common_data_sbfs = [], common_data_adminurl = "";
     var store_busitype;
     var store_STATUS = Ext.create('Ext.data.JsonStore', {
@@ -55,7 +56,7 @@
                         }
                     }
                 })
-                var pgbar = Ext.create('Ext.toolbar.Paging', {
+                 pgbar = Ext.create('Ext.toolbar.Paging', {
                     displayMsg: '显示 {0} - {1} 条,共计 {2} 条',
                     store: store_Trade,
                     id: 'pgbar',
@@ -247,15 +248,16 @@
         }
         var plwhids = "";
         for (var i = 0; i < recs.length; i++) {
-            plwhids += recs[i].data.ID + ',';
+                plwhids += recs[i].data.ID + ',';            
         }
         var unitcodes = "";
         for (var i = 0; i < recs.length; i++) {
-            unitcodes += recs[i].data.UNITCODE + ',';
+                unitcodes += recs[i].data.UNITCODE + ',';
         }
         plwhids = plwhids.substr(0, plwhids.length - 1);
         unitcodes = unitcodes.substr(0, unitcodes.length - 1);
         opencenterwin("/EnterpriseOrder/BatchMaintain?ids=" + plwhids + "&unitcodes=" + unitcodes, 1200, 800);
+       
     }
 </script>
 

@@ -1,5 +1,4 @@
-﻿/*****************************************************win 窗口 begin ********************************************/
-var repwayidcode;
+﻿var repwayidcode;
 
 function addwin(ID) {
     form_ini();
@@ -47,7 +46,15 @@ function form_ini() {
                 { boxLabel: '<font color=red>逐票生成</font>', name: 'CREATEMODE', inputValue: '按文件', id: "wj" }],
         listeners: {
             change: function (rb, newValue, oldValue, eOpts) {
-              
+                if (newValue.CREATEMODE == '按文件') {
+                    field_CODE.setValue("");
+                    field_CODE.setReadOnly(true);
+                }
+                else {
+
+                    field_CODE.setReadOnly(false);
+                }
+                
             }
         }
     });
@@ -79,6 +86,8 @@ function form_ini() {
         readOnly: true,
         margin: 0,
         flex: .90,
+        allowBlank: false,
+        blankText: '申报单位不能为空!'
     });
     var field_ID = Ext.create('Ext.form.field.Hidden', {
         name: 'ID'
@@ -151,6 +160,8 @@ function form_ini() {
         minChars: 2,
         hideTrigger: true,
         anyMatch: true,
+        allowBlank: false,
+        blankText: '申报关区不能为空!',
         listeners: {
             focus: function (cb) {
                 if (!cb.getValue()) {
@@ -206,8 +217,13 @@ function form_ini() {
 
     //企业编号
     var field_CODE = Ext.create('Ext.form.field.Text', {
+        id: 'field_CODE',
         fieldLabel: '企业编号',
-        name: 'CODE'
+        name: 'CODE',
+        allowBlank: false,
+        blankText: '企业编号不能为空!',
+        //validateOnBlur: false,
+        validateOnChange: false
     });
     //模板名称
     var store_TEMPLATENAME = Ext.create('Ext.data.JsonStore', {
@@ -268,6 +284,7 @@ function form_ini() {
        + '</div>';
     var bbar_r = '<div class="btn-group">'
     + '<button type="button" onclick="save()" class="btn btn-primary btn-sm" id="btn_saveorder"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
+    + '<button type="button" onclick="save(\'delegate\')" class="btn btn-primary btn-sm" id="btn_saveorder"><i class="fa fa-floppy-o"></i>&nbsp;确认委托</button>'
     + '</div>';
 
     var buttombar = Ext.create('Ext.toolbar.Toolbar', {
@@ -327,35 +344,7 @@ function form_ini() {
         items: [fileview]
     })
 }
-/*
-function loadform(ID) {
-    Ext.Ajax.request({
-        url: "/EnterpriseOrder/loadform",
-        params: { ID: ID },
-        success: function (response, opts) {
-            var data = Ext.decode(response.responseText);
-            repwayidcode = data.data.REPWAYID;//二次联动，前一个赋值后，调用此值 
-            Ext.getCmp('formpanel_u').getForm().setValues(data.data);
-            //文件接收单位
-            if (Ext.getCmp('field_FILERECEVIEUNIT').getValue()) {
-                Ext.getCmp('field_FILERECEVIEUNIT').setValue(Ext.getCmp('field_FILERECEVIEUNIT').getValue() + '(' + data.data.FILERECEVIEUNITCODE + ')');
-            }
-            //文件申报单位
-            if (Ext.getCmp('field_FILEDECLAREUNIT').getValue()) {
-                Ext.getCmp('field_FILEDECLAREUNIT').setValue(Ext.getCmp('field_FILEDECLAREUNIT').getValue() + '(' + data.data.FILEDECLAREUNITCODE + ')');
-            }
-            //文件明细
-            Ext.getCmp('fileview1').store.loadData(data.filedata);//加载附件列表数据
-            //如果是修改需要将随附文件的ID拼接成字符串 赋值到
-            var fileids = "";
-            Ext.each(Ext.getCmp('fileview1').store.getRange(), function (rec) {
-                fileids += rec.get("ID") + ",";
-            });
-            Ext.getCmp('field_ORIGINALFILEIDS').setValue(fileids);
-        }
-    });
-}
-*/
+
 function upload_ini() {
     var uploader = new plupload.Uploader({
         runtimes: 'html5,flash,silverlight,html4',
@@ -377,7 +366,7 @@ function upload_ini() {
         uploader.start();
     });
     uploader.bind('FileUploaded', function (up, file) {
-        var timestamp = Ext.Date.now();  //1351666679575  这个方法只是获取的时间戳
+        var timestamp = Ext.Date.now();  
         var date = new Date(timestamp);
         Ext.getCmp('fileview1').store.insert(Ext.getCmp('fileview1').store.data.length
             , { FILENAME: '/FileUpload/file/' + file.target_name, NEWNAME: file.target_name, ORIGINALNAME: file.name, SIZES: file.size, UPLOADTIME: Ext.Date.format(date, 'Y-m-d H:i:s'),FILETYPE:44});
@@ -438,8 +427,10 @@ function browsefile() {
 }
 
 function save(action) {
-    if (Ext.getCmp('formpanel_u').getForm().isValid()) {
-        if (Ext.getCmp('fileview1').store.data.items.length == 0) { //如果是提交,必须上传文件
+    if (action == "delegate" && !Ext.getCmp('formpanel_u').getForm().isValid()) {
+        return;
+    }
+    if (Ext.getCmp('fileview1').store.data.items.length == 0 && (action == "delegate" || Ext.getCmp('field_file').getValue().CREATEMODE == '按文件')) { //如果是提交,必须上传文件
             Ext.MessageBox.alert('提示', '随附文件不能为空！');
             return;
         }
@@ -449,7 +440,7 @@ function save(action) {
         mask.show();
         Ext.Ajax.request({
             url: "/EnterpriseOrder/Save",
-            params: { data: data, filedata: filedata },
+            params: { data: data, filedata: filedata,action:action},
             success: function (response, option) {
                 mask.hide();
                 var data = Ext.decode(response.responseText);
@@ -460,12 +451,15 @@ function save(action) {
                     });
                 }
                 else {
-                    Ext.MessageBox.alert("提示", "保存失败！");
+                    if (data.isrepeate == 'Y') {
+                        Ext.MessageBox.alert("提示", "企业编号重复！");
+                    }
+                    else {
+                        Ext.MessageBox.alert("提示", "保存失败！");
+                    }
                 }
             }
 
         });
-    }
+    
 }
-
-/*****************************************************win 窗口 end ********************************************/

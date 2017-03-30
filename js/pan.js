@@ -191,6 +191,7 @@ function bgsbdw_win(component) {//传入需要赋值的控件
         }]
     });
     win.show();
+    return win;
 }
 function bjsbdw_win(component) {//传入需要赋值的控件
     var tb_bjsbdw = Ext.create('Ext.toolbar.Toolbar', {

@@ -271,7 +271,7 @@ namespace MvcPlatform.Controllers
         { 
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string busiunitcode=json_user.Value<string>("CUSTOMERHSCODE");
-            string sql = "select ID,TEMPLATENAME from list_declaration_template where busiunitcode='" + busiunitcode + "'";
+            string sql = "select to_char(ID) ID,TEMPLATENAME from list_declaration_template where busiunitcode='" + busiunitcode + "'";
             string json_templatename = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
             return "{templatename:" + json_templatename + "}";
         }
@@ -317,18 +317,33 @@ namespace MvcPlatform.Controllers
                     JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
                     JObject json_data = (JObject)JsonConvert.DeserializeObject(Request["data"]);
                     string filedata = Request["filedata"] + "";
+                    string action=Request["action"]+"";
+                    string status =action=="delegate"?"10":json_data.Value<string>("STATUS");
                     string insert_sql = "";
                     string update_sql = "";
                     string sql = "";
                     string ent_id = "";
 
+
+                    if (!string.IsNullOrEmpty(json_data.Value<string>("CODE")))
+                    {
+                        string sql_check="select * from ENT_ORDER where CODE='"+json_data.Value<string>("CODE")+"'";
+                        if (!string.IsNullOrEmpty(json_data.Value<string>("ID")))
+                        {
+                            sql_check += " and ID !='" + json_data.Value<string>("ID") + "'";
+                        }
+                        DataTable dt_itemno = new DataTable();
+                        dt_itemno = DBMgr.GetDataTable(sql_check);
+                        if (dt_itemno.Rows.Count > 0) {  return "{success:false,isrepeate:'Y'}"; }
+
+                    }
                     if (string.IsNullOrEmpty(json_data.Value<string>("ID")))//新增
                     {
-                        insert_sql = @"insert into ENT_ORDER (id,createtime, unitcode,filerecevieunitcode, filerecevieunitname,
+                    insert_sql = @"insert into ENT_ORDER (id,createtime, unitcode,filerecevieunitcode, filerecevieunitname,
                     filedeclareunitcode,filedeclareunitname, busitypeid,customdistrictcode,customdistrictname,repwayid, 
-                    createid, createname,enterprisecode, enterprisename,remark,code,createmode,status,isreadpdf) 
+                    createid, createname,enterprisecode, enterprisename,remark,code,createmode,status,isreadpdf,templatename) 
                     values ('{0}',sysdate,(select fun_AutoQYBH(sysdate) from dual),'{1}','{2}','{3}','{4}','{5}',
-                     '{6}','{7}','{8}','{9}','{10}', '{11}','{12}','{13}','{14}','{15}','{16}',{17})";
+                     '{6}','{7}','{8}','{9}','{10}', '{11}','{12}','{13}','{14}','{15}','{16}',{17},'{18}')";
                         if (json_data.Value<string>("CREATEMODE") == "按批次")
                         {
                             sql = "select ENT_ORDER_ID.Nextval from dual";
@@ -338,7 +353,7 @@ namespace MvcPlatform.Controllers
                                   json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"), json_data.Value<string>("CUSTOMDISTRICTNAME"),
                                   json_data.Value<string>("REPWAYID"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),
                                   json_user.Value<string>("CUSTOMERHSCODE"), json_user.Value<string>("CUSTOMERNAME"), json_data.Value<string>("REMARK"),
-                                  json_data.Value<string>("CODE"), json_data.Value<string>("CREATEMODE"), json_data.Value<string>("STATUS"), json_data.Value<string>("ISREADPDF"));
+                                  json_data.Value<string>("CODE"), json_data.Value<string>("CREATEMODE"), status, json_data.Value<string>("ISREADPDF"), json_data.Value<string>("TEMPLATENAME"));
                             DBMgr.ExecuteNonQuery(sql);
                             //更新随附文件
                             Extension.Update_Attachment_ForEnterprise(ent_id, filedata, json_data.Value<string>("ORIGINALFILEIDS"), json_user);
@@ -355,7 +370,7 @@ namespace MvcPlatform.Controllers
                                       json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"), json_data.Value<string>("CUSTOMDISTRICTNAME"),
                                       json_data.Value<string>("REPWAYID"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),
                                       json_user.Value<string>("CUSTOMERHSCODE"), json_user.Value<string>("CUSTOMERNAME"), json_data.Value<string>("REMARK"),
-                                      json_data.Value<string>("CODE"), json_data.Value<string>("CREATEMODE"), json_data.Value<string>("STATUS"), json_data.Value<string>("ISREADPDF"));
+                                      json_data.Value<string>("CODE"), json_data.Value<string>("CREATEMODE"), status, json_data.Value<string>("ISREADPDF"), json_data.Value<string>("TEMPLATENAME"));
                                 DBMgr.ExecuteNonQuery(sql);
                                 //更新随附文件
                                 Extension.Update_Attachment_ForEnterprise(ent_id, "[" + JsonConvert.SerializeObject(json) + "]", json_data.Value<string>("ORIGINALFILEIDS"), json_user);
@@ -369,11 +384,11 @@ namespace MvcPlatform.Controllers
                     {
                         update_sql = @"update ENT_ORDER  set filerecevieunitcode='{1}',filerecevieunitname='{2}',filedeclareunitcode='{3}',
                     filedeclareunitname='{4}',busitypeid='{5}',customdistrictcode='{6}', customdistrictname='{7}',
-                    repwayid='{8}',remark='{9}',code='{10}' where id='{0}'";
+                    repwayid='{8}',remark='{9}',code='{10}',status='{11}',templatename='{12}' where id='{0}'";
                         sql = string.Format(update_sql, json_data.Value<string>("ID"), GetCode(json_data.Value<string>("FILERECEVIEUNITNAME")),
                         GetName(json_data.Value<string>("FILERECEVIEUNITNAME")), GetCode(json_data.Value<string>("FILEDECLAREUNITNAME")),
                         GetName(json_data.Value<string>("FILEDECLAREUNITNAME")), json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"),
-                        json_data.Value<string>("CUSTOMDISTRICTNAME"), json_data.Value<string>("REPWAYID"), json_data.Value<string>("REMARK"), json_data.Value<string>("CODE"));
+                        json_data.Value<string>("CUSTOMDISTRICTNAME"), json_data.Value<string>("REPWAYID"), json_data.Value<string>("REMARK"), json_data.Value<string>("CODE"), status, json_data.Value<string>("TEMPLATENAME"));
                         DBMgr.ExecuteNonQuery(sql);
                         //更新随附文件
                         Extension.Update_Attachment_ForEnterprise(json_data.Value<string>("ID"), filedata, json_data.Value<string>("ORIGINALFILEIDS"), json_user);
