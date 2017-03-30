@@ -114,6 +114,7 @@ function Element_ini() {//61034200、52115100、85011099、74101100、41041111
     });
 }
 
+//成品单号 for 企业
 function form_ini_con() {
     var rownum = -1;//记录当前编辑的行号
 
@@ -331,6 +332,47 @@ function form_ini_con() {
 
 }
 
+//成品单号 for 报关行
+function form_ini_con_Audit() {
+    var label_baseinfo = {
+        xtype: 'label',
+        margin: '5',
+        html: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;成品单耗信息</span></h4>'
+    }
+    var tbar = Ext.create('Ext.toolbar.Toolbar', {
+        items: [label_baseinfo, '->']
+    })
+
+    var store_PRODUCTCONSUME = Ext.create('Ext.data.JsonStore', {
+        storeId: 'store_PRODUCTCONSUME',
+        fields: ['ITEMNO_CONSUME', 'ITEMNO_COMMODITYNAME', 'ITEMNO_SPECIFICATIONSMODEL', 'ITEMNO_UNITNAME', 'ITEMNO_UNIT', 'CONSUME', 'ATTRITIONRATE']
+    });
+
+    var gridpanel_PRODUCTCONSUME = Ext.create('Ext.grid.Panel', {
+        id: 'gridpanel_PRODUCTCONSUME',
+        renderTo: 'div_form_con',
+        tbar: tbar,
+        border: 1,
+        store: store_PRODUCTCONSUME,
+        minHeight: 150,
+        enableColumnHide: false,
+        columns: [
+        { xtype: 'rownumberer', width: 35 },
+        { header: 'ID', dataIndex: 'ID', hidden: true },
+        { header: '对应料件序号', dataIndex: 'ITEMNO_CONSUME', width: 80 },
+        { header: '对应料件名称', dataIndex: 'ITEMNO_COMMODITYNAME', width: 130 },
+        { header: '对应料件规格', dataIndex: 'ITEMNO_SPECIFICATIONSMODEL', width: 130 },
+        { header: '对应料件计量单位', dataIndex: 'ITEMNO_UNITNAME', width: 80 },
+        { header: '单耗', dataIndex: 'CONSUME', width: 80 },
+        { header: '损耗率', dataIndex: 'ATTRITIONRATE', width: 80 }
+        ],
+        viewConfig: {
+            enableTextSelection: true
+        },
+        forceFit: true
+    });
+}
+
 function printitemno(ids) {
     opencenterwin("/RecordInfor/PrintRecordDetail?ids=" + ids, 1600, 900);
 }
@@ -355,7 +397,6 @@ function SetItemno_consume(recordid) {
         });
     }
 }
-
 
 function ViewAll(value, meta, record) {
     meta.tdAttr = 'data-qtip="' + value + '"';

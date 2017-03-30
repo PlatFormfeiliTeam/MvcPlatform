@@ -5,12 +5,12 @@
         data: common_data_jydw
     });
     var s_combo_enterprise = Ext.create('Ext.form.field.ComboBox', {
-        id: 's_combo_enterprise',        
+        id: 's_combo_enterprise',
+        name: 'ENTERPRISE',
         store: store_enterprise,
         fieldLabel: '委托企业',
         //width: 220,
         displayField: 'NAME',
-        name: 'NAME',
         minChars:4,
         valueField: 'CODE',
         triggerAction: 'all',
@@ -93,7 +93,7 @@
     //申请状态
     var store_status = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
-        data: status_js_data
+        data: status_js_data_Audit
     });
     var s_combo_status = Ext.create('Ext.form.field.ComboBox', {
         id: 's_combo_status',
@@ -208,6 +208,12 @@ function itemsbind_Audit() {
         { header: '委托企业', dataIndex: 'BUSIUNITNAME', width: 200, renderer: ViewAll },
         { header: '提交时间', dataIndex: 'SUBMITTIME', width: 150 }
         ],
+        listeners:
+        {
+            'itemdblclick': function (view, record, item, index, e) {
+                Open();
+            }
+        },
         viewConfig: {
             enableTextSelection: true
         },
@@ -273,6 +279,12 @@ function itemsbind_Audit() {
         { header: '委托企业', dataIndex: 'BUSIUNITNAME', width: 200, renderer: ViewAll },
         { header: '提交时间', dataIndex: 'SUBMITTIME', width: 150 }
         ],
+        listeners:
+        {
+            'itemdblclick': function (view, record, item, index, e) {
+                Open();
+            }
+        },
         viewConfig: {
             enableTextSelection: true
         },
@@ -281,7 +293,6 @@ function itemsbind_Audit() {
 }
 
 function Select() {
-    Ext.getCmp('pgbar_lj').moveFirst(); Ext.getCmp('pgbar_cp').moveFirst();
     Ext.getCmp('pgbar_lj_Go').moveFirst(); Ext.getCmp('pgbar_cp_Go').moveFirst();
 }
 

@@ -465,9 +465,28 @@
 
     });
 
+    //申报时间
+    var field_REPTIME = Ext.create('Ext.form.field.Text', {
+        id: 'REPTIME', name: 'REPTIME', fieldLabel: '申报时间', readOnly: true, fieldStyle: 'background-color: #CECECE;background-image: none;'
+    });
+    //申报人
+    var field_REPNAME = Ext.create('Ext.form.field.Text', {
+        id: 'REPNAME', name: 'REPNAME', fieldLabel: '申报人', readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;'
+    });
+    //确认完成时间
+    var field_FINISHTIME = Ext.create('Ext.form.field.Text', {
+        id: 'FINISHTIME', name: 'FINISHTIME', fieldLabel: '确认时间', readOnly: true, fieldStyle: 'background-color: #CECECE;background-image: none;'
+    });
+    //确认完成人
+    var field_FINISHNAME = Ext.create('Ext.form.field.Text', {
+        id: 'FINISHNAME', name: 'FINISHNAME', fieldLabel: '确认人', readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;'
+    });
+
     var field_CREATEID = Ext.create('Ext.form.field.Hidden', { name: 'CREATEID' });
     var field_SUBMITID = Ext.create('Ext.form.field.Hidden', { name: 'SUBMITID' });
+    var field_ACCEPTID = Ext.create('Ext.form.field.Hidden', { name: 'ACCEPTID' });
     var field_PREID = Ext.create('Ext.form.field.Hidden', { name: 'PREID' });
+    var field_REPID = Ext.create('Ext.form.field.Hidden', { name: 'REPID' });
     var field_FINISHID = Ext.create('Ext.form.field.Hidden', { name: 'FINISHID' });
 
     var panel_ele = Ext.create('Ext.panel.Panel', {
@@ -484,8 +503,9 @@
         { layout: 'column', border: 0, items: [panel_ele] },
         { layout: 'column', height: 42, border: 0, items: [textarea_container] },
         { layout: 'column', height: 42, border: 0, items: [field_CREATEDATE, field_CREATENAME, field_SUBMITTIME, field_SUBMITNAME] },
-        { layout: 'column', height: 42, border: 0, items: [field_ACCEPTTIME, field_ACCEPTNAME, field_PRETIME, field_PRENAME] },        
-        field_CUSTOMERNAME, field_CREATEID, field_SUBMITID, field_PREID, field_FINISHID
+        { layout: 'column', height: 42, border: 0, items: [field_ACCEPTTIME, field_ACCEPTNAME, field_PRETIME, field_PRENAME] },
+        { layout: 'column', height: 42, border: 0, items: [field_REPTIME, field_REPNAME, field_FINISHTIME, field_FINISHNAME] },
+        field_CUSTOMERNAME, field_CREATEID, field_SUBMITID, field_ACCEPTID, field_PREID, field_REPID, field_FINISHID
     ];
     
      var formpanel = Ext.create('Ext.form.Panel', {

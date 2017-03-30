@@ -952,7 +952,7 @@ namespace MvcPlatform.Controllers
                                          select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
                                                 ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark
                                                 ,aa.options,aa.status,aa.customercode,aa.customername,aa.submittime 
-                                         from sys_recordinfo_detail_task aa 
+                                         from sys_recordinfo_detail_task aa where aa.status>=10 
                                     ) b on a.id=b.recordinfoid 
                                 left join (select code,name from cusdoc.base_company where code is not null and enabled=1) c on a.busiunit=c.code";
             sql = sql + " where b.customercode='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where;
@@ -1043,7 +1043,55 @@ namespace MvcPlatform.Controllers
         }
 
         #endregion
-        
+
+
+        #region form_Audit
+
+        public string loadrecord_create_Audit()
+        {
+            string id = Request["id"];
+            string sql = "";
+
+            string result = "{}"; string formdata = "{}"; string productsonsumedata = "[]";
+
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+            //委托信息
+            sql = @"select a.*,b.busiunit enterprise,b.code||'('||b.bookattribute||')' recordinfoname
+                    from sys_recordinfo_detail_task a 
+                        left join cusdoc.sys_recordinfo b on a.recordinfoid=b.id 
+                    where a.id='" + id + "'";
+            DataTable dt = DBMgr.GetDataTable(sql);
+            formdata = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
+
+            //成品单耗
+            sql = "select * from SYS_PRODUCTCONSUME where rid='" + id + "' order by id desc";
+            productsonsumedata = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso);
+
+            result = "{formdata:" + formdata + ",productsonsumedata:" + productsonsumedata + "}";
+            return result;
+        }
+
+        public string Save_Audit()
+        {
+            string action = Request["action"];
+            JObject json = (JObject)JsonConvert.DeserializeObject(Request["formdata"]);
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string id = Request["id"];
+            string sql = ""; string resultmsg = "{success:false}";
+
+//            sql = @"UPDATE SYS_RECORDINFO_DETAIL_TASK SET CUSTOMERNAME='{14}',SUBMITID='{15}',SUBMITNAME='{16}',SUBMITTIME={17}
+//                        WHERE ID={0}";
+//            sql = string.Format(sql, id);
+
+            int result = DBMgr.ExecuteNonQuery(sql);
+            resultmsg = "{success:true,id:'" + id + "'}";
+            return resultmsg;
+        }
+
+        #endregion
+
         public string GetName(string value, string datasource)
         {
             string name = "";
