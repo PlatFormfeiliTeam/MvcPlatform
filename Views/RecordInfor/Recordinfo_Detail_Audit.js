@@ -1,5 +1,5 @@
 ﻿function initSearch_Audit() {
-    //企业编号
+    //委托企业
     var store_enterprise = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
         data: common_data_jydw
@@ -7,7 +7,7 @@
     var s_combo_enterprise = Ext.create('Ext.form.field.ComboBox', {
         id: 's_combo_enterprise',        
         store: store_enterprise,
-        fieldLabel: '企业编号',
+        fieldLabel: '委托企业',
         //width: 220,
         displayField: 'NAME',
         name: 'NAME',
@@ -294,6 +294,49 @@ function Reset() {
     Ext.getCmp("s_combo_status").setValue("");
     Ext.getCmp("date_start").setValue("");
     Ext.getCmp("date_end").setValue("");
+}
+
+function Open() {
+
+    var Compentid = "";
+    if (Ext.getCmp("tabpanel").getActiveTab().id == "tab_0") { Compentid = "gridpanel_lj_Go"; }
+    if (Ext.getCmp("tabpanel").getActiveTab().id == "tab_1") { Compentid = "gridpanel_cp_Go"; }
+
+    var recs = Ext.getCmp(Compentid).getSelectionModel().getSelection();
+    if (recs.length != 1) {
+        Ext.Msg.alert("提示", "请选择一笔记录!");
+        return;
+    }
+
+    if (recs[0].get("OPTIONS") == 'A') {//新增申请
+        opencenterwin("/RecordInfor/Create_Audit?id=" + recs[0].get("ID"), 1600, 900);
+    }
+    if (recs[0].get("OPTIONS") == 'U') {//变更申请                   
+        opencenterwin("/RecordInfor/Change_Audit?id=" + recs[0].get("ID"), 1600, 900);
+    }
+    if (recs[0].get("OPTIONS") == 'D') {//删除申请
+        opencenterwin("/RecordInfor/Delete_Audit?id=" + recs[0].get("ID"), 1600, 900);
+    }
+}
+
+function print_task_Audit() {
+    var Compentid = "";
+    if (Ext.getCmp("tabpanel").getActiveTab().id == "tab_0") { Compentid = "gridpanel_lj_Go"; }
+    if (Ext.getCmp("tabpanel").getActiveTab().id == "tab_1") { Compentid = "gridpanel_cp_Go"; }
+
+    var recs = Ext.getCmp(Compentid).getSelectionModel().getSelection();
+    if (recs.length == 0) {
+        Ext.Msg.alert("提示", "请选择打印记录!");
+        return;
+    }
+    var ids = ""; 
+    Ext.each(recs, function (rec) {
+        if (rec.get("STATUS") == "0") { bf = true; }
+        ids += rec.get("ID") + ",";
+    });
+    ids = ids.substr(0, ids.length - 1);
+    printitemno(ids);
+
 }
 
 function Export_Audit() {

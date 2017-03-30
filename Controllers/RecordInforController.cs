@@ -57,6 +57,25 @@ namespace MvcPlatform.Controllers
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
+        public ActionResult Create_Audit()//账册审核 create
+        {
+            ViewBag.navigator = "备案管理>>账册审核";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
+        public ActionResult Change_Audit()//账册审核 change
+        {
+            ViewBag.navigator = "备案管理>>账册审核";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
+
+        public ActionResult Delete_Audit()//账册审核 delete
+        {
+            ViewBag.navigator = "备案管理>>账册审核";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
 
         public ActionResult PrintRecordDetail()//打印界面
         {
