@@ -62,9 +62,16 @@ namespace MvcPlatform.Controllers
             return View();
         }
 
-        public ActionResult ListOrder_Index()  //文件委托
+        public ActionResult ListOrder_Index()  
         {
             //ViewBag.navigator = "企业服务>>委托任务";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
+
+        public ActionResult GoodsTrack()  //货况跟踪
+        {
+            //ViewBag.navigator = "货况跟踪";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
