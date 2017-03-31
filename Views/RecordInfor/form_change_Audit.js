@@ -211,16 +211,7 @@
         forceSelection: true,
         queryMode: 'local',
         anyMatch: true,
-        readOnly: true, flex: .5, fieldStyle: 'background-color: #CECECE; background-image: none;',
-        listeners: {
-            focus: function (cb) {
-                if (!cb.getValue()) {
-                    cb.clearInvalid();
-                    cb.store.clearFilter();
-                    cb.expand();
-                }
-            }
-        }
+        readOnly: true, flex: .5, fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
 
 
