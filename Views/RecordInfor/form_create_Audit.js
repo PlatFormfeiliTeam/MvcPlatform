@@ -442,25 +442,6 @@
 
 }
 
-function loadform_record_Audit() {
-    Ext.Ajax.request({
-        url: "/RecordInfor/loadrecord_create_Audit",
-        params: { id: id},
-        success: function (response, opts) {
-            var data = Ext.decode(response.responseText); 
-            Ext.getCmp("formpanel_id").getForm().setValues(data.formdata);
 
-            if (Ext.getCmp('gridpanel_PRODUCTCONSUME')) {
-                Ext.getCmp('gridpanel_PRODUCTCONSUME').store.loadData(data.productsonsumedata);
-            }
-
-            var status = Ext.getCmp('combo_STATUS').getValue();
-            document.getElementById("btn_accept").disabled = status >= 20;//已受理及以上 ，此按钮就禁用
-            document.getElementById("btn_pre").disabled = status >= 30;
-            document.getElementById("btn_rep").disabled = status >= 40;
-            document.getElementById("btn_finish").disabled = status >= 50;
-        }
-    });
-}
 
 

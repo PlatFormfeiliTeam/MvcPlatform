@@ -404,7 +404,7 @@ function ViewAll(value, meta, record) {
 }
 
 
-//----------------------------------------------------------audit 按钮公用----------------------------------------------------------
+//----------------------------------------------------------audit create change delete共用----------------------------------------------------------
 function form_ini_btn_Audit() {
     var bbar_r = '<div class="btn-group" role="group">'
                         + '<button type="button" onclick="form_btn_Audit_Deal(20)" id="btn_accept" class="btn btn-primary btn-sm"><i class="fa fa-sign-in"></i>&nbsp;受理</button>'
@@ -447,4 +447,41 @@ function form_btn_Audit_Deal(status) {
 
 }
 
+function loadform_record_Audit(type) {
+    Ext.Ajax.request({
+        url: "/RecordInfor/loadrecord_Audit",
+        params: { id: id },
+        success: function (response, opts) {
+            var data = Ext.decode(response.responseText);
+            Ext.getCmp("formpanel_id").getForm().setValues(data.formdata);
+
+            if (Ext.getCmp('gridpanel_PRODUCTCONSUME')) {
+                Ext.getCmp('gridpanel_PRODUCTCONSUME').store.loadData(data.productsonsumedata);
+            }
+
+            var status = Ext.getCmp('combo_STATUS').getValue();
+            document.getElementById("btn_accept").disabled = status >= 20;//已受理及以上 ，此按钮就禁用
+            document.getElementById("btn_pre").disabled = status >= 30;
+            document.getElementById("btn_rep").disabled = status >= 40;
+            document.getElementById("btn_finish").disabled = status >= 50;
+
+            if (type == 'U') {
+                if (Ext.getCmp('HSCODE').getValue() != Ext.getCmp('HSCODE_LEFT').getValue()) { Ext.getCmp('HSCODE').setFieldStyle({ color: 'blue' }); }
+                else { Ext.getCmp('HSCODE').setFieldStyle({ color: 'black' }); }
+
+                if (Ext.getCmp('ADDITIONALNO').getValue() != Ext.getCmp('ADDITIONALNO_LEFT').getValue()) { Ext.getCmp('ADDITIONALNO').setFieldStyle({ color: 'blue' }); }
+                else { Ext.getCmp('ADDITIONALNO').setFieldStyle({ color: 'black' }); }
+
+                if (Ext.getCmp('COMMODITYNAME').getValue() != Ext.getCmp('COMMODITYNAME_LEFT').getValue()) { Ext.getCmp('COMMODITYNAME').setFieldStyle({ color: 'blue' }); }
+                else { Ext.getCmp('COMMODITYNAME').setFieldStyle({ color: 'black' }); }
+
+                if (Ext.getCmp('SPECIFICATIONSMODEL').getValue() != Ext.getCmp('SPECIFICATIONSMODEL_LEFT').getValue()) { Ext.getCmp('SPECIFICATIONSMODEL').setFieldStyle({ color: 'blue' }); }
+                else { Ext.getCmp('SPECIFICATIONSMODEL').setFieldStyle({ color: 'black' }); }
+
+                if (Ext.getCmp('combo_UNIT').getValue() != Ext.getCmp('combo_UNIT_LEFT').getValue()) { Ext.getCmp('combo_UNIT').setFieldStyle({ color: 'blue' }); }
+                else { Ext.getCmp('combo_UNIT').setFieldStyle({ color: 'black' }); }
+            }
+        }
+    });
+}
 //--------------------------------------------------------------------------------------------------------------------

@@ -646,7 +646,6 @@ namespace MvcPlatform.Controllers
 
         public string loadrecord_change()
         {
-            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string id = Request["id"]; string rid = Request["rid"];
             string sql = ""; DataTable dt = new DataTable();
             string result = "{}"; string formdata = "{}"; string productsonsumedata = "[]";
@@ -779,7 +778,6 @@ namespace MvcPlatform.Controllers
 
         public string loadrecord_delete()
         {
-            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string id = Request["id"]; string rid = Request["rid"];
             string sql = ""; DataTable dt = new DataTable();
             string result = "{}"; string formdata = "{}"; string productsonsumedata = "[]";
@@ -1052,7 +1050,7 @@ namespace MvcPlatform.Controllers
 
         #region form_Audit
 
-        public string loadrecord_create_Audit()
+        public string loadrecord_Audit()
         {
             string id = Request["id"];
             string sql = "";
