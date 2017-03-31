@@ -2,7 +2,7 @@
 function cancel() {
     var status = Ext.getCmp('combo_STATUS').getValue();
     var msg = "";
-    if (status > 10) { msg = "当前状态为已受理，确认要执行撤回操作吗？"; }
+    if (status > 10) { msg = "当前状态为" + Ext.getCmp('combo_STATUS').getRawValue() +"，确认要执行撤回操作吗？"; }
     else { msg = "确定要执行撤单操作吗？"; }
 
     Ext.MessageBox.confirm("提示", msg, function (btn) {
@@ -16,7 +16,7 @@ function cancel() {
                         Ext.MessageBox.alert("提示", "撤单成功！");
                     }
                     else {
-                        Ext.MessageBox.alert("提示", "撤单失败,订单状态已发生变化！");
+                        Ext.MessageBox.alert("提示", "撤单失败！");
                     }
                     loadform_record();
                 }
@@ -402,3 +402,49 @@ function ViewAll(value, meta, record) {
     meta.tdAttr = 'data-qtip="' + value + '"';
     return value;
 }
+
+
+//----------------------------------------------------------audit 按钮公用----------------------------------------------------------
+function form_ini_btn_Audit() {
+    var bbar_r = '<div class="btn-group" role="group">'
+                        + '<button type="button" onclick="form_btn_Audit_Deal(20)" id="btn_accept" class="btn btn-primary btn-sm"><i class="fa fa-sign-in"></i>&nbsp;受理</button>'
+                        + '<button type="button" onclick="form_btn_Audit_Deal(30)" id="btn_pre" class="btn btn-primary btn-sm"><i class="fa fa-database"></i>&nbsp;预录</button>'
+                        + '<button type="button" onclick="form_btn_Audit_Deal(40)" id="btn_rep" class="btn btn-primary btn-sm"><i class="fa fa-anchor"></i>&nbsp;现场申报</button>'
+                        + '<button type="button" onclick="form_btn_Audit_Deal(50)" id="btn_finish" class="btn btn-primary btn-sm"><i class="fa fa-check"></i>&nbsp;确认完成</button>'
+                + '</div>'
+
+    var bbar_l = '<div class="btn-group">'
+                + '<button type="button" onclick="printitemno(' + id + ')" id="btn_print" class="btn btn-primary btn-sm"><i class="fa fa-print"></i>&nbsp;申请表打印</button>'
+            + '</div>';
+    var bbar = Ext.create('Ext.toolbar.Toolbar', {
+        items: [bbar_l, '->', bbar_r]
+    })
+
+    var formpanel_btn = Ext.create('Ext.form.Panel', {
+        renderTo: 'div_form_btn',
+        border: 0,
+        bbar: bbar
+    });
+}
+
+function form_btn_Audit_Deal(status) {
+
+    Ext.Ajax.request({
+        url: '/RecordInfor/Save_Audit',
+        params: { id: id, status: status, options: Ext.getCmp('combo_OPTIONS').getValue() },
+        success: function (response, options) {
+            var data = Ext.decode(response.responseText);
+            if (data.success == true) {
+                Ext.MessageBox.alert("提示", "操作成功！");
+            }
+            else {
+                Ext.MessageBox.alert("提示", "操作失败！");
+            }
+            id = data.id;
+            loadform_record_Audit();
+        }
+    });
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------

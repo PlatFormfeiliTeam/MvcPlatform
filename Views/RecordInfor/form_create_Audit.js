@@ -400,6 +400,8 @@
     var field_REPID = Ext.create('Ext.form.field.Hidden', { name: 'REPID' });
     var field_FINISHID = Ext.create('Ext.form.field.Hidden', { name: 'FINISHID' });
 
+    var field_RID = Ext.create('Ext.form.field.Hidden', { name: 'RID', id: 'RID' });
+
     var panel_ele = Ext.create('Ext.panel.Panel', {
         id: 'panel_ele',
         columnWidth: 1,
@@ -416,7 +418,7 @@
         { layout: 'column', height: 42, border: 0, items: [field_CREATEDATE, field_CREATENAME, field_SUBMITTIME, field_SUBMITNAME] },
         { layout: 'column', height: 42, border: 0, items: [field_ACCEPTTIME, field_ACCEPTNAME, field_PRETIME, field_PRENAME] },
         { layout: 'column', height: 42, border: 0, items: [field_REPTIME, field_REPNAME, field_FINISHTIME, field_FINISHNAME] },
-         field_RECORDINFOID, field_CREATEID, field_SUBMITID, field_ACCEPTID, field_PREID, field_REPID, field_FINISHID
+         field_RECORDINFOID, field_RID, field_CREATEID, field_SUBMITID, field_ACCEPTID, field_PREID, field_REPID, field_FINISHID
     ];
 
     var formpanel = Ext.create('Ext.form.Panel', {
@@ -440,28 +442,6 @@
 
 }
 
-function form_ini_btn_Audit() {
-    var bbar_r = '<div class="btn-group" role="group">'                       
-                        + '<button type="button" onclick="" id="btn_accept" class="btn btn-primary btn-sm"><i class="fa fa-sign-in"></i>&nbsp;受理</button>'
-                        + '<button type="button" onclick="" id="btn_pre" class="btn btn-primary btn-sm"><i class="fa fa-database"></i>&nbsp;预录</button>'
-                        + '<button type="button" onclick="" id="btn_rep" class="btn btn-primary btn-sm"><i class="fa fa-anchor"></i>&nbsp;现场申报</button>'
-                        + '<button type="button" onclick="" id="btn_finish" class="btn btn-primary btn-sm"><i class="fa fa-check"></i>&nbsp;确认完成</button>'
-                +'</div>'
-
-    var bbar_l = '<div class="btn-group">'
-                + '<button type="button" onclick="printitemno(' + id + ')" id="btn_print" class="btn btn-primary btn-sm"><i class="fa fa-print"></i>&nbsp;申请表打印</button>'
-            + '</div>';
-    var bbar = Ext.create('Ext.toolbar.Toolbar', {
-        items: [bbar_l, '->', bbar_r]
-    })
-
-    var formpanel_btn = Ext.create('Ext.form.Panel', {
-        renderTo: 'div_form_btn',
-        border: 0,
-        bbar: bbar
-    });
-}
-
 function loadform_record_Audit() {
     Ext.Ajax.request({
         url: "/RecordInfor/loadrecord_create_Audit",
@@ -474,17 +454,13 @@ function loadform_record_Audit() {
                 Ext.getCmp('gridpanel_PRODUCTCONSUME').store.loadData(data.productsonsumedata);
             }
 
-            formpanelcontrol_Audit();//表单字段控制
+            var status = Ext.getCmp('combo_STATUS').getValue();
+            document.getElementById("btn_accept").disabled = status >= 20;//已受理及以上 ，此按钮就禁用
+            document.getElementById("btn_pre").disabled = status >= 30;
+            document.getElementById("btn_rep").disabled = status >= 40;
+            document.getElementById("btn_finish").disabled = status >= 50;
         }
     });
 }
 
-function formpanelcontrol_Audit() {
 
-    var status = Ext.getCmp('combo_STATUS').getValue();
-    document.getElementById("btn_accept").disabled = status >= 20;//已受理及以上 ，此按钮就
-    document.getElementById("btn_pre").disabled = status >= 30;
-    document.getElementById("btn_rep").disabled = status >= 40;
-    document.getElementById("btn_finish").disabled = status >= 50;
-
-}

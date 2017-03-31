@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
+using Oracle.ManagedDataAccess.Client;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -382,12 +383,16 @@ namespace MvcPlatform.Controllers
                 return result;
             }
 
-            sql = "update sys_recordinfo_detail_task set STATUS = 0,SUBMITID=null,SUBMITTIME=null,SUBMITNAME=null where id ='" + id + "'";
+            sql = @"update sys_recordinfo_detail_task set STATUS = 0,SUBMITID=null,SUBMITTIME=null,SUBMITNAME=null 
+                        ,ACCEPTTIME=null,ACCEPTID=null,ACCEPTNAME=null,PRETIME=null,PREID=null,PRENAME=null
+                        ,REPTIME=null,REPID=null,REPNAME=null,FINISHTIME=null,FINISHID=null,FINISHNAME=null 
+                    where id ='" + id + "'";
             DBMgr.ExecuteNonQuery(sql);
 
             result = "{success:true}";
             return result;
         }
+
         public string GetElements()
         {
             string customarea = Request["customarea"].ToString(); string hscode = Request["hscode"].ToString(); 
@@ -1075,19 +1080,38 @@ namespace MvcPlatform.Controllers
 
         public string Save_Audit()
         {
-            string action = Request["action"];
-            JObject json = (JObject)JsonConvert.DeserializeObject(Request["formdata"]);
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            string id = Request["id"];
-            string sql = ""; string resultmsg = "{success:false}";
+            int id = Convert.ToInt32(Request["id"].ToString()); int status = Convert.ToInt32(Request["status"]);
+            string options = Request["options"]; int nextid = 0; int flag_parms;
 
-//            sql = @"UPDATE SYS_RECORDINFO_DETAIL_TASK SET CUSTOMERNAME='{14}',SUBMITID='{15}',SUBMITNAME='{16}',SUBMITTIME={17}
-//                        WHERE ID={0}";
-//            sql = string.Format(sql, id);
+            string resultmsg = "{success:false,id:'" + id + "'}";
 
-            int result = DBMgr.ExecuteNonQuery(sql);
-            resultmsg = "{success:true,id:'" + id + "'}";
+            string sql = "";
+            if (options == "A")
+            {
+                sql = "select SYS_RECORDINFO_DETAIL_ID.Nextval from dual";
+                nextid = Convert.ToInt32(DBMgrBase.GetDataTable(sql).Rows[0][0] + "");
+            }
+
+            OracleParameter[] parms = new OracleParameter[7];
+            parms[0] = new OracleParameter("p_id", OracleDbType.Int32, ParameterDirection.Input);parms[1] = new OracleParameter("p_status", OracleDbType.Int32, ParameterDirection.Input);
+            parms[2] = new OracleParameter("p_nextid", OracleDbType.Int32, ParameterDirection.Input); parms[3] = new OracleParameter("p_options", OracleDbType.NVarchar2, 20, ParameterDirection.Input);
+            parms[4] = new OracleParameter("p_userid", OracleDbType.Int32, ParameterDirection.Input); parms[5] = new OracleParameter("p_username", OracleDbType.NVarchar2, 50, ParameterDirection.Input);
+            parms[6] = new OracleParameter("p_flag_parms", OracleDbType.Int32, ParameterDirection.Output);
+
+            parms[0].Value = id; parms[1].Value = status; parms[2].Value = nextid; parms[3].Value = options;
+            parms[4].Value = json_user.Value<string>("ID"); parms[5].Value = json_user.Value<string>("REALNAME");
+
+            DBMgr.ExecuteNonQueryParm("Pro_Save_Audit", parms);
+            flag_parms = Convert.ToInt32(parms[6].Value.ToString());
+
+            if (flag_parms == 0)
+            {
+                resultmsg = "{success:true,id:'" + id + "'}";
+            }
             return resultmsg;
+
+           
         }
 
         #endregion
