@@ -51,7 +51,12 @@ namespace MvcPlatform.Controllers
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
-
+        public ActionResult Recordinfo_Detail_SUM_Detail()//申报数量 明细
+        {
+            ViewBag.navigator = "备案管理>>申报数量";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
         public ActionResult Recordinfo_Detail_Audit()//账册审核
         {
             ViewBag.navigator = "客户服务>>账册审核";
@@ -1111,6 +1116,23 @@ namespace MvcPlatform.Controllers
 
            
         }
+
+        #endregion
+
+        #region Recordinfo_SUM
+
+        public string loadRecordDetail_SUM()
+        {
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+            string sql = "";
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "", "desc"));//, "b.id", "desc")
+
+            var json = JsonConvert.SerializeObject(dt, iso);
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
 
         #endregion
 
