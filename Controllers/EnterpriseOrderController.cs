@@ -862,5 +862,59 @@ namespace MvcPlatform.Controllers
             where += " and ISINVALID=0 ";//?是否需要
             return where;
         }
+
+        public string getTrack()
+        {
+            string busitypeid = Request["busitypeid"] + "";
+            string id = Request["id"];
+            string sql = string.Empty;
+            sql = "select * from list_order a left join  LIST_GOOD_TRACK b on a.code=b.ordercode where a.busitype='" + busitypeid + "' and  a.id='" + id + "'";
+            DataTable dt_order = DBMgr.GetDataTable(sql);
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();
+            iso.DateTimeFormat = "yyyy-MM-dd";
+            string json_order = JsonConvert.SerializeObject(dt_order, iso);
+            string sql_container = "select * from list_predeclcontainer where ordercode='" + dt_order.Rows[0]["ORDERCODE"].ToString() + "'";
+            DataTable dt_container = DBMgr.GetDataTable(sql_container);
+            string json_container = JsonConvert.SerializeObject(dt_container, iso);
+
+            return "{\"json_order\":" + json_order + ",\"json_container\":" + json_container + "}";
+        
+        }
+        public string GoodsTrackSave()
+        {
+            JObject json_data = (JObject)JsonConvert.DeserializeObject(Request["data"]);
+            string fieldList = string.Empty;
+            string fieldValueList = string.Empty;
+            foreach (JToken item in json_data.Values<JToken>())
+	            {   
+                    string colName = ((JProperty)item).Name;
+                    string colValue = ((JProperty)item).Value.ToString();
+                    if (colName!="CODE")
+                    {
+                         if (item.Next == null)
+                        {
+                             fieldList += colName;
+                             fieldValueList += "'" + colValue + "'";
+                        }
+                        else
+                        {
+                             fieldList += colName + ",";
+                             fieldValueList += "'" + colValue + "',";
+                        }
+                    }
+                                 
+	            }
+             fieldList="ID,ORDERCODE,"+fieldList;
+             fieldValueList = "LIST_GOOD_TRACK_ID.Nextval,'" + json_data.Value<string>("CODE") + "'," + fieldValueList; 
+            string sql_del="delete from LIST_GOOD_TRACK where ordercode='"+json_data.Value<string>("CODE")+"'";
+            int i=DBMgr.ExecuteNonQuery(sql_del);
+            if (i >= 0)
+            {
+                DBMgr.ExecuteNonQuery("insert into LIST_GOOD_TRACK(" + fieldList + ") values(" + fieldValueList + ")");
+                return "{success:true}";
+            }
+
+            return "{success:false}";
+        }
     }
 }

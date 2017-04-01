@@ -10,10 +10,9 @@
 <script src="~/Views/EnterpriseOrder/Listorder_index.js"></script>
 <script type="text/javascript">
 
-   
+    var busitypeid;
     Ext.onReady(function () {
-        var busitypeid = getQueryString("busitypeid");
-
+        busitypeid = getQueryString("busitypeid");
         var busitype = "";
         var columns_order = [];
         switch (busitypeid) {
@@ -134,7 +133,16 @@
     function Select() {
         Ext.getCmp('pgbar').moveFirst();
     }
-
+    function Open()
+    {
+        var recs = gridpanel.getSelectionModel().getSelection();
+        if (recs.length == 0) {
+            Ext.MessageBox.alert('提示', '请选择需要维护的记录！');
+            return;
+        }
+        var id= recs[0].data.ID
+        opencenterwin("/EnterpriseOrder/GoodsTrack?busitypeid=" + busitypeid + "&id=" + id, 1200, 800);
+    }
 </script>
 <div class="container">
     <div id="div_form" style="width:100%;"></div>
