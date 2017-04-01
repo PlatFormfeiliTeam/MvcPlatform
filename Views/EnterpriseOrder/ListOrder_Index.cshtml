@@ -14,7 +14,22 @@
     Ext.onReady(function () {
         busitypeid = getQueryString("busitypeid");
         var busitype = "";
-        var columns_order = [];
+        var columns_order = [{ xtype: 'rownumberer', width: 35 },
+                                   { header: 'ID', dataIndex: 'ID', hidden: true, locked: true },
+                                   { header: '报关状态', dataIndex: 'DECLSTATUS', width: 90, renderer: renderOrder, locked: true },
+                                   { header: '报检状态', dataIndex: 'INSPSTATUS', width: 90, renderer: renderOrder, locked: true },
+                                   { header: '订单编号', dataIndex: 'CODE', width: 100, locked: true },
+                                   { header: '对应号', dataIndex: 'REPNO', width: 120, locked: true },
+                                   { header: '合同发票号', dataIndex: 'CONTRACTNO', width: 100, locked: true },
+                                   { header: '件数/重量', dataIndex: 'GOODSNUM', width: 65, renderer: renderOrder, locked: true },//该字段需要拼接
+                                   { header: '打印状态', dataIndex: 'PRINTSTATUS', width: 70, locked: true, renderer: renderOrder },
+                                   { header: '总单号', dataIndex: 'TOTALNO', width: 90 },//需要确定具体字段
+                                   { header: '分单号', dataIndex: 'DIVIDENO', width: 90 },//需要确定具体字段
+                                   { header: '申报关区', dataIndex: 'CUSTOMAREACODE', width: 70 },//需要显示编码
+                                   { header: '进/出口岸', dataIndex: 'PORTCODE', width: 70 },//需要显示编码
+                                   { header: '申报方式', dataIndex: 'REPWAYID', width: 100, renderer: renderOrder },
+                                   { header: '转关预录号', dataIndex: 'TURNPRENO', width: 130 },//需要确定具体字段
+                                   { header: '法检', dataIndex: 'LAWFLAG', width: 60, renderer: renderOrder }];
         switch (busitypeid) {
             case "10":
                 busitype = "空运出口"; break;
@@ -143,6 +158,32 @@
         var id= recs[0].data.ID
         opencenterwin("/EnterpriseOrder/GoodsTrack?busitypeid=" + busitypeid + "&id=" + id, 1200, 800);
     }
+    function Export()
+    {
+        var data = {
+            dec_insp_status:JSON.stringify(orderstatus_js_data),
+            busitypeid: busitypeid,
+            CONDITION1: Ext.getCmp('CONDITION1').getValue(), VALUE1: Ext.getCmp("CONDITION1_1").getValue(),
+            CONDITION2: Ext.getCmp('CONDITION2').getValue(), VALUE2: Ext.getCmp("CONDITION2_1").getValue(),
+            CONDITION3: Ext.getCmp('CONDITION3').getValue(), VALUE3: Ext.getCmp("CONDITION3_1").getValue(),
+            CONDITION4: Ext.getCmp('CONDITION4').getValue(), VALUE4: Ext.getCmp("CONDITION4_1").getValue()
+
+        }
+        Ext.Ajax.request({
+            url: '/EnterpriseOrder/ExportList',
+            method: 'POST',
+            params: data,
+            form: 'exportform',
+            success: function () {
+
+
+            }
+
+
+        });
+
+
+    }
 </script>
 <div class="container">
     <div id="div_form" style="width:100%;"></div>
@@ -153,7 +194,9 @@
         <div class="btn-group fr" role="group">
             <button onclick="Select()" class="btn btn-primary btn-sm"><i class="fa fa-search"></i>&nbsp;查询</button>
             <button onclick="Reset()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-refresh"></i>&nbsp;重置</button>
-            <button onclick="Reset()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-level-down"></i>&nbsp;导出</button>      
+            <form id="exportform" name="form" enctype="multipart/form-data" method="post" style="display:inline-block">
+                <button type="button" id="btn_Export" class="btn btn-primary btn-sm" onclick="Export()"><i class="fa fa-level-down"></i>&nbsp;导出</button>
+            </form>
         </div>
     </div>
     <div id="appConId" style="width:100%"></div>
