@@ -1123,11 +1123,52 @@ namespace MvcPlatform.Controllers
 
         public string loadRecordDetail_SUM()
         {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
-            string sql = "";
-            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "", "desc"));//, "b.id", "desc")
+            string sql = ""; string where = "";
+            if (!string.IsNullOrEmpty(Request["RECORDINFORID"]))
+            {
+                where += " and a.CODE='" + Request["RECORDINFORID"] + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["ITEMNO"]))
+            {
+                where += " and b.ITEMNO='" + Request["ITEMNO"] + "'";
+            }   
+            if (!string.IsNullOrEmpty(Request["DATE_START"]))//如果开始时间有值
+            {
+                where += " and a.reptime>=to_date('" + Request["DATE_START"] + "','yyyy-mm-dd hh24:mi:ss') ";
+            }
+            if (!string.IsNullOrEmpty(Request["DATE_END"]))//如果结束时间有值
+            {
+                where += " and a.reptime<=to_date('" + Request["DATE_END"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+            }
+            if (!string.IsNullOrEmpty(Request["INOUT_TYPE"]))
+            {
+                where += " and substr(a.declarationcode,9,1)='" + Request["INOUT_TYPE"] + "'";
+            }
+
+            sql = @"select aa.recordcode,aa.itemno,aa.internaltype,aa.internaltypename,aa.trademethod,aa.commodityname,aa.currency
+                           ,bb.isproductname ITEMNOATTRIBUTE,aa.cadunit,sum(aa.cadquantity) as cadquantity
+                    from(
+                        select substr(a.declarationcode,9,1) internaltype
+             	                ,case when substr(a.declarationcode,9,1)='1' then '进口' when substr(a.declarationcode,9,1)='0' then '出口' else '' end internaltypename
+                                ,a.trademethod,a.recordcode,b.itemno,b.cadquantity,b.cadunit,b.commodityname,b.currency,a.reptime 
+                        from (
+                            select t.code,t.busiunitcode
+                            from list_declaration t 
+                            where t.isinvalid=0and t.dataconfirm=2--查询已经确认的
+                            ) t1
+                            inner join list_declaration_after a on t1.code=a.code
+                            inner join list_decllist_after b on a.code=b.predeclcode and a.xzlb=b.xzlb
+                        where (a.xzlb='报关单'or a.xzlb='报关单解析') and t1.busiunitcode='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where
+                    + @") aa
+                        left join cusdoc.base_booksdata bb on aa.trademethod=bb.trade and aa.internaltypename=bb.isinportname
+                    group by aa.recordcode,aa.itemno,aa.internaltype,aa.internaltypename,aa.trademethod,bb.isproductname,aa.commodityname,aa.currency,aa.cadunit";
+
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "aa.recordcode,aa.itemno,aa.internaltype", "asc"));
 
             var json = JsonConvert.SerializeObject(dt, iso);
             return "{rows:" + json + ",total:" + totalProperty + "}";
