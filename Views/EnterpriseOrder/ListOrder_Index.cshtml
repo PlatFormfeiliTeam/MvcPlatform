@@ -35,22 +35,6 @@
                 busitype = "空运出口"; break;
             case "11":
                 busitype = "空运进口";
-                  columns_order = [{ xtype: 'rownumberer', width: 35 },
-                                   { header: 'ID', dataIndex: 'ID', hidden: true, locked: true },
-                                   { header: '报关状态', dataIndex: 'DECLSTATUS', width: 90, renderer: renderOrder, locked: true },
-                                   { header: '报检状态', dataIndex: 'INSPSTATUS', width: 90, renderer: renderOrder, locked: true },
-                                   { header: '订单编号', dataIndex: 'CODE', width: 100, locked: true },
-                                   { header: '对应号', dataIndex: 'REPNO', width: 120, locked: true },
-                                   { header: '合同发票号', dataIndex: 'CONTRACTNO', width: 100, locked: true },
-                                   { header: '件数/重量', dataIndex: 'GOODSNUM', width: 65, renderer: renderOrder, locked: true },//该字段需要拼接
-                                   { header: '打印状态', dataIndex: 'PRINTSTATUS', width: 70, locked: true, renderer: renderOrder },
-                                   { header: '总单号', dataIndex: 'TOTALNO', width: 90 },//需要确定具体字段
-                                   { header: '分单号', dataIndex: 'DIVIDENO', width: 90 },//需要确定具体字段
-                                   { header: '申报关区', dataIndex: 'CUSTOMAREACODE', width: 70 },//需要显示编码
-                                   { header: '进/出口岸', dataIndex: 'PORTCODE', width: 70 },//需要显示编码
-                                   { header: '申报方式', dataIndex: 'REPWAYID', width: 100, renderer: renderOrder },
-                                   { header: '转关预录号', dataIndex: 'TURNPRENO', width: 130 },//需要确定具体字段
-                                   { header: '法检', dataIndex: 'LAWFLAG', width: 60, renderer: renderOrder }];
                 break;
             case "20":
                 busitype = "海运出口"; break;
