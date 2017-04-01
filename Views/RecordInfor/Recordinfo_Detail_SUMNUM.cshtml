@@ -333,7 +333,7 @@
 
         var store_sum_d = Ext.create('Ext.data.JsonStore', {
             model: 'RecrodDetail_SUM_D',
-            pageSize: 20,
+            pageSize: 10,
             proxy: {
                 type: 'ajax',
                 url: '/RecordInfor/loadRecordDetail_SUM_D',
@@ -360,7 +360,7 @@
         var gridpanel_d = Ext.create('Ext.grid.Panel', {
             id: 'gridpanel_d',
             store: store_sum_d,
-            height: 500,
+            height: 380,
             tbar:tbar_d,
             bbar: pgbar_d,
             enableColumnHide: false,
