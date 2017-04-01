@@ -193,21 +193,7 @@
         triggerAction: 'all',
         forceSelection: true,
         queryMode: 'local',
-        anyMatch: true,
-        listeners: {
-            focus: function (cb) {
-                if (!cb.getValue()) {
-                    cb.clearInvalid();
-                    cb.store.clearFilter();
-                    cb.expand();
-                }
-            }
-        },
-        listConfig: {
-            maxHeight: 130
-        },
-        allowBlank: false,
-        blankText: '成交单位不能为空!'
+        anyMatch: true
     });
 
 
