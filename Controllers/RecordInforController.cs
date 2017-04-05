@@ -1121,12 +1121,9 @@ namespace MvcPlatform.Controllers
 
         #region Recordinfo_SUM
 
-        public string loadRecordDetail_SUM()
+        public string Query_RecordDetail_SUM()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-
-            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
-            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
             string sql = ""; string where = "";
             if (!string.IsNullOrEmpty(Request["RECORDINFORID"]))
@@ -1136,7 +1133,7 @@ namespace MvcPlatform.Controllers
             if (!string.IsNullOrEmpty(Request["ITEMNO"]))
             {
                 where += " and b.ITEMNO='" + Request["ITEMNO"] + "'";
-            }   
+            }
             if (!string.IsNullOrEmpty(Request["DATE_START"]))//如果开始时间有值
             {
                 where += " and a.reptime>=to_date('" + Request["DATE_START"] + "','yyyy-mm-dd hh24:mi:ss') ";
@@ -1168,6 +1165,14 @@ namespace MvcPlatform.Controllers
                         left join cusdoc.base_booksdata bb on aa.trademethod=bb.trade and aa.internaltypename=bb.isinportname
                     group by aa.recordcode,aa.itemno,aa.internaltype,aa.internaltypename,aa.trademethod,bb.isproductname,aa.commodityname,aa.currency,aa.cadunit";
 
+            return sql;
+        }
+        public string loadRecordDetail_SUM()
+        {
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+            string sql = Query_RecordDetail_SUM();
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "aa.recordcode,aa.itemno,aa.internaltype", "asc"));
 
             var json = JsonConvert.SerializeObject(dt, iso);
@@ -1220,6 +1225,45 @@ namespace MvcPlatform.Controllers
 
             var json = JsonConvert.SerializeObject(dt, iso);
             return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
+        public FileResult Export_SUM()
+        {
+            string sql = ""; string UNIT = Request["UNIT"];
+            //创建Excel文件的对象
+            NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();
+            string filename = "申报数量.xls";
+
+            sql = Query_RecordDetail_SUM();
+            sql = sql + " order by aa.recordcode,aa.itemno,aa.internaltype";
+            DataTable dt = DBMgr.GetDataTable(sql);
+
+            NPOI.SS.UserModel.ISheet sheet = book.CreateSheet("申报数量");
+
+            NPOI.SS.UserModel.IRow row1 = sheet.CreateRow(0);
+            row1.CreateCell(0).SetCellValue("账册号"); row1.CreateCell(1).SetCellValue("项号"); row1.CreateCell(2).SetCellValue("进出类型"); row1.CreateCell(3).SetCellValue("贸易方式");
+            row1.CreateCell(4).SetCellValue("项号属性"); row1.CreateCell(5).SetCellValue("商品名称"); row1.CreateCell(6).SetCellValue("成交数量"); row1.CreateCell(7).SetCellValue("成交单位");
+            row1.CreateCell(8).SetCellValue("币别");
+
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                NPOI.SS.UserModel.IRow rowtemp = sheet.CreateRow(i + 1);
+                rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["RECORDCODE"].ToString());
+                rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["ITEMNO"].ToString());
+                rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["INTERNALTYPENAME"].ToString());
+                rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["TRADEMETHOD"].ToString());
+                rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["ITEMNOATTRIBUTE"].ToString());
+                rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["COMMODITYNAME"].ToString());
+                rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["CADQUANTITY"].ToString());
+                rowtemp.CreateCell(7).SetCellValue(GetName(dt.Rows[i]["CADUNIT"].ToString(), UNIT));
+                rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["CURRENCY"].ToString());
+            }
+            
+            // 写入到客户端 
+            System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            book.Write(ms);
+            ms.Seek(0, SeekOrigin.Begin);
+            return File(ms, "application/vnd.ms-excel", filename);
         }
 
         #endregion
