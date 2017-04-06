@@ -2,7 +2,7 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <svg xmlns="http://www.w3.org/2000/svg">
 <metadata>
-Created by FontForge 20120731 at Thu Apr  6 10:55:33 2017
+Created by FontForge 20120731 at Thu Apr  6 17:22:26 2017
  By admin
 </metadata>
 <defs>
@@ -121,6 +121,8 @@ d="M704 172q-24 -24 -45 -59.5t-38 -52t-45 -16.5q-23 0 -46.5 9.5t-51 31.5t-45 38.
 t256.5 -81q8 5 21 14t46 34.5t58 48.5t46 50t21 45q0 32 -50 91t-113 95t-93 6z" />
     <glyph glyph-name="manage" unicode="&#xe617;" 
 d="M38 64l455 -211v473l-455 192v-454zM179 339l179 -83v-64l-179 83v64zM531 326v-480l455 212v460zM512 749l-474 -199l474 -198l474 198z" />
+    <glyph glyph-name="add1" unicode="&#xe60d;" 
+d="M1024 361h-451v451h-122v-451h-451v-122h451v-451h122v451h451v122z" />
     <glyph glyph-name="iconfontzuoye" unicode="&#xe668;" 
 d="M901 487l-278 -278l-203 -76l76 203l279 278q21 21 50.5 21t50.5 -21l25 -25q21 -21 21 -51t-21 -51zM481 195l122 45l7 7l-76 76l-7 -7zM559 349l76 -76l190 189l-76 76zM876 564l-25 25q-11 11 -25.5 11t-25.5 -11l-26 -25l76 -76l26 25q11 11 11 25.5t-11 25.5z
 M223 115v36h176l-13 -36h-163zM426 223h-203v36h217zM223 474h179v-36h-179v36zM402 330h-179v36h179v-36zM617 151v-36h-174l96 36h78zM528 677v-131q0 -15 10.5 -25.5t25.5 -10.5h55l-36 -36h-19q-30 0 -51 21t-21 51v161h-323q-15 0 -25.5 -10.5t-10.5 -25.5v-681
@@ -159,8 +161,6 @@ M495 201h172q8 0 14.5 6t6.5 15v171q0 9 -6.5 15.5t-14.5 6.5h-150v131q0 7 -5.5 12.
 q0 5 4 9t9 4z" />
     <glyph glyph-name="qita" unicode="&#xe6bc;" 
 d="M52 378h460v-461h51l409 921l-920 -409v-51v0zM52 378z" />
-    <glyph glyph-name="tianjiaadd27" unicode="&#xe692;" horiz-adv-x="1025" 
-d="M667 539v357h-310v-357h-357v-310h357v-357h310v357h357v310h-357z" />
     <glyph glyph-name="weibiaoti545" unicode="&#xe633;" 
 d="M426 564v170l-331 -301l331 -301v182h38t48 -2.5t58 -7.5t61.5 -14.5t66 -23t64 -35.5t62.5 -49t55 -65t46 -84v31q0 29 -7.5 69t-25.5 90t-44.5 99.5t-67.5 96t-90 80.5t-117.5 52.5t-146.5 12.5z" />
     <glyph glyph-name="18window" unicode="&#xe62e;" 
