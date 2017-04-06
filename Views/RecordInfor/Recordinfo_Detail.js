@@ -535,3 +535,120 @@ function Export() {
     $('#exportform').attr("action", path).submit();
 }
 
+//----------------------------------------------------------------------------账册设置------------------------------------------
+function RecordSet() {
+    var tbar_set = Ext.create('Ext.toolbar.Toolbar', {
+        items: ['->',
+            {
+                text: '<span class="icon iconfont" style="font-size:12px;color:#3071A9;">&#xe628;</span>&nbsp;<font color="#3071A9">启 用</font>',
+                handler: function () { RecordSet_task(1); }
+            },
+            {
+                text: '<span class="icon iconfont" style="font-size:12px;color:#3071A9;">&#xe634;</span>&nbsp;<font color="#3071A9">禁 用</font>',
+                handler: function () { RecordSet_task(0); }
+            }
+        ]
+    });
+
+    Ext.regModel('RecrodInfo', {
+        fields: ['ID', 'CODE', 'BOOKATTRIBUTE', 'ENABLED']
+    });
+    var store_set = Ext.create('Ext.data.JsonStore', {
+        model: 'RecrodInfo',
+        pageSize: 10,
+        proxy: {
+            type: 'ajax',
+            url: '/RecordInfor/loadRecrodInfo',
+            reader: {
+                root: 'rows',
+                type: 'json',
+                totalProperty: 'total'
+            }
+        },
+        autoLoad: true
+    });
+    var pgbar_set = Ext.create('Ext.toolbar.Paging', {
+        id: 'pgbar_set',
+        displayMsg: '显示 {0} - {1} 条,共计 {2} 条',
+        store: store_set,
+        displayInfo: true
+    })
+    var gridpanel_set = Ext.create('Ext.grid.Panel', {
+        id: 'gridpanel_set',
+        store: store_set,
+        height: 450, border: 0,
+        tbar:tbar_set,
+        bbar: pgbar_set,
+        selModel: { selType: 'checkboxmodel' },
+        enableColumnHide: false,
+        columns: [
+        { xtype: 'rownumberer', width: 35 },
+        { header: 'ID', dataIndex: 'ID', hidden: true },
+        { header: '账册号', dataIndex: 'CODE', width: 120 },
+        { header: '账册属性', dataIndex: 'BOOKATTRIBUTE', width: 120 },
+        {
+            header: '启用/禁用', dataIndex: 'ENABLED', width: 110, renderer: function renderOrder(value, cellmeta, record, rowIndex, columnIndex, store) {
+                if (value == "1") {
+                    return '<span class="icon iconfont" style="font-size:12px;color:blue;">&#xe628;</span>'
+                }
+                else if (value == "0") {
+                    return '<span class="icon iconfont" style="font-size:12px;color:red;">&#xe634;</span>'
+                }
+                else {
+                    return '';
+                }
+            }
+        }
+        ],
+        viewConfig: {
+            enableTextSelection: true
+        },
+        forceFit: true
+    });
+
+    var win = Ext.create("Ext.window.Window", {
+        title: '账册设置',
+        width: 500,
+        height: 480, border: 0,
+        modal: true,
+        items: [Ext.getCmp('gridpanel_set')],
+        listeners: {
+            "close": function () {
+                window.location.reload();
+            }
+        }
+    });
+    win.show();
+}
+
+function RecordSet_task(type) {
+    var recs = Ext.getCmp("gridpanel_set").getSelectionModel().getSelection();
+    if (recs.length == 0) {
+        Ext.Msg.alert("提示", "请选择记录!");
+        return;
+    }
+    var ids = ""; 
+    Ext.each(recs, function (rec) {
+        ids += rec.get("ID") + ",";
+    });
+    ids = ids.substr(0, ids.length - 1);
+
+    Ext.MessageBox.confirm("提示", "确定要设置所选择的记录吗？", function (btn) {
+        if (btn == 'yes') {
+            Ext.Ajax.request({
+                url: '/RecordInfor/RecordSet_task',
+                params: { ids: ids, type: type },
+                success: function (response, success, option) {
+                    var res = Ext.decode(response.responseText);
+                    var msgs = "";
+                    if (res.success) { msgs = "设置成功！"; }
+                    else { msgs = "设置失败！"; }
+
+                    Ext.MessageBox.alert('提示', msgs, function (btn) {
+                        Ext.getCmp("pgbar_set").moveFirst();
+                    });
+                }
+            });
+        }
+    });
+}

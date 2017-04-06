@@ -1662,7 +1662,7 @@ function renderOrder(value, cellmeta, record, rowIndex, columnIndex, store) {
             }
             break;
         case "PRINTSTATUS":
-            rtn = value == "1" ? '<i class="fa fa-check" style="color:blue" aria-hidden="true"></i>' : '<i class="fa fa-times" style="color:red" aria-hidden="true"></i>';
+            rtn = value == "1" ? '<span class="icon iconfont" style="font-size:12px;color:blue;">&#xe628;</span>' : '<span class="icon iconfont" style="font-size:12px;color:red;">&#xe634;</span>';
             break;
         case "UNIT": case "CADUNIT": case "LEGALUNIT":
             var rec = store_unit.findRecord('CODE', value);

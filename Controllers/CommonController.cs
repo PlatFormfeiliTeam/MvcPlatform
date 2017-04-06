@@ -519,7 +519,7 @@ namespace MvcPlatform.Controllers
             {
                 //========================================备案信息============================================================================
                 string json_recordid = "[]";//账册号
-                sql = @"select id,code,code||'('||bookattribute||')' as name from sys_recordinfo where busiunit= '" + json_user.Value<string>("CUSTOMERHSCODE") + "'";
+                sql = @"select id,code,code||'('||bookattribute||')' as name from sys_recordinfo where enabled=1 and busiunit= '" + json_user.Value<string>("CUSTOMERHSCODE") + "'";
                 json_recordid = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
 
                 string json_unit = "[]";//单位

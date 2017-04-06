@@ -123,7 +123,7 @@ namespace MvcPlatform.Controllers
             if (type == "go")
             {
                 sql = @"select a.code,b.*
-                            from cusdoc.sys_recordinfo a
+                            from (select * from cusdoc.sys_recordinfo where enabled=1) a
                                  inner join (  
                                          select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
                                                 ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark
@@ -134,7 +134,7 @@ namespace MvcPlatform.Controllers
             else
             {
                 sql = @"select a.code,b.*
-                            from cusdoc.sys_recordinfo a
+                            from (select * from cusdoc.sys_recordinfo where enabled=1) a
                                  inner join (
                                          select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
                                                 ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark 
@@ -159,7 +159,7 @@ namespace MvcPlatform.Controllers
 
         /*all sql
          * string sql = @"select a.code,b.*
-                        from cusdoc.sys_recordinfo a
+                        from (select * from cusdoc.sys_recordinfo where enabled=1) a
                              inner join (  
                                      select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
                                             ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark
@@ -354,6 +354,30 @@ namespace MvcPlatform.Controllers
             book.Write(ms);
             ms.Seek(0, SeekOrigin.Begin);
             return File(ms, "application/vnd.ms-excel", filename);
+        }
+
+        public string loadRecrodInfo()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            string sql = @"select * from cusdoc.sys_recordinfo where busiunit='" + json_user.Value<string>("CUSTOMERHSCODE") + "'";
+
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "ENABLED", "desc"));
+            var json = JsonConvert.SerializeObject(dt);
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
+        public string RecordSet_task()
+        {
+            string ids = Request["ids"]; string type = Request["type"];
+            string result = "{success:false}"; string sql = "";
+
+            sql = "update sys_recordinfo set ENABLED=" + type + " where id in(" + ids + ")";
+            DBMgrBase.ExecuteNonQuery(sql);
+
+            result = "{success:true}";
+
+            return result;
         }
 
         #endregion
@@ -908,7 +932,7 @@ namespace MvcPlatform.Controllers
         public string GetRecordidByEnterprise()
         {
             string json_recordid = "[]";//账册号
-            string sql = @"select id,code,code||'('||bookattribute||')' as name from sys_recordinfo where busiunit= '" + Request["EnterpriseHSCOCDE"] + "'";
+            string sql = @"select id,code,code||'('||bookattribute||')' as name from sys_recordinfo where enabled=1 and busiunit= '" + Request["EnterpriseHSCOCDE"] + "'";
             json_recordid = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
             return "{recordid:" + json_recordid + "}";
         }
@@ -955,7 +979,7 @@ namespace MvcPlatform.Controllers
                 where += " and b.SUBMITTIME<=to_date('" + Request["DATE_END"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
             }
             sql = @"select a.code,a.busiunit,b.*,c.name busiunitname 
-                            from cusdoc.sys_recordinfo a
+                            from (select * from cusdoc.sys_recordinfo where enabled=1) a
                                  inner join (  
                                          select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
                                                 ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark
@@ -1068,7 +1092,7 @@ namespace MvcPlatform.Controllers
             //委托信息
             sql = @"select a.*,b.busiunit enterprise,b.code||'('||b.bookattribute||')' recordinfoname
                     from sys_recordinfo_detail_task a 
-                        left join cusdoc.sys_recordinfo b on a.recordinfoid=b.id 
+                        left join (select * from cusdoc.sys_recordinfo where enabled=1) b on a.recordinfoid=b.id 
                     where a.id='" + id + "'";
             DataTable dt = DBMgr.GetDataTable(sql);
             formdata = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
@@ -1302,7 +1326,7 @@ namespace MvcPlatform.Controllers
             string ITEMNOATTRIBUTE = string.Empty;
             string sql = string.Empty; string sql_cp = string.Empty;
             IsoDateTimeConverter iso = new IsoDateTimeConverter();
-            string sql_recordinfo = "select a.itemnoattribute,(select code from cusdoc.SYS_RECORDINFO where id=a.recordinfoid) recordcode from SYS_RECORDINFO_DETAIL_TASK a where id=" + id;
+            string sql_recordinfo = "select a.itemnoattribute,(select code from cusdoc.SYS_RECORDINFO where enabled=1 and id=a.recordinfoid) recordcode from SYS_RECORDINFO_DETAIL_TASK a where id=" + id;
             DataTable dt_recordinfo = DBMgr.GetDataTable(sql_recordinfo);
             string json_recordinfo = JsonConvert.SerializeObject(dt_recordinfo, iso);
             ITEMNOATTRIBUTE = dt_recordinfo.Rows[0]["ITEMNOATTRIBUTE"].ToString();
