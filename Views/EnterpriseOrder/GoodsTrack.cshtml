@@ -76,9 +76,7 @@
                 var data = Ext.decode(response.responseText);
                 Ext.getCmp('panelbottom_1_1').getForm().setValues(data.json_order[0]);
                 Ext.getCmp('panelbottom_1_3').getForm().setValues(data.json_order[0]);
-                Ext.getCmp('w_grid').store.loadData(data.json_container);
-
-
+                if (Ext.getCmp('w_grid')) {Ext.getCmp('w_grid').store.loadData(data.json_container);}
             }
 
 

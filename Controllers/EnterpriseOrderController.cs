@@ -20,6 +20,7 @@ using StackExchange.Redis;
 
 namespace MvcPlatform.Controllers
 {
+     [Authorize]
     public class EnterpriseOrderController : Controller
     {
         int totalProperty = 0;

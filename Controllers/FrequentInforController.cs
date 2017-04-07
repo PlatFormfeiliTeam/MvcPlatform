@@ -1,6 +1,7 @@
 ﻿using MvcPlatform.Common;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -30,6 +31,13 @@ namespace MvcPlatform.Controllers
             return View();
         }
 
+          [Authorize]
+        public ActionResult CollectInfor()
+        {
+            ViewBag.navigator = "常用工具 > 收藏信息";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
         public ActionResult BaseCommodityHSDetail(string id)//HS编码 详细界面
         {
             Dictionary<string, DataTable> dic = new Dictionary<string, DataTable>();//新建字典
@@ -136,6 +144,97 @@ namespace MvcPlatform.Controllers
             pageSql = string.Format(pageSql, tempsql, order, asc, start + 1, limit + start);
             return pageSql;
         }
+        //分页 by heguiqin 2016-08-26
+        private string GetPageSql(string tempsql, string order, string asc)
+        {
+            int start = Convert.ToInt32(Request["start"]);
+            int limit = Convert.ToInt32(Request["limit"]);
+            string sql = "select count(1) from ( " + tempsql + " )";
+            totalProperty = Convert.ToInt32(DBMgr.GetDataTable(sql).Rows[0][0]);
+            string pageSql = @"SELECT * FROM ( SELECT tt.*, ROWNUM AS rowno FROM ({0} ORDER BY {1} {2}) tt WHERE ROWNUM <= {4}) table_alias WHERE table_alias.rowno >= {3}";
+            pageSql = string.Format(pageSql, tempsql, order, asc, start + 1, limit + start);
+            return pageSql;
+        }
 
+        public string GetToolsGroupByType()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+           // string sql = "select * from list_collect_infor_BYUSER a left join list_collect_infor b on a.rid=b.id where a.sysuserid='" + json_user.Value<string>("ID")+ "'";
+
+            string sql_gropByType = "select  DISTINCT TYPE ,'' ITEM from list_collect_infor order by TYPE ";
+            DataTable dt = DBMgr.GetDataTable(sql_gropByType);
+            for (int i = 0; i < dt.Rows.Count; i++)
+			{
+                string sql = "select ID RID,ICON,NAME,URL,TYPE,CREATEID,CREATEDATE,ISINVALID from list_collect_infor where TYPE='" + dt.Rows[i]["TYPE"].ToString() + "'";
+                dt.Rows[i]["ITEM"] = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
+            }
+            
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();
+            string json_tools = JsonConvert.SerializeObject(dt,iso);
+            return json_tools;
+        }
+
+
+        public string GetTools()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string sql = "select * from list_collect_infor_BYUSER a left join list_collect_infor b on a.rid=b.id where a.TYPE='tool' and a.sysuserid='" + json_user.Value<string>("ID") + "'";
+            //string sql = "select * from list_collect_infor";
+            DataTable dt = DBMgr.GetDataTable(sql);
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();
+            string json_tools = JsonConvert.SerializeObject(dt, iso);
+            return "{rows:" + json_tools + ",total:0}";
+        }
+        public string ManageTools()
+        {
+            string sql = string.Empty;
+            string action = Request["act"] + "";
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string rid = Request["RID"] + "";
+            if (action=="add")
+            {
+            sql = "insert into list_collect_infor_BYUSER(ID,SYSUSERID,TYPE,CREATEID,CREATEDATE,RID) values(LIST_COLLECT_INFOR_BYUSER_ID.Nextval,'{0}','tool','{1}',sysdate,'{2}')";
+            sql=string.Format(sql, json_user.Value<string>("ID"), json_user.Value<string>("ID"), rid);
+           
+            }
+            else
+            {
+                sql = "delete from  list_collect_infor_BYUSER where TYPE='tool' and  RID='" + rid + "' and SYSUSERID='" + json_user.Value<string>("ID") + "'";
+            
+            }
+            DBMgr.ExecuteNonQuery(sql);
+            return "{success:true}";
+        
+        }
+        public string GetNews()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string sql = "select a.*,b.TITLE,b.PUBLISHDATE,b.ISINVALID from list_collect_infor_BYUSER a left join web_notice b on a.rid=b.id where a.TYPE='news' and a.sysuserid='" + json_user.Value<string>("ID") + "'";
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "publishdate","desc"));
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();
+            string json_news = JsonConvert.SerializeObject(dt, iso);
+            return "{rows:" + json_news + ",total:" + totalProperty + "}";
+        }
+        public string ManageNews()
+        {
+            string sql = string.Empty;
+            string action = Request["act"] + "";
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string rid = Request["RID"] + "";
+            if (action == "add")
+            {
+                sql = "insert into list_collect_infor_BYUSER(ID,SYSUSERID,TYPE,CREATEID,CREATEDATE,RID) values(LIST_COLLECT_INFOR_BYUSER_ID.Nextval,'{0}','news','{1}',sysdate,'{2}')";
+                sql = string.Format(sql, json_user.Value<string>("ID"), json_user.Value<string>("ID"), rid);
+
+            }
+            else
+            {
+                sql = "delete from  list_collect_infor_BYUSER where TYPE='news' and  RID in (" + rid + ") and SYSUSERID='" + json_user.Value<string>("ID") + "'";
+
+            }
+            DBMgr.ExecuteNonQuery(sql);
+            return "{success:true}";
+
+        }
     }
 }
