@@ -14,6 +14,30 @@
     JArray jarry = JsonConvert.DeserializeObject<JArray>(attachment);
     int i = 0;
 }
+<script>
+    function getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]); return null;
+    }
+
+    function collect(action) {
+        var id = getQueryString("id");
+        $.ajax({
+            type: 'Post',
+            url: "/FrequentInfor/ManageNews",
+            dataType: "text",
+            data: { act: action, rid: id },
+            async: false,
+            success: function (data) {
+                if (data = "{success:true}") {
+                    if (action == "del") { $('#span_col').html('<span style="color: #ff6600; cursor: pointer;" onclick="collect(\'add\')"><i class="icon iconfont">&#xe7c6;</i>@Html.Raw("收藏")</span>'); }
+                    if (action == "add") { $('#span_col').html('<span style="color: #ff6600; cursor:pointer;" onclick="collect(\'del\')"><i class="icon iconfont">&#xe6aa;</i>@Html.Raw("取消收藏")</span>'); }
+                }
+            }
+        });
+    }
+</script>
 <div style="overflow:hidden;">
     <img src="/Images/zxdt_header.png" alt="" />
 </div>
@@ -22,6 +46,19 @@
     <p>
         <center>
             <h4><b>@Model["dt_notice"].Rows[0]["title"]</b></h4>
+            <span id="span_col">
+                @if (ViewBag.IfLogin)
+                {
+                    if (Model["dt_notice"].Rows[0]["iscollect"].ToString() != "0")
+                    {
+                        <span style="color: #ff6600; cursor:pointer;" onclick="collect('del')"><i class="icon iconfont">&#xe6aa;</i>@Html.Raw("取消收藏")</span>
+                    }
+                    else
+                    {
+                        <span style="color: #ff6600; cursor: pointer;" onclick="collect('add')"><i class="icon iconfont">&#xe7c6;</i>@Html.Raw("收藏")</span>
+                    }
+                }
+            </span>        
         </center>
     </p>
 
@@ -29,10 +66,10 @@
 
     @if (@Model["dt_notice"].Rows[0]["publishdate"].ToString() != "")
     {
-        <p style="text-align:right;">
-            发布日期：@Model["dt_notice"].Rows[0]["publishdate"].ToString()
+        <p style="text-align:right;">          
+            发布日期：@Model["dt_notice"].Rows[0]["publishdate"].ToString()            
         </p>
-    }
+    }      
 
     @Html.Raw(Model["dt_notice"].Rows[0]["content"])
 

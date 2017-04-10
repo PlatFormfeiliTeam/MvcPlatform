@@ -237,8 +237,18 @@ namespace MvcPlatform.Controllers
 
             sql = @"select type,(select name from newscategory where id=a.type) typename,title,content,attachment,to_char(a.publishdate,'yyyy-mm-dd') as publishdate 
                         ,to_char(updatetime,'yyyy/mm/dd hh24:mi:ss') as updatetime,REFERENCESOURCE 
+                        ,0 iscollect
                     from web_notice a where isinvalid=0 and id='" + ID + "'";
             dt_notice = DBMgr.GetDataTable(sql);
+
+            if (!string.IsNullOrEmpty(HttpContext.User.Identity.Name))
+            {
+                JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+                sql = @"select count(1) from list_collect_infor_BYUSER where type='news' and sysuserid='" + json_user.Value<string>("ID") + "' and rid='" + ID + "'";
+                dt_notice.Rows[0]["iscollect"] = DBMgr.GetDataTable(sql).Rows[0][0];
+            }
+
+
             dic.Add("dt_notice", dt_notice);
             type = dt_notice.Rows[0]["type"].ToString();typename = dt_notice.Rows[0]["typename"].ToString();
 

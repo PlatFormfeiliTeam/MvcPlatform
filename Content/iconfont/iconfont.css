@@ -1,10 +1,10 @@
 
 @font-face {font-family: "iconfont";
-  src: url('iconfont.eot?t=1491470546264'); /* IE9*/
-  src: url('iconfont.eot?t=1491470546264#iefix') format('embedded-opentype'), /* IE6-IE8 */
-  url('iconfont.woff?t=1491470546264') format('woff'), /* chrome, firefox */
-  url('iconfont.ttf?t=1491470546264') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
-  url('iconfont.svg?t=1491470546264#iconfont') format('svg'); /* iOS 4.1- */
+  src: url('iconfont.eot?t=1491550576369'); /* IE9*/
+  src: url('iconfont.eot?t=1491550576369#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('iconfont.woff?t=1491550576369') format('woff'), /* chrome, firefox */
+  url('iconfont.ttf?t=1491550576369') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
+  url('iconfont.svg?t=1491550576369#iconfont') format('svg'); /* iOS 4.1- */
 }
 
 .iconfont {
@@ -57,9 +57,13 @@
 
 .icon-add1:before { content: "\e60d"; }
 
+.icon-shoucang:before { content: "\e7c6"; }
+
 .icon-iconfontzuoye:before { content: "\e668"; }
 
 .icon-weixin:before { content: "\e64d"; }
+
+.icon-shoucang1:before { content: "\e6aa"; }
 
 .icon-changyonggongju:before { content: "\e6e4"; }
 
