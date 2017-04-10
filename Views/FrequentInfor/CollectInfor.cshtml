@@ -2,7 +2,7 @@
     ViewBag.Title = "CollectInfor";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<link href="/js/Extjs42/resources/css/ext-all-neptune.css" rel="stylesheet" type="text/css" />
+<link href="/js/Extjs42/resources/css/ext-all.css" rel="stylesheet" type="text/css" />
 <script src="/js/Extjs42/bootstrap.js" type="text/javascript"></script>
 <link href="/css/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
 <style type="text/css">
@@ -17,8 +17,16 @@
 
 </style>
 <script type="text/javascript">
-    var store_Tool_added;
+    var store_Tool_added, store_type ;
     Ext.onReady(function () {
+
+        var model_Type = Ext.define('model_Type', {
+            extend: 'Ext.data.Model',
+            fields: ["ID", "TYPENAME", "TYPEID"]
+        });
+        store_type = Ext.create('Ext.data.JsonStore', {
+            model:'model_Type'
+        });
 
         var tmp = new Ext.XTemplate(
        '<tpl for=".">',
@@ -33,7 +41,7 @@
        )
         var  model_Tool=Ext.define('model_Tool', {
             extend: 'Ext.data.Model',
-            fields: ["RID", "ICON", "NAME", "URL","TYPE","CREATEID","CREATEDATE","ISINVALID"]
+            fields: ["RID", "ICON", "NAME", "URL", "TYPENAME", "CREATEID", "CREATEDATE", "ISINVALID"]
         });
           store_Tool_added = Ext.create('Ext.data.JsonStore', {
             model:'model_Tool',
@@ -45,7 +53,20 @@
                     type: 'json'
                 }
             },
-            autoLoad: true
+            autoLoad: true,
+            listeners: {
+                datachanged: function (store, eOpts)
+                {
+                    if (store.data.length == 0) {
+                        if (Ext.getCmp("add_view")) {Ext.getCmp("add_view").hide();}
+                        
+                    } else {
+                        if (Ext.getCmp("add_view")) { Ext.getCmp("add_view").show(); }
+                    }
+                }
+
+
+            }
 
         });
 
@@ -120,14 +141,14 @@
             columns: [
             { xtype: 'rownumberer', width: 35},
             { header: 'ID', dataIndex: 'ID', hidden: true},
-            { header: '标题', dataIndex: 'TITLE', flex: 0.8 },
+            { header: '标题', dataIndex: 'TITLE', flex: 0.8, renderer: render },
             { header: '发布时间', dataIndex: 'PUBLISHDATE',flex:0.1},
             ],
             listeners:
             {
-                'itemdblclick': function (view, record, item, index, e) {
-                    javascript: window.open("/Home/IndexNoticeDetail?id=" + record.data.RID, "_blank")
-                }
+                //'itemdblclick': function (view, record, item, index, e) {
+                //    javascript: window.open("/Home/IndexNoticeDetail?id=" + record.data.RID, "_blank")
+                //}
             },
             viewConfig: {
                 enableTextSelection: true
@@ -149,7 +170,7 @@
      
         var model_Tool = Ext.define('model_Tool', {
             extend: 'Ext.data.Model',
-            fields: ["RID", "ICON", "NAME", "URL", "TYPE", "CREATEID", "CREATEDATE", "ISINVALID"]
+            fields: ["RID", "ICON", "NAME", "URL", "TYPENAME", "CREATEID", "CREATEDATE", "ISINVALID"]
         });
         var tmp_tool = new Ext.XTemplate(
                   '<tpl for=".">',
@@ -166,10 +187,11 @@
                   '<div class="panel-heading" style=" text-align:center;padding:5px 10px;">{[values.NAME]}</div>',
                   '</div>',
                   '</tpl>',
-                  '<div style="padding-top:5px;width:100%;height:30px;background:#d9e4ec;text-align:center;color:#7a8693;float:left">全部工具</div>');
+                  '<div style="padding-top:5px;width:100%;height:30px;background:#d9e4ec;text-align:center;color:#7a8693;float:left">未添加工具</div>');
         
         var text_tmp;
-        var add_view=new Ext.view.View({
+        var add_view = new Ext.view.View({
+            id:"add_view",
             tpl: tmp_tool_add,
             store: store_Tool_added,
             width: '100%',
@@ -190,6 +212,10 @@
                     Ext.get("tpl_div_" + record.data.RID).dom.className = "panel panel-default thumb-wrap fl";
                 },
                 itemclick: function (thisView, record, item, index, e) {
+                    var typeid =  store_type.findRecord("TYPENAME", record.data.TYPENAME).data.TYPEID;
+                    Ext.getCmp("view_" + typeid).store.insert(Ext.getCmp("view_" + typeid).store.data.length, record.data);
+                    var num = Ext.getCmp("view_" + typeid).store.data.length;
+                    Ext.getCmp("fs_" + typeid).setTitle(record.data.TYPENAME + "(" + num + ")");
                     Ext.Ajax.request({
                         url: '/FrequentInfor/ManageTools?act=del',
                         params:record.data,
@@ -207,16 +233,25 @@
         }
     })
         var fieldSet_tool = [add_view];
+        if (store_Tool_added.data.length == 0) {
+            if (Ext.getCmp("add_view")) { Ext.getCmp("add_view").hide(); }
+
+        } else {
+            if (Ext.getCmp("add_view")) { Ext.getCmp("add_view").show(); }
+        }
         Ext.Ajax.request({
             url: '/FrequentInfor/GetToolsGroupByType',
             success: function (response, opts) {
-                var Tool_data = Ext.decode(response.responseText);             
+                var Tool_data = Ext.decode(response.responseText);
+                store_type.loadData(Tool_data);
                 for (var i = 0; i < Tool_data.length; i++) {
                     var store_Tool_tmp = Ext.create('Ext.data.JsonStore', { model: 'model_Tool' });
+                    var el_id = Tool_data[i].TYPEID;
                     var data_item=Ext.decode(Tool_data[i].ITEM);
                     store_Tool_tmp.loadData(data_item);
                     var set_tmp = new Ext.form.FieldSet({
-                        title: Tool_data[i].TYPE + "(" + data_item.length+ ")",
+                        title: Tool_data[i].TYPENAME + "(" + data_item.length + ")",
+                        id: 'fs_' + el_id,
                         width: '99%',
                         border: '1 0 0 0',
                         style: 'padding:0 0',
@@ -225,6 +260,7 @@
                             new Ext.view.View({
                                 store: store_Tool_tmp,
                                 tpl: tmp_tool,
+                                id:"view_"+el_id,
                                 itemSelector: 'div.thumb-wrap',
                                 multiSelect: false,
                                 listeners: {
@@ -248,7 +284,12 @@
                                     },
                                     itemclick: function (thisView, record, item, index, e) {
 
+                                        thisView.store.remove(record);
 
+
+                                        var typeid = store_type.findRecord("TYPENAME", record.data.TYPENAME).data.TYPEID;
+                                        var num = Ext.getCmp("view_" + typeid).store.data.length;
+                                        Ext.getCmp("fs_" + typeid).setTitle(record.data.TYPENAME + "(" + num + ")");
                                         var rec = store_Tool_added.findRecord('RID', record.data.RID);
                                         if (!rec) {
                                             store_Tool_added.insert(store_Tool_added.data.length, record.data);
@@ -323,6 +364,17 @@
 
             }
         });
+    }
+    function render(value, cellmeta, record, rowIndex, columnIndex, store)
+    {
+        var rtn = "";
+        var dataindex = cellmeta.column.dataIndex;
+        switch (dataindex) {
+            case "TITLE":
+                rtn = "<a href='/Home/IndexNoticeDetail?id=" + record.get("RID") + "' target='_blank'>" + record.get("TITLE") + "</a>";
+                break;
+        }
+        return rtn;
     }
 </script>
 <div class="container">
