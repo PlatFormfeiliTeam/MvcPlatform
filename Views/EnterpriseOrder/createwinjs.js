@@ -42,30 +42,58 @@ function form_ini() {
         labelAlign: "right",
         fieldLabel: '  ',
         columns: 2,
-        items: [{ boxLabel: '<font color=red>批次生成</font>', name: 'CREATEMODE', inputValue: '按批次', id: "pc", checked: true },
-                { boxLabel: '<font color=red>逐票生成</font>', name: 'CREATEMODE', inputValue: '按文件', id: "wj" }],
+        items: [{ boxLabel: '<font color=red>逐票生成</font>', name: 'CREATEMODE', inputValue: '按文件', id: "wj", checked: true },
+                { boxLabel: '<font color=red>批次生成</font>', name: 'CREATEMODE', inputValue: '按批次', id: "pc" }],
         listeners: {
             change: function (rb, newValue, oldValue, eOpts) {
                 if (newValue.CREATEMODE == '按文件') {
                     field_CODE.setValue("");
                     field_CODE.setReadOnly(true);
+                    Ext.getCmp('formpanel_u').getForm().clearInvalid();
                 }
                 else {
 
                     field_CODE.setReadOnly(false);
+                    Ext.getCmp('formpanel_u').getForm().clearInvalid();
                 }
                 
             }
         }
     });
 
+
+    var store_jydw = Ext.create('Ext.data.JsonStore', {  //报关行combostore
+        fields: ['CODE', 'NAME'],
+        data: common_data_jydw
+    });
+    var field_FILERECEVIEUNITNAME_h = Ext.create('Ext.form.field.Hidden', {
+        name: 'FILERECEVIEUNITNAME'
+    });
+    var field_FILEDECLAREUNITNAME_h = Ext.create('Ext.form.field.Hidden', {
+        name: 'FILEDECLAREUNITNAME'
+    });
     //文件接收单位
-    var field_FILERECEVIEUNIT = Ext.create('Ext.form.field.Text', {
+    var field_FILERECEVIEUNIT = Ext.create('Ext.form.field.ComboBox', {
         id: 'field_FILERECEVIEUNIT',
-        readOnly: true,
-        name: 'FILERECEVIEUNITNAME',
+        name: 'FILERECEVIEUNITCODE',
         margin: 0,
-        flex: .90
+        flex: .90,
+        store: store_jydw,
+        displayField: 'NAME',
+        valueField: 'CODE',
+        triggerAction: 'all',
+        queryMode: 'local',
+        minChars: 4,
+        hideTrigger: true,
+        anyMatch: true,
+        listeners: {
+            focus: function (cb) {
+                cb.clearInvalid();
+            },
+            select: function (records) {
+                field_FILERECEVIEUNITNAME_h.setValue(records.rawValue.substr(0, records.rawValue.lastIndexOf('(')));
+            }
+        }
     })
     var cont_wjjsdw = Ext.create('Ext.form.FieldContainer', {
         fieldLabel: '文件接收单位',
@@ -73,21 +101,36 @@ function form_ini() {
         items: [field_FILERECEVIEUNIT,
             {
                 xtype: 'button', id: 'btn_filerecevieunit', handler: function () {
-                    bgsbdw_win(field_FILERECEVIEUNIT);
+                    selectjydw(field_FILERECEVIEUNIT, field_FILERECEVIEUNITNAME_h)
                 }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .10, margin: 0
             }
         ]
     })
 
     //文件申报单位
-    var field_FILEDECLAREUNIT = Ext.create('Ext.form.field.Text', {
+    var field_FILEDECLAREUNIT = Ext.create('Ext.form.field.ComboBox', {
         id: 'field_FILEDECLAREUNIT',
-        name: 'FILEDECLAREUNITNAME',
-        readOnly: true,
+        name: 'FILEDECLAREUNITCODE',
         margin: 0,
         flex: .90,
         allowBlank: false,
-        blankText: '申报单位不能为空!'
+        blankText: '申报单位不能为空!',
+        store: store_jydw,
+        displayField: 'NAME',
+        valueField: 'CODE',
+        triggerAction: 'all',
+        queryMode: 'local',
+        minChars: 4,
+        hideTrigger: true,
+        anyMatch: true,
+        listeners: {
+            focus: function (cb) {
+                cb.clearInvalid();
+            },
+            select: function (records) {
+                field_FILEDECLAREUNITNAME_h.setValue(records.rawValue.substr(0, records.rawValue.lastIndexOf('(')));
+            }
+        }
     });
     var field_ID = Ext.create('Ext.form.field.Hidden', {
         name: 'ID'
@@ -102,7 +145,7 @@ function form_ini() {
         items: [field_FILEDECLAREUNIT,
             {
                 xtype: 'button', id: 'btn_filedeclareunit', handler: function () {
-                    bgsbdw_win(field_FILEDECLAREUNIT);
+                    selectjydw(field_FILEDECLAREUNIT, field_FILEDECLAREUNITNAME_h);
                 }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .10, margin: 0
             }
         ]
@@ -110,28 +153,47 @@ function form_ini() {
 
     //业务类型
     var store_busitype = Ext.create('Ext.data.JsonStore', {
-        fields: ['CODE', 'NAME'],
+        fields: ['CODE', 'NAME', 'CODENAME'],
         data: common_data_busitype
     });
+ 
     var combo_BUSITYPE = Ext.create('Ext.form.field.ComboBox', {
         id: 'combo_BUSITYPE',
         name: 'BUSITYPEID',
         store: store_busitype,
         fieldLabel: '业务类型',
-        displayField: 'NAME',
+        displayField: 'CODENAME',
         valueField: 'CODE',
         triggerAction: 'all',
-        editable: false,
         queryMode: 'local',
+        minChars: 1,
+        hideTrigger: false,
+        anyMatch: true,
+        //editable: false,
+        queryMode: 'local',
+        //listConfig: {
+        //    getInnerTpl: function () {
+        //        return '{NAME} ({CODE})';
+        //    }
+        //},
         listeners: {
             change: function (combo, records) {
-                combo_REPWAYNAME.reset();
+                combo_REPWAYNAME.reset();              
+                // var busitype = store_busitype.findRecord("CODENAME", combo_BUSITYPE.getRawValue()).data.NAME;
+                var rec = store_busitype.findRecord('CODE', this.lastValue,0,false,false,true);
+                var busitype = "";
+                if (rec) {
+                    busitype = rec.get("NAME");
+                }
                 Ext.Ajax.request({
                     url: "/EnterPriseOrder/Ini_Base_Data_REPWAY",
-                    params: { busitype: combo_BUSITYPE.getRawValue() },
+                    params: { busitype: busitype },
                     success: function (response, opts) {
                         var commondata = Ext.decode(response.responseText);
                         common_data_sbfs = commondata.sbfs;//申报方式
+                        if (common_data_sbfs.length == 0) {
+                            combo_REPWAYNAME.reset();
+                        }
                         store_REPWAYNAME.loadData(common_data_sbfs);
 
                         var rec = store_REPWAYNAME.findRecord('CODE', repwayidcode);
@@ -141,6 +203,12 @@ function form_ini() {
                         combo_REPWAYNAME.setValue(repwayidcode);//编辑页赋值
                     }
                 });
+            },
+            blur: function (combo, records) {
+                var rec = store_busitype.findRecord('CODE', this.lastValue, 0, false, false, true);
+                if (!rec) {
+                    combo_BUSITYPE.reset();;
+                }
             }
         }
     });
@@ -222,7 +290,8 @@ function form_ini() {
         name: 'CODE',
         allowBlank: false,
         blankText: '企业编号不能为空!',
-        //validateOnBlur: false,
+        validateOnBlur: false,
+        readOnly: true,
         validateOnChange: false
     });
     //模板名称
@@ -311,7 +380,7 @@ function form_ini() {
             { layout: 'column', height: 42, border: 0, items: [combo_CUSTOMDISTRICTNAME,field_TEMPLATENAME ] },
             { layout: 'column', height: 42, border: 0, items: [field_REMARK,field_CODE, ] },
             { layout: 'column', height: 42, border: 0, items: [field_ISREADPDF, com_STATUS] },
-            field_CUSTOMDISTRICTNAME, field_ID, field_ORIGINALFILEIDS
+            field_CUSTOMDISTRICTNAME, field_ID, field_ORIGINALFILEIDS, field_FILERECEVIEUNITNAME_h, field_FILEDECLAREUNITNAME_h
         ]
     })
 

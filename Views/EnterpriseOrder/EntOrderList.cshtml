@@ -8,7 +8,7 @@
 <script type="text/javascript">
     var gridpanel;
     var pgbar;
-    var common_data_sbgq = [], common_data_sbfs = [], common_data_adminurl = "";
+    var common_data_sbgq = [], common_data_sbfs = [], common_data_adminurl = "",common_data_jydw = [];
     var store_busitype;
     var store_STATUS = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
@@ -26,13 +26,14 @@
                 common_data_sbgq = commondata.sbgq;//申报关区   for win 窗口使用
                 common_data_sbfs = commondata.sbfs;//申报方式   for win 窗口使用
                 common_data_adminurl = commondata.adminurl;//文件服务器URL
+                common_data_jydw = commondata.jydw;//经营单位
                 //查询区域
                 initSearch();
                 var store_Trade = Ext.create('Ext.data.JsonStore', {
                     fields: ['ID', 'FILERECEVIEUNITCODE', 'FILERECEVIEUNITNAME', 'FILEDECLAREUNITCODE', 'FILEDECLAREUNITNAME',
                         'BUSITYPEID', 'CUSTOMDISTRICTCODE', 'CUSTOMDISTRICTNAME', 'REPWAYID', 'NEWSTATUS',
                          'CODE', 'CREATEID', 'CREATENAME', 'CREATETIME', 'ASSOCIATENO', 'ORDERCODE', 'ENTERPRISECODE', 'ENTERPRISENAME', 'ACCEPTID', 'ACCEPTNAME',
-                         'ACCEPTTIME', 'UNITCODE', 'CREATEMODE', 'REMARK'],
+                         'ACCEPTTIME', 'UNITCODE', 'CREATEMODE', 'REMARK','SUBMITTIME'],
                     pageSize: 20,
                     proxy: {
                         type: 'ajax',
@@ -51,7 +52,8 @@
                                 FILEDECLAREUNIT: Ext.getCmp("FILEDECLAREUNIT_S").getValue(),
                                 CODE: Ext.getCmp('CODE_S').getValue(),
                                 STARTDATE: Ext.Date.format(Ext.getCmp("start_date").getValue(), 'Y-m-d H:i:s'),
-                                ENDDATE: Ext.Date.format(Ext.getCmp("end_date").getValue(), 'Y-m-d H:i:s')
+                                ENDDATE: Ext.Date.format(Ext.getCmp("end_date").getValue(), 'Y-m-d H:i:s'),
+                                STATUS: Ext.getCmp('STATUS_S').getValue()
                             }
                         }
                     }
@@ -79,16 +81,15 @@
                     { header: '业务类型', dataIndex: 'BUSITYPEID', width: 100, renderer: render, locked: true },
                     { header: '申报关区', dataIndex: 'CUSTOMDISTRICTCODE', width: 70 },
                     { header: '状态', dataIndex: 'NEWSTATUS', width: 70, renderer: render },
-                    { header: '创建时间', dataIndex: 'CREATETIME', width: 140, locked: true },
-                    { header: '生成方式', dataIndex: 'CREATEMODE', width: 120 },
+                    { header: '提交日期', dataIndex: 'SUBMITTIME', width: 140, locked: true },
                     { header: '备注', dataIndex: 'REMARK', width: 150 }
                     ],
-                    //listeners:
-                    //{
-                    //    'itemdblclick': function (view, record, item, index, e) {
-                    //        addwin(record.data.ID);
-                    //    }
-                    //},
+                    listeners:
+                    {
+                        'itemdblclick': function (view, record, item, index, e) {
+                            opencenterwin("/EnterpriseOrder/BatchMaintain?ids=" + record.data.ID + "&unitcodes=" + record.data.UNITCODE, 1200, 800);
+                        }
+                    },
                     viewConfig: {
                         enableTextSelection: true
                     }
@@ -101,82 +102,105 @@
         addwin("");
     }
     function initSearch() {
+        var store_jydw = Ext.create('Ext.data.JsonStore', {  //报关行combostore
+            fields: ['CODE', 'NAME'],
+            data: common_data_jydw
+        });
+
         //文件接收单位
-        var field_FILERECEVIEUNIT_S = Ext.create('Ext.form.field.Text', {
+        var field_FILERECEVIEUNIT_S = Ext.create('Ext.form.field.ComboBox', {
             id: 'FILERECEVIEUNIT_S',
             name: 'FILERECEVIEUNIT_S',
-            margin: 0,
-            flex: .85,
+            fieldLabel: '文件接收单位',
+            store: store_jydw,
+            displayField: 'NAME',
+            valueField: 'CODE',
+            triggerAction: 'all',
+            queryMode: 'local',
+            minChars: 4,
+            hideTrigger: true,
+            anyMatch: true,
+            forceSelection: true
         })
 
-        var cont_wjjsdw_S = Ext.create('Ext.form.FieldContainer', {
-            fieldLabel: '文件接收单位',
-            labelWidth: 90,
-            layout: 'hbox',
-            items: [field_FILERECEVIEUNIT_S, {
-                xtype: 'button', id: 'btn_filerecevieunit_S', handler: function () {
-                    bgsbdw_win(field_FILERECEVIEUNIT_S);
-                }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
-            }]
-        })
 
         //文件申报单位
-        var field_FILEDECLAREUNIT_S = Ext.create('Ext.form.field.Text', {
+        var field_FILEDECLAREUNIT_S = Ext.create('Ext.form.field.ComboBox', {
             id: 'FILEDECLAREUNIT_S',
             name: 'FILEDECLAREUNIT_S',
-            margin: 0,
-            flex: .85,
+            fieldLabel: '文件申报单位',
+            store: store_jydw,
+            displayField: 'NAME',
+            valueField: 'CODE',
+            triggerAction: 'all',
+            queryMode: 'local',
+            minChars: 4,
+            hideTrigger: true,
+            anyMatch: true,
+            forceSelection: true
         })
 
-        var cont_wjsbdw_S = Ext.create('Ext.form.FieldContainer', {
-            fieldLabel: '文件申报单位',
-            labelWidth: 90,
-            layout: 'hbox',
-            items: [field_FILEDECLAREUNIT_S, {
-                xtype: 'button', id: 'btn_filedeclareunit_S', handler: function () {
-                    bgsbdw_win(field_FILEDECLAREUNIT_S);
-                }, text: '<span class="glyphicon glyphicon-search"></span>', flex: .15, margin: 0
-            }]
-        })
+     
 
         //企业编号
         var field_CODE_S = Ext.create('Ext.form.field.Text', {
             id: 'CODE_S',
             fieldLabel: '企业编号',
-            name: 'CODE_S'
+            name: 'CODE_S',
+            flex: .33
         });
 
         var start_date = Ext.create('Ext.form.field.Date', {
             id: 'start_date',
             format: 'Y-m-d',
-            flex:.5
+            name:'start_date',
+            flex:.5,margin:0
         })
         var end_date = Ext.create('Ext.form.field.Date', {
             id: 'end_date',
             format: 'Y-m-d',
-            flex: .5
+            name: 'end_date',
+            flex: .5, margin: 0
         })
         //创建时间
         var wt_date = Ext.create('Ext.form.FieldContainer', {
-            fieldLabel: '委托时间',
-            labelWidth: 60,
+            fieldLabel: '提交日期',
+            //labelWidth: 60,
             layout: 'hbox',
-            columnWidth: .25,
-            items: [start_date, end_date]
+            columnWidth: .33,
+            items: [start_date, end_date],
+            //flex: .33
+        })
+
+        var status_data = [{ "CODE": "5", "NAME": "草稿(5)" }, { "CODE": "10", "NAME": "已提交(10)" }, { "CODE": "15", "NAME": "已受理(15)" }, { "CODE": "20", "NAME": "作废(20)" }, ];
+        var status_store=Ext.create('Ext.data.JsonStore', {
+            fields: ['CODE', 'NAME'],
+            data: status_data
+        })
+        var combo_STATUS = Ext.create('Ext.form.field.ComboBox', {
+            id: 'STATUS_S',
+            fieldLabel: '状态',
+            name: 'STATUS_S',
+            store: status_store,
+            displayField: 'NAME',
+            valueField: 'CODE',
+            triggerAction: 'all',
+            queryMode: 'local',
+            minChars: 1,
+            hideTrigger: false,
+            anyMatch: true,
+            flex: .33
         })
         var formpanel = Ext.create('Ext.form.Panel', {
             id: 'formpanel',
             renderTo: 'div_form',
             fieldDefaults: {
-                margin: '0 5 10 0',
-                columnWidth: 0.25
+                margin: '0 5 10 5',
+                columnWidth: 0.33, labelWidth: 80,
             },
             items: [
-            {
-                layout: 'column', border: 0, margin: '5 0 0 0', items: [
-                  cont_wjjsdw_S, cont_wjsbdw_S, field_CODE_S, wt_date
-                ]
-            },
+            { layout: 'column', columnWidth: 1, border: 0, margin: '5 0 0 0', items: [field_FILERECEVIEUNIT_S, field_FILEDECLAREUNIT_S, field_CODE_S] },
+            { layout: 'column', border: 0, margin: '5 0 0 0', items: [ wt_date, combo_STATUS]}
             ]
         });
     }

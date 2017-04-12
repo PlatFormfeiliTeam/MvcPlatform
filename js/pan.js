@@ -590,6 +590,7 @@ function selectjydw(cb_jydw, field_quanname) {//传入需要赋值的控件
         }]
     });
     win_jydw.show();
+    return win_jydw;
 }
 //贸易方式选择窗体
 function selectmyfs(cb_myfs, tradeway_m) {//传入需要赋值的控件tradeway_m 表示备注信息

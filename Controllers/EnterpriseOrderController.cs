@@ -262,7 +262,7 @@ namespace MvcPlatform.Controllers
             }
             else
             {
-                string sql = "select a.* from ENT_ORDER a where a.ID = '" + ID + "'";
+                string sql = "select a.*,(case printstatus when '1' then 15 else (case when status is null then 10 else status end) end) as newstatus from ENT_ORDER a where a.ID = '" + ID + "'";
                 dt = DBMgr.GetDataTable(sql);
                 data = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
                 //随附文件
@@ -364,8 +364,8 @@ namespace MvcPlatform.Controllers
                         {
                             sql = "select ENT_ORDER_ID.Nextval from dual";
                             ent_id = DBMgr.GetDataTable(sql).Rows[0][0] + "";//获取ID
-                            sql = string.Format(insert_sql, ent_id, GetCode(json_data.Value<string>("FILERECEVIEUNITNAME")), GetName(json_data.Value<string>("FILERECEVIEUNITNAME")),
-                                  GetCode(json_data.Value<string>("FILEDECLAREUNITNAME")), GetName(json_data.Value<string>("FILEDECLAREUNITNAME")),
+                            sql = string.Format(insert_sql, ent_id,json_data.Value<string>("FILERECEVIEUNITCODE"), json_data.Value<string>("FILERECEVIEUNITNAME"),
+                                  json_data.Value<string>("FILEDECLAREUNITCODE"), json_data.Value<string>("FILEDECLAREUNITNAME"),
                                   json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"), json_data.Value<string>("CUSTOMDISTRICTNAME"),
                                   json_data.Value<string>("REPWAYID"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),
                                   json_user.Value<string>("CUSTOMERHSCODE"), json_user.Value<string>("CUSTOMERNAME"), json_data.Value<string>("REMARK"),
@@ -381,8 +381,8 @@ namespace MvcPlatform.Controllers
                             {
                                 sql = "select ENT_ORDER_ID.Nextval from dual";
                                 ent_id = DBMgr.GetDataTable(sql).Rows[0][0] + "";//获取ID
-                                sql = string.Format(insert_sql, ent_id, GetCode(json_data.Value<string>("FILERECEVIEUNITNAME")), GetName(json_data.Value<string>("FILERECEVIEUNITNAME")),
-                                      GetCode(json_data.Value<string>("FILEDECLAREUNITNAME")), GetName(json_data.Value<string>("FILEDECLAREUNITNAME")),
+                                sql = string.Format(insert_sql, ent_id,json_data.Value<string>("FILERECEVIEUNITCODE"), json_data.Value<string>("FILERECEVIEUNITNAME"),
+                                      json_data.Value<string>("FILEDECLAREUNITCODE"), json_data.Value<string>("FILEDECLAREUNITNAME"),
                                       json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"), json_data.Value<string>("CUSTOMDISTRICTNAME"),
                                       json_data.Value<string>("REPWAYID"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),
                                       json_user.Value<string>("CUSTOMERHSCODE"), json_user.Value<string>("CUSTOMERNAME"), json_data.Value<string>("REMARK"),
@@ -396,14 +396,30 @@ namespace MvcPlatform.Controllers
 
 
                     }
-                    else//修改单独页面做
+                    else
                     {
-                        update_sql = @"update ENT_ORDER  set filerecevieunitcode='{1}',filerecevieunitname='{2}',filedeclareunitcode='{3}',
-                    filedeclareunitname='{4}',busitypeid='{5}',customdistrictcode='{6}', customdistrictname='{7}',
-                    repwayid='{8}',remark='{9}',code='{10}',status='{11}',templatename='{12}' where id='{0}'";
-                        sql = string.Format(update_sql, json_data.Value<string>("ID"), GetCode(json_data.Value<string>("FILERECEVIEUNITNAME")),
-                        GetName(json_data.Value<string>("FILERECEVIEUNITNAME")), GetCode(json_data.Value<string>("FILEDECLAREUNITNAME")),
-                        GetName(json_data.Value<string>("FILEDECLAREUNITNAME")), json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"),
+                        if (action == "ch")
+                        {
+                            update_sql = @"update ENT_ORDER  set status='5' where id='" + json_data.Value<string>("ID") + "'";
+                            DBMgr.ExecuteNonQuery(update_sql);
+                            return "{success:true}";
+                        }
+
+                        if (action == "delegate")
+                        {
+                            update_sql = @"update ENT_ORDER  set filerecevieunitcode='{1}',filerecevieunitname='{2}',filedeclareunitcode='{3}',
+                            filedeclareunitname='{4}',busitypeid='{5}',customdistrictcode='{6}', customdistrictname='{7}',
+                            repwayid='{8}',remark='{9}',code='{10}',status='{11}',templatename='{12}',submittime=sysdate where id='{0}'";
+                        }
+                        else
+                        {
+                         update_sql = @"update ENT_ORDER  set filerecevieunitcode='{1}',filerecevieunitname='{2}',filedeclareunitcode='{3}',
+                        filedeclareunitname='{4}',busitypeid='{5}',customdistrictcode='{6}', customdistrictname='{7}',
+                        repwayid='{8}',remark='{9}',code='{10}',status='{11}',templatename='{12}' where id='{0}'";
+                        }
+                        sql = string.Format(update_sql, json_data.Value<string>("ID"), json_data.Value<string>("FILERECEVIEUNITCODE"),
+                        json_data.Value<string>("FILERECEVIEUNITNAME"), json_data.Value<string>("FILEDECLAREUNITCODE"),
+                        json_data.Value<string>("FILEDECLAREUNITNAME"), json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"),
                         json_data.Value<string>("CUSTOMDISTRICTNAME"), json_data.Value<string>("REPWAYID"), json_data.Value<string>("REMARK"), json_data.Value<string>("CODE"), status, json_data.Value<string>("TEMPLATENAME"));
                         DBMgr.ExecuteNonQuery(sql);
                         //更新随附文件
@@ -465,15 +481,33 @@ namespace MvcPlatform.Controllers
                 }
                 if (!string.IsNullOrEmpty(Request["STARTDATE"]))
                 {
-                    where += " and t.ENTERPRISECODE='"+ Request["ENTERPRISENAME"] + "'";
+                    where += " and t.SUBMITTIME>=to_date('" + Request["STARTDATE"] + "','yyyy-mm-dd hh24:mi:ss')";
                 }
                 if (!string.IsNullOrEmpty(Request["ENDDATE"]))
                 {
-                    where += " and t.ENTERPRISECODE='"+ Request["ENTERPRISENAME"] + "'";
+                    where += " and t.SUBMITTIME<=to_date('" + Request["ENDDATE"] + "','yyyy-mm-dd hh24:mi:ss')+1";
+                }
+                if (!string.IsNullOrEmpty(Request["STATUS"]))
+                {
+                    string status=Request["STATUS"] ;
+                    switch (status)
+                    {
+                      case "10":
+                            where += " and t.STATUS='" + Request["STATUS"] + "' or (t.STATUS is null and t.printstatus!='1' )";
+                          break;
+                      case "15":
+                          where += " and t.STATUS='" + Request["STATUS"] + "' or  t.printstatus='1'";
+                          break;
+                     default:
+                       where += " and t.STATUS='" + Request["STATUS"] + "'";
+                       break;
+
+                    }
+                        
                 }
                 sql += where;
                 IsoDateTimeConverter iso = new IsoDateTimeConverter();
-                iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+                iso.DateTimeFormat = "yyyy-MM-dd";
                 DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
                 var json = JsonConvert.SerializeObject(dt, iso);
                 return "{rows:" + json + ",total:" + totalProperty + "}";
