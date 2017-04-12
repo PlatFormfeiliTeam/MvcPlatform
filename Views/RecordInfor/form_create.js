@@ -312,7 +312,6 @@
         queryMode: 'local',
         readOnly: true,
         editable: false,
-        flex: .33,
         value:'A',
         fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
@@ -333,7 +332,6 @@
         queryMode: 'local',
         readOnly: true,
         editable: false,
-        flex: .33,
         value: 0,
         fieldStyle: 'background-color: #CECECE; background-image: none;'        
     });
@@ -353,19 +351,9 @@
         queryMode: 'local',
         readOnly: true,
         editable: false,
-        flex: .33,
         value: 0,
         fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
-    
-
-    var combo_container = {
-        columnWidth: .50, 
-        xtype: 'fieldcontainer',
-        layout: 'hbox', margin: 0,
-        items: [combo_OPTIONS, combo_STATUS, combo_ISPRINT_APPLY]
-    }
-
 
     //-----------------------------
 
@@ -497,9 +485,9 @@
     });
 
     var configItem = [
-        { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_RECORDINFOID, combo_CUSTOMAREA, field_CUSTOMER] },
+        { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_RECORDINFOID, combo_CUSTOMAREA, field_CUSTOMER, combo_OPTIONS] },
         { layout: 'column', height: 42, border: 0, items: [field_ITEMNO, combo_ITEMNOATTRIBUTE, hs_container, combo_UNIT] },
-        { layout: 'column', height: 42, border: 0, items: [field_COMMODITYNAME, field_SPECIFICATIONSMODEL, combo_container] },
+        { layout: 'column', height: 42, border: 0, items: [field_COMMODITYNAME, field_SPECIFICATIONSMODEL, combo_STATUS, combo_ISPRINT_APPLY] },
         { layout: 'column', border: 0, items: [panel_ele] },
         { layout: 'column', height: 42, border: 0, items: [textarea_container] },
         { layout: 'column', height: 42, border: 0, items: [field_CREATEDATE, field_CREATENAME, field_SUBMITTIME, field_SUBMITNAME] },
