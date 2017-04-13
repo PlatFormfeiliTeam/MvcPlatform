@@ -172,16 +172,11 @@
             //flex: .33
         })
 
-        var status_data = [{ "CODE": "5", "NAME": "草稿(5)" }, { "CODE": "10", "NAME": "已提交(10)" }, { "CODE": "15", "NAME": "已受理(15)" }, { "CODE": "20", "NAME": "作废(20)" }, ];
-        var status_store=Ext.create('Ext.data.JsonStore', {
-            fields: ['CODE', 'NAME'],
-            data: status_data
-        })
         var combo_STATUS = Ext.create('Ext.form.field.ComboBox', {
             id: 'STATUS_S',
             fieldLabel: '状态',
             name: 'STATUS_S',
-            store: status_store,
+            store: store_STATUS,
             displayField: 'NAME',
             valueField: 'CODE',
             triggerAction: 'all',
