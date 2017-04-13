@@ -337,7 +337,7 @@
                             if (!rec) {
                                 repwayidcode = "";//找不到为空
                             }
-                            combo_REPWAYNAME.setValue(repwayidcode);//编辑页赋值
+                            combo_REPWAYNAME.setValue(repwayidcode);
                         }
                     });
                 },
@@ -648,6 +648,8 @@
                     var data = Ext.decode(response.responseText);
                     if (data.success) {
                         Ext.MessageBox.alert("提示", "保存成功！");
+                        loadform(Ext.getCmp('form_panel').getForm().getValues().ID);
+                        
                     }
                     else {
                         if (data.isrepeate=='Y') {
@@ -669,7 +671,7 @@
         document.getElementById("deletefile").disabled = status >= 10;
         document.getElementById("btn_saveorder").disabled = status >= 10;
         document.getElementById("btn_delegate").disabled = status >= 10;
-        document.getElementById("btn_ch").disabled = status <10;
+        document.getElementById("btn_ch").disabled = status !=10;
         
 
         Ext.Array.each(Ext.getCmp("form_panel").getForm().getFields().items, function (item) {

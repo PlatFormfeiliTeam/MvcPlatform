@@ -51,3 +51,9 @@ var orders_tatus = {
 //1,查询条件：草稿、已委托、申报中、申报完结、未完结（差的是没有申报完结的范围）
 //去掉订单状态：查询，列表展示；查询时，选的是报关状态，where条件就是报关状态=。。。
 //保存的时候：除了修改status,还要修改报关报检状态
+
+//货况跟踪菜单项
+
+var menu_js_data = [{ "NAME": "I跟踪", "URL": "http://www.igenzong.com/air/trace/", "busitypeid": "11" },
+                     { "NAME": "海勃", "URL": "http://www.hb56.com/Schdule.aspx", "busitypeid": "11" }
+]

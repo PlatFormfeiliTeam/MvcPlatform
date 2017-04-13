@@ -63,9 +63,36 @@ namespace MvcPlatform.Controllers
             return View();
         }
 
-        public ActionResult ListOrder_Index()  
+        public ActionResult ListOrder_Index(string busitypeid)  
         {
-            //ViewBag.navigator = "企业服务>>委托任务";
+            switch (busitypeid)
+          {
+                case "10":
+                    ViewBag.navigator = "业务管理>>空运出口";
+                    break;
+                case "11":
+                    ViewBag.navigator = "业务管理>>空运进口";
+                    break;
+                case "21":
+                    ViewBag.navigator = "业务管理>>海运进口";
+                    break;
+                case "20":
+                    ViewBag.navigator = "业务管理>>海运出口";
+                    break;
+                case "31":
+                    ViewBag.navigator = "业务管理>>陆运进口";
+                    break;
+                case "30":
+                    ViewBag.navigator = "业务管理>>陆运出口";
+                    break;
+                case "40-41":
+                    ViewBag.navigator = "业务管理>>国内结转";
+                    break;
+                case "50-51":
+                    ViewBag.navigator = "业务管理>>特殊区域";
+                    break;
+          }
+            
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
@@ -493,10 +520,10 @@ namespace MvcPlatform.Controllers
                     switch (status)
                     {
                       case "10":
-                            where += " and t.STATUS='" + Request["STATUS"] + "' or (t.STATUS is null and t.printstatus!='1' )";
+                            where += " and (t.STATUS='" + Request["STATUS"] + "' or (t.STATUS is null and t.printstatus!='1' ))";
                           break;
                       case "15":
-                          where += " and t.STATUS='" + Request["STATUS"] + "' or  t.printstatus='1'";
+                          where += " and (t.STATUS='" + Request["STATUS"] + "' or  t.printstatus='1')";
                           break;
                      default:
                        where += " and t.STATUS='" + Request["STATUS"] + "'";
