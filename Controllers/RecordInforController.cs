@@ -515,6 +515,21 @@ namespace MvcPlatform.Controllers
 
         #region form_create
 
+        public string GetCommodityHS()
+        {
+            string json_hscode = "[]";
+            string sql = @"select distinct hscode from BASE_COMMODITYHS where yearid= '" + Request["CUSTOMAREA"] + "' order by hscode";
+            json_hscode = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+            return "{hscode:" + json_hscode + "}";
+        }
+        public string GetCommodityEXTRA()
+        {
+            string json_extra = "[]";
+            string sql = @"select EXTRACODE from BASE_COMMODITYHS where yearid= '" + Request["CUSTOMAREA"] + "' and hscode= '" + Request["HSCODE"] + "' order by EXTRACODE";
+            json_extra = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+            return "{extra:" + json_extra + "}";
+        }
+
         public string loadrecord_create()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
@@ -523,11 +538,22 @@ namespace MvcPlatform.Controllers
             string result = "{}"; string formdata = "{}"; string productsonsumedata = "[]";
             if (string.IsNullOrEmpty(id))
             {
-                if (string.IsNullOrEmpty(copyid))//如果是复制新增
+                if (string.IsNullOrEmpty(copyid))
                 {
-                    formdata = "{ITEMNOATTRIBUTE:'料件',STATUS:0,OPTIONS:'A',ISPRINT_APPLY:0}";
+                    string RECORDINFOID = "", CUSTOMAREA = ""; 
+                    //账册号
+                    sql = @"select id from cusdoc.sys_recordinfo where enabled=1 and busiunit= '" + json_user.Value<string>("CUSTOMERHSCODE") + "' order by id";
+                    DataTable dt_temp = DBMgr.GetDataTable(sql);
+                    if (dt_temp.Rows.Count > 0) { RECORDINFOID = dt_temp.Rows[0][0].ToString(); }
+
+                    //备案关区
+                    sql = @"select id from cusdoc.base_year where customarea is not null and enabled=1 order by id";
+                    DataTable dt_temp2 = DBMgr.GetDataTable(sql);
+                    if (dt_temp2.Rows.Count > 0) { CUSTOMAREA = dt_temp2.Rows[0][0].ToString(); }
+
+                    formdata = "{ITEMNOATTRIBUTE:'料件',STATUS:0,OPTIONS:'A',ISPRINT_APPLY:0,RECORDINFOID:" + RECORDINFOID + ",CUSTOMAREA:" + CUSTOMAREA + "}";
                 }
-                else
+                else//如果是复制新增
                 {
                     IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
                     iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
@@ -1176,7 +1202,7 @@ namespace MvcPlatform.Controllers
                     from(
                         select substr(a.declarationcode,9,1) internaltype
              	                ,case when substr(a.declarationcode,9,1)='1' then '进口' when substr(a.declarationcode,9,1)='0' then '出口' else '' end internaltypename
-                                ,a.trademethod,a.recordcode,b.itemno,b.cadquantity,b.cadunit,b.commodityname,b.currency,a.reptime 
+                                ,a.trademethod,a.recordcode,to_number(b.itemno) itemno,b.cadquantity,b.cadunit,b.commodityname,b.currency,a.reptime 
                         from (
                             select t.code,t.busiunitcode
                             from list_declaration t 
@@ -1211,9 +1237,18 @@ namespace MvcPlatform.Controllers
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd";
 
-            where = " and a.recordcode='" + Request["f_field_recordid"] + "'and b.itemno='" + Request["f_field_ITEMNO"] + "'"
-                    + " and b.commodityname='" + Request["f_field_COMMODITYNAME"] + "' and a.trademethod='" + Request["f_field_TRADEMETHOD"] + "'"
-                    + " and b.cadunit='" + Request["f_combo_UNIT"] + "'and b.currency='" + Request["f_field_CURRENCY"] + "'";
+            if (!string.IsNullOrEmpty(Request["f_field_recordid"]))
+            {
+                where += " and a.recordcode='" + Request["f_field_recordid"] + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["f_field_ITEMNO"]))
+            {
+                where += " and b.itemno='" + Request["f_field_ITEMNO"] + "'";
+            }
+            where += " and b.commodityname='" + Request["f_field_COMMODITYNAME"] + "'"
+                    + " and a.trademethod='" + Request["f_field_TRADEMETHOD"] + "'"
+                    + " and b.cadunit='" + Request["f_combo_UNIT"] + "'"
+                    + " and b.currency='" + Request["f_field_CURRENCY"] + "'";
 
             if (!string.IsNullOrEmpty(Request["f_date_start"]))//如果开始时间有值
             {
@@ -1243,7 +1278,12 @@ namespace MvcPlatform.Controllers
                           where (a.xzlb='报关单'or a.xzlb='报关单解析') and t1.busiunitcode='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where
                     + @") aa
                       left join cusdoc.base_booksdata bb on aa.trademethod=bb.trade and aa.internaltypename=bb.isinportname "
-                    + @" where bb.isproductname='" + Request["f_field_ITEMNOATTRIBUTE"] + "' and aa.internaltypename='" + Request["f_field_inout_type"] + "'";
+                    + @" where aa.internaltypename='" + Request["f_field_inout_type"] + "'";
+
+            if (!string.IsNullOrEmpty(Request["f_field_ITEMNOATTRIBUTE"]))
+            {
+                sql += " and bb.isproductname='" + Request["f_field_ITEMNOATTRIBUTE"] + "'";
+            }
 
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "aa.reptime", "desc"));
 
