@@ -22,7 +22,6 @@
         displayField: 'NAME',
         valueField: 'ID',
         triggerAction: 'all',
-        value: store_RECORDINFOID.getCount() > 0 ? store_RECORDINFOID.getAt(0).get("ID") : '',
         forceSelection: true,
         queryMode: 'local',
         anyMatch: true,
@@ -61,7 +60,6 @@
         forceSelection: true,
         queryMode: 'local',
         anyMatch: true,
-        value: store_CUSTOMAREA.getCount() > 0 ? store_CUSTOMAREA.getAt(0).get("ID") : '',
         listeners: {
             focus: function (cb) {
                 if (!cb.getValue()) {
@@ -72,6 +70,22 @@
             },
             change: function (field_paste, newValue, oldValue, eOpts) {
                 if (newValue != oldValue) {
+                    if (i != 0) { hscode = ""; }
+
+                    Ext.getCmp('HSCODE').reset();
+                    Ext.getCmp('HSCODE').store.removeAll();
+
+                    Ext.Ajax.request({
+                        url: "/RecordInfor/GetCommodityHS",
+                        params: { CUSTOMAREA: this.lastValue },
+                        success: function (response, opts) {
+                            var commondata = Ext.decode(response.responseText);
+                            Ext.getCmp('HSCODE').store.loadData(commondata.hscode);
+
+                            Ext.getCmp('HSCODE').setValue(hscode);
+                        }
+                    });
+                    i++;
                     Element_ini();
                 }
             }
@@ -155,7 +169,6 @@
         fieldLabel: '项号属性',
         displayField: 'NAME',
         valueField: 'NAME',
-        value: "料件",
         triggerAction: 'all',
         forceSelection: true,
         queryMode: 'local',
@@ -179,11 +192,9 @@
                     SetItemno_consume(Ext.getCmp('combo_RECORDINFOID').getValue());//对应料件序号下拉
                 } else {
                     if (Ext.getCmp('formpanel_con')) {
-                        //Ext.getCmp('formpanel_con').destroy();
                         Ext.getCmp('formpanel_con').hide();
                     }
                     if (Ext.getCmp('gridpanel_PRODUCTCONSUME')) {
-                        //Ext.getCmp('gridpanel_PRODUCTCONSUME').destroy();
                         Ext.getCmp('gridpanel_PRODUCTCONSUME').hide();
                     }
                 }
@@ -191,17 +202,47 @@
         },
         allowBlank: false,
         blankText: '项号属性不能为空!'
-    });
-    
+    });   
+
     //HS编码
-    var field_HSCODE = Ext.create('Ext.form.field.Text', {
-        id: 'HSCODE',
-        name: 'HSCODE',
-        flex: 0.75, margin: 0,
+    var store_HSCODE = Ext.create('Ext.data.JsonStore', {
+        fields: ['HSCODE']
+    });
+    var combo_HSCODE = Ext.create('Ext.form.field.ComboBox', {
+        id: 'HSCODE', flex: 0.75, margin: 0, minChars: 4,
+        name: 'HSCODE', maxLength: 8, minLength: 8, enforceMaxLength: true,
+        store: store_HSCODE,
+        hideTrigger: true,
+        displayField: 'HSCODE',
+        valueField: 'HSCODE',
+        triggerAction: 'all',
+        forceSelection: true,
+        queryMode: 'local',
+        anyMatch: true,
         listeners: {
-            change: function (field_paste, newValue, oldValue, eOpts) {
+            focus: function (cb) {
+                cb.clearInvalid();
+            },
+            change: function (combo, newValue, oldValue, eOpts) {
                 if (newValue != oldValue) {
+                    if (j != 0) { extracode = ""; }
+
+                    Ext.getCmp('ADDITIONALNO').reset();
+                    Ext.getCmp('ADDITIONALNO').store.removeAll();
+
+                    Ext.Ajax.request({
+                        url: "/RecordInfor/GetCommodityEXTRA",
+                        params: { CUSTOMAREA: Ext.getCmp('combo_CUSTOMAREA').getValue(), HSCODE: this.lastValue },
+                        success: function (response, opts) {
+                            var commondata = Ext.decode(response.responseText);
+                            Ext.getCmp('ADDITIONALNO').store.loadData(commondata.extra);
+
+                            Ext.getCmp('ADDITIONALNO').setValue(extracode);
+                        }
+                    });
+                    j++;
                     Element_ini();
+                   
                 }
             }
         },
@@ -210,20 +251,36 @@
     });
 
     //附加码
-    var field_ADDITIONALNO = Ext.create('Ext.form.field.Text', {
-        id: 'ADDITIONALNO',
-        name: 'ADDITIONALNO',
-        flex: 0.25, margin: 0,
-        maxLength: 2,
-        minLength: 2,
-        enforceMaxLength: true,
-        minLengthText: '2位！',
+    var store_ADDITIONALNO = Ext.create('Ext.data.JsonStore', {
+        fields: ['EXTRACODE']
+    });
+    var combo_ADDITIONALNO = Ext.create('Ext.form.field.ComboBox', {
+        id: 'ADDITIONALNO', flex: 0.25, margin: 0, minChars: 1,
+        name: 'ADDITIONALNO', maxLength: 2, minLength: 2, enforceMaxLength: true,
+        store: store_ADDITIONALNO,
+        hideTrigger: true,
+        displayField: 'EXTRACODE',
+        valueField: 'EXTRACODE',
+        triggerAction: 'all',
+        forceSelection: true,
+        queryMode: 'local',
+        anyMatch: true,
         listeners: {
-            change: function (field_paste, newValue, oldValue, eOpts) {
+            focus: function (cb) {
+                if (!cb.getValue()) {
+                    cb.clearInvalid();
+                    cb.store.clearFilter();
+                    cb.expand();
+                }
+            },
+            change: function (combo, newValue, oldValue, eOpts) {
                 if (newValue != oldValue) {
                     Element_ini();
                 }
             }
+        },
+        listConfig: {
+            maxWidth: 55
         },
         allowBlank: false,
         blankText: '空!'
@@ -233,7 +290,7 @@
         xtype: 'fieldcontainer',
         layout: 'hbox',
         fieldLabel: 'HS编码/附加码',
-        items: [field_HSCODE, field_ADDITIONALNO]
+        items: [combo_HSCODE, combo_ADDITIONALNO]
     }
 
     //商品名称
@@ -606,6 +663,8 @@ function loadform_record() {
         params: { id: id, copyid: copyid },
         success: function (response, opts) {
             var data = Ext.decode(response.responseText);
+            hscode = data.formdata.HSCODE; extracode = data.formdata.ADDITIONALNO;//二次联动，前一个赋值后，调用此值 
+
             Ext.getCmp("formpanel_id").getForm().setValues(data.formdata);
 
             if (Ext.getCmp('gridpanel_PRODUCTCONSUME')) {

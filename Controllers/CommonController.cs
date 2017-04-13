@@ -519,7 +519,7 @@ namespace MvcPlatform.Controllers
             {
                 //========================================备案信息============================================================================
                 string json_recordid = "[]";//账册号
-                sql = @"select id,code,code||'('||bookattribute||')' as name from sys_recordinfo where enabled=1 and busiunit= '" + json_user.Value<string>("CUSTOMERHSCODE") + "'";
+                sql = @"select id,code,code||'('||bookattribute||')' as name from sys_recordinfo where enabled=1 and busiunit= '" + json_user.Value<string>("CUSTOMERHSCODE") + "' order by id";
                 json_recordid = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
 
                 string json_unit = "[]";//单位
@@ -535,7 +535,7 @@ namespace MvcPlatform.Controllers
                 }
 
                 string json_customarea = "[]";//备案关区
-                sql = @"select id,name,customarea,name||'('||customarea||')' as customareaname from cusdoc.base_year where customarea is not null and enabled=1";
+                sql = @"select id,name,customarea,name||'('||customarea||')' as customareaname from cusdoc.base_year where customarea is not null and enabled=1 order by id";
                 json_customarea = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
 
                 //============================================================================================================================
