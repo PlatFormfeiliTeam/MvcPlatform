@@ -1136,8 +1136,8 @@ namespace MvcPlatform.Controllers
 
             string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
                            det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
-                           det.TRANSNAME DECL_TRANSNAME, det.ISPRINT,
-                           det.TRANSNAME,det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
+                           det.TRANSNAME,det.VOYAGENO,det.ISPRINT,
+                           det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
                            ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
                            ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE, 
                            cus.SCENEDECLAREID,ort.CONTRACTNO CONTRACTNOORDER ,ort.CREATETIME                                                                      
@@ -3075,8 +3075,8 @@ namespace MvcPlatform.Controllers
             string where = QueryConditionDecl_E();
             string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
                            det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
-                           det.TRANSNAME DECL_TRANSNAME, det.ISPRINT,
-                           det.TRANSNAME,det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
+                           det.TRANSNAME,det.VOYAGENO,det.ISPRINT,
+                           det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
                            ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
                            ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE, 
                            cus.SCENEDECLAREID,ort.CONTRACTNO CONTRACTNOORDER ,ort.CREATETIME,ort.REPUNITNAME,ort.REPNO                                                                      

@@ -43,7 +43,7 @@
                 var store = Ext.create('Ext.data.JsonStore', {
                     fields: ['ID', 'PREDECLCODE', 'DECLARATIONCODE', 'CUSTOMSSTATUS', 'ISPRINT', 'CODE', 'REPFINISHTIME', 'TRANSNAME', 'BUSIUNITCODE', 'CUSTOMERNAME', 'IETYPE',
                              'BUSIUNITNAME', 'PORTCODE', 'BLNO', 'REPWAYID', 'REPWAYNAME', 'DECLWAY', 'DECLWAYNAME', 'TRADEWAYCODES', 'CONTRACTNO', 'GOODSNUM',
-                             'GOODSNW', 'SHEETNUM', 'ORDERCODE', 'CUSNO', 'ASSOCIATENO', 'CORRESPONDNO', 'BUSITYPE', 'DECL_TRANSNAME', 'DECLTYPE', 'CONTRACTNOORDER', 'REPUNITNAME'],
+                             'GOODSNW', 'SHEETNUM', 'ORDERCODE', 'CUSNO', 'ASSOCIATENO', 'CORRESPONDNO', 'BUSITYPE', 'CONTRACTNOORDER', 'REPUNITNAME'],
                     pageSize: 22,
                     proxy: {
                         type: 'ajax',
@@ -89,7 +89,7 @@
                     { header: '合同发票号', dataIndex: 'CONTRACTNOORDER', width: 140, locked: true, },
                     //{ header: '打印标志', dataIndex: 'ISPRINT', width: 70, renderer: render },
                     { header: '申报完成时间', dataIndex: 'REPFINISHTIME', width: 140 },
-                    { header: '运输工具名称', dataIndex: 'DECLTYPE', width: 150, renderer: render },
+                    { header: '运输工具名称', dataIndex: 'TRANSNAME', width: 150, renderer: render },
                     { header: '业务类型', dataIndex: 'BUSITYPE', width: 90, renderer: render },// 业务类型
                     { header: '进出口岸', dataIndex: 'PORTCODE', width: 80 },
                     { header: '提运单号', dataIndex: 'BLNO', width: 180 },
@@ -144,12 +144,20 @@
                 rtn = rec.get("NAME");
             }
         }
-        if (dataindex == "DECLTYPE" && value) {
-            if (value == 13 || value == 17) {
-                rtn = record.get("DECL_TRANSNAME");//取预制报关单的运输工具名称
+        if (dataindex == "TRANSNAME") {
+            var VOYAGENO = record.get("VOYAGENO");
+
+            if (value == null && VOYAGENO == null) {
+                rtn = '';
             }
-            else {
-                rtn = record.get("TRANSNAME");//取草单的运输工具名称
+            if (value == null && VOYAGENO != null) {
+                rtn = '/' + VOYAGENO;
+            }
+            if (value != null && VOYAGENO == null) {
+                rtn = value;
+            }
+            if (value != null && VOYAGENO != null) {
+                rtn = value + '/' + VOYAGENO;
             }
         }
         return rtn;
