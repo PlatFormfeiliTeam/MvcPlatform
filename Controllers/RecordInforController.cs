@@ -1303,8 +1303,8 @@ namespace MvcPlatform.Controllers
 
             NPOI.SS.UserModel.IRow row1 = sheet.CreateRow(0);
             row1.CreateCell(0).SetCellValue("账册号"); row1.CreateCell(1).SetCellValue("项号"); row1.CreateCell(2).SetCellValue("进出类型"); row1.CreateCell(3).SetCellValue("贸易方式");
-            row1.CreateCell(4).SetCellValue("项号属性"); row1.CreateCell(5).SetCellValue("商品名称"); row1.CreateCell(6).SetCellValue("成交数量"); row1.CreateCell(7).SetCellValue("成交单位");
-            row1.CreateCell(8).SetCellValue("币别");
+            row1.CreateCell(4).SetCellValue("项号属性"); row1.CreateCell(5).SetCellValue("商品名称"); row1.CreateCell(6).SetCellValue("成交数量"); row1.CreateCell(7).SetCellValue("成交总价");
+            row1.CreateCell(8).SetCellValue("成交单位"); row1.CreateCell(9).SetCellValue("币别");
 
             for (int i = 0; i < dt.Rows.Count; i++)
             {
@@ -1316,8 +1316,9 @@ namespace MvcPlatform.Controllers
                 rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["ITEMNOATTRIBUTE"].ToString());
                 rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["COMMODITYNAME"].ToString());
                 rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["CADQUANTITY"].ToString());
-                rowtemp.CreateCell(7).SetCellValue(GetName(dt.Rows[i]["CADUNIT"].ToString(), UNIT));
-                rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["CURRENCY"].ToString());
+                rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["TOTALPRICE"].ToString());
+                rowtemp.CreateCell(8).SetCellValue(GetName(dt.Rows[i]["CADUNIT"].ToString(), UNIT));
+                rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["CURRENCY"].ToString());
             }
             
             // 写入到客户端 
