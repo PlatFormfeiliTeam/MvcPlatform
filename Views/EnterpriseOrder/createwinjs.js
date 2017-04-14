@@ -2,6 +2,7 @@
 
 function addwin(ID) {
     form_ini();
+   
     var win = Ext.create("Ext.window.Window", {
         id: "wjcsWin",
         title: '委托信息',
@@ -50,11 +51,13 @@ function form_ini() {
                     field_CODE.setValue("");
                     field_CODE.setReadOnly(true);
                     Ext.getCmp('formpanel_u').getForm().clearInvalid();
+                    document.getElementById("btn_delegateorder").disabled = true;
                 }
                 else {
 
                     field_CODE.setReadOnly(false);
                     Ext.getCmp('formpanel_u').getForm().clearInvalid();
+                    document.getElementById("btn_delegateorder").disabled = false;
                 }
                 
             }
@@ -353,11 +356,11 @@ function form_ini() {
        + '</div>';
     var bbar_r = '<div class="btn-group">'
     + '<button type="button" onclick="save()" class="btn btn-primary btn-sm" id="btn_saveorder"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
-    + '<button type="button" onclick="save(\'delegate\')" class="btn btn-primary btn-sm" id="btn_saveorder"><i class="fa fa-floppy-o"></i>&nbsp;确认委托</button>'
+    + '<button type="button" onclick="save(\'delegate\')" class="btn btn-primary btn-sm" id="btn_delegateorder" disabled><i class="fa fa-hand-o-up"></i>&nbsp;确认委托</button>'
     + '</div>';
 
     var buttombar = Ext.create('Ext.toolbar.Toolbar', {
-        items: [bbar_l, '->', bbar_r]
+        items: [bbar_l, '<span style="color:blue">Tip：逐票生成：委托及企业编号 需至 批量维护界面</span>','->', bbar_r]
     })
 
     var formpanel_u = Ext.create('Ext.form.Panel', {

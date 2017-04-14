@@ -534,7 +534,7 @@ namespace MvcPlatform.Controllers
                 }
                 sql += where;
                 IsoDateTimeConverter iso = new IsoDateTimeConverter();
-                iso.DateTimeFormat = "yyyy-MM-dd";
+                iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
                 DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
                 var json = JsonConvert.SerializeObject(dt, iso);
                 return "{rows:" + json + ",total:" + totalProperty + "}";

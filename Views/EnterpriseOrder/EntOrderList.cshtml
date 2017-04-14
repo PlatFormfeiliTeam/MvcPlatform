@@ -81,7 +81,7 @@
                     { header: '业务类型', dataIndex: 'BUSITYPEID', width: 100, renderer: render, locked: true },
                     { header: '申报关区', dataIndex: 'CUSTOMDISTRICTCODE', width: 70 },
                     { header: '状态', dataIndex: 'NEWSTATUS', width: 70, renderer: render },
-                    { header: '提交日期', dataIndex: 'SUBMITTIME', width: 140, locked: true },
+                    { header: '提交时间', dataIndex: 'SUBMITTIME', width: 140, locked: true },
                     { header: '备注', dataIndex: 'REMARK', width: 150 }
                     ],
                     listeners:
@@ -285,7 +285,7 @@
     <div>
         <div class="btn-group" role="group">
             <button onclick="Open()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;添加</button>
-            <button onclick="openBatchWin()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-trash-o"></i>&nbsp;批量维护</button>
+            <button onclick="openBatchWin()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-edit"></i>&nbsp;批量维护</button>
             <button onclick="Delete()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-trash-o"></i>&nbsp;删除</button>   
         </div>
         <div class="btn-group fr" role="group">

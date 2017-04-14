@@ -128,14 +128,18 @@
             data: menu_js_data
         });
         $.each(menu_store.data.items, function (idx, item) {
-            if (idx == 0) {
-                $("#menu").append("<li style=\"background-color: #2a6496\" ref=\"" + item.data.URL + "\">" + item.data.NAME + "</li>")
-                $("#content").attr("src", item.data.URL);
-            }
+            var i = 0;
+            if (item.data.busitypeid == busitypeid) {
+                i++
+                if (i==1) {
+                    $("#menu").append("<li style=\"background-color: #2a6496\" ref=\"" + item.data.URL + "\">" + item.data.NAME + "</li>")
+                    $("#content").attr("src", item.data.URL);
+                }
+                
             else {
                 $("#menu").append("<li ref=\"" + item.data.URL + "\">" + item.data.NAME + "</li>")
             }
-           
+            }
         });
         
 
@@ -270,6 +274,18 @@
             fieldLabel: '对应号',
             readOnly: true
         });
+            //委托单位
+        var field_CUSTOMERNAME = Ext.create('Ext.form.field.Text', {
+            name: 'CUSTOMERNAME',
+            fieldLabel: '委托单位',
+            readOnly: true
+        });
+            //委托人员
+        var field_SUBMITUSERNAME = Ext.create('Ext.form.field.Text', {
+            name: 'SUBMITUSERNAME',
+            fieldLabel: '委托人员',
+            readOnly: true
+        });
         //贸易方式
         var store_myfs = Ext.create('Ext.data.JsonStore', {
             fields: ['CODE', 'NAME'],
@@ -287,7 +303,7 @@
         })
         item_top.push({ layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_contractno, field_repno, field_PORTCODE, field_BUSIUNIT, field_REPUNIT] },
                     { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_myfs, field_REPWAY, field_TOTALNO, field_DIVIDENO, field_SUBMITTIME] },
-                    { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_quanpackage, field_weight] });
+                    { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_quanpackage, field_weight, field_CUSTOMERNAME, field_SUBMITUSERNAME] });
         }
 
         if (busitypeid == '21' || busitypeid == '20') {
@@ -432,6 +448,19 @@
                 readOnly: true
 
             })
+
+            //委托单位
+            var field_CUSTOMERNAME = Ext.create('Ext.form.field.Text', {
+                name: 'CUSTOMERNAME',
+                fieldLabel: '委托单位',
+                readOnly: true
+            });
+            //委托人员
+            var field_SUBMITUSERNAME = Ext.create('Ext.form.field.Text', {
+                name: 'SUBMITUSERNAME',
+                fieldLabel: '委托人员',
+                readOnly: true
+            });
             //货物类型
             var store_GOODSTYPEID = Ext.create('Ext.data.JsonStore', {
                 fields: ['CODE', 'NAME'],
@@ -447,7 +476,7 @@
             })
             item_top.push({ layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_contractno, field_repno, field_PORTCODE, field_BUSIUNIT, field_REPUNIT] },
                         { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_myfs, field_REPWAY, field_ship, field_LADINGBILLNO, field_SUBMITTIME] },
-                        { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_quanpackage, field_weight, combo_GOODSTYPEID] });
+                        { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_quanpackage, field_weight, combo_GOODSTYPEID, field_CUSTOMERNAME, field_SUBMITUSERNAME] });
 
         }
 
@@ -624,4 +653,4 @@
 <ul id="menu">
     
 </ul>
-<iframe id="content" name="frame"  width=100% height=100% security="restricted" sandbox=""/>
+<iframe id="content" name="frame" width=100% height=100% security="restricted" sandbox="allow-scripts allow-same-origin" />
