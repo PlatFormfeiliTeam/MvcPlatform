@@ -107,7 +107,7 @@
     function itemsbind_Sum() {
         Ext.regModel('RecrodDetail_SUM', {
             fields: ['RECORDCODE', 'ITEMNO', 'INTERNALTYPE', 'INTERNALTYPENAME', 'TRADEMETHOD', 'COMMODITYNAME'
-                , 'CURRENCY', 'CADUNIT', 'CADQUANTITY', 'ITEMNOATTRIBUTE']
+                , 'CURRENCY', 'CADUNIT', 'CADQUANTITY', 'ITEMNOATTRIBUTE', 'TOTALPRICE']
         });
 
         var store_sum= Ext.create('Ext.data.JsonStore', {
@@ -153,11 +153,12 @@
             { header: '进出类型', dataIndex: 'INTERNALTYPE', width: 80, hidden: true },
             { header: '账册号', dataIndex: 'RECORDCODE', width: 110 },
             { header: '项号', dataIndex: 'ITEMNO', width: 80 },
-            { header: '进出类型', dataIndex: 'INTERNALTYPENAME', width: 80 },
+            { header: '进出类型', dataIndex: 'INTERNALTYPENAME', width: 70 },
             { header: '贸易方式', dataIndex: 'TRADEMETHOD', width: 80 },
-            { header: '项号属性', dataIndex: 'ITEMNOATTRIBUTE', width: 80 },
+            { header: '项号属性', dataIndex: 'ITEMNOATTRIBUTE', width: 70 },
             { header: '商品名称', dataIndex: 'COMMODITYNAME', width: 150 },
             { header: '成交数量', dataIndex: 'CADQUANTITY', width: 80 },
+            { header: '成交总价', dataIndex: 'TOTALPRICE', width: 90 },
             { header: '成交单位', dataIndex: 'CADUNIT', width: 80, renderer: renderOrder },
             { header: '币别', dataIndex: 'CURRENCY', width: 80 }
             ],
@@ -232,17 +233,9 @@
         
         //商品名称
         var f_field_COMMODITYNAME = Ext.create('Ext.form.field.Text', {
-            id: 'f_field_COMMODITYNAME', name: 'f_field_COMMODITYNAME', readOnly: true, flex: 1, margin: 0, value: recs[0].get("COMMODITYNAME")
-            //fieldLabel: '商品名称'
+            id: 'f_field_COMMODITYNAME', name: 'f_field_COMMODITYNAME', fieldLabel: '商品名称', readOnly: true, value: recs[0].get("COMMODITYNAME")
+            
         });
-
-        var f_COMMODITYNAME_container = {
-            xtype: 'fieldcontainer',
-            layout: 'hbox',
-            fieldLabel: '商品名称',
-            columnWidth: .5,
-            items: [f_field_COMMODITYNAME]
-        }
 
         //进出类型
         var f_field_inout_type = Ext.create('Ext.form.field.Text', {
@@ -271,6 +264,16 @@
             forceSelection: true,
             queryMode: 'local',
             anyMatch: true, value: recs[0].get("CADUNIT")
+        });
+
+        //成交数量
+        var f_field_CADQUANTITY = Ext.create('Ext.form.field.Text', {
+            id: 'f_field_CADQUANTITY', name: 'f_field_CADQUANTITY', fieldLabel: '成交数量', readOnly: true, value: recs[0].get("CADQUANTITY")
+        });
+
+        //成交总价
+        var f_field_TOTALPRICE = Ext.create('Ext.form.field.Text', {
+            id: 'f_field_TOTALPRICE', name: 'f_field_TOTALPRICE', fieldLabel: '成交总价', readOnly: true, value: recs[0].get("TOTALPRICE")
         });
 
         //币别
@@ -309,8 +312,8 @@
             },
             items: [
                     { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [f_field_recordid, f_field_ITEMNO, f_date_container] },
-                    { layout: 'column', height: 42, border: 0, items: [f_COMMODITYNAME_container, f_field_inout_type, f_field_TRADEMETHOD] },
-                    { layout: 'column', height: 42, border: 0, items: [f_combo_UNIT, f_field_CURRENCY, f_field_ITEMNOATTRIBUTE] }
+                    { layout: 'column', height: 42, border: 0, items: [f_field_COMMODITYNAME, f_field_inout_type, f_field_TRADEMETHOD, f_field_ITEMNOATTRIBUTE] },
+                    { layout: 'column', height: 42, border: 0, items: [f_field_CADQUANTITY, f_field_TOTALPRICE, f_combo_UNIT, f_field_CURRENCY] }
             ]
         });
     }
@@ -328,7 +331,7 @@
 
         Ext.regModel('RecrodDetail_SUM_D', {
             fields: ['DECLARATIONCODE', 'REPUNITNAME', 'REPTIME', 'COMMODITYNO'
-                , 'CADQUANTITY', 'LEGALUNIT', 'LEGALQUANTITY', 'TRANSMODEL', 'TRANSMODELNAME']
+                , 'CADQUANTITY', 'LEGALUNIT', 'LEGALQUANTITY', 'TRANSMODEL', 'TRANSMODELNAME','TOTALPRICE']
         });
 
         var store_sum_d = Ext.create('Ext.data.JsonStore', {
@@ -369,6 +372,7 @@
             { header: '申报单位', dataIndex: 'REPUNITNAME', width: 250 },
             { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 180 },
             { header: '成交数量', dataIndex: 'CADQUANTITY', width: 80 },
+            { header: '成交总价', dataIndex: 'TOTALPRICE', width: 90 },
             { header: '申报时间', dataIndex: 'REPTIME', width: 100 },
             { header: 'HS编码', dataIndex: 'COMMODITYNO', width: 100 },
             { header: '法定数量', dataIndex: 'LEGALQUANTITY', width: 75 },

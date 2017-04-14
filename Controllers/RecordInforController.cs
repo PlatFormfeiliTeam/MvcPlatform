@@ -1205,19 +1205,14 @@ namespace MvcPlatform.Controllers
             }
 
             sql = @"select aa.recordcode,aa.itemno,aa.internaltype,aa.internaltypename,aa.trademethod,aa.commodityname,aa.currency
-                           ,bb.isproductname ITEMNOATTRIBUTE,aa.cadunit,sum(aa.cadquantity) as cadquantity
+                           ,bb.isproductname ITEMNOATTRIBUTE,aa.cadunit,sum(aa.cadquantity) as cadquantity,sum(aa.totalprice) as totalprice 
                     from(
                         select substr(a.declarationcode,9,1) internaltype
              	                ,case when substr(a.declarationcode,9,1)='1' then '进口' when substr(a.declarationcode,9,1)='0' then '出口' else '' end internaltypename
-                                ,a.trademethod,a.recordcode,to_number(b.itemno) itemno,b.cadquantity,b.cadunit,b.commodityname,b.currency,a.reptime 
-                        from (
-                            select t.code,t.busiunitcode
-                            from list_declaration t 
-                            where t.isinvalid=0 and t.dataconfirm=2--查询已经确认的
-                            ) t1
-                            inner join list_declaration_after a on t1.code=a.code
+                                ,a.trademethod,a.recordcode,to_number(b.itemno) itemno,b.cadquantity,b.cadunit,b.commodityname,b.currency,b.totalprice,a.reptime 
+                        from list_declaration_after a 
                             inner join list_decllist_after b on a.code=b.predeclcode and a.xzlb=b.xzlb
-                        where (a.xzlb='报关单'or a.xzlb='报关单解析') and t1.busiunitcode='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where
+                        where a.dataconfirm=2 and a.busiunitcode='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where
                     + @") aa
                         left join cusdoc.base_booksdata bb on aa.trademethod=bb.trade and aa.internaltypename=bb.isinportname
                     group by aa.recordcode,aa.itemno,aa.internaltype,aa.internaltypename,aa.trademethod,bb.isproductname,aa.commodityname,aa.currency,aa.cadunit";
@@ -1267,22 +1262,17 @@ namespace MvcPlatform.Controllers
             }
 
             sql = @"select aa.recordcode,aa.itemno,aa.internaltype,aa.internaltypename,aa.trademethod,aa.commodityname,aa.currency
-                           ,bb.isproductname ITEMNOATTRIBUTE,aa.cadunit,cadquantity
+                           ,bb.isproductname ITEMNOATTRIBUTE,aa.cadunit,cadquantity,aa.totalprice
                            ,aa.reptime,aa.declarationcode,aa.legalquantity,aa.legalunit,aa.repunitname,aa.commodityno,aa.transmodel
                            ,(select ee.Name from cusdoc.base_Transport ee where aa.transmodel=ee.code) as transmodelname
                     from(
                           select substr(a.declarationcode,9,1) internaltype
              	                    ,case when substr(a.declarationcode,9,1)='1' then '进口' when substr(a.declarationcode,9,1)='0' then '出口' else '' end internaltypename
-                                 ,a.trademethod,a.recordcode,b.itemno,b.cadquantity,b.cadunit,b.commodityno,b.commodityname,b.currency
+                                 ,a.trademethod,a.recordcode,b.itemno,b.cadquantity,b.cadunit,b.commodityno,b.commodityname,b.currency,b.totalprice
                                  ,a.reptime,a.declarationcode,b.legalquantity,b.legalunit,a.repunitname,a.transmodel
-                          from (
-                                select t.code,t.busiunitcode
-                                from list_declaration t 
-                                where t.isinvalid=0 and t.dataconfirm=2--查询已经确认的
-                                ) t1
-                                inner join list_declaration_after a on t1.code=a.code
+                          from list_declaration_after a 
                                 inner join list_decllist_after b on a.code=b.predeclcode and a.xzlb=b.xzlb
-                          where (a.xzlb='报关单'or a.xzlb='报关单解析') and t1.busiunitcode='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where
+                          where a.dataconfirm=2 and a.busiunitcode='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where
                     + @") aa
                       left join cusdoc.base_booksdata bb on aa.trademethod=bb.trade and aa.internaltypename=bb.isinportname "
                     + @" where aa.internaltypename='" + Request["f_field_inout_type"] + "'";
