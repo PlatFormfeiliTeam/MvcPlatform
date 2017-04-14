@@ -711,11 +711,18 @@ namespace MvcPlatform.Controllers
                     IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
                     iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
-                    sql = @"select '{0}' RID,RECORDINFOID,ITEMNO,ITEMNOATTRIBUTE
+                    string CUSTOMAREA = "";
+                    //备案关区
+                    sql = @"select id from cusdoc.base_year where customarea is not null and enabled=1 order by id";
+                    DataTable dt_temp = DBMgrBase.GetDataTable(sql);
+                    if (dt_temp.Rows.Count > 0) { CUSTOMAREA = dt_temp.Rows[0][0].ToString(); }
+
+
+                    sql = @"select '{0}' RID,RECORDINFOID,ITEMNO,ITEMNOATTRIBUTE,{1} CUSTOMAREA
                                 ,HSCODE,ADDITIONALNO,COMMODITYNAME,SPECIFICATIONSMODEL,UNIT
                                 ,HSCODE HSCODE_LEFT,ADDITIONALNO ADDITIONALNO_LEFT,COMMODITYNAME COMMODITYNAME_LEFT,SPECIFICATIONSMODEL SPECIFICATIONSMODEL_LEFT,UNIT UNIT_LEFT   
                             from sys_recordinfo_detail where id='{0}'";
-                    sql = string.Format(sql, rid);
+                    sql = string.Format(sql, rid, CUSTOMAREA);
                     dt = DBMgrBase.GetDataTable(sql);
                     formdata = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
                 }

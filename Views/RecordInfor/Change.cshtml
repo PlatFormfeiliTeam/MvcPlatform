@@ -21,6 +21,7 @@
     var id = getQueryString("id"); var rid = getQueryString("rid");
     var common_data_recordid = [], common_data_unit = [], common_data_customarea = [], common_data_jydw = [];
 
+    var hscode = "", extracode = "", i = 0, j = 0;
     Ext.onReady(function () {
         Ext.Ajax.request({
             url: "/Common/Ini_Base_Data",
