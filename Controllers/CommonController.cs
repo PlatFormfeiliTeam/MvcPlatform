@@ -2520,7 +2520,7 @@ namespace MvcPlatform.Controllers
         }
 
 
-        public FileResult ExportList()
+        public string ExportList()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string where = QueryCondition();
@@ -2932,10 +2932,12 @@ namespace MvcPlatform.Controllers
             #endregion
 
             // 写入到客户端 
-            System.IO.MemoryStream ms = new System.IO.MemoryStream();
-            book.Write(ms);
-            ms.Seek(0, SeekOrigin.Begin);
-            return File(ms, "application/vnd.ms-excel", filename);
+            //System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            //book.Write(ms);
+            //ms.Seek(0, SeekOrigin.Begin);
+            //return File(ms, "application/vnd.ms-excel", filename);
+
+            return Extension.getPathname(filename, book);
         }
 
         public string getStatusName(string curstatus, string dec_insp_status)
@@ -2949,7 +2951,7 @@ namespace MvcPlatform.Controllers
             return statusname;
         }
 
-        public FileResult ExportDeclList()
+        public string ExportDeclList()
         {
             string sql = QueryConditionDecl();
             sql = sql + " order by CREATETIME desc";
@@ -3026,10 +3028,12 @@ namespace MvcPlatform.Controllers
 
 
             // 写入到客户端 
-            System.IO.MemoryStream ms = new System.IO.MemoryStream();
-            book.Write(ms);
-            ms.Seek(0, SeekOrigin.Begin);
-            return File(ms, "application/vnd.ms-excel", "报关单文件.xls");
+            //System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            //book.Write(ms);
+            //ms.Seek(0, SeekOrigin.Begin);
+            //return File(ms, "application/vnd.ms-excel", "报关单文件.xls");
+
+            return Extension.getPathname("报关单文件.xls", book);
         }
         
         public string LoadDeclarationList_E()
@@ -3227,7 +3231,7 @@ namespace MvcPlatform.Controllers
 
         }
         
-        public FileResult ExportDeclList_E()
+        public string ExportDeclList_E()
         {            
             string sql = QueryConditionDecl_E();
             sql = sql + " order by CREATETIME desc";
@@ -3304,10 +3308,12 @@ namespace MvcPlatform.Controllers
 
 
             // 写入到客户端 
-            System.IO.MemoryStream ms = new System.IO.MemoryStream();
-            book.Write(ms);
-            ms.Seek(0, SeekOrigin.Begin);
-            return File(ms, "application/vnd.ms-excel", "报关单文件.xls");
+            //System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            //book.Write(ms);
+            //ms.Seek(0, SeekOrigin.Begin);
+            //return File(ms, "application/vnd.ms-excel", "报关单文件.xls");
+
+            return Extension.getPathname("报关单文件.xls", book);
         }
                 
         public FileResult DownloadFile()

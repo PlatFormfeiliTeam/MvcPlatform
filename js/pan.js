@@ -1752,25 +1752,38 @@ function printFile(type) {
 }
 
 function Export(busitypeid) {
-    var OnlySelf = Ext.get('OnlySelfi').el.dom.className;
-    var CONDITION1 = Ext.getCmp('CONDITION1').getValue(); var VALUE1 = Ext.getCmp("CONDITION1_1").getValue(); VALUE1 = VALUE1 == null ? "" : VALUE1;
-    var CONDITION2 = Ext.getCmp('CONDITION2').getValue(); var VALUE2 = Ext.getCmp("CONDITION2_1").getValue();
-    var CONDITION3 = Ext.getCmp('CONDITION3').getValue(); var VALUE3 = Ext.getCmp("CONDITION3_1").getValue(); VALUE3 = VALUE3 == null ? "" : VALUE3;
-    var CONDITION4 = Ext.getCmp('CONDITION4').getValue(); var VALUE4_1 = Ext.Date.format(Ext.getCmp("CONDITION4_1").getValue(), 'Y-m-d H:i:s'); var VALUE4_2 = Ext.Date.format(Ext.getCmp("CONDITION4_2").getValue(), 'Y-m-d H:i:s');
-    var CONDITION5 = Ext.getCmp('CONDITION5').getValue(); var VALUE5 = Ext.getCmp("CONDITION5_1").getValue(); VALUE5 = VALUE5 == null ? "" : VALUE5;
-    var CONDITION6 = Ext.getCmp('CONDITION6').getValue(); var VALUE6 = Ext.getCmp("CONDITION6_1").getValue();
-    var CONDITION7 = Ext.getCmp('CONDITION7').getValue(); var VALUE7 = Ext.getCmp("CONDITION7_1").getValue(); VALUE7 = VALUE7 == null ? "" : VALUE7;
-    var CONDITION8 = Ext.getCmp('CONDITION8').getValue(); var VALUE8_1 = Ext.Date.format(Ext.getCmp("CONDITION8_1").getValue(), 'Y-m-d H:i:s'); var VALUE8_2 = Ext.Date.format(Ext.getCmp("CONDITION8_2").getValue(), 'Y-m-d H:i:s');
+    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "数据导出中，请稍等..." });
+    myMask.show();
 
-    var dec_insp_status = JSON.stringify(orderstatus_js_data);
-    if (busitypeid == "11") { $("#txt_seniorsearch").val(seniorcondition); }
+    var data = {
+        dec_insp_status: JSON.stringify(orderstatus_js_data), seniorsearch: typeof seniorcondition == "undefined" ? null : seniorcondition,
+        busitypeid: busitypeid, OnlySelf: Ext.get('OnlySelfi').el.dom.className,
+        CONDITION1: Ext.getCmp('CONDITION1').getValue(), VALUE1: Ext.getCmp("CONDITION1_1").getValue(),
+        CONDITION2: Ext.getCmp('CONDITION2').getValue(), VALUE2: Ext.getCmp("CONDITION2_1").getValue(),
+        CONDITION3: Ext.getCmp('CONDITION3').getValue(), VALUE3: Ext.getCmp("CONDITION3_1").getValue(),
+        CONDITION4: Ext.getCmp('CONDITION4').getValue(), VALUE4_1: Ext.Date.format(Ext.getCmp("CONDITION4_1").getValue(), 'Y-m-d H:i:s'), VALUE4_2: Ext.Date.format(Ext.getCmp("CONDITION4_2").getValue(), 'Y-m-d H:i:s'),
+        CONDITION5: Ext.getCmp('CONDITION5').getValue(), VALUE5: Ext.getCmp("CONDITION5_1").getValue(),
+        CONDITION6: Ext.getCmp('CONDITION6').getValue(), VALUE6: Ext.getCmp("CONDITION6_1").getValue(),
+        CONDITION7: Ext.getCmp('CONDITION7').getValue(), VALUE7: Ext.getCmp("CONDITION7_1").getValue(),
+        CONDITION8: Ext.getCmp('CONDITION8').getValue(), VALUE8_1: Ext.Date.format(Ext.getCmp("CONDITION8_1").getValue(), 'Y-m-d H:i:s'), VALUE8_2: Ext.Date.format(Ext.getCmp("CONDITION8_2").getValue(), 'Y-m-d H:i:s')
+    }
 
-    var path = '/Common/ExportList?busitypeid=' + busitypeid + '&OnlySelf=' + OnlySelf + '&CONDITION1=' + CONDITION1 + '&VALUE1=' + VALUE1
-        + '&CONDITION2=' + CONDITION2 + '&VALUE2=' + VALUE2 + '&CONDITION3=' + CONDITION3 + '&VALUE3=' + VALUE3
-        + '&CONDITION4=' + CONDITION4 + '&VALUE4_1=' + VALUE4_1 + '&VALUE4_2=' + VALUE4_2 + '&CONDITION5=' + CONDITION5 + '"&VALUE5=' + VALUE5
-        + '&CONDITION6=' + CONDITION6 + '&VALUE6=' + VALUE6 + '&CONDITION7=' + CONDITION7 + '&VALUE7=' + VALUE7
-        + '&CONDITION8=' + CONDITION8 + '&VALUE8_1=' + VALUE8_1 + '&VALUE8_2=' + VALUE8_2 + "&dec_insp_status=" + dec_insp_status;
-    $('#exportform').attr("action", path).submit();
+    Ext.Ajax.request({
+        url: '/Common/ExportList',
+        method: 'POST',
+        params: data,
+        success: function (response, option) {
+            Ext.Ajax.request({
+                url: '/Common/DownloadFile',
+                method: 'POST',
+                params: Ext.decode(response.responseText),
+                form: 'exportform',
+                success: function (response, option) {
+                }
+            });
+            myMask.hide();
+        }
+    });
 }
 
 //对应料件项号
