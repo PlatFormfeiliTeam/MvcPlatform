@@ -276,10 +276,12 @@
        
     }
 
-    function Export()
-    {
+    function Export() {
+        var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "数据导出中，请稍等..." });
+        myMask.show();
+
         var data = {
-            dec_insp_status:JSON.stringify(orderstatus_js_data),
+            dec_insp_status: JSON.stringify(orderstatus_js_data),
             busitypeid: busitypeid,
             CONDITION1: Ext.getCmp('CONDITION1').getValue(), VALUE1: Ext.getCmp("CONDITION1_1").getValue(),
             CONDITION2: Ext.getCmp('CONDITION2').getValue(), VALUE2: Ext.getCmp("CONDITION2_1").getValue(),
@@ -289,17 +291,19 @@
         }
         Ext.Ajax.request({
             url: '/EnterpriseOrder/ExportList',
-            method: 'POST',
             params: data,
-            form: 'exportform',
-            success: function () {
-
-
+            success: function (response, option) {
+                Ext.Ajax.request({
+                    url: '/Common/DownloadFile',
+                    method: 'POST',
+                    params: Ext.decode(response.responseText),
+                    form: 'exportform',
+                    success: function (response, option) {
+                    }
+                });
+                myMask.hide();
             }
-
-
         });
-
 
     }
 </script>

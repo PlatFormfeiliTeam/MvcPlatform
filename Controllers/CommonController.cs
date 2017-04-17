@@ -3226,8 +3226,7 @@ namespace MvcPlatform.Controllers
             return sql;
 
         }
-
-
+        
         public FileResult ExportDeclList_E()
         {            
             string sql = QueryConditionDecl_E();
@@ -3310,9 +3309,30 @@ namespace MvcPlatform.Controllers
             ms.Seek(0, SeekOrigin.Begin);
             return File(ms, "application/vnd.ms-excel", "报关单文件.xls");
         }
+                
+        public FileResult DownloadFile()
+        {
+            string WebDownPath = ConfigurationManager.AppSettings["WebDownPath"];
+            string path = WebDownPath + Request["filename_s"];
 
+            FileInfo fi = new FileInfo(path);
+            if (fi.Exists)
+            {
+                Response.Clear();
+                Response.AddHeader("Content-Disposition", "attachment; filename=" + HttpUtility.UrlEncode(Request["filename"]));// + fi.Name
+                Response.AddHeader("Content-Length", fi.Length.ToString());
+                Response.ContentType = "application/octet-stream";
+                Response.Filter.Close();
+                Response.WriteFile(path);
+                Response.Flush();
+                Response.Close();
+                if (System.IO.File.Exists(path))
+                    System.IO.File.Delete(path);
+                Response.End();
+            }
 
-
+           return new FileStreamResult(Response.OutputStream, "application/vnd.ms-excel");
+        }
 
     }
 }

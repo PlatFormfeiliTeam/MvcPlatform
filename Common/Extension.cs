@@ -531,5 +531,21 @@ namespace MvcPlatform.Common
             return sql;
         }
 
+        public static string getPathname(string filename, NPOI.HSSF.UserModel.HSSFWorkbook book)
+        {
+            string WebDownPath = ConfigurationManager.AppSettings["WebDownPath"];
+
+            if (!Directory.Exists(WebDownPath))
+                Directory.CreateDirectory(WebDownPath);
+
+            string filename_s = DateTime.Now.ToString("yyMMddHHmmssfff") + ".xls";
+            string path = WebDownPath + filename_s;
+
+            FileStream fs = new FileStream(path, FileMode.Create);
+            book.Write(fs);
+            fs.Close();
+            return "{filename_s:'" + filename_s + "',filename:'" + filename + "'}";
+        }
+
     }
 }

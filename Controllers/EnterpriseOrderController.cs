@@ -990,7 +990,7 @@ namespace MvcPlatform.Controllers
             return statusname;
         }
 
-        public FileResult ExportList()
+        public string ExportList()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string where = QueryCondition();
@@ -1392,10 +1392,15 @@ namespace MvcPlatform.Controllers
             #endregion
 
             // 写入到客户端 
-            System.IO.MemoryStream ms = new System.IO.MemoryStream();
-            book.Write(ms);
-            ms.Seek(0, SeekOrigin.Begin);
-            return File(ms, "application/vnd.ms-excel", filename);
+            //System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            //book.Write(ms);
+            //ms.Seek(0, SeekOrigin.Begin);
+            //return File(ms, "application/vnd.ms-excel", filename);
+
+            return Extension.getPathname(filename, book);
         }
+
+       
+
     }
 }
