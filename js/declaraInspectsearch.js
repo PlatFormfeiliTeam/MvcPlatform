@@ -70,25 +70,41 @@
         items: [combo_2, field_2_1]
     }
 
+    var declarationsearch_js_condition3_data_dy = [{ "NAME": "已打印", "CODE": "1" }, { "NAME": "未打印", "CODE": "0" }];
+    var declarationsearch_js_condition3_data_hg = [{ "NAME": "已结关", "CODE": "已结关" }, { "NAME": "未结关", "CODE": "未结关" }];
+
     var store_3 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: [{ "NAME": "打印标志", "CODE": "DYBZ" }]
-    });
+        data: [{ "NAME": "打印标志", "CODE": "DYBZ" }, { "NAME": "海关状态", "CODE": "HGZT" }]
+    });    
+
     var combo_3 = Ext.create("Ext.form.ComboBox", {
         id: 'CONDITION3',
         name: "CONDITION3",
-        value: "DYBZ",
+        value: "HGZT",
         store: store_3,
         queryMode: 'local',
         editable: false,
         displayField: 'NAME',
         valueField: "CODE",
         margin: 0,
-        flex: .35
+        flex: .35,
+        listeners:
+            {
+                change: function (combo, newValue, oldValue, eOpts) {
+                    combo_3_1.reset();
+                    if (newValue == "HGZT") {
+                        store_3_1.loadData(declarationsearch_js_condition3_data_hg);
+                    }
+                    if (newValue == "DYBZ") {
+                        store_3_1.loadData(declarationsearch_js_condition3_data_dy);
+                    }
+                }
+            }
     });
     var store_3_1 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: [{ "NAME": "已打印", "CODE": "1" }, { "NAME": "未打印", "CODE": "0" }]
+        data: declarationsearch_js_condition3_data_hg
     });
     var combo_3_1 = Ext.create("Ext.form.ComboBox", {
         id: 'CONDITION3_1',
