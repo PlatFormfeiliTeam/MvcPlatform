@@ -407,7 +407,7 @@
         fields: ['EXTRACODE']
     });
     var combo_ADDITIONALNO = Ext.create('Ext.form.field.ComboBox', {
-        id: 'ADDITIONALNO', fieldLabel: 'HS附加码', flex: .5, margin: 0, minChars: 1,
+        id: 'ADDITIONALNO', fieldLabel: 'HS附加码', flex: .5, minChars: 1,
         name: 'ADDITIONALNO', maxLength: 2, minLength: 2, enforceMaxLength: true, minLengthText: '附加码为2位！',
         store: store_ADDITIONALNO,
         hideTrigger: true,
