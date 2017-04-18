@@ -244,7 +244,7 @@ namespace MvcPlatform.Controllers
             return result;
         }
 
-        public FileResult Export()
+        public string Export()
         {
             string sql = "";string e_options=Request["e_options"];string e_status=Request["e_status"];string e_unit=Request["e_unit"];
             //创建Excel文件的对象
@@ -350,10 +350,12 @@ namespace MvcPlatform.Controllers
             }
             //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             // 写入到客户端 
-            System.IO.MemoryStream ms = new System.IO.MemoryStream();
-            book.Write(ms);
-            ms.Seek(0, SeekOrigin.Begin);
-            return File(ms, "application/vnd.ms-excel", filename);
+            //System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            //book.Write(ms);
+            //ms.Seek(0, SeekOrigin.Begin);
+            //return File(ms, "application/vnd.ms-excel", filename);
+
+            return Extension.getPathname(filename, book);
         }
 
         public string loadRecrodInfo()
@@ -1036,7 +1038,7 @@ namespace MvcPlatform.Controllers
             return "{rows:" + json + ",total:" + totalProperty + "}";
         }
 
-        public FileResult Export_Audit()
+        public string Export_Audit()
         {
             string sql = ""; string e_options = Request["e_options"]; string e_status = Request["e_status"]; string e_unit = Request["e_unit"];
             //创建Excel文件的对象
@@ -1101,10 +1103,12 @@ namespace MvcPlatform.Controllers
             }
             //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             // 写入到客户端 
-            System.IO.MemoryStream ms = new System.IO.MemoryStream();
-            book.Write(ms);
-            ms.Seek(0, SeekOrigin.Begin);
-            return File(ms, "application/vnd.ms-excel", filename);
+            //System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            //book.Write(ms);
+            //ms.Seek(0, SeekOrigin.Begin);
+            //return File(ms, "application/vnd.ms-excel", filename);
+
+            return Extension.getPathname(filename, book);
         }
 
         #endregion
@@ -1288,7 +1292,7 @@ namespace MvcPlatform.Controllers
             return "{rows:" + json + ",total:" + totalProperty + "}";
         }
 
-        public FileResult Export_SUM()
+        public string Export_SUM()
         {
             string sql = ""; string UNIT = Request["UNIT"];
             //创建Excel文件的对象
@@ -1322,10 +1326,12 @@ namespace MvcPlatform.Controllers
             }
             
             // 写入到客户端 
-            System.IO.MemoryStream ms = new System.IO.MemoryStream();
-            book.Write(ms);
-            ms.Seek(0, SeekOrigin.Begin);
-            return File(ms, "application/vnd.ms-excel", filename);
+            //System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            //book.Write(ms);
+            //ms.Seek(0, SeekOrigin.Begin);
+            //return File(ms, "application/vnd.ms-excel", filename);
+
+            return Extension.getPathname(filename, book);
         }
 
         #endregion

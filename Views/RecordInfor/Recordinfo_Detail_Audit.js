@@ -351,20 +351,29 @@ function print_task_Audit() {
 }
 
 function Export_Audit() {
-    var enterprisecode = Ext.getCmp('s_combo_enterprise').getValue(); enterprisecode = enterprisecode == null ? "" : enterprisecode;
-    var recordid = Ext.getCmp('s_combo_recordid').getValue(); recordid = recordid == null ? "" : recordid;
-    var itemno = Ext.getCmp('field_ITEMNO').getValue(); var hscode = Ext.getCmp('field_HSCODE').getValue();
-    var options = Ext.getCmp('s_combo_optionstatus').getValue(); options = options == null ? "" : options;
-    var status = Ext.getCmp('s_combo_status').getValue(); status = status == null ? "" : status;
-    var date_start = Ext.Date.format(Ext.getCmp("date_start").getValue(), 'Y-m-d H:i:s'); var date_end = Ext.Date.format(Ext.getCmp("date_end").getValue(), 'Y-m-d H:i:s');
+    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "数据导出中，请稍等..." });
+    myMask.show();
 
-    $('#e_options').val(JSON.stringify(optionstatus_js_data));
-    $('#e_status').val(JSON.stringify(status_js_data));
-    $('#e_unit').val(JSON.stringify(common_data_unit));
-
-    var path = '/RecordInfor/Export_Audit?ENTERPRISECODE=' + enterprisecode + '&RECORDINFORID=' + recordid + '&ITEMNO=' + itemno
-        + '&HSCODE=' + hscode + '&OPTIONS=' + options + '&STATUS=' + status + '&DATE_START=' + date_start + '&DATE_END=' + date_end;
-    $('#exportform').attr("action", path).submit();
-
-   
+    var data = {
+        e_options: JSON.stringify(optionstatus_js_data), e_status: JSON.stringify(status_js_data), e_unit: JSON.stringify(common_data_unit),
+        ENTERPRISECODE: Ext.getCmp('s_combo_enterprise').getValue(), RECORDINFORID: Ext.getCmp('s_combo_recordid').getValue(),
+        ITEMNO: Ext.getCmp("field_ITEMNO").getValue(), HSCODE: Ext.getCmp('field_HSCODE').getValue(),
+        OPTIONS: Ext.getCmp('s_combo_optionstatus').getValue(), STATUS: Ext.getCmp("s_combo_status").getValue(),
+        DATE_START: Ext.Date.format(Ext.getCmp("date_start").getValue(), 'Y-m-d H:i:s'), DATE_END: Ext.Date.format(Ext.getCmp("date_end").getValue(), 'Y-m-d H:i:s')
+    }
+    Ext.Ajax.request({
+        url: '/RecordInfor/Export_Audit',
+        params: data,
+        success: function (response, option) {
+            Ext.Ajax.request({
+                url: '/Common/DownloadFile',
+                method: 'POST',
+                params: Ext.decode(response.responseText),
+                form: 'exportform',
+                success: function (response, option) {
+                }
+            });
+            myMask.hide();
+        }
+    });
 }
