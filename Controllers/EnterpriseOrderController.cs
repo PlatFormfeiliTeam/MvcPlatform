@@ -1030,6 +1030,14 @@ namespace MvcPlatform.Controllers
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             string sql = @"select * from LIST_ORDER a  left join (select CODE,NAME||'('||CODE||')' REPWAYNAME from cusdoc.SYS_REPWAY where Enabled=1 and instr(busitype,'" + busitype + "')>0) b on a.REPWAYID=b.CODE "
                       +"where instr('" + Request["busitypeid"] + "',BUSITYPE)>0 and BUSIUNITCODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "' " + where;
+
+            DataTable dt_count = DBMgr.GetDataTable("select count(1) from ("+sql+") a");
+            int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
+            if (Convert.ToInt32(dt_count.Rows[0][0]) > WebDownCount)
+            {
+                return "{success:false,WebDownCount:" + WebDownCount + "}";
+            }
+            
             DataTable dt = DBMgr.GetDataTable(sql);
 
             //创建Excel文件的对象

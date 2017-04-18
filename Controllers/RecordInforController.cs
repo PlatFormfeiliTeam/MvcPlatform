@@ -6,6 +6,7 @@ using Oracle.ManagedDataAccess.Client;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -254,6 +255,13 @@ namespace MvcPlatform.Controllers
             //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             sql = Query_RecordInfor("");
             sql = sql + " order by recordinfoid,itemno";
+
+            DataTable dt_count = DBMgr.GetDataTable("select count(1) from (" + sql + ") a");
+            int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
+            if (Convert.ToInt32(dt_count.Rows[0][0]) > WebDownCount)
+            {
+                return "{success:false,WebDownCount:" + WebDownCount + "}";
+            }
 
             DataTable dt = DBMgr.GetDataTable(sql);
             DataRow[] dr_lj = dt.Select("itemnoattribute='料件'"); DataRow[] dr_cp = dt.Select("itemnoattribute='成品'");
@@ -1049,6 +1057,13 @@ namespace MvcPlatform.Controllers
             sql = Query_RecordInfor_Audit();         
             sql = sql + " order by b.id desc";
 
+            DataTable dt_count = DBMgr.GetDataTable("select count(1) from (" + sql + ") a");
+            int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
+            if (Convert.ToInt32(dt_count.Rows[0][0]) > WebDownCount)
+            {
+                return "{success:false,WebDownCount:" + WebDownCount + "}";
+            }
+
             DataTable dt_go = DBMgr.GetDataTable(sql);
             DataRow[] dr_lj_go = dt_go.Select("itemnoattribute='料件'"); DataRow[] dr_cp_go = dt_go.Select("itemnoattribute='成品'");
 
@@ -1301,6 +1316,14 @@ namespace MvcPlatform.Controllers
 
             sql = Query_RecordDetail_SUM();
             sql = sql + " order by aa.recordcode,aa.itemno,aa.internaltype";
+
+            DataTable dt_count = DBMgr.GetDataTable("select count(1) from (" + sql + ") a");
+            int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
+            if (Convert.ToInt32(dt_count.Rows[0][0]) > WebDownCount)
+            {
+                return "{success:false,WebDownCount:" + WebDownCount + "}";
+            }
+
             DataTable dt = DBMgr.GetDataTable(sql);
 
             NPOI.SS.UserModel.ISheet sheet = book.CreateSheet("申报数量");

@@ -2560,6 +2560,14 @@ namespace MvcPlatform.Controllers
             string sql = "select a.*,b.REPWAYNAME from LIST_ORDER a "
                     + " left join (select CODE,NAME||'('||CODE||')' REPWAYNAME from cusdoc.SYS_REPWAY where Enabled=1 and instr(busitype,'" + busitype + "')>0) b on a.REPWAYID=b.CODE "
                     + " where instr('" + busitypeid + "',a.BUSITYPE)>0 and a.customercode='" + json_user.Value<string>("CUSTOMERCODE") + "' " + where;
+
+            DataTable dt_count = DBMgr.GetDataTable("select count(1) from (" + sql + ") a");
+            int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
+            if (Convert.ToInt32(dt_count.Rows[0][0]) > WebDownCount)
+            {
+                return "{success:false,WebDownCount:" + WebDownCount + "}";
+            }
+
             DataTable dt = DBMgr.GetDataTable(sql);
 
             //创建Excel文件的对象
@@ -2953,12 +2961,20 @@ namespace MvcPlatform.Controllers
 
         public string ExportDeclList()
         {
-            string sql = QueryConditionDecl();
-            sql = sql + " order by CREATETIME desc";
             string common_data_busitype = Request["common_data_busitype"];
-
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+            string sql = QueryConditionDecl();
+            sql = sql + " order by CREATETIME desc";
+
+            DataTable dt_count = DBMgr.GetDataTable("select count(1) from (" + sql + ") a");
+            int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
+            if (Convert.ToInt32(dt_count.Rows[0][0]) > WebDownCount)
+            {
+                return "{success:false,WebDownCount:" + WebDownCount + "}";
+            }
+           
             DataTable dt = DBMgr.GetDataTable(sql);
 
             //创建Excel文件的对象
@@ -3232,14 +3248,20 @@ namespace MvcPlatform.Controllers
         }
         
         public string ExportDeclList_E()
-        {            
-            string sql = QueryConditionDecl_E();
-            sql = sql + " order by CREATETIME desc";
-
+        {
             string common_data_busitype = Request["common_data_busitype"];
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
+            string sql = QueryConditionDecl_E();
+            sql = sql + " order by CREATETIME desc";
+
+            DataTable dt_count = DBMgr.GetDataTable("select count(1) from (" + sql + ") a");
+            int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
+            if (Convert.ToInt32(dt_count.Rows[0][0]) > WebDownCount)
+            {
+                return "{success:false,WebDownCount:" + WebDownCount + "}";
+            }
             
             DataTable dt = DBMgr.GetDataTable(sql);
 
