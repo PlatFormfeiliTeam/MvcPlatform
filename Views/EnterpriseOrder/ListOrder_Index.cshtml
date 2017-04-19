@@ -251,6 +251,12 @@
     function Select() {
         Ext.getCmp('pgbar').moveFirst();
     }
+    function openrwindow(url, width, height) {
+        var iWidth = width ? width : "1000", iHeight = height ? height : "600";
+        var iTop = (window.screen.availHeight - 30 - iHeight) / 2; //获得窗口的垂直位置;
+        var iLeft = (window.screen.availWidth - 10 - iWidth) / 2; //获得窗口的水平位置; 
+        window.open(url, '', 'height=' + iHeight + ',,innerHeight=' + iHeight + ',width=' + iWidth + ',innerWidth=' + iWidth + ',top=' + iTop + ',left=' + iLeft + ',location=yes,scrollbars=yes');
+    }
     function Open()
     {
         var recs = gridpanel.getSelectionModel().getSelection();
@@ -259,7 +265,7 @@
             return;
         }
         var id= recs[0].data.ID
-        opencenterwin("/EnterpriseOrder/GoodsTrack?busitypeid=" + busitypeid + "&id=" + id, 1200, 1000);
+        openrwindow("/EnterpriseOrder/GoodsTrack?busitypeid=" + busitypeid + "&id=" + id, 1200, 1000);
     }
     function ViewsEnterprise() {
         var recs = gridpanel.getSelectionModel().getSelection();
