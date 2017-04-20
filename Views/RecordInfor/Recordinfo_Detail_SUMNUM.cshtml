@@ -197,7 +197,7 @@
         grid_ini_detail();
         var win = Ext.create("Ext.window.Window", {
             title: '申报明细',
-            width: 850,
+            width: 900,
             height: 550,
             modal: true,
             items: [Ext.getCmp('f_formpanel'), Ext.getCmp('gridpanel_d')]
@@ -330,7 +330,7 @@
         })
 
         Ext.regModel('RecrodDetail_SUM_D', {
-            fields: ['DECLARATIONCODE', 'REPUNITNAME', 'REPTIME', 'COMMODITYNO'
+            fields: ['DECLARATIONCODE','CUSTOMSSTATUS', 'REPUNITNAME', 'REPTIME', 'COMMODITYNO'
                 , 'CADQUANTITY', 'LEGALUNIT', 'LEGALQUANTITY', 'TRANSMODEL', 'TRANSMODELNAME','TOTALPRICE']
         });
 
@@ -370,6 +370,7 @@
             columns: [
             { xtype: 'rownumberer', width: 35 },
             { header: '申报单位', dataIndex: 'REPUNITNAME', width: 250 },
+            { header: '海关状态', dataIndex: 'CUSTOMSSTATUS', width: 80 },
             { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 180 },
             { header: '成交数量', dataIndex: 'CADQUANTITY', width: 80 },
             { header: '成交总价', dataIndex: 'TOTALPRICE', width: 90 },

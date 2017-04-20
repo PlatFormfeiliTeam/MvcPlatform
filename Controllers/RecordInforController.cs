@@ -1284,13 +1284,16 @@ namespace MvcPlatform.Controllers
                            ,bb.isproductname ITEMNOATTRIBUTE,aa.cadunit,cadquantity,aa.totalprice
                            ,aa.reptime,aa.declarationcode,aa.legalquantity,aa.legalunit,aa.repunitname,aa.commodityno,aa.transmodel
                            ,(select ee.Name from cusdoc.base_Transport ee where aa.transmodel=ee.code) as transmodelname
+                           ,aa.customsstatus
                     from(
                           select substr(a.declarationcode,9,1) internaltype
              	                    ,case when substr(a.declarationcode,9,1)='1' then '进口' when substr(a.declarationcode,9,1)='0' then '出口' else '' end internaltypename
                                  ,a.trademethod,a.recordcode,b.itemno,b.cadquantity,b.cadunit,b.commodityno,b.commodityname,b.currency,b.totalprice
                                  ,a.reptime,a.declarationcode,b.legalquantity,b.legalunit,a.repunitname,a.transmodel
+                                 ,c.customsstatus
                           from list_declaration_after a 
-                                inner join list_decllist_after b on a.code=b.predeclcode and a.xzlb=b.xzlb
+                                inner join list_decllist_after b on a.code=b.predeclcode and a.xzlb=b.xzlb 
+                                inner join list_declaration c on a.code=c.code 
                           where a.dataconfirm=2 and a.busiunitcode='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where
                     + @") aa
                       left join cusdoc.base_booksdata bb on aa.trademethod=bb.trade and aa.internaltypename=bb.isinportname "
