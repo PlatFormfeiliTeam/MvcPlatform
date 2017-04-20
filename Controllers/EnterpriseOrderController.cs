@@ -921,6 +921,15 @@ namespace MvcPlatform.Controllers
                         break;
                 }
             }
+              if (!string.IsNullOrEmpty(Request["STARTDATE"]))
+              {
+                  where += " and SUBMITTIME>=to_date('" + Request["STARTDATE"] + "','yyyy-mm-dd hh24:mi:ss')";
+              }
+              if (!string.IsNullOrEmpty(Request["ENDDATE"]))
+              {
+                  where += " and SUBMITTIME<=to_date('" + Request["ENDDATE"] + "','yyyy-mm-dd hh24:mi:ss')+1";
+              }
+
             where += " and ISINVALID=0 ";//?是否需要
             return where;
         }

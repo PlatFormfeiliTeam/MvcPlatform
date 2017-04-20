@@ -32,8 +32,10 @@
                   { header: '申报方式', dataIndex: 'REPWAYID', width: 100, renderer: renderOrder },
                   { header: '运抵编号', dataIndex: 'ARRIVEDNO', width: 140 },//需要确定具体字段
                   { header: '法检', dataIndex: 'LAWFLAG', width: 60, renderer: renderOrder },
-                  { header: '委托时间', dataIndex: 'SUBMITTIME', width: 130 },
-                  { header: '订单编号', dataIndex: 'CODE'}];
+                  { header: '受理时间', dataIndex: 'SUBMITTIME', width: 130, locked: true },
+                  { header: '订单编号', dataIndex: 'CODE'},
+                  { header: '委托人员', dataIndex: 'SUBMITUSERNAME', width: 80, locked: true },
+                  { header: '报关申报单位', dataIndex: 'REPUNITNAME', width: 180, locked: true }];
                 break;
             case "11":
                 busitype = "空运进口";
@@ -51,7 +53,10 @@
                     { header: '申报方式', dataIndex: 'REPWAYID', width: 100, renderer: renderOrder },
                     { header: '转关预录号', dataIndex: 'TURNPRENO', width: 130 },//需要确定具体字段
                     { header: '法检', dataIndex: 'LAWFLAG', width: 60, renderer: renderOrder },
-                    { header: '订单编号', dataIndex: 'CODE', width: 100 }];
+                    { header: '受理时间', dataIndex: 'SUBMITTIME', width: 130, locked: true },
+                    { header: '订单编号', dataIndex: 'CODE', width: 100 },
+                    { header: '委托人员', dataIndex: 'SUBMITUSERNAME', width: 80, locked: true },
+                    { header: '报关申报单位', dataIndex: 'REPUNITNAME', width: 180, locked: true }];
                 break;
             case "20":
                 busitype = "海运出口";
@@ -68,8 +73,10 @@
                     { header: '申报方式', dataIndex: 'REPWAYID', width: 100, renderer: renderOrder },
                     { header: '转关预录号', dataIndex: 'TURNPRENO', width: 70 },//需要确定具体字段
                     { header: '法检', dataIndex: 'LAWFLAG', width: 60, renderer: renderOrder },
-                    { header: '委托时间', dataIndex: 'SUBMITTIME', width: 130 },
-                    { header: '订单编号', dataIndex: 'CODE', width: 100}];
+                    { header: '受理时间', dataIndex: 'SUBMITTIME', width: 130, locked: true },
+                    { header: '订单编号', dataIndex: 'CODE', width: 100 },
+                  { header: '委托人员', dataIndex: 'SUBMITUSERNAME', width: 80, locked: true },
+                  { header: '报关申报单位', dataIndex: 'REPUNITNAME', width: 180, locked: true }];
                 break;
             case "21":
                 busitype = "海运进口";
@@ -86,8 +93,10 @@
                     { header: '申报方式', dataIndex: 'REPWAYID', width: 110, renderer: renderOrder },
                     { header: '转关预录号', dataIndex: 'TURNPRENO', width: 130 },
                     { header: '法检', dataIndex: 'LAWFLAG', width: 60, renderer: renderOrder },
-                    { header: '委托时间', dataIndex: 'SUBMITTIME', width: 130 },
-                    { header: '订单编号', dataIndex: 'CODE', width: 100 }];
+                    { header: '受理时间', dataIndex: 'SUBMITTIME', width: 130,locked: true},
+                    { header: '订单编号', dataIndex: 'CODE', width: 100 },
+                  { header: '委托人员', dataIndex: 'SUBMITUSERNAME', width: 80, locked: true },
+                  { header: '报关申报单位', dataIndex: 'REPUNITNAME', width: 180, locked: true }];
                 break;
             case "30":
                 busitype = "陆运出口";
@@ -105,8 +114,10 @@
                     { header: '运抵编号', dataIndex: 'ARRIVEDNO', width: 130 },//需要确定具体字段
                     { header: '转关预录号', dataIndex: 'TURNPRENO', width: 130 },//需要确定具体字段
                     { header: '法检', dataIndex: 'LAWFLAG', width: 60, renderer: renderOrder },
-                    { header: '委托时间', dataIndex: 'SUBMITTIME', width: 130 },
-                    { header: '订单编号', dataIndex: 'CODE', width: 100}];
+                    { header: '受理时间', dataIndex: 'SUBMITTIME', width: 130, locked: true },
+                    { header: '订单编号', dataIndex: 'CODE', width: 100 },
+                  { header: '委托人员', dataIndex: 'SUBMITUSERNAME', width: 80, locked: true },
+                  { header: '报关申报单位', dataIndex: 'REPUNITNAME', width: 180, locked: true }];
                 $("#logistics").hide();
                 break;
             case "31":
@@ -122,8 +133,10 @@
                    { header: '进/出口岸', dataIndex: 'PORTCODE', width: 70 },//需要显示编码
                    { header: '申报方式', dataIndex: 'REPWAYID', width: 100, renderer: renderOrder },
                    { header: '法检', dataIndex: 'LAWFLAG', width: 60, renderer: renderOrder },
-                   { header: '委托时间', dataIndex: 'SUBMITTIME', width: 130 },
-                   { header: '订单编号', dataIndex: 'CODE', width: 100 }];
+                   { header: '受理时间', dataIndex: 'SUBMITTIME', width: 130, locked: true },
+                   { header: '订单编号', dataIndex: 'CODE', width: 100 },
+                  { header: '委托人员', dataIndex: 'SUBMITUSERNAME', width: 80, locked: true },
+                  { header: '报关申报单位', dataIndex: 'REPUNITNAME', width: 180, locked: true }];
                    $("#logistics").hide();
                 break;
             case "40-41":
@@ -139,9 +152,11 @@
                    { header: '法检', dataIndex: 'LAWFLAG', width: 40, renderer: renderOrder },
                    { header: '业务类型', dataIndex: 'BUSITYPE', width: 70, renderer: renderOrder },
                    { header: '两单关联号', dataIndex: 'ASSOCIATENO', width: 120 },
-                   { header: '委托时间', dataIndex: 'SUBMITTIME', width: 130 },
+                   { header: '受理时间', dataIndex: 'SUBMITTIME', width: 130, locked: true },
                    { header: '多单关联号', dataIndex: 'CORRESPONDNO', width: 110 },
-                   { header: '订单编号', dataIndex: 'CODE', width: 100} ];
+                   { header: '订单编号', dataIndex: 'CODE', width: 100 },
+                  { header: '委托人员', dataIndex: 'SUBMITUSERNAME', width: 80, locked: true },
+                  { header: '报关申报单位', dataIndex: 'REPUNITNAME', width: 180, locked: true }];
                 $("#logistics").hide();
                 break;
             case "50-51":
@@ -157,8 +172,10 @@
                     { header: '进/出口岸', dataIndex: 'PORTCODE', width: 70 },
                     { header: '转关预录号', dataIndex: 'TURNPRENO', width: 150 },
                     { header: '法检', dataIndex: 'LAWFLAG', width: 60, renderer: renderOrder },
-                    { header: '委托时间', dataIndex: 'SUBMITTIME', width: 130 },
-                    { header: '订单编号', dataIndex: 'CODE', width: 100 }
+                    { header: '受理时间', dataIndex: 'SUBMITTIME', width: 130, locked: true },
+                    { header: '订单编号', dataIndex: 'CODE', width: 100 },
+                  { header: '委托人员', dataIndex: 'SUBMITUSERNAME', width: 80, locked: true },
+                  { header: '报关申报单位', dataIndex: 'REPUNITNAME', width: 180, locked: true }
                 ];
                 $("#logistics").hide();
                 break;
@@ -167,7 +184,7 @@
         var model_fields = ['ID', 'ENTRUSTTYPE', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE', 'TURNPRENO', 'SUBMITTIME',
                             'BUSIUNITNAME', 'BUSIUNITCODE', 'CONTRACTNO', 'TOTALNO', 'DIVIDENO', 'REPWAYID', 'GOODSNUM',
                             'GOODSGW', 'CUSTOMAREACODE', 'LAWFLAG', 'ISINVALID', 'BUSITYPE', 'PRINTSTATUS', 'STATUS', 'REPNO', 'ASSOCIATENO',
-                           'CORRESPONDNO', 'FIRSTLADINGBILLNO', 'SECONDLADINGBILLNO', 'ARRIVEDNO'];
+                           'CORRESPONDNO', 'FIRSTLADINGBILLNO', 'SECONDLADINGBILLNO', 'ARRIVEDNO', 'SUBMITUSERNAME', 'REPUNITNAME'];
         Ext.define('ORDERLIST', {
             extend: 'Ext.data.Model',
             fields: model_fields
@@ -212,7 +229,9 @@
                                     CONDITION1: Ext.getCmp('CONDITION1').getValue(), VALUE1: Ext.getCmp("CONDITION1_1").getValue(),
                                     CONDITION2: Ext.getCmp('CONDITION2').getValue(), VALUE2: Ext.getCmp("CONDITION2_1").getValue(),
                                     CONDITION3: Ext.getCmp('CONDITION3').getValue(), VALUE3: Ext.getCmp("CONDITION3_1").getValue(),
-                                    CONDITION4: Ext.getCmp('CONDITION4').getValue(), VALUE4: Ext.getCmp("CONDITION4_1").getValue()
+                                    CONDITION4: Ext.getCmp('CONDITION4').getValue(), VALUE4: Ext.getCmp("CONDITION4_1").getValue(),
+                                    STARTDATE: Ext.Date.format(Ext.getCmp("start_date").getValue(), 'Y-m-d H:i:s'),
+                                    ENDDATE: Ext.Date.format(Ext.getCmp("end_date").getValue(), 'Y-m-d H:i:s'),
                                     
                             }
                         }

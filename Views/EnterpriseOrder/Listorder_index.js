@@ -52,13 +52,13 @@
         valueField: "CODE",
         editable: false,
         queryMode: 'local',
-        flex: .35,
+        flex: .40,
         margin: 0,
     });
     var field_2_1 = Ext.create('Ext.form.field.Text', {
         id: 'CONDITION2_1',
         margin: 0,
-        flex: .65
+        flex: .60
     })
     var condition2 = {
         xtype: 'fieldcontainer',
@@ -68,7 +68,7 @@
 
     var store_3 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: [{ "NAME": "对应号", "CODE": "REPNO" }, { "NAME": "分单号", "CODE": "DIVIDENO" }, { "NAME": "载货清单号", "CODE": "MANIFEST" }, { "NAME": "海关提运单号", "CODE": "SECONDLADINGBILLNO" }]
+        data: [{ "NAME": "对应号", "CODE": "REPNO" }, { "NAME": "分单号", "CODE": "DIVIDENO" }, { "NAME": "载货清单号", "CODE": "MANIFEST" }, { "NAME": "海关提单号", "CODE": "SECONDLADINGBILLNO" }]
     });
     var combo_3 = Ext.create('Ext.form.field.ComboBox', {
         id: 'CONDITION3',
@@ -79,13 +79,13 @@
         valueField: "CODE",
         editable: false,
         queryMode: 'local',
-        flex: .35,
+        flex: .40,
         margin: 0,
     });
     var field_3_1 = Ext.create('Ext.form.field.Text', {
         id: 'CONDITION3_1',
         margin: 0,
-        flex: .65
+        flex: .60
     })
     var condition3 = {
         xtype: 'fieldcontainer',
@@ -151,6 +151,27 @@
         items: [combo_4, combo_4_1]
     }
    
+    var start_date = Ext.create('Ext.form.field.Date', {
+        id: 'start_date',
+        format: 'Y-m-d',
+        name: 'start_date',
+        flex: .5, margin: 0
+    })
+    var end_date = Ext.create('Ext.form.field.Date', {
+        id: 'end_date',
+        format: 'Y-m-d',
+        name: 'end_date',
+        flex: .5, margin: 0
+    })
+    //创建时间
+    var condition5 = Ext.create('Ext.form.FieldContainer', {
+        fieldLabel: '受理日期',
+        labelWidth: 60,
+        layout: 'hbox',
+        columnWidth: .24,
+        items: [start_date, end_date],
+        //flex: .33
+    })
 
 
 
@@ -163,10 +184,10 @@
         renderTo: 'div_form',
         fieldDefaults: {
             margin: '5',
-            columnWidth: 0.25
+            columnWidth: 0.19
         },
         items: [
-        { layout: 'column', border: 0, items: [condition1,condition2, condition3,condition4] },
+        { layout: 'column', border: 0, items: [condition1, condition2, condition3, condition4,condition5] },
         ]
     });
 
@@ -182,4 +203,7 @@ function Reset() {
     Ext.getCmp("CONDITION3_1").setValue("");
     Ext.getCmp("CONDITION4").setValue("CUSTOMAREACODE");
     Ext.getCmp("CONDITION4_1").setValue("");
+    Ext.getCmp("start_date").setValue("");
+    Ext.getCmp("end_date").setValue("");
+
 }
