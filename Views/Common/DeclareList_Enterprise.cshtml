@@ -9,7 +9,7 @@
 
 <script src="/js/pan.js" type="text/javascript"></script>
 <script src="/js/commondata.js"></script>
-<script src="/js/DeclareList_Enterprise.js" type="text/javascript"></script>
+<script src="~/Views/Common/DeclareList_Enterprise.js"></script>
 
 <script type="text/javascript">
     //传参示例 /Common/DeclareList?busitypeid=11&module=ddzx&role=customer
@@ -41,8 +41,8 @@
                     data: common_data_busitype
                 });
                 var store = Ext.create('Ext.data.JsonStore', {
-                    fields: ['ID', 'PREDECLCODE', 'DECLARATIONCODE', 'CUSTOMSSTATUS', 'ISPRINT', 'CODE', 'REPFINISHTIME', 'TRANSNAME', 'BUSIUNITCODE', 'CUSTOMERNAME', 'IETYPE',
-                             'BUSIUNITNAME', 'PORTCODE', 'BLNO', 'REPWAYID', 'REPWAYNAME', 'DECLWAY', 'DECLWAYNAME', 'TRADEWAYCODES', 'CONTRACTNO', 'GOODSNUM',
+                    fields: ['ID', 'PREDECLCODE', 'DECLARATIONCODE', 'CUSTOMSSTATUS','CODE', 'REPTIME', 'TRANSNAME', 'BUSIUNITCODE', 'CUSTOMERNAME', 'IETYPE',
+                             'BUSIUNITNAME', 'PORTCODE', 'BLNO', 'REPWAYID', 'REPWAYNAME', 'DECLWAY', 'DECLWAYNAME', 'TRADEMETHOD', 'CONTRACTNO', 'GOODSNUM',
                              'GOODSNW', 'SHEETNUM', 'ORDERCODE', 'CUSNO', 'ASSOCIATENO', 'CORRESPONDNO', 'BUSITYPE', 'CONTRACTNOORDER', 'REPUNITNAME'],
                     pageSize: 22,
                     proxy: {
@@ -94,15 +94,14 @@
                     { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 140, locked: true, renderer: render },
                     { header: '申报单位', dataIndex: 'REPUNITNAME', width: 200 },
                     { header: '合同发票号', dataIndex: 'CONTRACTNOORDER', width: 140, locked: true, },
-                    //{ header: '打印标志', dataIndex: 'ISPRINT', width: 70, renderer: render },
-                    { header: '申报完成时间', dataIndex: 'REPFINISHTIME', width: 140 },
+                    { header: '申报日期', dataIndex: 'REPTIME', width: 140 },
                     { header: '运输工具名称', dataIndex: 'TRANSNAME', width: 150, renderer: render },
                     { header: '业务类型', dataIndex: 'BUSITYPE', width: 90, renderer: render },// 业务类型
                     { header: '进出口岸', dataIndex: 'PORTCODE', width: 80 },
                     { header: '提运单号', dataIndex: 'BLNO', width: 180 },
                     { header: '申报方式', dataIndex: 'REPWAYNAME', width: 100, renderer: render },
                     { header: '报关方式', dataIndex: 'DECLWAYNAME', width: 100, renderer: render },
-                    { header: '贸易方式', dataIndex: 'TRADEWAYCODES', width: 80 },
+                    { header: '贸易方式', dataIndex: 'TRADEMETHOD', width: 80 },
                     { header: '合同协议号', dataIndex: 'CONTRACTNO', width: 110 },
                     { header: '件数', dataIndex: 'GOODSNUM', width: 60 },
                     { header: '重量', dataIndex: 'GOODSNW', width: 60 },
@@ -124,9 +123,6 @@
     function render(value, cellmeta, record, rowIndex, columnIndex, store) {
         var rtn = "";
         var dataindex = cellmeta.column.dataIndex;
-        //if (dataindex == "CUSTOMSSTATUS" && value) {
-        //    rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='showcustoms_receipt(\"" + record.get("CODE") + "\")'>" + value + "</div>";
-        //}
         if (dataindex == "DECLARATIONCODE" && value) {
             rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='FileConsult(\"" + record.get("ORDERCODE") + "\",\"" + escape(record.get("BUSITYPE")) + "\",\"" + record.get("CODE") + "\")'>" + value + "</div>";
         }
@@ -179,52 +175,7 @@
     function FileConsult(ORDERCODE, BUSITYPE, PREDECLCODE) {
         opencenterwin("/Common/FileConsult_E?source=declare&ORDERCODE=" + ORDERCODE + "&BUSITYPE=" + BUSITYPE + "&PREDECLCODE=" + PREDECLCODE, 1200, 900);
     }
-
-    function ClickShowwinwj() {   //打开调阅信息
-        var recs = Ext.getCmp("declare_grid").getSelectionModel().getSelection();
-        if (recs.length == 0) {
-            Ext.MessageBox.alert('提示', '请选择需要调阅的记录！');
-            return;
-        }
-        opencenterwin("/Common/FileConsult_E?source=declare&ORDERCODE=" + recs[0].get("ORDERCODE") + "&BUSITYPE=" + recs[0].get("BUSITYPE") + "&PREDECLCODE=" + recs[0].get("CODE"), 1200, 900);
-    }
-
-    ////显示海关状态回执记录
-    //function showcustoms_receipt(code_bgd) {
-    //    var store_customs = Ext.create('Ext.data.JsonStore', {
-    //        fields: ['TIMES', 'DECLSTATUS'],
-    //        proxy: {
-    //            type: 'ajax',
-    //            url: '/Common/LoadCustomsReceipt?bgdcode=' + code_bgd,
-    //            reader: {
-    //                root: 'rows',
-    //                type: 'json'
-    //            }
-    //        },
-    //        autoLoad: true
-    //    })
-    //    var grid_customs = Ext.create('Ext.grid.Panel', {
-    //        title: '海关状态回执',
-    //        store: store_customs,
-    //        height: 100,
-    //        columns: [
-    //            { xtype: 'rownumberer', width: 35 },
-    //            { header: '时间', dataIndex: 'TIMES', width: 130 },
-    //            { header: '海关状态', dataIndex: 'DECLSTATUS', flex: 1 }
-    //        ]
-    //    })
-    //    var win_customs_status = Ext.create("Ext.window.Window", {
-    //        title: "",
-    //        width: 400,
-    //        height: 400,
-    //        layout: "fit",
-    //        modal: true,
-    //        items: [grid_customs]
-    //    });
-    //    win_customs_status.show();
-    //}
-
-
+        
     function ExportDecl() {
         var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "数据导出中，请稍等..." });
         myMask.show();
@@ -274,7 +225,7 @@
     <div id="div_form" style="width:100%;"></div>
     <div>
         <div class="btn-group" role="group">
-           
+
         </div>
         <div class="btn-group fr" role="group">
             <button onclick="Select()" class="btn btn-primary btn-sm"><i class="fa fa-search"></i>&nbsp;查询</button>
