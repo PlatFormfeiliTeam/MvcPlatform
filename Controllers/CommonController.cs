@@ -1054,7 +1054,7 @@ namespace MvcPlatform.Controllers
                 switch (Request["CONDITION1"])
                 {
                     case "BUSIUNITCODE"://经营单位
-                        where += " and lda.busiunitcode='" + Request["VALUE1"] + "' ";
+                        where += " and ort.BUSIUNITCODE='" + Request["VALUE1"] + "' ";
                         break;
                 }
             }
@@ -1066,7 +1066,7 @@ namespace MvcPlatform.Controllers
                         where += " and instr(ort.CUSNO,'" + Request["VALUE2"] + "')>0 ";
                         break;
                     case "BLNO"://提运单号
-                        where += " and instr(lda.blno,'" + Request["VALUE2"] + "')>0 ";
+                        where += " and instr(det.BLNO,'" + Request["VALUE2"] + "')>0 ";
                         break;
                     case "ORDERCODE"://订单编号
                         where += " and instr(det.ORDERCODE,'" + Request["VALUE2"] + "')>0 ";
@@ -1075,13 +1075,13 @@ namespace MvcPlatform.Controllers
                         where += " and instr(ort.DECLCARNO,'" + Request["VALUE2"] + "')>0 ";
                         break;
                     case "TRANSNAME"://运输工具名称
-                        where += " and (instr(lda.transname,'" + Request["VALUE2"] + "')>0 or instr(lda.voyageno,'" + Request["VALUE2"] + "')>0) ";
+                        where += " and instr(det.TRANSNAME,'" + Request["VALUE2"] + "')>0 ";
                         break;
                     case "DECLNO"://报关单号
-                        where += " and instr(lda.declarationcode,'" + Request["VALUE2"] + "')>0 ";
+                        where += " and instr(det.DECLARATIONCODE,'" + Request["VALUE2"] + "')>0 ";
                         break;
                     case "CONTRACTNO"://合同协议号
-                        where += " and instr(lda.contractno,'" + Request["VALUE2"] + "')>0 ";
+                        where += " and instr(det.CONTRACTNO,'" + Request["VALUE2"] + "')>0 ";
                         break;
                     case "CONTRACTNOORDER"://合同发票号
                         where += " and instr(ort.CONTRACTNO,'" + Request["VALUE2"] + "')>0 ";
@@ -1113,14 +1113,14 @@ namespace MvcPlatform.Controllers
                         where += " and ort.SUBMITTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
                     }
                     break;
-                case "REPTIME"://申报时间
+                case "REPTIME"://申报完成时间
                     if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
                     {
-                        where += " and lda.reptime>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                        where += " and det.REPENDTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
                     }
                     if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
                     {
-                        where += " and lda.reptime<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                        where += " and det.REPENDTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
                     }
                     break;
             }
@@ -1132,30 +1132,42 @@ namespace MvcPlatform.Controllers
             {
                 where += @" and ort.customercode ='" + json_user.Value<string>("CUSTOMERCODE") + "' ";
             }
-            string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.ISPRINT,det.SHEETNUM,
-                              lda.transname,lda.voyageno,lda.busiunitcode,lda.busiunitname,lda.portcode,
-                              lda.trademethod,lda.declkind DECLWAY,lda.declkind DECLWAYNAME,  
-                              ort.BUSITYPE,ort.CONTRACTNO CONTRACTNOORDER,ort.REPWAYID,ort.REPWAYID REPWAYNAME,ort.CUSNO,
-                              ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.customercode,ort.CUSTOMERNAME,ort.CREATETIME, 
-                              cus.SCENEDECLAREID                                                             
-                        from list_declaration det     
-                            left join list_order ort on det.ordercode = ort.code 
-                            left join cusdoc.sys_customer cus on ort.customercode = cus.code 
-                            left join list_declaration_after lda on det.code=lda.code and lda.dataconfirm=2
-                            left join (select ordercode from list_declaration ld where ld.isinvalid=0 and ld.STATUS!=130 and ld.STATUS!=110) a on det.ordercode=a.ordercode
-                            left join (
-                                  select ASSOCIATENO from list_order l inner join list_declaration i on l.code=i.ordercode 
-                                  where l.ASSOCIATENO is not null and l.isinvalid=0 and i.isinvalid=0 and (i.STATUS!=130 and i.STATUS!=110)          
-                                  ) b on ort.ASSOCIATENO=b.ASSOCIATENO     
-                        where (det.STATUS=130 or det.STATUS=110) and det.isinvalid=0 and ort.isinvalid=0 
-                               and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where +
-                            @" and a.ordercode is null 
-                               and b.ASSOCIATENO is null";
+
+            string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
+                           det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
+                           det.TRANSNAME,det.VOYAGENO,det.ISPRINT,
+                           det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
+                           ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
+                           ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE, 
+                           cus.SCENEDECLAREID,ort.CONTRACTNO CONTRACTNOORDER ,ort.CREATETIME                                                                      
+                           from list_declaration det 
+                                left join list_order ort on det.ordercode = ort.code 
+                                left join cusdoc.sys_customer cus on ort.customercode = cus.code 
+                                left join (
+                                      select ASSOCIATENO from list_order l inner join list_declaration i on l.code=i.ordercode 
+                                      where l.ASSOCIATENO is not null and l.isinvalid=0 and i.isinvalid=0 and (i.STATUS!=130 and i.STATUS!=110)          
+                                      ) a on ort.ASSOCIATENO=a.ASSOCIATENO 
+                                left join (select ordercode from list_declaration ld where ld.isinvalid=0 and ld.STATUS!=130 and ld.STATUS!=110) b on det.ordercode=b.ordercode
+                           where (det.STATUS=130 or det.STATUS=110) and det.isinvalid=0 and ort.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where
+                      + " and a.ASSOCIATENO is null and b.ordercode is  null ";
 
             return sql;
 
         }
 
+        /*通过查询条件获取具体的报关单海关状态数据 list_receiptstatus 这个表是预制报关单海关状态回执表
+         目前有两个地方在抓取 我显示时按照时间进行升序，如果有重复的状态名称,取时间早的那个时间值
+         by panhuaguo 2016-6-3*/
+        public string LoadCustomsReceipt()
+        {
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            string sql = @"select * from (select l.DECLSTATUS,min(l.TIMES) TIMES from list_receiptstatus l where l.DECLSTATUS is not null and 
+                         l.code = '" + Request["bgdcode"] + "' group by l.DECLSTATUS) a order by a.times asc ";
+            DataTable dt = DBMgr.GetDataTable(sql);
+            string json = JsonConvert.SerializeObject(dt, iso);
+            return "{rows:" + json + "}";
+        }
 
         #region FileConsult 文件调阅 测试单号：16063955942
 
@@ -2908,7 +2920,7 @@ namespace MvcPlatform.Controllers
             //给sheet1添加第一行的头部标题
             NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
             row1.CreateCell(0).SetCellValue("海关状态"); row1.CreateCell(1).SetCellValue("合同发票号"); row1.CreateCell(2).SetCellValue("报关单号"); row1.CreateCell(3).SetCellValue("委托单位");
-            row1.CreateCell(4).SetCellValue("申报日期"); row1.CreateCell(5).SetCellValue("进/出"); row1.CreateCell(6).SetCellValue("对应号"); row1.CreateCell(7).SetCellValue("运输工具名称");
+            row1.CreateCell(4).SetCellValue("申报完成时间"); row1.CreateCell(5).SetCellValue("进/出"); row1.CreateCell(6).SetCellValue("对应号"); row1.CreateCell(7).SetCellValue("运输工具名称");
             row1.CreateCell(8).SetCellValue("业务类型"); row1.CreateCell(9).SetCellValue("出口口岸"); row1.CreateCell(10).SetCellValue("提运单号"); row1.CreateCell(11).SetCellValue("申报方式");
             row1.CreateCell(12).SetCellValue("报关方式"); row1.CreateCell(13).SetCellValue("贸易方式"); row1.CreateCell(14).SetCellValue("合同协议号"); row1.CreateCell(15).SetCellValue("件数");
             row1.CreateCell(16).SetCellValue("重量"); row1.CreateCell(17).SetCellValue("张数"); row1.CreateCell(18).SetCellValue("多单关联号"); row1.CreateCell(19).SetCellValue("订单编号");
@@ -2924,7 +2936,7 @@ namespace MvcPlatform.Controllers
                 rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["CONTRACTNOORDER"].ToString());
                 rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["DECLARATIONCODE"].ToString());
                 rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CUSTOMERNAME"].ToString());
-                rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["REPTIME"].ToString());
+                rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["REPFINISHTIME"].ToString());
                 rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["IETYPE"].ToString());
                 rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["ASSOCIATENO"].ToString());
                 if (dt.Rows[i]["TRANSNAME"].ToString() == "" && dt.Rows[i]["VOYAGENO"].ToString() == "")
@@ -2953,7 +2965,7 @@ namespace MvcPlatform.Controllers
                 rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["BLNO"].ToString());//REPWAYID
                 rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());
                 rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["DECLWAYNAME"].ToString());
-                rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["TRADEMETHOD"].ToString());
+                rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["TRADEWAYCODES"].ToString());
                 rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
                 rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
                 rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
@@ -2996,10 +3008,10 @@ namespace MvcPlatform.Controllers
                 switch (Request["CONDITION1"])
                 {
                     case "REPUNITCODE"://申报单位
-                        where += " and lda.REPUNITCODE='" + Request["VALUE1"] + "' ";
+                        where += " and ort.REPUNITCODE='" + Request["VALUE1"] + "' ";
                         break;
                     case "PORTCODE"://进出口岸
-                        where += " and lda.PORTCODE='" + Request["VALUE1"] + "' ";
+                        where += " and ort.PORTCODE='" + Request["VALUE1"] + "' ";
                         break;
                 }
             }
@@ -3008,10 +3020,10 @@ namespace MvcPlatform.Controllers
                 switch (Request["CONDITION5"])
                 {
                     case "REPUNITCODE"://申报单位
-                        where += " and lda.REPUNITCODE='" + Request["VALUE5"] + "' ";
+                        where += " and ort.REPUNITCODE='" + Request["VALUE5"] + "' ";
                         break;
                     case "PORTCODE"://进出口岸
-                        where += " and lda.PORTCODE='" + Request["VALUE5"] + "' ";
+                        where += " and ort.PORTCODE='" + Request["VALUE5"] + "' ";
                         break;
                 }
             }
@@ -3023,7 +3035,7 @@ namespace MvcPlatform.Controllers
                         where += " and instr(ort.REPNO,'" + Request["VALUE2"] + "')>0 ";
                         break;
                     case "BLNO"://提运单号
-                        where += " and instr(lda.BLNO,'" + Request["VALUE2"] + "')>0 ";
+                        where += " and instr(det.BLNO,'" + Request["VALUE2"] + "')>0 ";
                         break;
                     case "ORDERCODE"://订单编号
                         where += " and instr(det.ORDERCODE,'" + Request["VALUE2"] + "')>0 ";
@@ -3032,13 +3044,13 @@ namespace MvcPlatform.Controllers
                         where += " and instr(ort.DECLCARNO,'" + Request["VALUE2"] + "')>0 ";
                         break;
                     case "TRANSNAME"://运输工具名称
-                        where += " and (instr(lda.transname,'" + Request["VALUE2"] + "')>0 or instr(lda.voyageno,'" + Request["VALUE2"] + "')>0) ";
+                        where += " and instr(det.TRANSNAME,'" + Request["VALUE2"] + "')>0 ";
                         break;
                     case "DECLNO"://报关单号
-                        where += " and instr(lda.declarationcode,'" + Request["VALUE2"] + "')>0 ";
+                        where += " and instr(det.DECLARATIONCODE,'" + Request["VALUE2"] + "')>0 ";
                         break;
                     case "CONTRACTNO"://合同协议号
-                        where += " and instr(lda.contractno,'" + Request["VALUE2"] + "')>0 ";
+                        where += " and instr(det.CONTRACTNO,'" + Request["VALUE2"] + "')>0 ";
                         break;
                     case "CONTRACTNOORDER"://合同发票号
                         where += " and instr(ort.CONTRACTNO,'" + Request["VALUE2"] + "')>0 ";
@@ -3053,7 +3065,7 @@ namespace MvcPlatform.Controllers
                         where += " and instr(ort.REPNO,'" + Request["VALUE6"] + "')>0 ";
                         break;
                     case "BLNO"://提运单号
-                        where += " and instr(lda.BLNO,'" + Request["VALUE6"] + "')>0 ";
+                        where += " and instr(det.BLNO,'" + Request["VALUE6"] + "')>0 ";
                         break;
                     case "ORDERCODE"://订单编号
                         where += " and instr(det.ORDERCODE,'" + Request["VALUE6"] + "')>0 ";
@@ -3062,16 +3074,16 @@ namespace MvcPlatform.Controllers
                         where += " and instr(ort.DECLCARNO,'" + Request["VALUE6"] + "')>0 ";
                         break;
                     case "TRANSNAME"://运输工具名称
-                        where += " and (instr(lda.transname,'" + Request["VALUE2"] + "')>0 or instr(lda.voyageno,'" + Request["VALUE2"] + "')>0) ";
+                        where += " and instr(det.TRANSNAME,'" + Request["VALUE6"] + "')>0 ";
                         break;
                     case "DECLNO"://报关单号
-                        where += " and instr(lda.declarationcode,'" + Request["VALUE2"] + "')>0 ";
+                        where += " and instr(det.DECLARATIONCODE,'" + Request["VALUE6"] + "')>0 ";
                         break;
                     case "CONTRACTNO"://合同协议号
-                        where += " and instr(lda.contractno,'" + Request["VALUE2"] + "')>0 ";
+                        where += " and instr(det.CONTRACTNO,'" + Request["VALUE6"] + "')>0 ";
                         break;
                     case "CONTRACTNOORDER"://合同发票号
-                        where += " and instr(ort.CONTRACTNO,'" + Request["VALUE2"] + "')>0 ";
+                        where += " and instr(ort.CONTRACTNO,'" + Request["VALUE6"] + "')>0 ";
                         break;
                 }
             }
@@ -3113,14 +3125,14 @@ namespace MvcPlatform.Controllers
                         where += " and ort.SUBMITTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
                     }
                     break;
-                case "REPTIME"://申报日期
+                case "REPTIME"://申报完成时间
                     if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
                     {
-                        where += " and lda.REPTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
+                        where += " and det.REPENDTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
                     }
                     if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
                     {
-                        where += " and lda.REPTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
+                        where += " and det.REPENDTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
                     }
                     break;
             }
@@ -3136,36 +3148,36 @@ namespace MvcPlatform.Controllers
                         where += " and ort.SUBMITTIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
                     }
                     break;
-                case "REPTIME"://申报日期
+                case "REPTIME"://申报完成时间
                     if (!string.IsNullOrEmpty(Request["VALUE8_1"]))//如果开始时间有值
                     {
-                        where += " and lda.REPTIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
+                        where += " and det.REPENDTIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
                     }
                     if (!string.IsNullOrEmpty(Request["VALUE8_2"]))//如果结束时间有值
                     {
-                        where += " and lda.REPTIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
+                        where += " and det.REPENDTIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
                     }
                     break;
             }
             where += @" and ort.BUSIUNITCODE ='" + json_user.Value<string>("CUSTOMERHSCODE") + "' ";
 
-            string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.SHEETNUM,
-                              lda.transname,lda.voyageno,lda.busiunitcode,lda.busiunitname,lda.portcode,
-                              lda.trademethod,lda.declkind DECLWAY,lda.declkind DECLWAYNAME,lda.REPUNITNAME,
-                              ort.BUSITYPE,ort.CONTRACTNO CONTRACTNOORDER,ort.REPWAYID,ort.REPWAYID REPWAYNAME,ort.CUSNO,
-                              ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.customercode,ort.CUSTOMERNAME,ort.CREATETIME, 
-                              ort.REPNO    
+            string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
+                           det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
+                           det.TRANSNAME,det.VOYAGENO,det.ISPRINT,
+                           det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
+                           ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
+                           ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE, 
+                           cus.SCENEDECLAREID,ort.CONTRACTNO CONTRACTNOORDER ,ort.CREATETIME,ort.REPUNITNAME,ort.REPNO                                                                      
                            from list_declaration det 
                                 left join list_order ort on det.ordercode = ort.code 
-                                left join list_declaration_after lda on det.code=lda.code and lda.dataconfirm=2
-                                left join (select ordercode from list_declaration ld where ld.isinvalid=0 and ld.STATUS!=130 and ld.STATUS!=110) a on det.ordercode=a.ordercode
+                                left join cusdoc.sys_customer cus on ort.customercode = cus.code 
                                 left join (
                                       select ASSOCIATENO from list_order l inner join list_declaration i on l.code=i.ordercode 
                                       where l.ASSOCIATENO is not null and l.isinvalid=0 and i.isinvalid=0 and (i.STATUS!=130 and i.STATUS!=110)          
-                                      ) b on ort.ASSOCIATENO=b.ASSOCIATENO 
-                           where (det.STATUS=130 or det.STATUS=110) and det.isinvalid=0 and ort.isinvalid=0 " + where +
-                         @"  and a.ordercode is null 
-                             and b.ASSOCIATENO is null ";
+                                      ) a on ort.ASSOCIATENO=a.ASSOCIATENO 
+                                left join (select ordercode from list_declaration ld where ld.isinvalid=0 and ld.STATUS!=130 and ld.STATUS!=110) b on det.ordercode=b.ordercode
+                           where (det.STATUS=130 or det.STATUS=110) and det.isinvalid=0 and ort.isinvalid=0 " + where
+                     + " and a.ASSOCIATENO is null and b.ordercode is  null ";
             return sql;
 
         }
@@ -3197,7 +3209,7 @@ namespace MvcPlatform.Controllers
             //给sheet1添加第一行的头部标题
             NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
             row1.CreateCell(0).SetCellValue("海关状态"); row1.CreateCell(1).SetCellValue("报关单号"); row1.CreateCell(2).SetCellValue("合同发票号"); row1.CreateCell(3).SetCellValue("申报单位");
-            row1.CreateCell(4).SetCellValue("申报日期"); row1.CreateCell(5).SetCellValue("运输工具名称"); row1.CreateCell(6).SetCellValue("业务类型"); row1.CreateCell(7).SetCellValue("出口口岸");
+            row1.CreateCell(4).SetCellValue("申报完成时间"); row1.CreateCell(5).SetCellValue("运输工具名称"); row1.CreateCell(6).SetCellValue("业务类型"); row1.CreateCell(7).SetCellValue("出口口岸");
             row1.CreateCell(8).SetCellValue("提运单号"); row1.CreateCell(9).SetCellValue("申报方式"); row1.CreateCell(10).SetCellValue("报关方式"); row1.CreateCell(11).SetCellValue("贸易方式");
             row1.CreateCell(12).SetCellValue("合同协议号"); row1.CreateCell(13).SetCellValue("件数"); row1.CreateCell(14).SetCellValue("重量"); row1.CreateCell(15).SetCellValue("张数");
             row1.CreateCell(16).SetCellValue("订单编号"); row1.CreateCell(17).SetCellValue("客户编号"); row1.CreateCell(18).SetCellValue("进/出"); row1.CreateCell(19).SetCellValue("两单关联号");
@@ -3213,7 +3225,7 @@ namespace MvcPlatform.Controllers
                 rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["DECLARATIONCODE"].ToString());
                 rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["CONTRACTNOORDER"].ToString());
                 rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["REPUNITNAME"].ToString());
-                rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["REPTIME"].ToString());
+                rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["REPFINISHTIME"].ToString());
                 if (dt.Rows[i]["TRANSNAME"].ToString() == "" && dt.Rows[i]["VOYAGENO"].ToString() == "")
                 {
                     rowtemp.CreateCell(5).SetCellValue("");
@@ -3239,7 +3251,7 @@ namespace MvcPlatform.Controllers
                 rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["BLNO"].ToString());
                 rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());
                 rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["DECLWAYNAME"].ToString());//REPWAYID
-                rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["TRADEMETHOD"].ToString());
+                rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["TRADEWAYCODES"].ToString());
                 rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
                 rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
                 rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
