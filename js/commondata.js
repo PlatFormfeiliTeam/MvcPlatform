@@ -16,7 +16,7 @@ var common_data_busitype = [
     { "CODE": "50", "NAME": "特殊区域出口", "CODENAME": "特殊区域出口(50)" }, { "CODE": "51", "NAME": "特殊区域进口", "CODENAME": "特殊区域进口(51)" }];
 
 //报关单管理 查询区域 查询条件4 /Common/condition4
-var declarationsearch_js_condition4_data = [{ "NAME": "订单委托日期", "CODE": "SUBMITTIME" }, { "NAME": "申报完成", "CODE": "REPTIME" }];
+var declarationsearch_js_condition4_data = [{ "NAME": "订单委托日期", "CODE": "SUBMITTIME" }, { "NAME": "申报日期", "CODE": "REPTIME" }];
 
 //查询区域 查询条件1 /Common/loadcondition1
 var search_js_condition1_data = [{ "NAME": "经营单位", "CODE": "BUSIUNITCODE" }, { "NAME": "申报关区", "CODE": "CUSTOMDISTRICTCODE" }, { "NAME": "进口口岸", "CODE": "PORTCODE" }, { "NAME": "申报方式", "CODE": "REPWAYID" }];
