@@ -1133,6 +1133,7 @@ namespace MvcPlatform.Controllers
                 where += @" and ort.customercode ='" + json_user.Value<string>("CUSTOMERCODE") + "' ";
             }
             string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.ISPRINT,det.SHEETNUM,
+                              lda.declarationcode,to_char(lda.reptime,'yyyy-mm-dd') reptime,lda.contractno,lda.goodsnum,lda.goodsnw,lda.blno,
                               lda.transname,lda.voyageno,lda.busiunitcode,lda.busiunitname,lda.portcode,
                               lda.trademethod,lda.declkind DECLWAY,lda.declkind DECLWAYNAME,  
                               ort.BUSITYPE,ort.CONTRACTNO CONTRACTNOORDER,ort.REPWAYID,ort.REPWAYID REPWAYNAME,ort.CUSNO,
@@ -3150,6 +3151,7 @@ namespace MvcPlatform.Controllers
             where += @" and ort.BUSIUNITCODE ='" + json_user.Value<string>("CUSTOMERHSCODE") + "' ";
 
             string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.SHEETNUM,
+                              lda.declarationcode,to_char(lda.reptime,'yyyy-mm-dd') reptime,lda.contractno,lda.goodsnum,lda.goodsnw,lda.blno,
                               lda.transname,lda.voyageno,lda.busiunitcode,lda.busiunitname,lda.portcode,
                               lda.trademethod,lda.declkind DECLWAY,lda.declkind DECLWAYNAME,lda.REPUNITNAME,
                               ort.BUSITYPE,ort.CONTRACTNO CONTRACTNOORDER,ort.REPWAYID,ort.REPWAYID REPWAYNAME,ort.CUSNO,
