@@ -1,4 +1,57 @@
-﻿function initSearch() {
+﻿
+var common_data_recordid = [], common_data_unit = [];
+var store_unit, store_optionstatus, store_status;//中文所需
+var gridpanel_lj, gridpanel_cp, gridpanel_lj_Go, gridpanel_cp_Go;
+
+Ext.onReady(function () {
+    Ext.Ajax.request({
+        url: "/Common/Ini_Base_Data",
+        params: { ParaType: 'recordinfo' },
+        success: function (response, opts) {
+            var commondata = Ext.decode(response.responseText);
+            common_data_recordid = commondata.recordid;//账册号
+            common_data_unit = commondata.unit;//单位
+
+            store_unit = Ext.create('Ext.data.JsonStore', {
+                fields: ['CODE', 'NAME'],
+                data: common_data_unit
+            });
+
+            store_optionstatus = Ext.create('Ext.data.JsonStore', {
+                fields: ['CODE', 'NAME'],
+                data: optionstatus_js_data
+            });
+
+            store_status = Ext.create('Ext.data.JsonStore', {
+                fields: ['CODE', 'NAME'],
+                data: status_js_data
+            });
+
+            initSearch();
+            itemsbind();
+
+            var items = [{ title: '料件', id: "tab_0", items: [gridpanel_lj] }, { title: '成品', id: "tab_1", items: [gridpanel_cp] },
+                { title: '料件_申请', id: "tab_2", items: [gridpanel_lj_Go] }, { title: '成品_申请', id: "tab_3", items: [gridpanel_cp_Go] }];
+            var tabpanel = Ext.create('Ext.tab.Panel', {
+                id: 'tabpanel',
+                items: items,
+                renderTo: 'appConId',
+                listeners: {
+                    tabchange: function (tabPanel, newCard, oldCard, eOpts) {
+                        if (newCard.id == "tab_2" || newCard.id == "tab_3") {
+                            $("#change_btn").hide(); $("#delete_btn").hide();
+                        } else {
+                            $("#change_btn").show(); $("#delete_btn").show();
+                        }
+                    }
+                }
+            });
+        }
+    });
+});
+
+
+function initSearch() {
     //账册号
     var store_recordid = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],

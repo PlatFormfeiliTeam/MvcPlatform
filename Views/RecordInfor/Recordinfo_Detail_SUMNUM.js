@@ -1,4 +1,32 @@
-﻿function initSearch_Sum() {
+﻿
+
+var common_data_jydw = [], common_data_unit = [];
+var store_unit, store_optionstatus, store_status;//中文所需
+var gridpanel_lj, gridpanel_cp, gridpanel_lj_Go, gridpanel_cp_Go;
+
+Ext.onReady(function () {
+    Ext.Ajax.request({
+        url: "/Common/Ini_Base_Data",
+        params: { ParaType: 'recordinfo' },
+        success: function (response, opts) {
+            var commondata = Ext.decode(response.responseText);
+            common_data_recordid = commondata.recordid;//账册号
+            common_data_unit = commondata.unit;//单位
+
+            store_unit = Ext.create('Ext.data.JsonStore', {
+                fields: ['CODE', 'NAME'],
+                data: common_data_unit
+            });
+
+            initSearch_Sum();
+            itemsbind_Sum();
+        }
+    });
+});
+
+
+
+function initSearch_Sum() {
     //账册号
     var s_store_recordid = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
