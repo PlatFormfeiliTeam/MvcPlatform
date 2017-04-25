@@ -1075,7 +1075,7 @@ namespace MvcPlatform.Controllers
                         where += " and instr(ort.DECLCARNO,'" + Request["VALUE2"] + "')>0 ";
                         break;
                     case "TRANSNAME"://运输工具名称
-                        where += " and instr(det.TRANSNAME,'" + Request["VALUE2"] + "')>0 ";
+                        where += " and (instr(det.TRANSNAME,'" + Request["VALUE2"] + "')>0 or instr(det.VOYAGENO,'" + Request["VALUE2"] + "')>0)";
                         break;
                     case "DECLNO"://报关单号
                         where += " and instr(det.DECLARATIONCODE,'" + Request["VALUE2"] + "')>0 ";
