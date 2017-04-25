@@ -553,15 +553,6 @@ function FileConsult(ORDERCODE, BUSITYPE, PREDECLCODE) {
     opencenterwin("/Common/FileConsult_E?source=declare&ORDERCODE=" + ORDERCODE + "&BUSITYPE=" + BUSITYPE + "&PREDECLCODE=" + PREDECLCODE, 1200, 900);
 }
 
-function ClickShowwinwj() {   //打开调阅信息
-    var recs = Ext.getCmp("declare_grid").getSelectionModel().getSelection();
-    if (recs.length == 0) {
-        Ext.MessageBox.alert('提示', '请选择需要调阅的记录！');
-        return;
-    }
-    opencenterwin("/Common/FileConsult_E?source=declare&ORDERCODE=" + recs[0].get("ORDERCODE") + "&BUSITYPE=" + recs[0].get("BUSITYPE") + "&PREDECLCODE=" + recs[0].get("CODE"), 1200, 900);
-}
-
 function ExportDecl() {
     var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "数据导出中，请稍等..." });
     myMask.show();
