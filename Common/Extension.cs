@@ -226,35 +226,37 @@ namespace MvcPlatform.Common
                         string filetypename = json.Value<string>("FILETYPENAME");
                         string extname = json.Value<string>("ORIGINALNAME").ToString().Substring(json.Value<string>("ORIGINALNAME").ToString().LastIndexOf('.') + 1);
 
-                        try
+                        if (json.Value<string>("ORIGINALNAME").IndexOf(".txt") > 0 || json.Value<string>("ORIGINALNAME").IndexOf(".TXT") > 0)
                         {
-
-                            string[] split = json.Value<string>("NEWNAME").Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries);
-                            string oldName = webFilePath + json.Value<string>("NEWNAME");
-                            string newName = webFilePath+split[0]+"_0."+split[1];
-
-                            FileInfo fi = new FileInfo(oldName);
-                            fi.MoveTo(Path.Combine(newName));
-                            StreamReader sr = new StreamReader(newName, Encoding.GetEncoding("BIG5"));
-                            String line;
-                            FileStream fs = new FileStream(oldName, FileMode.Create);
-                            while ((line = sr.ReadLine()) != null)
+                            try
                             {
-                                byte[] dst = Encoding.UTF8.GetBytes(line);
-                                fs.Write(dst, 0, dst.Length);
-                                fs.WriteByte(13);
-                                fs.WriteByte(10);
+
+                                string[] split = json.Value<string>("NEWNAME").Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries);
+                                string oldName = webFilePath + json.Value<string>("NEWNAME");
+                                string newName = webFilePath + split[0] + "_0." + split[1];
+
+                                FileInfo fi = new FileInfo(oldName);
+                                fi.MoveTo(Path.Combine(newName));
+                                StreamReader sr = new StreamReader(newName, Encoding.GetEncoding("BIG5"));
+                                String line;
+                                FileStream fs = new FileStream(oldName, FileMode.Create);
+                                while ((line = sr.ReadLine()) != null)
+                                {
+                                    byte[] dst = Encoding.UTF8.GetBytes(line);
+                                    fs.Write(dst, 0, dst.Length);
+                                    fs.WriteByte(13);
+                                    fs.WriteByte(10);
+                                }
+                                fs.Flush();
+                                fs.Close();
                             }
-                            fs.Flush();
-                            fs.Close();
-                        }
-                        catch (Exception)
-                        {
-                            
-                            throw;
-                        }
+                            catch (Exception)
+                            {
 
+                                throw;
+                            }
 
+                        }
 
                         sql = @"insert into LIST_ATTACHMENT (id,filename,originalname,filetype,uploadtime,uploaduserid,customercode,entid,
                         sizes,filetypename,filesuffix) values(List_Attachment_Id.Nextval,'{0}','{1}','{2}',sysdate,{3},'{4}','{5}','{6}','{7}','{8}')";
