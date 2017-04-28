@@ -1656,7 +1656,7 @@ namespace MvcPlatform.Controllers
             }
             stamper.Close();
             reader.Close();
-            return "http://192.168.252.8:8012/Declare/" + outname + ".pdf";
+            return "http://" + Request.Url.Authority + "/Declare/" + outname + ".pdf";
         }
 
         public void UpdatePrintInfo(string tablename, string code, string role)
