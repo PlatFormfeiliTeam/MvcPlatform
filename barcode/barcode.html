@@ -49,10 +49,10 @@ font-family: sans-serif;
 				</div> 
 			</td> 
 		</tr> 
-		<tr> 
-			<td id="declcode_td" colspan="2" align="center" style="margin: 2px; font-weight:800; font-size:18px;"> 
+		<!--<tr> 
+			<td id="declcode_td" colspan="2" align="center" style="margin: 2px; font-weight: 800; font-size: 20px; font-family: sans-serif"> 
 			</td> 
-		</tr>  
+		</tr>-->  
 	</table> 
 </div> 
 <script type="text/javascript" src="jquery-1.4.4.min.js"></script>
@@ -65,7 +65,7 @@ font-family: sans-serif;
     jQuery(document).ready(function () {
         $('#declcode_td').text(declcode);
         $(".bcTarget").each(function () {
-            $(this).empty().barcode(declcode, "code128", { barWidth: 2, barHeight: 50, showHRI: true, fontSize: 9, output: "bmp" });
+            $(this).empty().barcode(declcode, "code128", { barWidth:2, barHeight: 50, showHRI: true, fontSize: 9, fontSize:18,output: "svg" });
         });
 
         $(".bcTarget object").attr("width", "300px");
