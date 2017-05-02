@@ -1231,7 +1231,7 @@ namespace MvcPlatform.Controllers
                                 ,a.trademethod,a.recordcode,to_number(b.itemno) itemno,b.cadquantity,b.cadunit,b.commodityname,b.currency,b.totalprice,a.reptime 
                         from list_declaration_after a 
                             inner join list_decllist_after b on a.code=b.predeclcode and a.xzlb=b.xzlb
-                        where a.dataconfirm=2 and a.busiunitcode='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where
+                        where a.dataconfirm=2 and a.csid=1 and a.busiunitcode='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where
                     + @") aa
                         left join cusdoc.base_booksdata bb on aa.trademethod=bb.trade and aa.internaltypename=bb.isinportname
                     group by aa.recordcode,aa.itemno,aa.internaltype,aa.internaltypename,aa.trademethod,bb.isproductname,aa.commodityname,aa.currency,aa.cadunit";
@@ -1294,7 +1294,7 @@ namespace MvcPlatform.Controllers
                           from list_declaration_after a 
                                 inner join list_decllist_after b on a.code=b.predeclcode and a.xzlb=b.xzlb 
                                 inner join list_declaration c on a.code=c.code 
-                          where a.dataconfirm=2 and a.busiunitcode='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where
+                          where a.dataconfirm=2 and a.csid=1 and a.busiunitcode='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where
                     + @") aa
                       left join cusdoc.base_booksdata bb on aa.trademethod=bb.trade and aa.internaltypename=bb.isinportname "
                     + @" where aa.internaltypename='" + Request["f_field_inout_type"] + "'";
