@@ -486,7 +486,7 @@ function Open() {
         return;
     }
     var id = recs[0].data.ID
-    openrwindow("/EnterpriseOrder/GoodsTrack?busitypeid=" + busitypeid + "&id=" + id, 1200, 1000);
+    openrwindow("/EnterpriseOrder/GoodsTrack?busitypeid=" + busitypeid + "&id=" + id, 1200, 800);
 }
 function ViewsEnterprise() {
     var recs = gridpanel.getSelectionModel().getSelection();

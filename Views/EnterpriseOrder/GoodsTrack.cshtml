@@ -78,7 +78,7 @@
                         var paneltop_2 = Ext.create('Ext.panel.Panel', {
                             border: 0,
                             region: 'center',
-                            height: 570,
+                            height: 520,
                             contentEl: 'content'
                         })
                         var paneltop_1 = Ext.create('Ext.panel.Panel', {
@@ -91,7 +91,7 @@
                         var panel_top = Ext.create('Ext.panel.Panel', {
                             title: '<i class="fa fa-hand-o-right" aria-hidden="true"></i>&nbsp;网站信息',
                             border: 0,
-                            height: 600,
+                            height: 550,
                             region: 'north',
                             items: [paneltop_1, paneltop_2]
                         })
@@ -302,9 +302,9 @@
             readOnly: true
 
         })
-        item_top.push({ layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_contractno, field_repno, field_PORTCODE, field_BUSIUNIT, field_REPUNIT] },
-                    { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_myfs, field_REPWAY, field_TOTALNO, field_DIVIDENO, field_SUBMITTIME] },
-                    { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_quanpackage, field_weight, field_CUSTOMERNAME, field_SUBMITUSERNAME] });
+        item_top.push({ layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [field_contractno, field_repno, field_PORTCODE, field_BUSIUNIT, field_REPUNIT] },
+                    { layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [combo_myfs, field_REPWAY, field_TOTALNO, field_DIVIDENO, field_SUBMITTIME] },
+                    { layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [field_quanpackage, field_weight, field_CUSTOMERNAME, field_SUBMITUSERNAME] });
         }
 
         if (busitypeid == '21' || busitypeid == '20') {
@@ -475,9 +475,9 @@
                 valueField: 'CODE',
                 readOnly:true
             })
-            item_top.push({ layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_contractno, field_repno, field_PORTCODE, field_BUSIUNIT, field_REPUNIT] },
-                        { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_myfs, field_REPWAY, field_ship, field_LADINGBILLNO, field_SUBMITTIME] },
-                        { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_quanpackage, field_weight, combo_GOODSTYPEID, field_CUSTOMERNAME, field_SUBMITUSERNAME] });
+            item_top.push({ layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [field_contractno, field_repno, field_PORTCODE, field_BUSIUNIT, field_REPUNIT] },
+                        { layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [combo_myfs, field_REPWAY, field_ship, field_LADINGBILLNO, field_SUBMITTIME] },
+                        { layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [field_quanpackage, field_weight, combo_GOODSTYPEID, field_CUSTOMERNAME, field_SUBMITUSERNAME] });
 
         }
 
@@ -530,9 +530,9 @@
                 name: 'COL006',
                 fieldLabel: 'ATA'
             });
-            itemsAll.push({ layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [label_busiinfo] },
-                          { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_COL001, field_COL002, field_COL003, field_COL004, field_COL005] },
-                          { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_COL006] });
+            itemsAll.push({ layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [label_busiinfo] },
+                          { layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [field_COL001, field_COL002, field_COL003, field_COL004, field_COL005] },
+                          { layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [field_COL006] });
 
 
         }
@@ -570,8 +570,8 @@
             })
 
             itemsAll.push(
-                          { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [label_busiinfo] },
-                          { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_COL001] });
+                          { layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [label_busiinfo] },
+                          { layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [field_COL001] });
         }
 
 
