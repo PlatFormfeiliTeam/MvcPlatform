@@ -175,6 +175,11 @@ namespace MvcPlatform.Controllers
                             from ENT_ORDER t 
                                 left join (select entid,count(1) as FILENUM from list_attachment where entid is not null group by entid) l on t.ID=l.entid
                             where l.FILENUM>0 and t.FILEDECLAREUNITCODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where;
+            sql += @" and (t.printstatus=1 
+                            or (
+                                t.printstatus!=1 and (t.status is null or (t.status is not null and t.status>5))
+                                )
+                    )";
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
             var json = JsonConvert.SerializeObject(dt, iso);
             return "{rows:" + json + ",total:" + totalProperty + "}";
