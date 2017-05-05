@@ -56,6 +56,6 @@ var orders_tatus = {
 
 var menu_js_data = [{ "NAME": "I跟踪", "URL": "http://www.igenzong.com/air/trace/", "busitypeid": "11" },
                     { "NAME": "I跟踪", "URL": "http://www.igenzong.com/air/trace/", "busitypeid": "10" },
-                    { "NAME": "海勃", "URL": "http://www.hb56.com/Schdule.aspx","busitypeid": "21" },
-                    { "NAME": "海勃", "URL": "http://www.hb56.com/Schdule.aspx","busitypeid": "20" }
+                    { "NAME": "海勃", "URL": "http://www.hb56.com/Main.aspx", "busitypeid": "21" },
+                    { "NAME": "海勃", "URL": "http://www.hb56.com/Main.aspx", "busitypeid": "20" }
 ]
