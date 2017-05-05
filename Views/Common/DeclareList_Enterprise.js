@@ -479,7 +479,10 @@ function gridpanelBind() {
 
 function render(value, cellmeta, record, rowIndex, columnIndex, store) {
     var rtn = "";
-    var dataindex = cellmeta.column.dataIndex;  
+    var dataindex = cellmeta.column.dataIndex;
+    if (dataindex == "DECLARATIONCODE" && value) {
+        rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='FileConsult(\"" + record.get("ORDERCODE") + "\",\"" + escape(record.get("BUSITYPE")) + "\",\"" + record.get("CODE") + "\")'>" + value + "</div>";
+    }
     if (dataindex == "REPWAYNAME" && value) {
         var rec = store_sbfs.findRecord('CODE', value);
         if (rec) {
