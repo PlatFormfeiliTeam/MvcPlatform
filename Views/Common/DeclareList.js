@@ -57,10 +57,11 @@ Ext.onReady(function () {
                 data: common_data_busitype
             });
             var store = Ext.create('Ext.data.JsonStore', {
-                fields: ['ID', 'PREDECLCODE', 'DECLARATIONCODE', 'CUSTOMSSTATUS', 'ISPRINT', 'CODE', 'REPFINISHTIME', 'TRANSNAME', 'BUSIUNITCODE', 'CUSTOMERNAME', 'IETYPE',
-                         'BUSIUNITNAME', 'PORTCODE', 'BLNO', 'REPWAYID', 'REPWAYNAME', 'DECLWAY', 'DECLWAYNAME', 'TRADEWAYCODES', 'CONTRACTNO', 'GOODSNUM',
-                         'GOODSNW', 'SHEETNUM', 'ORDERCODE', 'CUSNO', 'ASSOCIATENO', 'CORRESPONDNO', 'BUSITYPE', 'DECLTYPE', 'CONTRACTNOORDER',
-                         'VOYAGENO'],
+                fields: ['ID','CODE', 'ORDERCODE', 'CUSTOMSSTATUS', 'ISPRINT', 'SHEETNUM',
+                        'DECLARATIONCODE', 'REPTIME', 'CONTRACTNO', 'GOODSNUM', 'GOODSNW', 'BLNO', 'TRANSNAME', 'VOYAGENO',
+                        'BUSIUNITCODE', 'BUSIUNITNAME', 'PORTCODE', 'TRADEMETHOD', 'DECLWAY', 'DECLWAYNAME',
+                        'BUSITYPE', 'CONTRACTNOORDER', 'REPWAYID', 'REPWAYNAME',
+                        'CUSNO', 'IETYPE', 'ASSOCIATENO', 'CORRESPONDNO', 'CUSTOMERNAME'],
                 pageSize: 22,
                 proxy: {
                     type: 'ajax',
@@ -79,7 +80,11 @@ Ext.onReady(function () {
                             CONDITION1: Ext.getCmp('CONDITION1').getValue(), VALUE1: Ext.getCmp("CONDITION1_1").getValue(),
                             CONDITION2: Ext.getCmp('CONDITION2').getValue(), VALUE2: Ext.getCmp("CONDITION2_1").getValue(),
                             CONDITION3: Ext.getCmp('CONDITION3').getValue(), VALUE3: Ext.getCmp("CONDITION3_1").getValue(),
-                            CONDITION4: Ext.getCmp('CONDITION4').getValue(), VALUE4_1: Ext.Date.format(Ext.getCmp("CONDITION4_1").getValue(), 'Y-m-d H:i:s'), VALUE4_2: Ext.Date.format(Ext.getCmp("CONDITION4_2").getValue(), 'Y-m-d H:i:s')
+                            CONDITION4: Ext.getCmp('CONDITION4').getValue(), VALUE4_1: Ext.Date.format(Ext.getCmp("CONDITION4_1").getValue(), 'Y-m-d H:i:s'), VALUE4_2: Ext.Date.format(Ext.getCmp("CONDITION4_2").getValue(), 'Y-m-d H:i:s'),
+                            CONDITION5: Ext.getCmp('CONDITION5').getValue(), VALUE5: Ext.getCmp("CONDITION5_1").getValue(),
+                            CONDITION6: Ext.getCmp('CONDITION6').getValue(), VALUE6: Ext.getCmp("CONDITION6_1").getValue(),
+                            CONDITION7: Ext.getCmp('CONDITION7').getValue(), VALUE7: Ext.getCmp("CONDITION7_1").getValue(),
+                            CONDITION8: Ext.getCmp('CONDITION8').getValue(), VALUE8_1: Ext.Date.format(Ext.getCmp("CONDITION8_1").getValue(), 'Y-m-d H:i:s'), VALUE8_2: Ext.Date.format(Ext.getCmp("CONDITION8_2").getValue(), 'Y-m-d H:i:s')
                         }
                     }
                 }
@@ -97,14 +102,14 @@ Ext.onReady(function () {
                 selModel: { selType: 'checkboxmodel' },
                 bbar: pgbar,
                 columns: [
-                { xtype: 'rownumberer', width: 35 },
+                { xtype: 'rownumberer', width: 45 },
                 { header: 'ID', dataIndex: 'ID', sortable: true, hidden: true },
-                { header: '海关状态', dataIndex: 'CUSTOMSSTATUS', width: 90, locked: true, renderer: render },
+                { header: '海关状态', dataIndex: 'CUSTOMSSTATUS', width: 90, locked: true },
                 { header: '合同发票号', dataIndex: 'CONTRACTNOORDER', width: 140 },
                 { header: '打印标志', dataIndex: 'ISPRINT', width: 70, renderer: render },
                 { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 140, locked: true, renderer: render },
                 { header: '委托单位', dataIndex: 'CUSTOMERNAME', width: 100, locked: role == 'supplier', hidden: role == 'customer' },
-                { header: '申报完成时间', dataIndex: 'REPFINISHTIME', width: 140 },
+                { header: '申报日期', dataIndex: 'REPTIME', width: 140 },
                 { header: '进/出', dataIndex: 'IETYPE', width: 80, hidden: busitypeid != '40-41' },
                 { header: '两单关联号', dataIndex: 'ASSOCIATENO', width: 110, hidden: busitypeid != '40-41' },//两单关联号
                 { header: '运输工具名称', dataIndex: 'TRANSNAME', width: 150, renderer: render },
@@ -113,7 +118,7 @@ Ext.onReady(function () {
                 { header: '提运单号', dataIndex: 'BLNO', width: 180 },
                 { header: '申报方式', dataIndex: 'REPWAYNAME', width: 100, renderer: render },
                 { header: '报关方式', dataIndex: 'DECLWAYNAME', width: 100, renderer: render },
-                { header: '贸易方式', dataIndex: 'TRADEWAYCODES', width: 80 },
+                { header: '贸易方式', dataIndex: 'TRADEMETHOD', width: 80 },
                 { header: '合同协议号', dataIndex: 'CONTRACTNO', width: 110 },
                 { header: '件数', dataIndex: 'GOODSNUM', width: 60 },
                 { header: '重量', dataIndex: 'GOODSNW', width: 60 },
@@ -136,7 +141,7 @@ Ext.onReady(function () {
 function initSearch() {
     var store_1 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: [{ "NAME": "经营单位", "CODE": "BUSIUNITCODE" }]
+        data: [{ "NAME": "经营单位", "CODE": "BUSIUNITCODE"},{"NAME": "申报方式", "CODE": "REPWAYNAME" }]
     });
     var combo_1 = Ext.create('Ext.form.field.ComboBox', {
         id: 'CONDITION1',
@@ -148,7 +153,21 @@ function initSearch() {
         editable: false,
         queryMode: 'local',
         margin: 0,
-        flex: .35
+        flex: .35,
+        listeners:
+           {
+               change: function (combo, newValue, oldValue, eOpts) {
+                   combo_1_1.reset();
+                   if (newValue == "REPWAYNAME") {
+                       combo_1_1.minChars = 2;
+                       store_1_1.loadData(common_data_sbfs);
+                   }
+                   if (newValue == "BUSIUNITCODE") {
+                       combo_1_1.minChars = 4;
+                       store_1_1.loadData(common_data_jydw);
+                   }
+               }
+           }
     })
     var store_1_1 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
@@ -295,6 +314,161 @@ function initSearch() {
         items: [combo_4, date_4_1, date_4_2]
     }
 
+
+
+
+    var combo_5 = Ext.create('Ext.form.field.ComboBox', {
+        id: 'CONDITION5',
+        name: "CONDITION5",
+        value: "REPWAYNAME",
+        store: store_1,
+        displayField: 'NAME',
+        valueField: "CODE",
+        editable: false,
+        queryMode: 'local',
+        margin: 0,
+        flex: .35,
+        listeners:
+          {
+              change: function (combo, newValue, oldValue, eOpts) {
+                  combo_5_1.reset();
+                  if (newValue == "REPWAYNAME") {
+                      combo_5_1.minChars = 2;
+                      store_5_1.loadData(common_data_sbfs);
+                  }
+                  if (newValue == "BUSIUNITCODE") {
+                      combo_5_1.minChars = 4;
+                      store_5_1.loadData(common_data_jydw);
+                  }
+              }
+          }
+    })
+    var store_5_1 = Ext.create("Ext.data.JsonStore", {
+        fields: ["CODE", "NAME"],
+        data: common_data_sbfs
+    });
+    var combo_5_1 = Ext.create('Ext.form.field.ComboBox', {
+        id: 'CONDITION5_1',
+        name: "NAME",
+        margin: 0,
+        store: store_5_1,
+        displayField: 'NAME',
+        valueField: "CODE",
+        hideTrigger: true,
+        anyMatch: true,
+        queryMode: 'local',
+        forceSelection: true,
+        minChars: 2,
+        flex: .65
+    })
+    var condition5 = {
+        xtype: 'fieldcontainer',
+        layout: 'hbox',
+        items: [combo_5, combo_5_1]
+    }
+
+    var combo_6 = Ext.create('Ext.form.field.ComboBox', {
+        id: 'CONDITION6',
+        name: "CONDITION6",
+        store: store_2,
+        value: "BLNO",
+        displayField: 'NAME',
+        valueField: "CODE",
+        editable: false,
+        queryMode: 'local',
+        flex: .35,
+        margin: 0,
+    });
+    var field_6_1 = Ext.create('Ext.form.field.Text', {
+        id: 'CONDITION6_1',
+        margin: 0,
+        flex: .65
+    })
+    var condition6 = {
+        xtype: 'fieldcontainer',
+        layout: 'hbox',
+        items: [combo_6, field_6_1]
+    }
+
+    var combo_7 = Ext.create("Ext.form.ComboBox", {
+        id: 'CONDITION7',
+        name: "CONDITION7",
+        value: "DYBZ",
+        store: store_3,
+        queryMode: 'local',
+        editable: false,
+        displayField: 'NAME',
+        valueField: "CODE",
+        margin: 0,
+        flex: .35,
+        listeners:
+            {
+                change: function (combo, newValue, oldValue, eOpts) {
+                    combo_7_1.reset();
+                    if (newValue == "HGZT") {
+                        store_7_1.loadData(declarationsearch_js_condition3_data_hg);
+                    }
+                    if (newValue == "DYBZ") {
+                        store_7_1.loadData(declarationsearch_js_condition3_data_dy);
+                    }
+                }
+            }
+    });
+    var store_7_1 = Ext.create("Ext.data.JsonStore", {
+        fields: ["CODE", "NAME"],
+        data: declarationsearch_js_condition3_data_dy
+    });
+    var combo_7_1 = Ext.create("Ext.form.ComboBox", {
+        id: 'CONDITION7_1',
+        store: store_7_1,
+        displayField: 'NAME',
+        valueField: "CODE",
+        hideTrigger: true,
+        margin: 0,
+        flex: .65,
+        anyMatch: true,
+        queryMode: 'local',
+        editable: false
+    });
+    var condition7 = {
+        xtype: 'fieldcontainer',
+        layout: 'hbox',
+        items: [combo_7, combo_7_1]
+    }
+
+    var combo_8 = Ext.create("Ext.form.ComboBox", {
+        id: 'CONDITION8',
+        name: 'CONDITION8',
+        value: 'REPTIME',
+        margin: 0,
+        flex: .35,
+        store: store_4,
+        queryMode: 'local',
+        displayField: 'NAME',
+        valueField: "CODE",
+        editable: false
+    })
+    var date_8_1 = Ext.create('Ext.form.field.Date', {
+        id: 'CONDITION8_1',
+        margin: 0,
+        flex: .325,
+        emptyText: '开始日期',
+        format: 'Y-m-d'
+    })
+    var date_8_2 = Ext.create('Ext.form.field.Date', {
+        id: 'CONDITION8_2',
+        margin: 0,
+        flex: .325,
+        emptyText: '结束日期',
+        format: 'Y-m-d'
+    })
+    var condition8 = {
+        xtype: 'fieldcontainer',
+        layout: 'hbox',
+        columnWidth: .34,
+        items: [combo_8, date_8_1, date_8_2]
+    }
+
     var formpanel = Ext.create('Ext.form.Panel', {
         renderTo: 'div_form',
         fieldDefaults: {
@@ -302,7 +476,8 @@ function initSearch() {
             columnWidth: 0.22
         },
         items: [
-        { layout: 'column', border: 0, items: [condition1, condition2, condition3, condition4] }
+        { layout: 'column', border: 0, items: [condition1, condition2, condition3, condition4] },
+         { layout: 'column', border: 0, items: [condition5, condition6, condition7, condition8] }
         ]
     });
 
@@ -314,20 +489,27 @@ function Reset() {
     Ext.getCmp("CONDITION1_1").setValue("");
     Ext.getCmp("CONDITION2").setValue("CUSNO");
     Ext.getCmp("CONDITION2_1").setValue("");
-    Ext.getCmp("CONDITION3").setValue("DYBZ");
+    Ext.getCmp("CONDITION3").setValue("HGZT");
     Ext.getCmp("CONDITION3_1").setValue("");
     Ext.getCmp("CONDITION4").setValue("SUBMITTIME");
     Ext.getCmp("CONDITION4_1").setValue("");
     Ext.getCmp("CONDITION4_2").setValue("");
+
+    Ext.getCmp("CONDITION5").setValue("REPWAYNAME");
+    Ext.getCmp("CONDITION5_1").setValue("");
+    Ext.getCmp("CONDITION6").setValue("BLNO");
+    Ext.getCmp("CONDITION6_1").setValue("");
+    Ext.getCmp("CONDITION7").setValue("DYBZ");
+    Ext.getCmp("CONDITION7_1").setValue("");
+    Ext.getCmp("CONDITION8").setValue("REPTIME");
+    Ext.getCmp("CONDITION8_1").setValue("");
+    Ext.getCmp("CONDITION8_2").setValue("");
 }
 
 
 function render(value, cellmeta, record, rowIndex, columnIndex, store) {
     var rtn = "";
     var dataindex = cellmeta.column.dataIndex;
-    if (dataindex == "CUSTOMSSTATUS" && value) {
-        rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='showcustoms_receipt(\"" + record.get("CODE") + "\")'>" + value + "</div>";
-    }
     if (dataindex == "DECLARATIONCODE" && value) {
         rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='FileConsult(\"" + record.get("ORDERCODE") + "\",\"" + escape(record.get("BUSITYPE")) + "\",\"" + record.get("CODE") + "\")'>" + value + "</div>";
     }
@@ -408,40 +590,7 @@ function MultiPrint() {
     opencenterwin("/Common/MultiPrint?source=declare&data=" + data, 1100, 700);
 }
 
-//显示海关状态回执记录
-function showcustoms_receipt(code_bgd) {
-    var store_customs = Ext.create('Ext.data.JsonStore', {
-        fields: ['TIMES', 'DECLSTATUS'],
-        proxy: {
-            type: 'ajax',
-            url: '/Common/LoadCustomsReceipt?bgdcode=' + code_bgd,
-            reader: {
-                root: 'rows',
-                type: 'json'
-            }
-        },
-        autoLoad: true
-    })
-    var grid_customs = Ext.create('Ext.grid.Panel', {
-        title: '海关状态回执',
-        store: store_customs,
-        height: 100,
-        columns: [
-            { xtype: 'rownumberer', width: 35 },
-            { header: '时间', dataIndex: 'TIMES', width: 130 },
-            { header: '海关状态', dataIndex: 'DECLSTATUS', flex: 1 }
-        ]
-    })
-    var win_customs_status = Ext.create("Ext.window.Window", {
-        title: "",
-        width: 400,
-        height: 400,
-        layout: "fit",
-        modal: true,
-        items: [grid_customs]
-    });
-    win_customs_status.show();
-}
+
 
 
 function ExportDecl() {

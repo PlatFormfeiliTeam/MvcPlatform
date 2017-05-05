@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using System.Web.Security;
 
 namespace MvcPlatform.Controllers
 {
@@ -17,10 +18,15 @@ namespace MvcPlatform.Controllers
 
         protected override void OnResultExecuting(ResultExecutingContext filterContext)
         {
-            RouteBase rb = filterContext.RouteData.Route;
+
+            //FormsAuthenticationTicket r = new FormsAuthenticationTicket(;
+            string userdata=((FormsIdentity)HttpContext.User.Identity).Ticket.UserData;
+           HttpRequestBase hrb = filterContext.HttpContext.Request;
+           //Uri url=hrb.;
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             base.OnResultExecuting(filterContext);
         }
 
     }
 }
+    

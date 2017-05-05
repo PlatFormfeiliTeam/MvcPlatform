@@ -400,9 +400,9 @@ function initSearch() {
 
 function gridpanelBind() {
     var store = Ext.create('Ext.data.JsonStore', {
-        fields: ['ID', 'PREDECLCODE', 'DECLARATIONCODE', 'CUSTOMSSTATUS', 'ISPRINT', 'CODE', 'REPFINISHTIME', 'TRANSNAME', 'BUSIUNITCODE', 'CUSTOMERNAME', 'IETYPE',
-                 'BUSIUNITNAME', 'PORTCODE', 'BLNO', 'REPWAYID', 'REPWAYNAME', 'DECLWAY', 'DECLWAYNAME', 'TRADEWAYCODES', 'CONTRACTNO', 'GOODSNUM',
-                 'GOODSNW', 'SHEETNUM', 'ORDERCODE', 'CUSNO', 'ASSOCIATENO', 'CORRESPONDNO', 'BUSITYPE', 'CONTRACTNOORDER', 'REPUNITNAME'],
+        fields: ['ID', 'PREDECLCODE', 'DECLARATIONCODE', 'CUSTOMSSTATUS', 'CODE', 'REPTIME', 'TRANSNAME', 'BUSIUNITCODE', 'CUSTOMERNAME', 'IETYPE',
+                'BUSIUNITNAME', 'PORTCODE', 'BLNO', 'REPWAYID', 'REPWAYNAME', 'DECLWAY', 'DECLWAYNAME', 'TRADEMETHOD', 'CONTRACTNO', 'GOODSNUM',
+                'GOODSNW', 'SHEETNUM', 'ORDERCODE', 'CUSNO', 'ASSOCIATENO', 'CORRESPONDNO', 'BUSITYPE', 'CONTRACTNOORDER', 'REPUNITNAME'],
         pageSize: 22,
         proxy: {
             type: 'ajax',
@@ -453,14 +453,14 @@ function gridpanelBind() {
         { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 140, locked: true, renderer: render },
         { header: '申报单位', dataIndex: 'REPUNITNAME', width: 200 },
         { header: '合同发票号', dataIndex: 'CONTRACTNOORDER', width: 140, locked: true, },
-        { header: '申报完成时间', dataIndex: 'REPFINISHTIME', width: 140 },
+        { header: '申报日期', dataIndex: 'REPTIME', width: 140 },
         { header: '运输工具名称', dataIndex: 'TRANSNAME', width: 150, renderer: render },
         { header: '业务类型', dataIndex: 'BUSITYPE', width: 90, renderer: render },// 业务类型
         { header: '进出口岸', dataIndex: 'PORTCODE', width: 80 },
         { header: '提运单号', dataIndex: 'BLNO', width: 180 },
         { header: '申报方式', dataIndex: 'REPWAYNAME', width: 100, renderer: render },
         { header: '报关方式', dataIndex: 'DECLWAYNAME', width: 100, renderer: render },
-        { header: '贸易方式', dataIndex: 'TRADEWAYCODES', width: 80 },
+        { header: '贸易方式', dataIndex: 'TRADEMETHOD', width: 80 },
         { header: '合同协议号', dataIndex: 'CONTRACTNO', width: 110 },
         { header: '件数', dataIndex: 'GOODSNUM', width: 60 },
         { header: '重量', dataIndex: 'GOODSNW', width: 60 },
@@ -479,10 +479,7 @@ function gridpanelBind() {
 
 function render(value, cellmeta, record, rowIndex, columnIndex, store) {
     var rtn = "";
-    var dataindex = cellmeta.column.dataIndex;
-    if (dataindex == "DECLARATIONCODE" && value) {
-        rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='FileConsult(\"" + record.get("ORDERCODE") + "\",\"" + escape(record.get("BUSITYPE")) + "\",\"" + record.get("CODE") + "\")'>" + value + "</div>";
-    }
+    var dataindex = cellmeta.column.dataIndex;  
     if (dataindex == "REPWAYNAME" && value) {
         var rec = store_sbfs.findRecord('CODE', value);
         if (rec) {
