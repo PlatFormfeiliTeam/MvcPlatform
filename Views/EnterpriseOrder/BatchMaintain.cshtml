@@ -211,6 +211,7 @@
             margin: 0,
             flex: .90,
             store: store_jydw,
+            forceSelection: true,
             displayField: 'NAME',
             valueField: 'CODE',
             triggerAction: 'all',
@@ -255,11 +256,13 @@
             allowBlank: false,
             blankText: '申报单位不能为空!',
             store: store_jydw,
+            forceSelection: true,
             displayField: 'NAME',
             valueField: 'CODE',
             triggerAction: 'all',
             queryMode: 'local',
             minChars: 4,
+
             hideTrigger: true,
             anyMatch: true,
             listeners: {
