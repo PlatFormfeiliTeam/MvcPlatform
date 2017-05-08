@@ -1239,10 +1239,11 @@ namespace MvcPlatform.Controllers
 
             string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.ISPRINT,det.SHEETNUM,
                               lda.declarationcode,to_char(lda.reptime,'yyyy-mm-dd') reptime,lda.contractno,lda.goodsnum,lda.goodsnw,lda.blno,
-                              lda.transname,lda.voyageno,lda.busiunitcode,lda.busiunitname,lda.portcode,
+                              lda.transname,lda.voyageno,lda.portcode,
                               lda.trademethod,lda.declkind DECLWAY,lda.declkind DECLWAYNAME,  
                               ort.BUSITYPE,ort.CONTRACTNO CONTRACTNOORDER,ort.REPWAYID,ort.REPWAYID REPWAYNAME,ort.CUSNO,
                               ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.customercode,ort.CUSTOMERNAME,ort.CREATETIME, 
+                              ort.busiunitcode,ort.busiunitname,ort.totalno,ort.divideno,ort.secondladingbillno, 
                               cus.SCENEDECLAREID                                                             
                         from list_declaration det     
                             left join list_order ort on det.ordercode = ort.code 

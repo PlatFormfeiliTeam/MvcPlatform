@@ -60,7 +60,7 @@ Ext.onReady(function () {
                 fields: ['ID','CODE', 'ORDERCODE', 'CUSTOMSSTATUS', 'ISPRINT', 'SHEETNUM',
                         'DECLARATIONCODE', 'REPTIME', 'CONTRACTNO', 'GOODSNUM', 'GOODSNW', 'BLNO', 'TRANSNAME', 'VOYAGENO',
                         'BUSIUNITCODE', 'BUSIUNITNAME', 'PORTCODE', 'TRADEMETHOD', 'DECLWAY', 'DECLWAYNAME',
-                        'BUSITYPE', 'CONTRACTNOORDER', 'REPWAYID', 'REPWAYNAME',
+                        'BUSITYPE', 'CONTRACTNOORDER', 'REPWAYID', 'REPWAYNAME', 'TOTALNO', 'DIVIDENO','SECONDLADINGBILLNO',
                         'CUSNO', 'IETYPE', 'ASSOCIATENO', 'CORRESPONDNO', 'CUSTOMERNAME'],
                 pageSize: 22,
                 proxy: {
@@ -105,7 +105,10 @@ Ext.onReady(function () {
                 { xtype: 'rownumberer', width: 45 },
                 { header: 'ID', dataIndex: 'ID', sortable: true, hidden: true },
                 { header: '海关状态', dataIndex: 'CUSTOMSSTATUS', width: 90, locked: true },
-                { header: '合同发票号', dataIndex: 'CONTRACTNOORDER', width: 140 },
+                { header: '合同发票号', dataIndex: 'CONTRACTNOORDER', width: 100 },
+                { header: '总单号', dataIndex: 'TOTALNO', width: 100, hidden: (busitypeid != '10' && busitypeid != '11')},
+                { header: '分单号', dataIndex: 'DIVIDENO', width: 100, hidden: (busitypeid != '10' && busitypeid != '11') },
+                { header: '海运提单号', dataIndex: 'SECONDLADINGBILLNO', width: 140, hidden: (busitypeid != '20' && busitypeid != '21') },
                 { header: '打印标志', dataIndex: 'ISPRINT', width: 70, renderer: render },
                 { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 140, locked: true, renderer: render },
                 { header: '委托单位', dataIndex: 'CUSTOMERNAME', width: 100, locked: role == 'supplier', hidden: role == 'customer' },
@@ -125,7 +128,7 @@ Ext.onReady(function () {
                 { header: '张数', dataIndex: 'SHEETNUM', width: 60 },
                 { header: '多单关联号', dataIndex: 'CORRESPONDNO', width: 100, hidden: busitypeid != '40-41' },//多单关联号
                 { header: '订单编号', dataIndex: 'ORDERCODE', width: 100 },
-                { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 100, locked: role == 'customer' },
+                { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 140, locked: role == 'customer' },
                 { header: '客户编号', dataIndex: 'CUSNO', width: 125 }
                 ],
                 viewConfig: {
