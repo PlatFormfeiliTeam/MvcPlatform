@@ -450,6 +450,7 @@ namespace MvcPlatform.Common
 
         public static void MergePDFFiles(IList<string> fileList, string outMergeFile)
         {
+            int rotation = 0;
             PdfReader reader;
             Document document = new Document();  // Define the output place, and add the document to the stream          
             PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(outMergeFile, FileMode.Create));
@@ -467,6 +468,22 @@ namespace MvcPlatform.Common
                     document.NewPage();
                     newPage = writer.GetImportedPage(reader, j);
                     cb.AddTemplate(newPage, 0, 0);
+                    rotation = reader.GetPageRotation(j);
+                    switch (rotation)
+                    {
+                        case 90:
+                            cb.AddTemplate(newPage, 0, -1f, 1f, 0, 0, reader.GetPageSizeWithRotation(j).Height);
+                            break;
+                        case 180:
+                            cb.AddTemplate(newPage, -1f, 0, 0, -1f, reader.GetPageSizeWithRotation(j).Width, reader.GetPageSizeWithRotation(j).Height);
+                            break;
+                        case 270:
+                            cb.AddTemplate(newPage, 0, 1f, -1f, 0, reader.GetPageSizeWithRotation(j).Width, 0);
+                            break;
+                        default:
+                            cb.AddTemplate(newPage, 1f, 0, 0, 1f, 0, 0);//等同于
+                            break;
+                    }
                 }
             }
             document.Close();
