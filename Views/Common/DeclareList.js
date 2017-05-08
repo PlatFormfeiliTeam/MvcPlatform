@@ -105,7 +105,7 @@ Ext.onReady(function () {
                 { xtype: 'rownumberer', width: 45 },
                 { header: 'ID', dataIndex: 'ID', sortable: true, hidden: true },
                 { header: '海关状态', dataIndex: 'CUSTOMSSTATUS', width: 90, locked: true },
-                { header: '合同发票号', dataIndex: 'CONTRACTNOORDER', width: 100 },
+                { header: '合同发票号', dataIndex: 'CONTRACTNOORDER', width: 140 },
                 { header: '总单号', dataIndex: 'TOTALNO', width: 100, hidden: (busitypeid != '10' && busitypeid != '11')},
                 { header: '分单号', dataIndex: 'DIVIDENO', width: 100, hidden: (busitypeid != '10' && busitypeid != '11') },
                 { header: '海运提单号', dataIndex: 'SECONDLADINGBILLNO', width: 140, hidden: (busitypeid != '20' && busitypeid != '21') },
