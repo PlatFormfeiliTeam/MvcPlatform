@@ -2,9 +2,11 @@
     $(".showtip1").popover({
         trigger: 'manual',
         placement: 'top',
-        title: '<div style="text-align:center; color:red; text-decoration:underline; font-size:12px;"> 点击或扫描二维码<br>联系我们</div>',
+        title: '<div style="text-align:center; color:red; text-decoration:underline; font-size:12px;"> 群名称：关务云客户服务<br>群账号：526451858</div>',
         html: 'true', //needed to show html of course
-        content: '<div id="popOverBox" align="center"><img src="/Images/float/qq.jpg" /></div>',
+        content: '<div id="popOverBox" align="center"> <a target="_blank" href="//shang.qq.com/wpa/qunwpa?idkey=e1d4f03a3e46e7343bc450b824aa98bfcdea1c3ea87de3784c7b0573c430b9cf">'
+                  +'<img border="0" src="/Images/float/erweima.png" alt="关务云客户服务" title="关务云客户服务">'
+                + '</a></div>',
         animation: false
     }).on("mouseenter", function () {
         var _this = this;
