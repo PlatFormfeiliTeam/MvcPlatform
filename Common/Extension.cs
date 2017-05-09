@@ -452,7 +452,7 @@ namespace MvcPlatform.Common
         {
             int rotation = 0;
             PdfReader reader;
-            Document document = new Document();  // Define the output place, and add the document to the stream          
+            Document document = new Document();  // Define the output place, and add the document to the stream       
             PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(outMergeFile, FileMode.Create));
             document.Open();// Open document         
             // writer.AddJavaScript("this.print(true);", true);
@@ -465,9 +465,12 @@ namespace MvcPlatform.Common
                 int iPageNum = reader.NumberOfPages;
                 for (int j = 1; j <= iPageNum; j++)
                 {
-                    document.NewPage();
+
                     newPage = writer.GetImportedPage(reader, j);
-                    cb.AddTemplate(newPage, 0, 0);
+                    document.SetPageSize(new Rectangle(reader.GetPageSizeWithRotation(j).Width, reader.GetPageSizeWithRotation(j).Height));
+                    document.NewPage();
+                   // newPage = writer.GetImportedPage(reader, j);
+                   // cb.AddTemplate(newPage, 0, 0);
                     rotation = reader.GetPageRotation(j);
                     switch (rotation)
                     {
