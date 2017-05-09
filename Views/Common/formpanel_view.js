@@ -24,7 +24,7 @@
         data: [{ "CODE": "01", "NAME": "报关单(01)" }, { "CODE": "02", "NAME": "报检单(02)" }, { "CODE": "03", "NAME": "报关/检单(03)" }]
     })
     var field_ENTRUSTTYPE = Ext.create('Ext.form.field.ComboBox', {
-        name: 'ENTRUSTTYPEID',
+        name: 'ENTRUSTTYPE',
         store: store_ENTRUSTTYPENAME,
         fieldLabel: '委托类型',
         displayField: 'NAME',
@@ -52,7 +52,7 @@
         data: common_data_sbgq
     })
     var field_CUSTOMDISTRICT = Ext.create('Ext.form.field.ComboBox', {
-        name: 'CUSTOMDISTRICTCODE',
+        name: 'CUSTOMAREACODE',
         store: store_CUSTOMDISTRICTNAME,
         fieldLabel: '申报关区',
         displayField: 'NAME',
