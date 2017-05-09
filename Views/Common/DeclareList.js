@@ -201,6 +201,14 @@ function initSearch() {
     if (busitypeid == 10 || busitypeid == 30) {  //如果是空运出口，或者是陆运出口
         declarationsearch_js_condition2_data.push({ "NAME": "报关车号", "CODE": "DECLCARNO" });
     }
+    if (busitypeid == 10 || busitypeid == 11) {
+        declarationsearch_js_condition2_data.push({ "NAME": "总单号", "CODE": "TOTALNO" });
+        declarationsearch_js_condition2_data.push({ "NAME": "分单号", "CODE": "DIVIDENO" });
+    }
+    if (busitypeid == 20 || busitypeid == 21) {
+        declarationsearch_js_condition2_data.push({ "NAME": "海关提单号", "CODE": "SECONDLADINGBILLNO" });
+    }
+
     var store_2 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
         data: declarationsearch_js_condition2_data
@@ -607,7 +615,12 @@ function ExportDecl() {
         CONDITION1: Ext.getCmp('CONDITION1').getValue(), VALUE1: Ext.getCmp("CONDITION1_1").getValue(),
         CONDITION2: Ext.getCmp('CONDITION2').getValue(), VALUE2: Ext.getCmp("CONDITION2_1").getValue(),
         CONDITION3: Ext.getCmp('CONDITION3').getValue(), VALUE3: Ext.getCmp("CONDITION3_1").getValue(),
-        CONDITION4: Ext.getCmp('CONDITION4').getValue(), VALUE4_1: Ext.Date.format(Ext.getCmp("CONDITION4_1").getValue(), 'Y-m-d H:i:s'), VALUE4_2: Ext.Date.format(Ext.getCmp("CONDITION4_2").getValue(), 'Y-m-d H:i:s')
+        CONDITION4: Ext.getCmp('CONDITION4').getValue(), VALUE4_1: Ext.Date.format(Ext.getCmp("CONDITION4_1").getValue(), 'Y-m-d H:i:s'), VALUE4_2: Ext.Date.format(Ext.getCmp("CONDITION4_2").getValue(), 'Y-m-d H:i:s'),
+        CONDITION5: Ext.getCmp('CONDITION5').getValue(), VALUE5: Ext.getCmp("CONDITION5_1").getValue(),
+        CONDITION6: Ext.getCmp('CONDITION6').getValue(), VALUE6: Ext.getCmp("CONDITION6_1").getValue(),
+        CONDITION7: Ext.getCmp('CONDITION7').getValue(), VALUE7: Ext.getCmp("CONDITION7_1").getValue(),
+        CONDITION8: Ext.getCmp('CONDITION8').getValue(), VALUE8_1: Ext.Date.format(Ext.getCmp("CONDITION8_1").getValue(), 'Y-m-d H:i:s'), VALUE8_2: Ext.Date.format(Ext.getCmp("CONDITION8_2").getValue(), 'Y-m-d H:i:s')
+
     }
 
     Ext.Ajax.request({

@@ -1089,6 +1089,15 @@ namespace MvcPlatform.Controllers
                     case "CONTRACTNOORDER"://合同发票号
                         where += " and instr(ort.CONTRACTNO,'" + Request["VALUE2"] + "')>0 ";
                         break;
+                    case "TOTALNO"://总单号
+                        where += " and instr(ort.TOTALNO,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "DIVIDENO"://分单号
+                        where += " and instr(ort.DIVIDENO,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "SECONDLADINGBILLNO"://海关提单号
+                        where += " and instr(ort.SECONDLADINGBILLNO,'" + Request["VALUE2"] + "')>0 ";
+                        break;
                 }
             }
             if (!string.IsNullOrEmpty(Request["VALUE3"]))//判断查询条件3是否有值
@@ -1168,6 +1177,15 @@ namespace MvcPlatform.Controllers
                         break;
                     case "CONTRACTNOORDER"://合同发票号
                         where += " and instr(ort.CONTRACTNO,'" + Request["VALUE6"] + "')>0 ";
+                        break;
+                    case "TOTALNO"://总单号
+                        where += " and instr(ort.TOTALNO,'" + Request["VALUE6"] + "')>0 ";
+                        break;
+                    case "DIVIDENO"://分单号
+                        where += " and instr(ort.DIVIDENO,'" + Request["VALUE6"] + "')>0 ";
+                        break;
+                    case "SECONDLADINGBILLNO"://海关提单号
+                        where += " and instr(ort.SECONDLADINGBILLNO,'" + Request["VALUE6"] + "')>0 ";
                         break;
                 }
             }
@@ -3017,73 +3035,297 @@ namespace MvcPlatform.Controllers
                 return "{success:false,WebDownCount:" + WebDownCount + "}";
             }
            
-            DataTable dt = DBMgr.GetDataTable(sql);
+                      
+            NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();//创建Excel文件的对象            
+            NPOI.SS.UserModel.ISheet sheet_S = book.CreateSheet("报关单信息");//添加一个导出成功sheet           
+            NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0); //给sheet1添加第一行的头部标题
 
-            //创建Excel文件的对象
-            NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();
-            //添加一个导出成功sheet
-            NPOI.SS.UserModel.ISheet sheet_S = book.CreateSheet("报关单信息");
+            string busitypeid = Request["busitypeid"];
+            DataTable dt = DBMgr.GetDataTable(sql);  
 
-            //给sheet1添加第一行的头部标题
-            NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
-            row1.CreateCell(0).SetCellValue("海关状态"); row1.CreateCell(1).SetCellValue("合同发票号"); row1.CreateCell(2).SetCellValue("报关单号"); row1.CreateCell(3).SetCellValue("委托单位");
-            row1.CreateCell(4).SetCellValue("申报日期"); row1.CreateCell(5).SetCellValue("进/出"); row1.CreateCell(6).SetCellValue("对应号"); row1.CreateCell(7).SetCellValue("运输工具名称");
-            row1.CreateCell(8).SetCellValue("业务类型"); row1.CreateCell(9).SetCellValue("出口口岸"); row1.CreateCell(10).SetCellValue("提运单号"); row1.CreateCell(11).SetCellValue("申报方式");
-            row1.CreateCell(12).SetCellValue("报关方式"); row1.CreateCell(13).SetCellValue("贸易方式"); row1.CreateCell(14).SetCellValue("合同协议号"); row1.CreateCell(15).SetCellValue("件数");
-            row1.CreateCell(16).SetCellValue("重量"); row1.CreateCell(17).SetCellValue("张数"); row1.CreateCell(18).SetCellValue("多单关联号"); row1.CreateCell(19).SetCellValue("订单编号");
-            row1.CreateCell(20).SetCellValue("经营单位"); row1.CreateCell(21).SetCellValue("客户编号");
-
-
-
-            //将数据逐步写入sheet_S各个行
-            for (int i = 0; i < dt.Rows.Count; i++)
+            #region 空运进出口
+            if (busitypeid == "10" || busitypeid == "11")
             {
-                NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
-                rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["CUSTOMSSTATUS"].ToString());
-                rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["CONTRACTNOORDER"].ToString());
-                rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["DECLARATIONCODE"].ToString());
-                rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CUSTOMERNAME"].ToString());
-                rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["REPTIME"].ToString());
-                rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["IETYPE"].ToString());
-                rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["ASSOCIATENO"].ToString());
-                if (dt.Rows[i]["TRANSNAME"].ToString() == "" && dt.Rows[i]["VOYAGENO"].ToString() == "")
+                row1.CreateCell(0).SetCellValue("海关状态"); row1.CreateCell(1).SetCellValue("报关单号"); row1.CreateCell(2).SetCellValue("经营单位"); row1.CreateCell(3).SetCellValue("合同发票号");
+                row1.CreateCell(4).SetCellValue("总单号"); row1.CreateCell(5).SetCellValue("分单号"); row1.CreateCell(6).SetCellValue("申报日期"); row1.CreateCell(7).SetCellValue("运输工具名称"); 
+                row1.CreateCell(8).SetCellValue("业务类型"); row1.CreateCell(9).SetCellValue("出口口岸");row1.CreateCell(10).SetCellValue("提运单号"); row1.CreateCell(11).SetCellValue("申报方式");
+                row1.CreateCell(12).SetCellValue("报关方式"); row1.CreateCell(13).SetCellValue("贸易方式");row1.CreateCell(14).SetCellValue("合同协议号"); row1.CreateCell(15).SetCellValue("件数"); 
+                row1.CreateCell(16).SetCellValue("重量"); row1.CreateCell(17).SetCellValue("张数");row1.CreateCell(18).SetCellValue("订单编号"); row1.CreateCell(19).SetCellValue("客户编号");
+                
+
+                //将数据逐步写入sheet_S各个行
+                for (int i = 0; i < dt.Rows.Count; i++)
                 {
-                    rowtemp.CreateCell(7).SetCellValue("");
+                    NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                    rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["CUSTOMSSTATUS"].ToString());
+                    rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["DECLARATIONCODE"].ToString());
+                    rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
+                    rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CONTRACTNOORDER"].ToString());
+                    rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["TOTALNO"].ToString());
+                    rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["DIVIDENO"].ToString());
+                    rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["REPTIME"].ToString());
+                    if (dt.Rows[i]["TRANSNAME"].ToString() == "" && dt.Rows[i]["VOYAGENO"].ToString() == "")
+                    {
+                        rowtemp.CreateCell(7).SetCellValue("");
+
+                    }
+                    if (dt.Rows[i]["TRANSNAME"].ToString() == "" && dt.Rows[i]["VOYAGENO"].ToString() != "")
+                    {
+                        rowtemp.CreateCell(7).SetCellValue("/" + dt.Rows[i]["VOYAGENO"].ToString());
+
+                    }
+                    if (dt.Rows[i]["TRANSNAME"].ToString() != "" && dt.Rows[i]["VOYAGENO"].ToString() == "")
+                    {
+                        rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["TRANSNAME"].ToString());
+
+                    }
+                    if (dt.Rows[i]["TRANSNAME"].ToString() != "" && dt.Rows[i]["VOYAGENO"].ToString() != "")
+                    {
+                        rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["TRANSNAME"].ToString() + "/" + dt.Rows[i]["VOYAGENO"].ToString());
+
+                    }
+                    rowtemp.CreateCell(8).SetCellValue(getStatusName(dt.Rows[i]["BUSITYPE"].ToString(), common_data_busitype));
+                    rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
+                    rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["BLNO"].ToString());//REPWAYID
+                    rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());
+                    rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["DECLWAYNAME"].ToString());
+                    rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["TRADEMETHOD"].ToString());
+                    rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                    rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
+                    rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
+                    rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
+                    rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
+                    rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
 
                 }
-                if (dt.Rows[i]["TRANSNAME"].ToString() == "" && dt.Rows[i]["VOYAGENO"].ToString() != "")
-                {
-                    rowtemp.CreateCell(7).SetCellValue("/" + dt.Rows[i]["VOYAGENO"].ToString());
-
-                }
-                if (dt.Rows[i]["TRANSNAME"].ToString() != "" && dt.Rows[i]["VOYAGENO"].ToString() == "")
-                {
-                    rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["TRANSNAME"].ToString());
-
-                }
-                if (dt.Rows[i]["TRANSNAME"].ToString() != "" && dt.Rows[i]["VOYAGENO"].ToString() != "")
-                {
-                    rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["TRANSNAME"].ToString() + "/" + dt.Rows[i]["VOYAGENO"].ToString());
-
-                }
-
-                rowtemp.CreateCell(8).SetCellValue(getStatusName(dt.Rows[i]["BUSITYPE"].ToString(), common_data_busitype));
-                rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
-                rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["BLNO"].ToString());//REPWAYID
-                rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());
-                rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["DECLWAYNAME"].ToString());
-                rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["TRADEMETHOD"].ToString());
-                rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
-                rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
-                rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
-                rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
-                rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["CORRESPONDNO"].ToString());
-                rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
-                rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
-                rowtemp.CreateCell(21).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
-
             }
+            #endregion
 
+            #region 海运进出口
+            if (busitypeid == "20" || busitypeid == "21")
+            {
+                row1.CreateCell(0).SetCellValue("海关状态"); row1.CreateCell(1).SetCellValue("报关单号"); row1.CreateCell(2).SetCellValue("经营单位"); row1.CreateCell(3).SetCellValue("合同发票号");
+                row1.CreateCell(4).SetCellValue("海运提单号"); row1.CreateCell(5).SetCellValue("申报日期"); row1.CreateCell(6).SetCellValue("运输工具名称");row1.CreateCell(7).SetCellValue("业务类型"); 
+                row1.CreateCell(8).SetCellValue("出口口岸"); row1.CreateCell(9).SetCellValue("提运单号"); row1.CreateCell(10).SetCellValue("申报方式");row1.CreateCell(11).SetCellValue("报关方式"); 
+                row1.CreateCell(12).SetCellValue("贸易方式"); row1.CreateCell(13).SetCellValue("合同协议号"); row1.CreateCell(14).SetCellValue("件数");row1.CreateCell(15).SetCellValue("重量"); 
+                row1.CreateCell(16).SetCellValue("张数"); row1.CreateCell(17).SetCellValue("订单编号"); row1.CreateCell(18).SetCellValue("客户编号");
+
+
+                //将数据逐步写入sheet_S各个行
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                    rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["CUSTOMSSTATUS"].ToString());
+                    rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["DECLARATIONCODE"].ToString());
+                    rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
+                    rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CONTRACTNOORDER"].ToString());
+                    rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["SECONDLADINGBILLNO"].ToString());
+                    rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["REPTIME"].ToString());
+                    if (dt.Rows[i]["TRANSNAME"].ToString() == "" && dt.Rows[i]["VOYAGENO"].ToString() == "")
+                    {
+                        rowtemp.CreateCell(6).SetCellValue("");
+
+                    }
+                    if (dt.Rows[i]["TRANSNAME"].ToString() == "" && dt.Rows[i]["VOYAGENO"].ToString() != "")
+                    {
+                        rowtemp.CreateCell(6).SetCellValue("/" + dt.Rows[i]["VOYAGENO"].ToString());
+
+                    }
+                    if (dt.Rows[i]["TRANSNAME"].ToString() != "" && dt.Rows[i]["VOYAGENO"].ToString() == "")
+                    {
+                        rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["TRANSNAME"].ToString());
+
+                    }
+                    if (dt.Rows[i]["TRANSNAME"].ToString() != "" && dt.Rows[i]["VOYAGENO"].ToString() != "")
+                    {
+                        rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["TRANSNAME"].ToString() + "/" + dt.Rows[i]["VOYAGENO"].ToString());
+
+                    }
+                    rowtemp.CreateCell(7).SetCellValue(getStatusName(dt.Rows[i]["BUSITYPE"].ToString(), common_data_busitype));
+                    rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
+                    rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["BLNO"].ToString());//REPWAYID
+                    rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());
+                    rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["DECLWAYNAME"].ToString());
+                    rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["TRADEMETHOD"].ToString());
+                    rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                    rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
+                    rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
+                    rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
+                    rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
+                    rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+
+                }
+            }
+            #endregion
+
+            #region 陆运进出口
+            if (busitypeid == "30" || busitypeid == "31")
+            {
+                row1.CreateCell(0).SetCellValue("海关状态"); row1.CreateCell(1).SetCellValue("报关单号"); row1.CreateCell(2).SetCellValue("经营单位"); row1.CreateCell(3).SetCellValue("合同发票号");
+                row1.CreateCell(4).SetCellValue("申报日期"); row1.CreateCell(5).SetCellValue("运输工具名称"); row1.CreateCell(6).SetCellValue("业务类型"); row1.CreateCell(7).SetCellValue("出口口岸");
+                row1.CreateCell(8).SetCellValue("提运单号"); row1.CreateCell(9).SetCellValue("申报方式"); row1.CreateCell(10).SetCellValue("报关方式"); row1.CreateCell(11).SetCellValue("贸易方式");
+                row1.CreateCell(12).SetCellValue("合同协议号"); row1.CreateCell(13).SetCellValue("件数"); row1.CreateCell(14).SetCellValue("重量"); row1.CreateCell(15).SetCellValue("张数");
+                row1.CreateCell(16).SetCellValue("订单编号"); row1.CreateCell(17).SetCellValue("客户编号");
+
+                //将数据逐步写入sheet_S各个行
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                    rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["CUSTOMSSTATUS"].ToString());
+                    rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["DECLARATIONCODE"].ToString());
+                    rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
+                    rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CONTRACTNOORDER"].ToString());
+                    rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["REPTIME"].ToString());
+                    if (dt.Rows[i]["TRANSNAME"].ToString() == "" && dt.Rows[i]["VOYAGENO"].ToString() == "")
+                    {
+                        rowtemp.CreateCell(5).SetCellValue("");
+
+                    }
+                    if (dt.Rows[i]["TRANSNAME"].ToString() == "" && dt.Rows[i]["VOYAGENO"].ToString() != "")
+                    {
+                        rowtemp.CreateCell(5).SetCellValue("/" + dt.Rows[i]["VOYAGENO"].ToString());
+
+                    }
+                    if (dt.Rows[i]["TRANSNAME"].ToString() != "" && dt.Rows[i]["VOYAGENO"].ToString() == "")
+                    {
+                        rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["TRANSNAME"].ToString());
+
+                    }
+                    if (dt.Rows[i]["TRANSNAME"].ToString() != "" && dt.Rows[i]["VOYAGENO"].ToString() != "")
+                    {
+                        rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["TRANSNAME"].ToString() + "/" + dt.Rows[i]["VOYAGENO"].ToString());
+
+                    }
+                    rowtemp.CreateCell(6).SetCellValue(getStatusName(dt.Rows[i]["BUSITYPE"].ToString(), common_data_busitype));
+                    rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
+                    rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["BLNO"].ToString());//REPWAYID
+                    rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());
+                    rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["DECLWAYNAME"].ToString());
+                    rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["TRADEMETHOD"].ToString());
+                    rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                    rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
+                    rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
+                    rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
+                    rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
+                    rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+
+                }
+            }
+            #endregion
+
+            #region 国内进出口
+            if (busitypeid == "40-41")
+            {
+                row1.CreateCell(0).SetCellValue("海关状态"); row1.CreateCell(1).SetCellValue("报关单号");row1.CreateCell(2).SetCellValue("经营单位");row1.CreateCell(3).SetCellValue("合同发票号");
+                row1.CreateCell(4).SetCellValue("申报日期"); row1.CreateCell(5).SetCellValue("进/出"); row1.CreateCell(6).SetCellValue("两单关联号"); row1.CreateCell(7).SetCellValue("运输工具名称");                
+                row1.CreateCell(8).SetCellValue("业务类型"); row1.CreateCell(9).SetCellValue("出口口岸"); row1.CreateCell(10).SetCellValue("提运单号"); row1.CreateCell(11).SetCellValue("申报方式");
+                row1.CreateCell(12).SetCellValue("报关方式"); row1.CreateCell(13).SetCellValue("贸易方式"); row1.CreateCell(14).SetCellValue("合同协议号"); row1.CreateCell(15).SetCellValue("件数");
+                row1.CreateCell(16).SetCellValue("重量"); row1.CreateCell(17).SetCellValue("张数"); row1.CreateCell(18).SetCellValue("多单关联号"); row1.CreateCell(19).SetCellValue("订单编号");
+                row1.CreateCell(20).SetCellValue("客户编号");
+
+                //将数据逐步写入sheet_S各个行
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                    rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["CUSTOMSSTATUS"].ToString());
+                    rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["DECLARATIONCODE"].ToString());
+                    rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
+                    rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CONTRACTNOORDER"].ToString());
+                    rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["REPTIME"].ToString());
+                    rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["IETYPE"].ToString());
+                    rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["ASSOCIATENO"].ToString());
+                    if (dt.Rows[i]["TRANSNAME"].ToString() == "" && dt.Rows[i]["VOYAGENO"].ToString() == "")
+                    {
+                        rowtemp.CreateCell(7).SetCellValue("");
+
+                    }
+                    if (dt.Rows[i]["TRANSNAME"].ToString() == "" && dt.Rows[i]["VOYAGENO"].ToString() != "")
+                    {
+                        rowtemp.CreateCell(7).SetCellValue("/" + dt.Rows[i]["VOYAGENO"].ToString());
+
+                    }
+                    if (dt.Rows[i]["TRANSNAME"].ToString() != "" && dt.Rows[i]["VOYAGENO"].ToString() == "")
+                    {
+                        rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["TRANSNAME"].ToString());
+
+                    }
+                    if (dt.Rows[i]["TRANSNAME"].ToString() != "" && dt.Rows[i]["VOYAGENO"].ToString() != "")
+                    {
+                        rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["TRANSNAME"].ToString() + "/" + dt.Rows[i]["VOYAGENO"].ToString());
+
+                    }
+                    rowtemp.CreateCell(8).SetCellValue(getStatusName(dt.Rows[i]["BUSITYPE"].ToString(), common_data_busitype));
+                    rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
+                    rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["BLNO"].ToString());//REPWAYID
+                    rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());
+                    rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["DECLWAYNAME"].ToString());
+                    rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["TRADEMETHOD"].ToString());
+                    rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                    rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
+                    rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
+                    rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
+                    rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["CORRESPONDNO"].ToString());
+                    rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
+                    rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["CUSNO"].ToString());                 
+
+                }
+            }
+            #endregion
+
+            #region 特殊区域
+            if (busitypeid == "50-51")
+            {
+                row1.CreateCell(0).SetCellValue("海关状态"); row1.CreateCell(1).SetCellValue("报关单号"); row1.CreateCell(2).SetCellValue("经营单位"); row1.CreateCell(3).SetCellValue("合同发票号");
+                row1.CreateCell(4).SetCellValue("申报日期"); row1.CreateCell(5).SetCellValue("运输工具名称");row1.CreateCell(6).SetCellValue("业务类型"); row1.CreateCell(7).SetCellValue("出口口岸"); 
+                row1.CreateCell(8).SetCellValue("提运单号"); row1.CreateCell(9).SetCellValue("申报方式"); row1.CreateCell(10).SetCellValue("报关方式"); row1.CreateCell(11).SetCellValue("贸易方式");
+                row1.CreateCell(12).SetCellValue("合同协议号"); row1.CreateCell(13).SetCellValue("件数");row1.CreateCell(14).SetCellValue("重量"); row1.CreateCell(15).SetCellValue("张数") ; 
+                row1.CreateCell(16).SetCellValue("订单编号");row1.CreateCell(17).SetCellValue("客户编号");
+
+                //将数据逐步写入sheet_S各个行
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                    rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["CUSTOMSSTATUS"].ToString());
+                    rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["DECLARATIONCODE"].ToString());
+                    rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
+                    rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CONTRACTNOORDER"].ToString());
+                    rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["REPTIME"].ToString());
+                    if (dt.Rows[i]["TRANSNAME"].ToString() == "" && dt.Rows[i]["VOYAGENO"].ToString() == "")
+                    {
+                        rowtemp.CreateCell(5).SetCellValue("");
+
+                    }
+                    if (dt.Rows[i]["TRANSNAME"].ToString() == "" && dt.Rows[i]["VOYAGENO"].ToString() != "")
+                    {
+                        rowtemp.CreateCell(5).SetCellValue("/" + dt.Rows[i]["VOYAGENO"].ToString());
+
+                    }
+                    if (dt.Rows[i]["TRANSNAME"].ToString() != "" && dt.Rows[i]["VOYAGENO"].ToString() == "")
+                    {
+                        rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["TRANSNAME"].ToString());
+
+                    }
+                    if (dt.Rows[i]["TRANSNAME"].ToString() != "" && dt.Rows[i]["VOYAGENO"].ToString() != "")
+                    {
+                        rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["TRANSNAME"].ToString() + "/" + dt.Rows[i]["VOYAGENO"].ToString());
+
+                    }
+                    rowtemp.CreateCell(6).SetCellValue(getStatusName(dt.Rows[i]["BUSITYPE"].ToString(), common_data_busitype));
+                    rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
+                    rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["BLNO"].ToString());//REPWAYID
+                    rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());
+                    rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["DECLWAYNAME"].ToString());
+                    rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["TRADEMETHOD"].ToString());
+                    rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                    rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
+                    rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
+                    rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
+                    rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
+                    rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+
+                }
+            }
+            #endregion
 
             // 写入到客户端 
             //System.IO.MemoryStream ms = new System.IO.MemoryStream();
