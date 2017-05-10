@@ -46,7 +46,7 @@ namespace MvcPlatform.Controllers
                                   ) b on a.id=b.rootid
                     ) a
                     where numid<=6
-                    order by a.sortindex,a.type";
+                    order by a.sortindex,a.type,a.publishdate desc";
             dt_notice = DBMgr.GetDataTable(sql);   
 
             dic.Add("dt_type", dt_type);
@@ -173,7 +173,7 @@ namespace MvcPlatform.Controllers
                                     select row_number() over (order by publishdate) numid,t.id
                                          ,case when length(t.title)>50 then substr(t.title,1,50)||'...' else t.title end title
                                          ,to_char(t.publishdate,'yyyy-mm-dd') as publishdate ,to_char(t.updatetime,'yyyy-mm-dd hh24:mi') as updatetime  
-                                    from web_notice t where " + strwhere + ") a where numid>{0} and numid<={1}";
+                                    from web_notice t where " + strwhere + ") a where numid>{0} and numid<={1} order by a.publishdate desc";
             sql = string.Format(sql, startIndex, endIndex);
 
 
