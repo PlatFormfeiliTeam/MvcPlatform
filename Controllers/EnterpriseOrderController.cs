@@ -17,6 +17,11 @@ using System.Drawing.Printing;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using StackExchange.Redis;
+using LumiSoft.Net;
+using LumiSoft.Net.POP3.Client;
+using LumiSoft.Net.Mail;
+using LumiSoft.Net.MIME;
+using System.IO;
 
 namespace MvcPlatform.Controllers
 {
@@ -404,7 +409,7 @@ namespace MvcPlatform.Controllers
                                   json_data.Value<string>("CODE"), json_data.Value<string>("CREATEMODE"), status, json_data.Value<string>("ISREADPDF"), json_data.Value<string>("TEMPLATENAME"));
                             DBMgr.ExecuteNonQuery(sql);
                             //更新随附文件
-                            Extension.Update_Attachment_ForEnterprise(ent_id, filedata, json_data.Value<string>("ORIGINALFILEIDS"), json_user);
+                            Extension.Update_Attachment_ForEnterprise(ent_id, filedata, json_data.Value<string>("ORIGINALFILEIDS"), json_user,"");
                         }
                         if (json_data.Value<string>("CREATEMODE") == "按文件")
                         {
@@ -421,7 +426,7 @@ namespace MvcPlatform.Controllers
                                       json_data.Value<string>("CODE"), json_data.Value<string>("CREATEMODE"), status, json_data.Value<string>("ISREADPDF"), json_data.Value<string>("TEMPLATENAME"));
                                 DBMgr.ExecuteNonQuery(sql);
                                 //更新随附文件
-                                Extension.Update_Attachment_ForEnterprise(ent_id, "[" + JsonConvert.SerializeObject(json) + "]", json_data.Value<string>("ORIGINALFILEIDS"), json_user);
+                                Extension.Update_Attachment_ForEnterprise(ent_id, "[" + JsonConvert.SerializeObject(json) + "]", json_data.Value<string>("ORIGINALFILEIDS"), json_user,"");
                             }
                         }
 
@@ -455,7 +460,7 @@ namespace MvcPlatform.Controllers
                         json_data.Value<string>("CUSTOMDISTRICTNAME"), json_data.Value<string>("REPWAYID"), json_data.Value<string>("REMARK"), json_data.Value<string>("CODE"), status, json_data.Value<string>("TEMPLATENAME"));
                         DBMgr.ExecuteNonQuery(sql);
                         //更新随附文件
-                        Extension.Update_Attachment_ForEnterprise(json_data.Value<string>("ID"), filedata, json_data.Value<string>("ORIGINALFILEIDS"), json_user);
+                        Extension.Update_Attachment_ForEnterprise(json_data.Value<string>("ID"), filedata, json_data.Value<string>("ORIGINALFILEIDS"), json_user,"");
                     }
                     return "{success:true}";
                 }
@@ -1422,7 +1427,110 @@ namespace MvcPlatform.Controllers
             return Extension.getPathname(filename, book);
         }
 
-       
+        #region
+        public string mailImport()
+        {
+            string mailUserName = ConfigurationManager.AppSettings["mailUserName"];
+            string mailPassword = ConfigurationManager.AppSettings["mailPassword"];
+            string mailAddress = ConfigurationManager.AppSettings["mailAddress"];
+            string sendAddress = Request["sendAddress"] + "";
+            string filedata = string.Empty;
+            JArray JA = new JArray();
+            using (POP3_Client client = new POP3_Client())
+            {
+
+            client.Connect(mailAddress, 110, false);
+            client.Login(mailUserName, mailPassword);//两个参数，前者为Email的账号，后者为Email的密码
+            POP3_ClientMessageCollection messages = client.Messages;
+           // Console.WriteLine("共{0}封邮件", messages.Count);
+
+            foreach (POP3_ClientMessage message in messages)
+            {
+                
+
+                Mail_Message mime = Mail_Message.ParseFromByte(message.MessageToByte());
+
+                string address = mime.Sender == null ? mime.ReturnPath.Address : mime.Sender.Address;//发件人地址
+                if (address == sendAddress)
+                 {
+                    JArray JA_file = new JArray();
+                     var uploadPath = Server.MapPath("/FileUpload/file/");
+                    foreach (MIME_Entity entity in mime.Attachments)
+                    {
+                       
+
+                        if (entity.ContentDisposition != null && entity.ContentDisposition.Param_FileName != null)
+                        { 
+                            string remote=DateTime.Now.ToString("yyyy-MM-dd");
+                            string ORIGINALNAME=entity.ContentDisposition.Param_FileName;
+                            string NEWNAME=Guid.NewGuid().ToString() + ORIGINALNAME.Substring(ORIGINALNAME.IndexOf("."));
+                            string filePath = "/FileUpload/file/" + NEWNAME;
+                            string savePath = uploadPath+NEWNAME;
+                            int size = ((MIME_b_SinglepartBase)entity.Body).Data.Length;
+                            System.IO.File.WriteAllBytes(savePath, ((MIME_b_SinglepartBase)entity.Body).Data);
+                            string fileContent = "{\"FILENAME\":\"" + filePath + "\",\"NEWNAME\":\"" + NEWNAME + "\",\"ORIGINALNAME\":\"" + ORIGINALNAME + "\",\"SIZES\":\"" + size + "\",\"UPLOADTIME\":\"" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "\",\"FILETYPE\":\"44\"}";
+                            JObject JO_file = JObject.Parse(fileContent);
+                            JA_file.Add(JO_file);
+
+                        }
+
+                         
+                    }
+                    filedata = JsonConvert.SerializeObject(JA_file);
+                    JObject JO = JObject.Parse("{\"SUBJECT\":\"" + mime.Subject + "\",\"FILECOUNT\":\"" + mime.Attachments.Length + "\",\"FILEDATA\":" + filedata + "}");
+                    JA.Add(JO);
+                    message.MarkForDeletion();//删除邮件,测试时先不删除  
+                }
+               
+            }
+
+            }
+            string result = string.Empty;
+            if (JA.Count == 0)
+            {
+              result="{success:true}";
+            }
+            else
+            { 
+              result=JsonConvert.SerializeObject(JA);
+            }
+            return result;
+        
+        }
+
+        public string import()
+        {
+            try
+            {
+                string records = Request["records"];
+                JArray ja_data = JArray.Parse(records);
+                JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+                foreach (JObject item in ja_data)
+                {
+
+                    string filedata = JsonConvert.SerializeObject(item.Value<JArray>("FILEDATA"));
+                    string insert_sql = @"insert into ENT_ORDER (id,createtime, unitcode,createid, createname,enterprisecode, enterprisename,status,isreadpdf,templatename,createmode) 
+                                     values ('{0}',sysdate,(select fun_AutoQYBH(sysdate) from dual),'{1}','{2}', '{3}','{4}',5,0,'','按批次')";
+
+                    string sql = "select ENT_ORDER_ID.Nextval from dual";
+                    string ent_id = DBMgr.GetDataTable(sql).Rows[0][0] + "";//获取ID
+                    sql = string.Format(insert_sql, ent_id, json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"), json_user.Value<string>("CUSTOMERHSCODE"), json_user.Value<string>("CUSTOMERNAME"));
+                    DBMgr.ExecuteNonQuery(sql);
+                    Extension.Update_Attachment_ForEnterprise(ent_id, filedata, "", json_user,"mailimport/"+DateTime.Now.ToString("yyyy-MM-dd"));
+                }
+                return "{success:true}";
+            }
+            catch (Exception)
+            {
+
+                return "{success:false}";
+            }
+            
+        
+        }
+        #endregion
+
+
 
     }
 }

@@ -204,7 +204,7 @@ namespace MvcPlatform.Common
                 }
             }
         }
-        public static void Update_Attachment_ForEnterprise(string entorder_id, string filedata, string originalfileids, JObject json_user)
+        public static void Update_Attachment_ForEnterprise(string entorder_id, string filedata, string originalfileids, JObject json_user,string path)
         {
             if (!string.IsNullOrEmpty(filedata))
             {
@@ -215,12 +215,18 @@ namespace MvcPlatform.Common
                 FtpHelper ftp = new FtpHelper(Uri, UserName, Password);
                 JArray jarry = JsonConvert.DeserializeObject<JArray>(filedata);
                 string sql = "";
-                string remote = DateTime.Now.ToString("yyyy-MM-dd");
+                string remote = path;
+                if (remote == "")
+                {
+                    remote = DateTime.Now.ToString("yyyy-MM-dd");
+                }
+                
                 IDatabase db = SeRedis.redis.GetDatabase(); 
                 foreach (JObject json in jarry)
                 {
                     if (string.IsNullOrEmpty(json.Value<string>("ID")))
                     {
+                       
                         string filename = "/" + remote + "/" + json.Value<string>("NEWNAME");
                         string sizes = json.Value<string>("SIZES");
                         string filetypename = json.Value<string>("FILETYPENAME");
