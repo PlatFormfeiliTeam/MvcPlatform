@@ -18,7 +18,7 @@
     }
     #menu li {
         float: left;
-        width: 100px;
+        width: 130px;
         list-style: none;
         height: 30px;
         padding-top: 5px;
@@ -114,6 +114,8 @@
                         Ext.getCmp('panelbottom_1_1').getForm().setValues(data.json_order[0]);
                         Ext.getCmp('panelbottom_1_3').getForm().setValues(data.json_order[0]);
                         if (Ext.getCmp('w_grid')) { Ext.getCmp('w_grid').store.loadData(data.json_container); }
+                        var TOTALNO_DIVIDENO_value = data.json_order[0].TOTALNO+"_"+data.json_order[0].DIVIDENO
+                        Ext.getCmp('TOTALNO_DIVIDENO').setValue(TOTALNO_DIVIDENO_value);
                     }
 
 
@@ -128,8 +130,8 @@
             fields: ['NAME', 'URL', 'busitypeid'],
             data: menu_js_data
         });
+        var i = 0;
         $.each(menu_store.data.items, function (idx, item) {
-            var i = 0;
             if (item.data.busitypeid == busitypeid) {
                 i++
                 if (i==1) {
@@ -208,20 +210,42 @@
             readOnly: true
         });
 
+            /*
         //总单号
         var field_TOTALNO = Ext.create('Ext.form.field.Text', {
-            name: 'TOTALNO',
-            fieldLabel: '总单号',
-            readOnly: true
+            name: 'TOTALNO', margin: 0,
+            readOnly: true,flex:0.5
         });
 
         //分单号
         var field_DIVIDENO = Ext.create('Ext.form.field.Text', {
-            name: 'DIVIDENO',
-            fieldLabel: '分单号',
-            readOnly: true
+            name: 'DIVIDENO', margin: 0,
+            readOnly: true,flex:0.5
         });
+        
 
+            //总分单号
+        var container_TOTALNO_DIVIDENO = {
+            xtype: 'fieldcontainer',
+            fieldLabel: '总分单号',
+            layout: 'hbox',
+            items: [field_TOTALNO, field_DIVIDENO],
+            columnWidth: .4,
+        }
+        */
+        var field_TOTALNO_DIVIDENO = Ext.create('Ext.form.field.Text', {
+            id:'TOTALNO_DIVIDENO',
+            name: 'TOTALNO_DIVIDENO', margin: 0,
+            readOnly: true,
+            flex:1
+        });
+        var container_TOTALNO_DIVIDENO = {
+            xtype: 'fieldcontainer',
+            fieldLabel: '总分单号',
+            layout: 'hbox',
+            items: [field_TOTALNO_DIVIDENO],
+            columnWidth: .4,
+        }
         //件数/包装
         var field_GOODSNUM = Ext.create('Ext.form.field.Text', {
             name: 'GOODSNUM',
@@ -287,6 +311,12 @@
             fieldLabel: '委托人员',
             readOnly: true
         });
+            //转关预录号
+        var field_TURNPRENO = Ext.create('Ext.form.field.Text', {
+            name: 'TURNPRENO',
+            fieldLabel: '转关预录号',
+            readOnly: true
+        });
         //贸易方式
         var store_myfs = Ext.create('Ext.data.JsonStore', {
             fields: ['CODE', 'NAME'],
@@ -303,8 +333,8 @@
 
         })
         item_top.push({ layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [field_contractno, field_repno, field_PORTCODE, field_BUSIUNIT, field_REPUNIT] },
-                    { layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [combo_myfs, field_REPWAY, field_TOTALNO, field_DIVIDENO, field_SUBMITTIME] },
-                    { layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [field_quanpackage, field_weight, field_CUSTOMERNAME, field_SUBMITUSERNAME] });
+                    { layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [combo_myfs, field_REPWAY, container_TOTALNO_DIVIDENO, field_SUBMITTIME] },
+                    { layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [field_quanpackage, field_weight, field_CUSTOMERNAME, field_SUBMITUSERNAME, field_TURNPRENO] });
         }
 
         if (busitypeid == '21' || busitypeid == '20') {
@@ -516,19 +546,23 @@
             })
             var field_COL003 = Ext.create('Ext.form.field.Text', {
                 name: 'COL003',
-                fieldLabel: '始发'
+                fieldLabel: '始发站'
             });
             var field_COL004 = Ext.create('Ext.form.field.Text', {
                 name: 'COL004',
-                fieldLabel: '到达'
+                fieldLabel: '到达站'
             });
-            var field_COL005 = Ext.create('Ext.form.field.Text', {
+            var field_COL005 = Ext.create('Ext.form.field.Date', {
                 name: 'COL005',
-                fieldLabel: 'ATD'
+                fieldLabel: 'ATD',
+                //emptyText: '预计到达时间',
+                format: 'Y-m-d'
             });
-            var field_COL006 = Ext.create('Ext.form.field.Text', {
+            var field_COL006 = Ext.create('Ext.form.field.Date', {
                 name: 'COL006',
-                fieldLabel: 'ATA'
+                fieldLabel: 'ATA',
+               //emptyText: '实际到达时间',
+                format: 'Y-m-d'
             });
             itemsAll.push({ layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [label_busiinfo] },
                           { layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [field_COL001, field_COL002, field_COL003, field_COL004, field_COL005] },
@@ -579,7 +613,7 @@
               + '<button type="button" onclick="save()" class="btn btn-primary btn-sm" id="btn_saveorder"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
               + '</div>';
         var buttombar = Ext.create('Ext.toolbar.Toolbar', {
-            items: ['->', bbar_r]
+            items: ['<span style="color:red">备注：ATD:预计到达时间  ATA实际到达时间</span>', '->', bbar_r]
         })
 
         var panelbottom_1_1 = Ext.create('Ext.form.Panel', {
