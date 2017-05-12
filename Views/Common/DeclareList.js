@@ -57,7 +57,7 @@ Ext.onReady(function () {
                 data: common_data_busitype
             });
             var store = Ext.create('Ext.data.JsonStore', {
-                fields: ['ID','CODE', 'ORDERCODE', 'CUSTOMSSTATUS', 'ISPRINT', 'SHEETNUM',
+                fields: ['ID', 'CODE', 'ORDERCODE', 'CUSTOMSSTATUS', 'ISPRINT', 'SHEETNUM', 'MODIFYFLAG', 'PRETRANSNAME',
                         'DECLARATIONCODE', 'REPTIME', 'CONTRACTNO', 'GOODSNUM', 'GOODSNW', 'BLNO', 'TRANSNAME', 'VOYAGENO',
                         'BUSIUNITCODE', 'BUSIUNITNAME', 'PORTCODE', 'TRADEMETHOD', 'DECLWAY', 'DECLWAYNAME',
                         'BUSITYPE', 'CONTRACTNOORDER', 'REPWAYID', 'REPWAYNAME', 'TOTALNO', 'DIVIDENO','SECONDLADINGBILLNO',
@@ -116,6 +116,7 @@ Ext.onReady(function () {
                 { header: '进/出', dataIndex: 'IETYPE', width: 80, hidden: busitypeid != '40-41' },
                 { header: '两单关联号', dataIndex: 'ASSOCIATENO', width: 110, hidden: busitypeid != '40-41' },//两单关联号
                 { header: '运输工具名称', dataIndex: 'TRANSNAME', width: 150, renderer: render },
+                { header: busitypeid == '21' ? '船名' : '预录号', dataIndex: 'PRETRANSNAME', width: 150, hidden: (busitypeid != '21' && busitypeid != '50-51') },
                 { header: '业务类型', dataIndex: 'BUSITYPE', width: 90, renderer: render },// 业务类型
                 { header: '出口口岸', dataIndex: 'PORTCODE', width: 80 },
                 { header: '提运单号', dataIndex: 'BLNO', width: 180 },
@@ -126,6 +127,7 @@ Ext.onReady(function () {
                 { header: '件数', dataIndex: 'GOODSNUM', width: 60 },
                 { header: '重量', dataIndex: 'GOODSNW', width: 60 },
                 { header: '张数', dataIndex: 'SHEETNUM', width: 60 },
+                { header: '删改单', dataIndex: 'MODIFYFLAG', width: 60, renderer: render },
                 { header: '多单关联号', dataIndex: 'CORRESPONDNO', width: 100, hidden: busitypeid != '40-41' },//多单关联号
                 { header: '订单编号', dataIndex: 'ORDERCODE', width: 100 },
                 { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 140, locked: role == 'customer' },
@@ -198,15 +200,21 @@ function initSearch() {
     var declarationsearch_js_condition2_data = [{ "NAME": "客户编号", "CODE": "CUSNO" }, { "NAME": "提运单号", "CODE": "BLNO" }
             , { "NAME": "订单编号", "CODE": "ORDERCODE" }, { "NAME": "报关单号", "CODE": "DECLNO" }
             , { "NAME": "合同协议号", "CODE": "CONTRACTNO" }, { "NAME": "运输工具名称", "CODE": "TRANSNAME" }, { "NAME": "合同发票号", "CODE": "CONTRACTNOORDER" }];
-    if (busitypeid == 10 || busitypeid == 30) {  //如果是空运出口，或者是陆运出口
+    if (busitypeid == "10" || busitypeid == "30") {  //如果是空运出口，或者是陆运出口
         declarationsearch_js_condition2_data.push({ "NAME": "报关车号", "CODE": "DECLCARNO" });
     }
-    if (busitypeid == 10 || busitypeid == 11) {
+    if (busitypeid == "10" || busitypeid == "11") {
         declarationsearch_js_condition2_data.push({ "NAME": "总单号", "CODE": "TOTALNO" });
         declarationsearch_js_condition2_data.push({ "NAME": "分单号", "CODE": "DIVIDENO" });
     }
-    if (busitypeid == 20 || busitypeid == 21) {
+    if (busitypeid == "20" || busitypeid == "21") {
         declarationsearch_js_condition2_data.push({ "NAME": "海关提单号", "CODE": "SECONDLADINGBILLNO" });
+    }
+    if (busitypeid == "21") {
+        declarationsearch_js_condition2_data.push({ "NAME": "船名", "CODE": "PRETRANSNAME" });
+    }
+    if (busitypeid == "50-51") {
+        declarationsearch_js_condition2_data.push({ "NAME": "预录号", "CODE": "PRETRANSNAME" });
     }
 
     var store_2 = Ext.create("Ext.data.JsonStore", {
@@ -237,10 +245,11 @@ function initSearch() {
 
     var declarationsearch_js_condition3_data_dy = [{ "NAME": "已打印", "CODE": "1" }, { "NAME": "未打印", "CODE": "0" }];
     var declarationsearch_js_condition3_data_hg = [{ "NAME": "已结关", "CODE": "已结关" }, { "NAME": "未结关", "CODE": "未结关" }];
+    var declarationsearch_js_condition3_data_sg = [{ "NAME": "正常", "CODE": "0" }, { "NAME": "删单", "CODE": "1" }, { "NAME": "改单", "CODE": "2" }];
 
     var store_3 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: [{ "NAME": "打印标志", "CODE": "DYBZ" }, { "NAME": "海关状态", "CODE": "HGZT" }]
+        data: [{ "NAME": "打印标志", "CODE": "DYBZ" }, { "NAME": "海关状态", "CODE": "HGZT" }, { "NAME": "删改单", "CODE": "SGD" }]
     });    
 
     var combo_3 = Ext.create("Ext.form.ComboBox", {
@@ -264,6 +273,9 @@ function initSearch() {
                     if (newValue == "DYBZ") {
                         store_3_1.loadData(declarationsearch_js_condition3_data_dy);
                     }
+                    if (newValue == "SGD") {
+                        store_3_1.loadData(declarationsearch_js_condition3_data_sg);
+                    }
                 }
             }
     });
@@ -281,7 +293,17 @@ function initSearch() {
         flex: .65,
         anyMatch: true,
         queryMode: 'local',
-        editable: false
+        //editable: false
+        forceSelection: true,
+        listeners: {
+            focus: function (cb) {
+                if (!cb.getValue()) {
+                    cb.clearInvalid();
+                    cb.store.clearFilter();
+                    cb.expand()
+                }
+            }
+        }
     });
     var condition3 = {
         xtype: 'fieldcontainer',
@@ -422,6 +444,9 @@ function initSearch() {
                     if (newValue == "DYBZ") {
                         store_7_1.loadData(declarationsearch_js_condition3_data_dy);
                     }
+                    if (newValue == "SGD") {
+                        store_7_1.loadData(declarationsearch_js_condition3_data_sg);
+                    }
                 }
             }
     });
@@ -439,7 +464,17 @@ function initSearch() {
         flex: .65,
         anyMatch: true,
         queryMode: 'local',
-        editable: false
+        //editable: false
+        forceSelection: true,
+        listeners: {
+            focus: function (cb) {
+                if (!cb.getValue()) {
+                    cb.clearInvalid();
+                    cb.store.clearFilter();
+                    cb.expand()
+                }
+            }
+        }
     });
     var condition7 = {
         xtype: 'fieldcontainer',
@@ -526,6 +561,11 @@ function render(value, cellmeta, record, rowIndex, columnIndex, store) {
     }
     if (dataindex == "ISPRINT") {
         rtn = value == "0" ? "未打印" : "已打印";
+    }
+    if (dataindex == "MODIFYFLAG") {
+        if (value == "0") rtn = "正常";
+        if (value == "1") rtn = "删单";
+        if (value == "2") rtn = "改单";
     }
     if (dataindex == "REPWAYNAME" && value) {
         var rec = store_sbfs.findRecord('CODE', value);
@@ -629,7 +669,11 @@ function ExportDecl() {
         success: function (response, option) {
             var json = Ext.decode(response.responseText);
             if (json.success == false) {
-                Ext.MessageBox.alert('提示', '综合需求及性能，导出记录限制' + json.WebDownCount + '！');
+                if (json.WebDownCount==0) {
+                    Ext.MessageBox.alert('提示', '记录为空！');
+                }else{
+                    Ext.MessageBox.alert('提示', '综合需求及性能，导出记录限制' + json.WebDownCount + '！');
+                }
             } else {
                 Ext.Ajax.request({
                     url: '/Common/DownloadFile',

@@ -38,6 +38,7 @@ Ext.onReady(function () {
 
 function initSearch() {
     var declarationsearch_js_condition3_data_hg = [{ "NAME": "已结关", "CODE": "已结关" }, { "NAME": "未结关", "CODE": "未结关" }];
+    var declarationsearch_js_condition3_data_sg = [{ "NAME": "正常", "CODE": "0" }, { "NAME": "删单", "CODE": "1" }, { "NAME": "改单", "CODE": "2" }];
 
     var store_1 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
@@ -125,7 +126,7 @@ function initSearch() {
 
     var store_3 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: [{ "NAME": "业务类型", "CODE": "BUSITYPE" }, { "NAME": "海关状态", "CODE": "HGZT" }]
+        data: [{ "NAME": "业务类型", "CODE": "BUSITYPE" }, { "NAME": "海关状态", "CODE": "HGZT" }, { "NAME": "删改单", "CODE": "SGD" }]
     });
     var combo_3 = Ext.create('Ext.form.field.ComboBox', {
         id: 'CONDITION3',
@@ -147,6 +148,9 @@ function initSearch() {
                    }                  
                    if (this.getValue() == "HGZT") {
                        store_3_1.loadData(declarationsearch_js_condition3_data_hg);
+                   }
+                   if (this.getValue() == "SGD") {
+                       store_3_1.loadData(declarationsearch_js_condition3_data_sg);
                    }
                }
            }
@@ -297,7 +301,7 @@ function initSearch() {
 
     var store_7 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: [{ "NAME": "业务类型", "CODE": "BUSITYPE" }, { "NAME": "海关状态", "CODE": "HGZT" }]
+        data: [{ "NAME": "业务类型", "CODE": "BUSITYPE" }, { "NAME": "海关状态", "CODE": "HGZT" }, { "NAME": "删改单", "CODE": "SGD" }]
     });
     var combo_7 = Ext.create('Ext.form.field.ComboBox', {
         id: 'CONDITION7',
@@ -319,6 +323,9 @@ function initSearch() {
                    }
                    if (this.getValue() == "HGZT") {
                        store_7_1.loadData(declarationsearch_js_condition3_data_hg);
+                   }
+                   if (this.getValue() == "SGD") {
+                       store_7_1.loadData(declarationsearch_js_condition3_data_sg);
                    }
                }
            }
@@ -400,7 +407,7 @@ function initSearch() {
 
 function gridpanelBind() {
     var store = Ext.create('Ext.data.JsonStore', {
-        fields: ['ID', 'PREDECLCODE', 'DECLARATIONCODE', 'CUSTOMSSTATUS', 'CODE', 'REPTIME', 'TRANSNAME', 'BUSIUNITCODE', 'CUSTOMERNAME', 'IETYPE',
+        fields: ['ID', 'PREDECLCODE', 'DECLARATIONCODE', 'CUSTOMSSTATUS', 'CODE', 'MODIFYFLAG', 'REPTIME', 'TRANSNAME', 'BUSIUNITCODE', 'CUSTOMERNAME', 'IETYPE',
                 'BUSIUNITNAME', 'PORTCODE', 'BLNO', 'REPWAYID', 'REPWAYNAME', 'DECLWAY', 'DECLWAYNAME', 'TRADEMETHOD', 'CONTRACTNO', 'GOODSNUM',
                 'GOODSNW', 'SHEETNUM', 'ORDERCODE', 'CUSNO', 'ASSOCIATENO', 'CORRESPONDNO', 'BUSITYPE', 'CONTRACTNOORDER', 'REPUNITNAME'],
         pageSize: 22,
@@ -465,6 +472,7 @@ function gridpanelBind() {
         { header: '件数', dataIndex: 'GOODSNUM', width: 60 },
         { header: '重量', dataIndex: 'GOODSNW', width: 60 },
         { header: '张数', dataIndex: 'SHEETNUM', width: 60 },
+        { header: '删改单', dataIndex: 'MODIFYFLAG', width: 60, renderer: render },
         { header: '订单编号', dataIndex: 'ORDERCODE', width: 100 },
         { header: '客户编号', dataIndex: 'CUSNO', width: 125 }
         //,{ header: '进/出', dataIndex: 'IETYPE', width: 80},
@@ -482,6 +490,11 @@ function render(value, cellmeta, record, rowIndex, columnIndex, store) {
     var dataindex = cellmeta.column.dataIndex;
     if (dataindex == "DECLARATIONCODE" && value) {
         rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='FileConsult(\"" + record.get("ORDERCODE") + "\",\"" + escape(record.get("BUSITYPE")) + "\",\"" + record.get("CODE") + "\")'>" + value + "</div>";
+    }
+    if (dataindex == "MODIFYFLAG") {
+        if (value == "0") rtn = "正常";
+        if (value == "1") rtn = "删单";
+        if (value == "2") rtn = "改单";
     }
     if (dataindex == "REPWAYNAME" && value) {
         var rec = store_sbfs.findRecord('CODE', value);

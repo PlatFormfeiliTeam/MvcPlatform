@@ -1032,10 +1032,17 @@ namespace MvcPlatform.Controllers
 
         /*报关单管理 列表页展示*/
         public string LoadDeclarationList()
-        {            
+        {
             string sql = QueryConditionDecl();
+            DataTable dt = null;           
+            try
+            {
+                dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));  
+            }
+            catch (Exception ex)
+            {
 
-            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
+            }
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             var json = JsonConvert.SerializeObject(dt, iso);
@@ -1098,6 +1105,9 @@ namespace MvcPlatform.Controllers
                     case "SECONDLADINGBILLNO"://海关提单号
                         where += " and instr(ort.SECONDLADINGBILLNO,'" + Request["VALUE2"] + "')>0 ";
                         break;
+                    case "PRETRANSNAME"://船名、预录号
+                        where += " and instr(det.TRANSNAME,'" + Request["VALUE2"] + "')>0 ";
+                        break;
                 }
             }
             if (!string.IsNullOrEmpty(Request["VALUE3"]))//判断查询条件3是否有值
@@ -1110,6 +1120,9 @@ namespace MvcPlatform.Controllers
                     case "HGZT"://海关状态
                         if (Request["VALUE3"] == "已结关") { where += " and det.CUSTOMSSTATUS='已结关' "; }
                         if (Request["VALUE3"] == "未结关") { where += " and det.CUSTOMSSTATUS!='已结关' "; }
+                        break;
+                    case "SGD"://删改单
+                        where += " and det.modifyflag='" + Request["VALUE3"] + "' ";
                         break;
                 }
             }
@@ -1187,6 +1200,9 @@ namespace MvcPlatform.Controllers
                     case "SECONDLADINGBILLNO"://海关提单号
                         where += " and instr(ort.SECONDLADINGBILLNO,'" + Request["VALUE6"] + "')>0 ";
                         break;
+                    case "PRETRANSNAME"://船名、预录号
+                        where += " and instr(det.TRANSNAME,'" + Request["VALUE6"] + "')>0 ";
+                        break;
                 }
             }
             if (!string.IsNullOrEmpty(Request["VALUE7"]))//判断查询条件3是否有值
@@ -1199,6 +1215,9 @@ namespace MvcPlatform.Controllers
                     case "HGZT"://海关状态
                         if (Request["VALUE7"] == "已结关") { where += " and det.CUSTOMSSTATUS='已结关' "; }
                         if (Request["VALUE7"] == "未结关") { where += " and det.CUSTOMSSTATUS!='已结关' "; }
+                        break;
+                    case "SGD"://删改单
+                        where += " and det.modifyflag='" + Request["VALUE7"] + "' ";
                         break;
                 }
             }
@@ -1255,7 +1274,7 @@ namespace MvcPlatform.Controllers
 //                      + " and a.ASSOCIATENO is null and b.ordercode is  null ";
 
 
-            string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.ISPRINT,det.SHEETNUM,
+            string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.ISPRINT,det.SHEETNUM,det.modifyflag,det.transname as pretransname,
                               lda.declarationcode,to_char(lda.reptime,'yyyy-mm-dd') reptime,lda.contractno,lda.goodsnum,lda.goodsnw,lda.blno,
                               lda.transname,lda.voyageno,lda.portcode,
                               lda.trademethod,lda.declkind DECLWAY,lda.declkind DECLWAYNAME,  
@@ -3021,27 +3040,39 @@ namespace MvcPlatform.Controllers
 
         public string ExportDeclList()
         {
-            string common_data_busitype = Request["common_data_busitype"];
+            string common_data_busitype = Request["common_data_busitype"]; string busitypeid = Request["busitypeid"];
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
             string sql = QueryConditionDecl();
             sql = sql + " order by CREATETIME desc";
-
-            DataTable dt_count = DBMgr.GetDataTable("select count(1) from (" + sql + ") a");
-            int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
-            if (Convert.ToInt32(dt_count.Rows[0][0]) > WebDownCount)
+            DataTable dt = new DataTable();
+            try
             {
-                return "{success:false,WebDownCount:" + WebDownCount + "}";
+                DataTable dt_count = DBMgr.GetDataTable("select count(1) from (" + sql + ") a");
+
+                int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
+                if (Convert.ToInt32(dt_count.Rows[0][0]) > WebDownCount)
+                {
+                    return "{success:false,WebDownCount:" + WebDownCount + "}";
+                }
+
+                dt = DBMgr.GetDataTable(sql);
             }
-           
+            catch (Exception ex)
+            {
+                
+            }
+
+            if (dt.Rows.Count <= 0)
+            {
+                return "{success:false,WebDownCount:0}";
+            }
                       
             NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();//创建Excel文件的对象            
             NPOI.SS.UserModel.ISheet sheet_S = book.CreateSheet("报关单信息");//添加一个导出成功sheet           
             NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0); //给sheet1添加第一行的头部标题
 
-            string busitypeid = Request["busitypeid"];
-            DataTable dt = DBMgr.GetDataTable(sql);  
 
             #region 空运进出口
             if (busitypeid == "10" || busitypeid == "11")
@@ -3049,8 +3080,9 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(0).SetCellValue("海关状态"); row1.CreateCell(1).SetCellValue("报关单号"); row1.CreateCell(2).SetCellValue("经营单位"); row1.CreateCell(3).SetCellValue("合同发票号");
                 row1.CreateCell(4).SetCellValue("总单号"); row1.CreateCell(5).SetCellValue("分单号"); row1.CreateCell(6).SetCellValue("申报日期"); row1.CreateCell(7).SetCellValue("运输工具名称"); 
                 row1.CreateCell(8).SetCellValue("业务类型"); row1.CreateCell(9).SetCellValue("出口口岸");row1.CreateCell(10).SetCellValue("提运单号"); row1.CreateCell(11).SetCellValue("申报方式");
-                row1.CreateCell(12).SetCellValue("报关方式"); row1.CreateCell(13).SetCellValue("贸易方式");row1.CreateCell(14).SetCellValue("合同协议号"); row1.CreateCell(15).SetCellValue("件数"); 
-                row1.CreateCell(16).SetCellValue("重量"); row1.CreateCell(17).SetCellValue("张数");row1.CreateCell(18).SetCellValue("订单编号"); row1.CreateCell(19).SetCellValue("客户编号");
+                row1.CreateCell(12).SetCellValue("报关方式"); row1.CreateCell(13).SetCellValue("贸易方式");row1.CreateCell(14).SetCellValue("合同协议号"); row1.CreateCell(15).SetCellValue("件数");
+                row1.CreateCell(16).SetCellValue("重量"); row1.CreateCell(17).SetCellValue("张数"); row1.CreateCell(18).SetCellValue("删改单"); row1.CreateCell(19).SetCellValue("订单编号"); 
+                row1.CreateCell(20).SetCellValue("客户编号");
                 
 
                 //将数据逐步写入sheet_S各个行
@@ -3094,8 +3126,24 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
                     rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
                     rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
-                    rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
-                    rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+
+                    switch (dt.Rows[i]["MODIFYFLAG"].ToString())
+                    {
+                        case "0": 
+                            rowtemp.CreateCell(18).SetCellValue("正常");
+                            break;
+                        case "1":
+                            rowtemp.CreateCell(18).SetCellValue("删单");
+                            break;
+                        case "2":
+                            rowtemp.CreateCell(18).SetCellValue("改单");
+                            break;
+                        default:
+                            rowtemp.CreateCell(18).SetCellValue("");
+                            break;
+                    }
+                    rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
+                    rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
 
                 }
             }
@@ -3107,8 +3155,8 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(0).SetCellValue("海关状态"); row1.CreateCell(1).SetCellValue("报关单号"); row1.CreateCell(2).SetCellValue("经营单位"); row1.CreateCell(3).SetCellValue("合同发票号");
                 row1.CreateCell(4).SetCellValue("海运提单号"); row1.CreateCell(5).SetCellValue("申报日期"); row1.CreateCell(6).SetCellValue("运输工具名称");row1.CreateCell(7).SetCellValue("业务类型"); 
                 row1.CreateCell(8).SetCellValue("出口口岸"); row1.CreateCell(9).SetCellValue("提运单号"); row1.CreateCell(10).SetCellValue("申报方式");row1.CreateCell(11).SetCellValue("报关方式"); 
-                row1.CreateCell(12).SetCellValue("贸易方式"); row1.CreateCell(13).SetCellValue("合同协议号"); row1.CreateCell(14).SetCellValue("件数");row1.CreateCell(15).SetCellValue("重量"); 
-                row1.CreateCell(16).SetCellValue("张数"); row1.CreateCell(17).SetCellValue("订单编号"); row1.CreateCell(18).SetCellValue("客户编号");
+                row1.CreateCell(12).SetCellValue("贸易方式"); row1.CreateCell(13).SetCellValue("合同协议号"); row1.CreateCell(14).SetCellValue("件数");row1.CreateCell(15).SetCellValue("重量");
+                row1.CreateCell(16).SetCellValue("张数"); row1.CreateCell(17).SetCellValue("删改单"); row1.CreateCell(18).SetCellValue("订单编号"); row1.CreateCell(19).SetCellValue("客户编号");
 
 
                 //将数据逐步写入sheet_S各个行
@@ -3151,8 +3199,25 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
                     rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
                     rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
-                    rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
-                    rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+
+                    switch (dt.Rows[i]["MODIFYFLAG"].ToString())
+                    {
+                        case "0":
+                            rowtemp.CreateCell(17).SetCellValue("正常");
+                            break;
+                        case "1":
+                            rowtemp.CreateCell(17).SetCellValue("删单");
+                            break;
+                        case "2":
+                            rowtemp.CreateCell(17).SetCellValue("改单");
+                            break;
+                        default:
+                            rowtemp.CreateCell(17).SetCellValue("");
+                            break;
+                    }
+
+                    rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
+                    rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
 
                 }
             }
@@ -3165,7 +3230,7 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(4).SetCellValue("申报日期"); row1.CreateCell(5).SetCellValue("运输工具名称"); row1.CreateCell(6).SetCellValue("业务类型"); row1.CreateCell(7).SetCellValue("出口口岸");
                 row1.CreateCell(8).SetCellValue("提运单号"); row1.CreateCell(9).SetCellValue("申报方式"); row1.CreateCell(10).SetCellValue("报关方式"); row1.CreateCell(11).SetCellValue("贸易方式");
                 row1.CreateCell(12).SetCellValue("合同协议号"); row1.CreateCell(13).SetCellValue("件数"); row1.CreateCell(14).SetCellValue("重量"); row1.CreateCell(15).SetCellValue("张数");
-                row1.CreateCell(16).SetCellValue("订单编号"); row1.CreateCell(17).SetCellValue("客户编号");
+                row1.CreateCell(16).SetCellValue("删改单"); row1.CreateCell(17).SetCellValue("订单编号"); row1.CreateCell(18).SetCellValue("客户编号");
 
                 //将数据逐步写入sheet_S各个行
                 for (int i = 0; i < dt.Rows.Count; i++)
@@ -3206,8 +3271,25 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
                     rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
                     rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
-                    rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
-                    rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+
+                    switch (dt.Rows[i]["MODIFYFLAG"].ToString())
+                    {
+                        case "0":
+                            rowtemp.CreateCell(16).SetCellValue("正常");
+                            break;
+                        case "1":
+                            rowtemp.CreateCell(16).SetCellValue("删单");
+                            break;
+                        case "2":
+                            rowtemp.CreateCell(16).SetCellValue("改单");
+                            break;
+                        default:
+                            rowtemp.CreateCell(16).SetCellValue("");
+                            break;
+                    }
+
+                    rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
+                    rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
 
                 }
             }
@@ -3220,8 +3302,8 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(4).SetCellValue("申报日期"); row1.CreateCell(5).SetCellValue("进/出"); row1.CreateCell(6).SetCellValue("两单关联号"); row1.CreateCell(7).SetCellValue("运输工具名称");                
                 row1.CreateCell(8).SetCellValue("业务类型"); row1.CreateCell(9).SetCellValue("出口口岸"); row1.CreateCell(10).SetCellValue("提运单号"); row1.CreateCell(11).SetCellValue("申报方式");
                 row1.CreateCell(12).SetCellValue("报关方式"); row1.CreateCell(13).SetCellValue("贸易方式"); row1.CreateCell(14).SetCellValue("合同协议号"); row1.CreateCell(15).SetCellValue("件数");
-                row1.CreateCell(16).SetCellValue("重量"); row1.CreateCell(17).SetCellValue("张数"); row1.CreateCell(18).SetCellValue("多单关联号"); row1.CreateCell(19).SetCellValue("订单编号");
-                row1.CreateCell(20).SetCellValue("客户编号");
+                row1.CreateCell(16).SetCellValue("重量"); row1.CreateCell(17).SetCellValue("张数"); row1.CreateCell(18).SetCellValue("多单关联号"); row1.CreateCell(19).SetCellValue("删改单");
+                row1.CreateCell(20).SetCellValue("订单编号"); row1.CreateCell(21).SetCellValue("客户编号");
 
                 //将数据逐步写入sheet_S各个行
                 for (int i = 0; i < dt.Rows.Count; i++)
@@ -3265,8 +3347,25 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
                     rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
                     rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["CORRESPONDNO"].ToString());
-                    rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
-                    rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["CUSNO"].ToString());                 
+
+                    switch (dt.Rows[i]["MODIFYFLAG"].ToString())
+                    {
+                        case "0":
+                            rowtemp.CreateCell(19).SetCellValue("正常");
+                            break;
+                        case "1":
+                            rowtemp.CreateCell(19).SetCellValue("删单");
+                            break;
+                        case "2":
+                            rowtemp.CreateCell(19).SetCellValue("改单");
+                            break;
+                        default:
+                            rowtemp.CreateCell(19).SetCellValue("");
+                            break;
+                    }
+
+                    rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
+                    rowtemp.CreateCell(21).SetCellValue(dt.Rows[i]["CUSNO"].ToString());                 
 
                 }
             }
@@ -3278,8 +3377,8 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(0).SetCellValue("海关状态"); row1.CreateCell(1).SetCellValue("报关单号"); row1.CreateCell(2).SetCellValue("经营单位"); row1.CreateCell(3).SetCellValue("合同发票号");
                 row1.CreateCell(4).SetCellValue("申报日期"); row1.CreateCell(5).SetCellValue("运输工具名称");row1.CreateCell(6).SetCellValue("业务类型"); row1.CreateCell(7).SetCellValue("出口口岸"); 
                 row1.CreateCell(8).SetCellValue("提运单号"); row1.CreateCell(9).SetCellValue("申报方式"); row1.CreateCell(10).SetCellValue("报关方式"); row1.CreateCell(11).SetCellValue("贸易方式");
-                row1.CreateCell(12).SetCellValue("合同协议号"); row1.CreateCell(13).SetCellValue("件数");row1.CreateCell(14).SetCellValue("重量"); row1.CreateCell(15).SetCellValue("张数") ; 
-                row1.CreateCell(16).SetCellValue("订单编号");row1.CreateCell(17).SetCellValue("客户编号");
+                row1.CreateCell(12).SetCellValue("合同协议号"); row1.CreateCell(13).SetCellValue("件数");row1.CreateCell(14).SetCellValue("重量"); row1.CreateCell(15).SetCellValue("张数") ;
+                row1.CreateCell(16).SetCellValue("删改单"); row1.CreateCell(17).SetCellValue("订单编号"); row1.CreateCell(18).SetCellValue("客户编号");
 
                 //将数据逐步写入sheet_S各个行
                 for (int i = 0; i < dt.Rows.Count; i++)
@@ -3320,8 +3419,25 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
                     rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
                     rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
-                    rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
-                    rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+
+                    switch (dt.Rows[i]["MODIFYFLAG"].ToString())
+                    {
+                        case "0":
+                            rowtemp.CreateCell(16).SetCellValue("正常");
+                            break;
+                        case "1":
+                            rowtemp.CreateCell(16).SetCellValue("删单");
+                            break;
+                        case "2":
+                            rowtemp.CreateCell(16).SetCellValue("改单");
+                            break;
+                        default:
+                            rowtemp.CreateCell(16).SetCellValue("");
+                            break;
+                    }
+
+                    rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
+                    rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
 
                 }
             }
@@ -3447,6 +3563,9 @@ namespace MvcPlatform.Controllers
                         if (Request["VALUE3"] == "已结关") { where += " and det.CUSTOMSSTATUS='已结关' "; }
                         if (Request["VALUE3"] == "未结关") { where += " and det.CUSTOMSSTATUS!='已结关' "; }
                         break;
+                    case "SGD"://删改单
+                        where += " and det.modifyflag='" + Request["VALUE3"] + "' ";
+                        break;
                 }
             }
             if (!string.IsNullOrEmpty(Request["VALUE7"]))//判断查询条件1是否有值
@@ -3459,6 +3578,9 @@ namespace MvcPlatform.Controllers
                     case "HGZT"://海关状态
                         if (Request["VALUE7"] == "已结关") { where += " and det.CUSTOMSSTATUS='已结关' "; }
                         if (Request["VALUE7"] == "未结关") { where += " and det.CUSTOMSSTATUS!='已结关' "; }
+                        break;
+                    case "SGD"://删改单
+                        where += " and det.modifyflag='" + Request["VALUE7"] + "' ";
                         break;
                 }
             }
@@ -3528,7 +3650,7 @@ namespace MvcPlatform.Controllers
 //                           where (det.STATUS=130 or det.STATUS=110) and det.isinvalid=0 and ort.isinvalid=0 " + where
 //                     + " and a.ASSOCIATENO is null and b.ordercode is  null ";
 
-            string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.SHEETNUM,
+            string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.SHEETNUM,det.modifyflag,
                               lda.declarationcode,to_char(lda.reptime,'yyyy-mm-dd') reptime,lda.contractno,lda.goodsnum,lda.goodsnw,lda.blno,
                               lda.transname,lda.voyageno,lda.busiunitcode,lda.busiunitname,lda.portcode,
                               lda.trademethod,lda.declkind DECLWAY,lda.declkind DECLWAYNAME,lda.REPUNITNAME,
@@ -3581,7 +3703,7 @@ namespace MvcPlatform.Controllers
             row1.CreateCell(8).SetCellValue("提运单号"); row1.CreateCell(9).SetCellValue("申报方式"); row1.CreateCell(10).SetCellValue("报关方式"); row1.CreateCell(11).SetCellValue("贸易方式");
             row1.CreateCell(12).SetCellValue("合同协议号"); row1.CreateCell(13).SetCellValue("件数"); row1.CreateCell(14).SetCellValue("重量"); row1.CreateCell(15).SetCellValue("张数");
             row1.CreateCell(16).SetCellValue("订单编号"); row1.CreateCell(17).SetCellValue("客户编号"); row1.CreateCell(18).SetCellValue("进/出"); row1.CreateCell(19).SetCellValue("两单关联号");
-            row1.CreateCell(20).SetCellValue("多单关联号"); 
+            row1.CreateCell(20).SetCellValue("多单关联号"); row1.CreateCell(21).SetCellValue("删改单"); 
 
 
 
@@ -3629,6 +3751,22 @@ namespace MvcPlatform.Controllers
                 rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["IETYPE"].ToString());
                 rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["ASSOCIATENO"].ToString());
                 rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["CORRESPONDNO"].ToString());
+
+                switch (dt.Rows[i]["MODIFYFLAG"].ToString())
+                {
+                    case "0":
+                        rowtemp.CreateCell(21).SetCellValue("正常");
+                        break;
+                    case "1":
+                        rowtemp.CreateCell(21).SetCellValue("删单");
+                        break;
+                    case "2":
+                        rowtemp.CreateCell(21).SetCellValue("改单");
+                        break;
+                    default:
+                        rowtemp.CreateCell(21).SetCellValue("");
+                        break;
+                }
             }
 
 
