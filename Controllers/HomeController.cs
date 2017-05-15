@@ -157,7 +157,7 @@ namespace MvcPlatform.Controllers
             //ViewBag.navigator = "关务云>>首页";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
 
-            string strwhere = " 1=1";
+            string strwhere = " isinvalid=0";
             if (!string.IsNullOrWhiteSpace(typeid))
             {
                 strwhere += " and (type='" + typeid + "' or type in(select id  from newscategory START WITH pid ='" + typeid + "' connect by prior id=pid))";
