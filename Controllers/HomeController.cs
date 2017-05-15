@@ -29,11 +29,12 @@ namespace MvcPlatform.Controllers
 
             //'yyyy/mm/dd hh24:mi'
 
-            sql = @"select a.*
+            sql = @"select a.type,a.sortindex,a.numid,a.id,a.title
+                        ,to_char(a.publishdate,'yyyy-mm-dd') as publishdate ,to_char(a.updatetime,'yyyy-mm-dd hh24:mi') as updatetime ,publishdate
                     from (
                       select a.id as type,a.sortindex,row_number() over (partition by a.id order by b.publishdate) numid,b.id
                         ,case when length(b.title)>50 then substr(b.title,1,50)||'...' else b.title end title
-                        ,to_char(b.publishdate,'yyyy-mm-dd') as publishdate ,to_char(b.updatetime,'yyyy-mm-dd hh24:mi') as updatetime 
+                        ,b.publishdate ,b.updatetime
                       from (select * from newscategory where pid is null) a
                            left join (
                                   select a.rootid,b.*
@@ -169,11 +170,14 @@ namespace MvcPlatform.Controllers
             int startIndex = (id - 1) * pagenum;
             int endIndex = id * pagenum;
 
-            string sql = @"select * from (
+            string sql = @"select numid ,id,title
+                                ,to_char(publishdate,'yyyy-mm-dd') as publishdate ,to_char(updatetime,'yyyy-mm-dd hh24:mi') as updatetime 
+                            from (
                                     select row_number() over (order by publishdate) numid,t.id
                                          ,case when length(t.title)>50 then substr(t.title,1,50)||'...' else t.title end title
-                                         ,to_char(t.publishdate,'yyyy-mm-dd') as publishdate ,to_char(t.updatetime,'yyyy-mm-dd hh24:mi') as updatetime  
-                                    from web_notice t where " + strwhere + ") a where numid>{0} and numid<={1} order by a.publishdate desc";
+                                         ,t.publishdate ,t.updatetime  
+                                    from web_notice t where " + strwhere + 
+                            @") a where numid>{0} and numid<={1} order by a.publishdate desc";
             sql = string.Format(sql, startIndex, endIndex);
 
 
