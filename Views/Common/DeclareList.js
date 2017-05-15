@@ -117,7 +117,7 @@ Ext.onReady(function () {
                 { header: '两单关联号', dataIndex: 'ASSOCIATENO', width: 110, hidden: busitypeid != '40-41' },//两单关联号
                 { header: '运输工具名称', dataIndex: 'TRANSNAME', width: 150, renderer: render },
                 { header: busitypeid == '21' ? '船名' : '预录号', dataIndex: 'PRETRANSNAME', width: 150, hidden: (busitypeid != '21' && busitypeid != '50-51') },
-                { header: '业务类型', dataIndex: 'BUSITYPE', width: 90, renderer: render },// 业务类型
+                { header: '业务类型', dataIndex: 'BUSITYPE', width: 90, renderer: render, hidden: (busitypeid != '40-41' && busitypeid != '50-51') },// 业务类型
                 { header: '出口口岸', dataIndex: 'PORTCODE', width: 80 },
                 { header: '提运单号', dataIndex: 'BLNO', width: 180 },
                 { header: '申报方式', dataIndex: 'REPWAYNAME', width: 100, renderer: render },
