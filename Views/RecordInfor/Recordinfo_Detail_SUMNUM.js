@@ -24,8 +24,6 @@ Ext.onReady(function () {
     });
 });
 
-
-
 function initSearch_Sum() {
     //账册号
     var s_store_recordid = Ext.create('Ext.data.JsonStore', {
@@ -187,13 +185,16 @@ function Open() {
         return;
     }
     form_ini_detail(recs);
+    form_ini_detail_search();
     grid_ini_detail();
+
     var win = Ext.create("Ext.window.Window", {
+        id: "win_d",
         title: '申报明细',
-        width: 900,
-        height: 550,
+        width: 1000,
+        height: 650,
         modal: true,
-        items: [Ext.getCmp('f_formpanel'), Ext.getCmp('gridpanel_d')]
+        items: [Ext.getCmp('f_formpanel'), Ext.getCmp('formpanel_d'), Ext.getCmp('gridpanel_d')]
     });
     win.show();
 }
@@ -210,34 +211,34 @@ function form_ini_detail(recs) {
 
     //账册号
     var f_field_recordid = Ext.create('Ext.form.field.Text', {
-        id: 'f_field_recordid', name: 'f_field_recordid', fieldLabel: '账册号', readOnly: true, value: recs[0].get("RECORDCODE")
+        id: 'f_field_recordid', name: 'f_field_recordid', fieldLabel: '账册号', readOnly: true, value: recs[0].get("RECORDCODE"), fieldStyle: 'background-color: #CECECE;background-image: none;'
     });
 
 
     //项号
     var f_field_ITEMNO = Ext.create('Ext.form.field.Text', {
-        id: 'f_field_ITEMNO', name: 'f_field_ITEMNO', fieldLabel: '项号', readOnly: true, value: recs[0].get("ITEMNO")
+        id: 'f_field_ITEMNO', name: 'f_field_ITEMNO', fieldLabel: '项号', readOnly: true, value: recs[0].get("ITEMNO"), fieldStyle: 'background-color: #CECECE;background-image: none;'
     });
 
     //项号属性
     var f_field_ITEMNOATTRIBUTE = Ext.create('Ext.form.field.Text', {
-        id: 'f_field_ITEMNOATTRIBUTE', name: 'f_field_ITEMNOATTRIBUTE', fieldLabel: '项号属性', readOnly: true, value: recs[0].get("ITEMNOATTRIBUTE")
+        id: 'f_field_ITEMNOATTRIBUTE', name: 'f_field_ITEMNOATTRIBUTE', fieldLabel: '项号属性', readOnly: true, value: recs[0].get("ITEMNOATTRIBUTE"), fieldStyle: 'background-color: #CECECE;background-image: none;'
     });
 
     //商品名称
     var f_field_COMMODITYNAME = Ext.create('Ext.form.field.Text', {
-        id: 'f_field_COMMODITYNAME', name: 'f_field_COMMODITYNAME', fieldLabel: '商品名称', readOnly: true, value: recs[0].get("COMMODITYNAME")
+        id: 'f_field_COMMODITYNAME', name: 'f_field_COMMODITYNAME', fieldLabel: '商品名称', readOnly: true, value: recs[0].get("COMMODITYNAME"), fieldStyle: 'background-color: #CECECE;background-image: none;'
 
     });
 
     //进出类型
     var f_field_inout_type = Ext.create('Ext.form.field.Text', {
-        id: 'f_field_inout_type', name: 'f_field_inout_type', fieldLabel: '进(出)', readOnly: true, value: recs[0].get("INTERNALTYPENAME")
+        id: 'f_field_inout_type', name: 'f_field_inout_type', fieldLabel: '进(出)', readOnly: true, value: recs[0].get("INTERNALTYPENAME"), fieldStyle: 'background-color: #CECECE;background-image: none;'
     });
 
     //贸易方式
     var f_field_TRADEMETHOD = Ext.create('Ext.form.field.Text', {
-        id: 'f_field_TRADEMETHOD', name: 'f_field_TRADEMETHOD', fieldLabel: '贸易方式', readOnly: true, value: recs[0].get("TRADEMETHOD")
+        id: 'f_field_TRADEMETHOD', name: 'f_field_TRADEMETHOD', fieldLabel: '贸易方式', readOnly: true, value: recs[0].get("TRADEMETHOD"), fieldStyle: 'background-color: #CECECE;background-image: none;'
     });
 
 
@@ -247,7 +248,7 @@ function form_ini_detail(recs) {
         data: common_data_unit
     });
     var f_combo_UNIT = Ext.create('Ext.form.field.ComboBox', {
-        id: 'f_combo_UNIT', name: 'f_combo_UNIT', readOnly: true,
+        id: 'f_combo_UNIT', name: 'f_combo_UNIT', readOnly: true, fieldStyle: 'background-color: #CECECE;background-image: none;',
         store: f_store_UNIT,
         fieldLabel: '成交单位',
         displayField: 'CODENAME',
@@ -261,26 +262,26 @@ function form_ini_detail(recs) {
 
     //成交数量
     var f_field_CADQUANTITY = Ext.create('Ext.form.field.Text', {
-        id: 'f_field_CADQUANTITY', name: 'f_field_CADQUANTITY', fieldLabel: '成交数量', readOnly: true, value: recs[0].get("CADQUANTITY")
+        id: 'f_field_CADQUANTITY', name: 'f_field_CADQUANTITY', fieldLabel: '成交数量', readOnly: true, value: recs[0].get("CADQUANTITY"), fieldStyle: 'background-color: #CECECE;background-image: none;'
     });
 
     //成交总价
     var f_field_TOTALPRICE = Ext.create('Ext.form.field.Text', {
-        id: 'f_field_TOTALPRICE', name: 'f_field_TOTALPRICE', fieldLabel: '成交总价', readOnly: true, value: recs[0].get("TOTALPRICE")
+        id: 'f_field_TOTALPRICE', name: 'f_field_TOTALPRICE', fieldLabel: '成交总价', readOnly: true, value: recs[0].get("TOTALPRICE"), fieldStyle: 'background-color: #CECECE;background-image: none;'
     });
 
     //币别
     var f_field_CURRENCY = Ext.create('Ext.form.field.Text', {
-        id: 'f_field_CURRENCY', name: 'f_field_CURRENCY', fieldLabel: '币别', readOnly: true, value: recs[0].get("CURRENCY")
+        id: 'f_field_CURRENCY', name: 'f_field_CURRENCY', fieldLabel: '币别', readOnly: true, value: recs[0].get("CURRENCY"), fieldStyle: 'background-color: #CECECE;background-image: none;'
     });
 
     //申报日期
     var f_date_start = Ext.create('Ext.form.field.Date', {
-        id: 'f_date_start', name: 'f_date_start', flex: .5, readOnly: true,
+        id: 'f_date_start', name: 'f_date_start', flex: .5, readOnly: true, fieldStyle: 'background-color: #CECECE;background-image: none;',
         format: 'Y-m-d', value: Ext.getCmp('s_date_start').getValue()
     });
     var f_date_end = Ext.create('Ext.form.field.Date', {
-        id: 'f_date_end', name: 'f_date_end', flex: .5, readOnly: true,
+        id: 'f_date_end', name: 'f_date_end', flex: .5, readOnly: true, fieldStyle: 'background-color: #CECECE;background-image: none;',
         format: 'Y-m-d', value: Ext.getCmp('s_date_end').getValue()
     });
     var f_date_container = {
@@ -311,7 +312,7 @@ function form_ini_detail(recs) {
     });
 }
 
-function grid_ini_detail() {
+function form_ini_detail_search() {
 
     var label_baseinfo_d = {
         xtype: 'label',
@@ -320,11 +321,49 @@ function grid_ini_detail() {
     }
     var tbar_d = Ext.create('Ext.toolbar.Toolbar', {
         items: [label_baseinfo_d, '->']
-    })
+    });
+
+    var bbar_r = '<div class="btn-group" role="group">'
+                       + '<button onclick="Select_d()" class="btn btn-primary btn-sm"><i class="fa fa-search"></i>&nbsp;查询</button>'
+                       + '<form id="exportform_d" name="form" enctype="multipart/form-data" method="post" style="display:inline-block">'
+                       + '<button onclick="Export_SUM_D()" type="button" id="btn_Export" class="btn btn-primary btn-sm"><i class="fa fa-level-down"></i>&nbsp;导出</button></form>'
+                  +'</div>';
+
+    var bbar = Ext.create('Ext.toolbar.Toolbar', {
+        items: ['->', bbar_r]
+    });
+
+    //报关单号
+    var field_declartioncode_d = Ext.create('Ext.form.field.Text', {
+        id: 'field_declartioncode_d', name: 'field_declartioncode_d', fieldLabel: '报关单号'
+    });
+
+
+    var formpanel_d = Ext.create('Ext.form.Panel', {
+        id: 'formpanel_d',
+        minHeight: 100,
+        border: 0,
+        tbar: tbar_d,
+        bbar: bbar,
+        fieldDefaults: {
+            margin: '0 5 10 0',
+            labelWidth: 80,
+            columnWidth: .25,
+            labelAlign: 'right',
+            labelSeparator: ''
+        },
+        items: [
+                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_declartioncode_d] }
+        ]
+    });
+}
+
+function grid_ini_detail() {
 
     Ext.regModel('RecrodDetail_SUM_D', {
         fields: ['DECLARATIONCODE', 'CUSTOMSSTATUS', 'REPUNITNAME', 'REPTIME', 'COMMODITYNO'
-            , 'CADQUANTITY', 'LEGALUNIT', 'LEGALQUANTITY', 'TRANSMODEL', 'TRANSMODELNAME', 'TOTALPRICE']
+            , 'CADQUANTITY', 'LEGALUNIT', 'LEGALQUANTITY', 'TRANSMODEL', 'TRANSMODELNAME', 'TOTALPRICE'
+            , 'MODIFYFLAG', 'DATACONFIRM']
     });
 
     var store_sum_d = Ext.create('Ext.data.JsonStore', {
@@ -343,6 +382,7 @@ function grid_ini_detail() {
         listeners: {
             beforeload: function () {
                 store_sum_d.getProxy().extraParams = Ext.getCmp('f_formpanel').getForm().getValues();
+                store_sum_d.getProxy().extraParams.f_field_declartioncode = Ext.getCmp("field_declartioncode_d").getValue();
             }
         }
     });
@@ -356,28 +396,47 @@ function grid_ini_detail() {
     var gridpanel_d = Ext.create('Ext.grid.Panel', {
         id: 'gridpanel_d',
         store: store_sum_d,
-        height: 350,
-        tbar: tbar_d,
+        height: 300,
         bbar: pgbar_d,
         enableColumnHide: false,
         columns: [
         { xtype: 'rownumberer', width: 35 },
         { header: '申报单位', dataIndex: 'REPUNITNAME', width: 250 },
         { header: '海关状态', dataIndex: 'CUSTOMSSTATUS', width: 80 },
-        { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 180 },
+        { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 180},
         { header: '成交数量', dataIndex: 'CADQUANTITY', width: 80 },
         { header: '成交总价', dataIndex: 'TOTALPRICE', width: 90 },
         { header: '申报时间', dataIndex: 'REPTIME', width: 100 },
         { header: 'HS编码', dataIndex: 'COMMODITYNO', width: 100 },
         { header: '法定数量', dataIndex: 'LEGALQUANTITY', width: 75 },
         { header: '法定单位', dataIndex: 'LEGALUNIT', width: 75, renderer: renderOrder },
-        { header: '运输方式', dataIndex: 'TRANSMODELNAME', width: 150 }
+        { header: '运输方式', dataIndex: 'TRANSMODELNAME', width: 150 },
+        { header: '删改单', dataIndex: 'MODIFYFLAG', width: 60, renderer: render_sum },
+        { header: '数据确认', dataIndex: 'DATACONFIRM', width: 85, renderer: render_sum }
         ],
         viewConfig: {
             enableTextSelection: true
         },
         forceFit: true
     });
+}
+
+function Select_d() {
+    Ext.getCmp('pgbar_d').moveFirst();
+}
+
+function render_sum(value, cellmeta, record, rowIndex, columnIndex, store) {
+    var rtn = "";
+    var dataindex = cellmeta.column.dataIndex;
+    if (dataindex == "MODIFYFLAG") {
+        if (value == "0") rtn = "正常";
+        if (value == "1") rtn = "删单";
+        if (value == "2") rtn = "改单";
+    }
+    if (dataindex == "DATACONFIRM") {
+        rtn = value == "2" ? "是" : "否";
+    }
+    return rtn;
 }
 
 function Export_SUM() {
@@ -412,3 +471,34 @@ function Export_SUM() {
         }
     });
 }
+
+function Export_SUM_D() {
+    var myMask = new Ext.LoadMask(Ext.getCmp("win_d"), { msg: "数据导出中，请稍等..." });
+    myMask.show();
+
+    var data = Ext.getCmp('f_formpanel').getForm().getValues();
+    data.f_field_declartioncode = Ext.getCmp("field_declartioncode_d").getValue();
+    data.UNIT = JSON.stringify(common_data_unit);
+
+    Ext.Ajax.request({
+        url: '/RecordInfor/Export_SUM_D',
+        params: data,
+        success: function (response, option) {
+            var json = Ext.decode(response.responseText);
+            if (json.success == false) {
+                Ext.MessageBox.alert('提示', '综合需求及性能，导出记录限制' + json.WebDownCount + '！');
+            } else {
+                Ext.Ajax.request({
+                    url: '/Common/DownloadFile',
+                    method: 'POST',
+                    params: Ext.decode(response.responseText),
+                    form: 'exportform_d',
+                    success: function (response, option) {
+                    }
+                });
+            }
+            myMask.hide();
+        }
+    });
+}
+

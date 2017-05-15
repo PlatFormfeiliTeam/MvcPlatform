@@ -1230,8 +1230,10 @@ namespace MvcPlatform.Controllers
              	                ,case when substr(a.declarationcode,9,1)='1' then '进口' when substr(a.declarationcode,9,1)='0' then '出口' else '' end internaltypename
                                 ,a.trademethod,a.recordcode,to_number(b.itemno) itemno,b.cadquantity,b.cadunit,b.commodityname,b.currency,b.totalprice,a.reptime 
                         from list_declaration_after a 
-                            inner join list_decllist_after b on a.code=b.predeclcode and a.xzlb=b.xzlb
-                        where a.dataconfirm=2 and a.csid=1 and a.busiunitcode='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where
+                            inner join list_decllist_after b on a.code=b.predeclcode and a.xzlb=b.xzlb 
+                            inner join list_declaration c on a.code=c.code 
+                        where a.csid=1 and (c.modifyflag<>1 or (c.modifyflag=1 and a.dataconfirm<>2))--排除删单已确认的 
+                            and a.busiunitcode='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where
                     + @") aa
                         left join cusdoc.base_booksdata bb on aa.trademethod=bb.trade and aa.internaltypename=bb.isinportname
                     group by aa.recordcode,aa.itemno,aa.internaltype,aa.internaltypename,aa.trademethod,bb.isproductname,aa.commodityname,aa.currency,aa.cadunit";
@@ -1250,14 +1252,17 @@ namespace MvcPlatform.Controllers
             return "{rows:" + json + ",total:" + totalProperty + "}";
         }
 
-        public string loadRecordDetail_SUM_D()
+        public string Query_RecordDetail_SUM_D()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string sql = ""; string where = "";
 
-            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
-            iso.DateTimeFormat = "yyyy-MM-dd";
+            if (!string.IsNullOrEmpty(Request["f_field_declartioncode"]))
+            {
+                where += " and a.declarationcode='" + Request["f_field_declartioncode"] + "'";
+            }
 
+            //=====================================================================================================
             if (!string.IsNullOrEmpty(Request["f_field_recordid"]))
             {
                 where += " and a.recordcode='" + Request["f_field_recordid"] + "'";
@@ -1284,17 +1289,18 @@ namespace MvcPlatform.Controllers
                            ,bb.isproductname ITEMNOATTRIBUTE,aa.cadunit,cadquantity,aa.totalprice
                            ,aa.reptime,aa.declarationcode,aa.legalquantity,aa.legalunit,aa.repunitname,aa.commodityno,aa.transmodel
                            ,(select ee.Name from cusdoc.base_Transport ee where aa.transmodel=ee.code) as transmodelname
-                           ,aa.customsstatus
+                           ,aa.customsstatus,aa.modifyflag,aa.dataconfirm 
                     from(
                           select substr(a.declarationcode,9,1) internaltype
              	                    ,case when substr(a.declarationcode,9,1)='1' then '进口' when substr(a.declarationcode,9,1)='0' then '出口' else '' end internaltypename
                                  ,a.trademethod,a.recordcode,b.itemno,b.cadquantity,b.cadunit,b.commodityno,b.commodityname,b.currency,b.totalprice
                                  ,a.reptime,a.declarationcode,b.legalquantity,b.legalunit,a.repunitname,a.transmodel
-                                 ,c.customsstatus
+                                 ,c.customsstatus,c.modifyflag,c.dataconfirm 
                           from list_declaration_after a 
                                 inner join list_decllist_after b on a.code=b.predeclcode and a.xzlb=b.xzlb 
                                 inner join list_declaration c on a.code=c.code 
-                          where a.dataconfirm=2 and a.csid=1 and a.busiunitcode='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where
+                          where a.csid=1 and (c.modifyflag<>1 or (c.modifyflag=1 and a.dataconfirm<>2))--排除删单已确认的
+                                and a.busiunitcode='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where
                     + @") aa
                       left join cusdoc.base_booksdata bb on aa.trademethod=bb.trade and aa.internaltypename=bb.isinportname "
                     + @" where aa.internaltypename='" + Request["f_field_inout_type"] + "'";
@@ -1303,9 +1309,18 @@ namespace MvcPlatform.Controllers
             {
                 sql += " and bb.isproductname='" + Request["f_field_ITEMNOATTRIBUTE"] + "'";
             }
+            //=====================================================================================================
 
+            return sql;
+        }
+
+        public string loadRecordDetail_SUM_D()
+        {
+            string sql = Query_RecordDetail_SUM_D(); 
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "aa.reptime", "desc"));
 
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();
+            iso.DateTimeFormat = "yyyy-MM-dd";      
             var json = JsonConvert.SerializeObject(dt, iso);
             return "{rows:" + json + ",total:" + totalProperty + "}";
         }
@@ -1359,6 +1374,71 @@ namespace MvcPlatform.Controllers
 
             return Extension.getPathname(filename, book);
         }
+
+        public string Export_SUM_D()
+        {
+            string sql = ""; string UNIT = Request["UNIT"];
+            //创建Excel文件的对象
+            NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();
+            string filename = "申报数量明细.xls";
+
+            sql = Query_RecordDetail_SUM_D();
+            sql = sql + " order by aa.reptime desc";
+
+            DataTable dt_count = DBMgr.GetDataTable("select count(1) from (" + sql + ") a");
+            int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
+            if (Convert.ToInt32(dt_count.Rows[0][0]) > WebDownCount)
+            {
+                return "{success:false,WebDownCount:" + WebDownCount + "}";
+            }
+
+            DataTable dt = DBMgr.GetDataTable(sql);
+            NPOI.SS.UserModel.ISheet sheet = book.CreateSheet("申报数量明细");
+            NPOI.SS.UserModel.IRow row1 = sheet.CreateRow(0);
+            row1.CreateCell(0).SetCellValue("申报单位"); row1.CreateCell(1).SetCellValue("海关状态"); row1.CreateCell(2).SetCellValue("报关单号"); row1.CreateCell(3).SetCellValue("成交数量");
+            row1.CreateCell(4).SetCellValue("成交总价"); row1.CreateCell(5).SetCellValue("申报时间"); row1.CreateCell(6).SetCellValue("HS编码"); row1.CreateCell(7).SetCellValue("法定数量");
+            row1.CreateCell(8).SetCellValue("法定单位"); row1.CreateCell(9).SetCellValue("运输方式"); row1.CreateCell(10).SetCellValue("删改单"); row1.CreateCell(11).SetCellValue("数据确认");
+
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                NPOI.SS.UserModel.IRow rowtemp = sheet.CreateRow(i + 1);
+                rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["REPUNITNAME"].ToString());
+                rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["CUSTOMSSTATUS"].ToString());
+                rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["DECLARATIONCODE"].ToString());
+                rowtemp.CreateCell(3).SetCellValue(GetName(dt.Rows[i]["CADQUANTITY"].ToString(), UNIT));
+                rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["TOTALPRICE"].ToString());
+                rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["REPTIME"].ToString());
+                rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["COMMODITYNO"].ToString());
+                rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["LEGALQUANTITY"].ToString());
+                rowtemp.CreateCell(8).SetCellValue(GetName(dt.Rows[i]["LEGALUNIT"].ToString(), UNIT));
+                rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["TRANSMODELNAME"].ToString());
+                switch (dt.Rows[i]["MODIFYFLAG"].ToString())
+                {
+                    case "0":
+                        rowtemp.CreateCell(10).SetCellValue("正常");
+                        break;
+                    case "1":
+                        rowtemp.CreateCell(10).SetCellValue("删单");
+                        break;
+                    case "2":
+                        rowtemp.CreateCell(10).SetCellValue("改单");
+                        break;
+                    default:
+                        rowtemp.CreateCell(10).SetCellValue("");
+                        break;
+                }
+                rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["DATACONFIRM"].ToString() == "2" ? "是" : "否");
+            }
+
+            // 写入到客户端 
+            //System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            //book.Write(ms);
+            //ms.Seek(0, SeekOrigin.Begin);
+            //return File(ms, "application/vnd.ms-excel", filename);
+
+            return Extension.getPathname(filename, book);
+        }
+
 
         #endregion
 
