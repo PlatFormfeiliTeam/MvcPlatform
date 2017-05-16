@@ -29,12 +29,11 @@ namespace MvcPlatform.Controllers
 
             //'yyyy/mm/dd hh24:mi'
 
-            sql = @"select a.type,a.sortindex,a.numid,a.id,a.title
-                        ,to_char(a.publishdate,'yyyy-mm-dd') as publishdate ,to_char(a.updatetime,'yyyy-mm-dd hh24:mi') as updatetime ,publishdate
+            sql = @"select *                        
                     from (
-                      select a.id as type,a.sortindex,row_number() over (partition by a.id order by b.publishdate) numid,b.id
+                      select a.id as type,a.sortindex,row_number() over (partition by a.id order by b.publishdate desc) numid,b.id
                         ,case when length(b.title)>50 then substr(b.title,1,50)||'...' else b.title end title
-                        ,b.publishdate ,b.updatetime
+                        ,to_char(b.publishdate,'yyyy-mm-dd') as publishdate ,to_char(b.updatetime,'yyyy-mm-dd hh24:mi') as updatetime 
                       from (select * from newscategory where pid is null) a
                            left join (
                                   select a.rootid,b.*
@@ -170,14 +169,13 @@ namespace MvcPlatform.Controllers
             int startIndex = (id - 1) * pagenum;
             int endIndex = id * pagenum;
 
-            string sql = @"select numid ,id,title
-                                ,to_char(publishdate,'yyyy-mm-dd') as publishdate ,to_char(updatetime,'yyyy-mm-dd hh24:mi') as updatetime 
+            string sql = @"select *                                
                             from (
-                                    select row_number() over (order by publishdate) numid,t.id
+                                    select row_number() over (order by publishdate desc) numid,t.id
                                          ,case when length(t.title)>50 then substr(t.title,1,50)||'...' else t.title end title
-                                         ,t.publishdate ,t.updatetime  
+                                         ,to_char(t.publishdate,'yyyy-mm-dd') as publishdate ,to_char(t.updatetime,'yyyy-mm-dd hh24:mi') as updatetime 
                                     from web_notice t where " + strwhere + 
-                            @") a where numid>{0} and numid<={1} order by a.publishdate desc";
+                            @") a where numid>{0} and numid<={1}";
             sql = string.Format(sql, startIndex, endIndex);
 
 
