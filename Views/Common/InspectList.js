@@ -1,7 +1,7 @@
 ﻿//=======================================================JS init begin======================================================
 var busitypeid = getQueryString("busitypeid"); var role = getQueryString("role");
-var pgbar; var store_busitype;//var store_mzbz, store_jylb, store_sbkb, store_inspbzzl;
-var common_data_jydw = [];//var common_data_mzbz = [], common_data_jylb = [], common_data_sbkb = [], common_data_inspbzzl = [];
+var pgbar; var store_busitype, store_insptradeway;
+var common_data_jydw = [], common_data_inspmyfs = [];
 
 var busitype = "";
 switch (busitypeid) {
@@ -32,34 +32,17 @@ Ext.onReady(function () {
         success: function (response, opts) {
             var commondata = Ext.decode(response.responseText)
             common_data_jydw = commondata.jydw;//经营单位  查询区要用
-            //common_data_mzbz = commondata.mzbz;//木质包装
-            //common_data_jylb = commondata.jylb;//检验类别
-            //common_data_sbkb = commondata.sbkb;//申报库别
-            //common_data_inspbzzl = commondata.inspbzzl;//报检包装种类
+            common_data_inspmyfs = commondata.inspmyfs;//贸易方式
 
             initSearch();  //查询区域
 
-            if (busitypeid == '50-51') {
-                Ext.getCmp('CONDITION2').setValue('DECLNO');
-            }
-            else {
-                Ext.getCmp('CONDITION2').setValue('CUSNO');
-            }
-
             store_busitype = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_busitype });
-            ////木质包装
-            //store_mzbz = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_mzbz });
-            ////检验类别
-            //store_jylb = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_jylb });
-            ////申报库别
-            //store_sbkb = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_sbkb });
-            ////报检包装种类
-            //store_inspbzzl = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_inspbzzl });
+            store_insptradeway = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_inspmyfs });
 
             var store = Ext.create('Ext.data.JsonStore', {
-                fields: ['ID', 'CODE', 'INSPSTATUS', 'ISPRINT', 'APPROVALCODE', 'INSPECTIONCODE', 'REPFINISHTIME',
-                    'UPCNNAME', 'INSPTYPE', 'ENTRYPORT', 'TRANSTOOL', 'LADINGNO', 'TOTALNO', 'TRADE', 'CONTRACTNO', 'INSPUNITNAME', 'BUSITYPE',
-                    'ISFORCELAW', 'WOODPACKINGID', 'GOODSNUM', 'PACKAGETYPE', 'DECLTYPE', 'ORDERCODE', 'CUSNO', 'FOBPORT', 'FOBPORTNAME'],
+                fields: ['ID', 'CODE', 'ORDERCODE', 'INSPSTATUS', 'ISPRINT', 'APPROVALCODE', 'INSPECTIONCODE', 'CLEARANCECODE'
+                    , 'TRADEWAY', 'ISNEEDCLEARANCE', 'LAWFLAG', 'STATUS', 'MODIFYFLAG', 'SHEETNUM'
+                    , 'BUSITYPE', 'CUSNO', 'SUBMITTIME', 'BUSIUNITCODE', 'BUSIUNITNAME', 'CONTRACTNO'],
                 pageSize: 22,
                 proxy: {
                     type: 'ajax',
@@ -91,25 +74,20 @@ Ext.onReady(function () {
             var col_array = [
                 { xtype: 'rownumberer', width: 35 },
                 { header: 'ID', dataIndex: 'ID', width: 110, sortable: true, hidden: true },
-                { header: '国检状态', dataIndex: 'INSPSTATUS', width: 90, locked: true, renderer: render },
-                { header: '打印标志', dataIndex: 'ISPRINT', width: 70, locked: true, renderer: render },
-                { header: '核放单号', dataIndex: 'APPROVALCODE', width: 160, locked: true },
-                { header: '报检单号', dataIndex: 'INSPECTIONCODE', width: 150, locked: true, renderer: render },
-                //{ header: '申报完成时间', dataIndex: 'REPFINISHTIME', width: 130 },
-                { header: '业务类型', dataIndex: 'BUSITYPE', width: 100, renderer: render },
-                //{ header: '收货单位', dataIndex: 'UPCNNAME', width: 170 },
-                //{ header: '检验类别', dataIndex: 'INSPTYPE', width: 100, renderer: render },
-                //{ header: '入境口岸', dataIndex: 'ENTRYPORT', width: 80 },
-                //{ header: '运输工具', dataIndex: 'TRANSNAME', width: 80 },
-                //{ header: '提运单号', dataIndex: 'LADINGNO', width: 130 },
-                //{ header: '贸易方式', dataIndex: 'TRADEWAYCODES', width: 80 },
-                //{ header: '合同号', dataIndex: 'CONTRACTNO', width: 100 },
-                //{ header: '报检单位', dataIndex: 'INSPUNITNAME', width: 200 },
-                //{ header: '是否法检', dataIndex: 'ISFORCELAW', width: 60, renderer: render },
-                //{ header: '木质包装', dataIndex: 'WOODPACKINGID', width: 80, renderer: render },
-                //{ header: '包装数量', dataIndex: 'GOODSNUM', width: 80 },
-                //{ header: '包装种类', dataIndex: 'PACKAGETYPE', width: 80, renderer: render },
-                //{ header: '申报库别', dataIndex: 'DECLTYPE', width: 120, renderer: render },
+                { header: '国检状态', dataIndex: 'INSPSTATUS', width: 80, locked: true },
+                { header: '报检状态', dataIndex: 'STATUS', width: 80, locked: true, renderer: render },
+                { header: '核准单号', dataIndex: 'APPROVALCODE', width: 140, locked: true },
+                { header: '报检单号', dataIndex: 'INSPECTIONCODE', width: 140, locked: true, renderer: render },
+                { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 200, locked: role == 'customer' },
+                { header: '通关单号', dataIndex: 'CLEARANCECODE', width: 140 },
+                { header: '监管方式', dataIndex: 'TRADEWAY', width: 160, renderer: render },
+                { header: '打印标志', dataIndex: 'ISPRINT', width: 70, renderer: render },
+                { header: '张数', dataIndex: 'SHEETNUM', width: 70 },
+                { header: '删改单', dataIndex: 'MODIFYFLAG', width: 70, renderer: render },
+                { header: '业务类型', dataIndex: 'BUSITYPE', width: 100, renderer: render, hidden: (busitypeid != '40-41' && busitypeid != '50-51') },
+                { header: '是否需通关单', dataIndex: 'ISNEEDCLEARANCE', width: 80, renderer: render },
+                { header: '是否法检', dataIndex: 'LAWFLAG', width: 60, renderer: render },
+                { header: '委托时间', dataIndex: 'SUBMITTIME', width: 130 },
                 { header: '订单编号', dataIndex: 'ORDERCODE', width: 120 },
                 { header: '客户编号', dataIndex: 'CUSNO', width: 130 }
             ]
@@ -171,15 +149,14 @@ function initSearch() {
         layout: 'hbox',
         items: [combo_1, combo_1_1]
     }
-    var declarationsearch_js_condition2_data = [{ "NAME": "客户编号", "CODE": "CUSNO" }, { "NAME": "提运单号", "CODE": "BLNO" }
-            , { "NAME": "订单编号", "CODE": "ORDERCODE" }, { "NAME": "报关单号", "CODE": "DECLNO" }
-            , { "NAME": "合同协议号", "CODE": "CONTRACTNO" }, { "NAME": "运输工具名称", "CODE": "TRANSNAME" }, { "NAME": "合同发票号", "CODE": "CONTRACTNOORDER" }];
-    if (busitypeid == 10 || busitypeid == 30) {  //如果是空运出口，或者是陆运出口
-        declarationsearch_js_condition2_data.push({ "NAME": "报关车号", "CODE": "DECLCARNO" });
-    }
+    var inspsearch_condition2_data = [{ "NAME": "客户编号", "CODE": "CUSNO" }, { "NAME": "订单编号", "CODE": "ORDERCODE" }
+            , { "NAME": "报检单号", "CODE": "INSPECTIONCODE" }, { "NAME": "核准单号", "CODE": "APPROVALCODE" }
+            , { "NAME": "通关单号", "CODE": "CLEARANCECODE" }, { "NAME": "合同发票号", "CODE": "CONTRACTNOORDER" }
+    ];
+
     var store_2 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: declarationsearch_js_condition2_data
+        data: inspsearch_condition2_data
     });
     var combo_2 = Ext.create('Ext.form.field.ComboBox', {
         id: 'CONDITION2',
@@ -190,7 +167,7 @@ function initSearch() {
         editable: false,
         queryMode: 'local',
         flex: .35,
-        margin: 0,
+        margin: 0, value: 'CUSNO'
     });
     var field_2_1 = Ext.create('Ext.form.field.Text', {
         id: 'CONDITION2_1',
@@ -203,17 +180,18 @@ function initSearch() {
         items: [combo_2, field_2_1]
     }
 
-    var declarationsearch_js_condition3_data_dy = [{ "NAME": "已打印", "CODE": "1" }, { "NAME": "未打印", "CODE": "0" }];
+    var insp_condition3_data_dy = [{ "NAME": "已打印", "CODE": "1" }, { "NAME": "未打印", "CODE": "0" }];
+    var insp_condition3_data_bj = [{ "NAME": "已完结", "CODE": "1" }, { "NAME": "未完结", "CODE": "0" }];
 
     var store_3 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: [{ "NAME": "打印标志", "CODE": "DYBZ" }]
+        data: [{ "NAME": "打印标志", "CODE": "DYBZ" }, { "NAME": "报检状态", "CODE": "BJZT" }]
     });    
 
     var combo_3 = Ext.create("Ext.form.ComboBox", {
         id: 'CONDITION3',
         name: "CONDITION3",
-        value: "DYBZ",
+        value: "BJZT",
         store: store_3,
         queryMode: 'local',
         editable: false,
@@ -226,14 +204,17 @@ function initSearch() {
                 change: function (combo, newValue, oldValue, eOpts) {
                     combo_3_1.reset();
                     if (newValue == "DYBZ") {
-                        store_3_1.loadData(declarationsearch_js_condition3_data_dy);
+                        store_3_1.loadData(insp_condition3_data_dy);
+                    }
+                    if (newValue == "BJZT") {
+                        store_3_1.loadData(insp_condition3_data_bj);
                     }
                 }
             }
     });
     var store_3_1 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: declarationsearch_js_condition3_data_dy
+        data: insp_condition3_data_bj
     });
     var combo_3_1 = Ext.create("Ext.form.ComboBox", {
         id: 'CONDITION3_1',
@@ -252,9 +233,12 @@ function initSearch() {
         layout: 'hbox',
         items: [combo_3, combo_3_1]
     }
+
+    var inspsearch_condition4_data =[{ "NAME": "订单委托日期", "CODE": "SUBMITTIME" }];
+
     var store_4 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: declarationsearch_js_condition4_data
+        data: inspsearch_condition4_data
     });
     var combo_4 = Ext.create("Ext.form.ComboBox", {
         id: 'CONDITION4',
@@ -308,7 +292,7 @@ function Reset() {
     Ext.getCmp("CONDITION1_1").setValue("");
     Ext.getCmp("CONDITION2").setValue("CUSNO");
     Ext.getCmp("CONDITION2_1").setValue("");
-    Ext.getCmp("CONDITION3").setValue("DYBZ");
+    Ext.getCmp("CONDITION3").setValue("BJZT");
     Ext.getCmp("CONDITION3_1").setValue("");
     Ext.getCmp("CONDITION4").setValue("SUBMITTIME");
     Ext.getCmp("CONDITION4_1").setValue("");
@@ -319,14 +303,15 @@ function Reset() {
 function render(value, cellmeta, record, rowIndex, columnIndex, store) {
     var rtn = "";
     var dataindex = cellmeta.column.dataIndex;
-    if (dataindex == "INSPSTATUS" && value) {
-        rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='showinspect_receipt(\"" + record.get("CODE") + "\")'>" + value + "</div>";
-    }
     if (dataindex == "ISPRINT") {
         rtn = value == "0" ? "未打印" : "已打印";
     }
+    if (dataindex == "MODIFYFLAG") {
+        if (value == "0") rtn = "正常";
+        if (value == "1") rtn = "删单";
+        if (value == "2") rtn = "改单";
+    }
     if (dataindex == "INSPECTIONCODE" && value) {
-        //rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='showwinwj(\"" + record.get("ID") + "\",\"" + record.get("ORDERCODE") + "\",\"" + record.get("CODE") + "\",TYPE=61)'>" + value + "</div>";
         rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='showwinwj(\"" + record.get("ORDERCODE") + "\",\"" + escape(record.get("BUSITYPE")) + "\",\"" + record.get("CODE") + "\")'>" + value + "</div>";
     }
     if (dataindex == "BUSITYPE" && value) {
@@ -335,33 +320,18 @@ function render(value, cellmeta, record, rowIndex, columnIndex, store) {
             rtn = rec.get("NAME");
         }
     }
-    //if (dataindex == "WOODPACKINGID") {//木质包装
-    //    var rec = store_mzbz.findRecord('CODE', value);
-    //    if (rec) {
-    //        rtn = rec.get("NAME");
-    //    }
-    //}
-    //if (dataindex == "INSPTYPE") {//检验类别    
-    //    var rec = store_jylb.findRecord('CODE', value);
-    //    if (rec) {
-    //        rtn = rec.get("NAME");
-    //    }
-    //}
-    //if (dataindex == "PACKAGETYPE") {//包装种类
-    //    var rec = store_inspbzzl.findRecord('CODE', value);
-    //    if (rec) {
-    //        rtn = rec.get("NAME");
-    //    }
-    //}
-    //if (dataindex == "DECLTYPE") {//申报库别
-    //    var rec = store_sbkb.findRecord('CODE', value);
-    //    if (rec) {
-    //        rtn = rec.get("NAME");
-    //    }
-    //}
-    //if (dataindex == "ISFORCELAW") {
-    //    rtn = value == "0" ? "否" : "是";
-    //}      
+    if (dataindex == "TRADEWAY" && value) {
+        var rec = store_insptradeway.findRecord('CODE', value);
+        if (rec) {
+            rtn = rec.get("NAME");
+        }
+    }
+    if (dataindex == "STATUS") {
+        rtn = orders_tatus[value];
+    }
+    if (dataindex == "LAWFLAG" || dataindex == "ISNEEDCLEARANCE") {
+        rtn = value == "0" ? "否" : "是";
+    }
     return rtn;
 }
 
@@ -372,7 +342,6 @@ function Select() {
 
 //打开调阅信息
 function showwinwj(ORDERCODE, BUSITYPE, PREINSPCODE) {
-    //opencenterwin("/Common/FileConsult?ID=" + ID + "&ORDERCODE=" + ORDERCODE + "&DECLCODE=" + DECLCODE + "&TYPE=" + TYPE, 1200, 900);
     opencenterwin("/Common/FileConsult?source=inspect&ORDERCODE=" + ORDERCODE + "&BUSITYPE=" + BUSITYPE + "&PREINSPCODE=" + PREINSPCODE, 1200, 900);
 }
 
@@ -386,40 +355,6 @@ function ClickShowwinwj() {
     opencenterwin("/Common/FileConsult?source=inspect&ORDERCODE=" + recs[0].get("ORDERCODE") + "&BUSITYPE=" + recs[0].get("BUSITYPE") + "&PREINSPCODE=" + recs[0].get("CODE"), 1200, 900);
 }
 
-//显示国检状态回执记录
-function showinspect_receipt(code_bjd) {
-    var store_inspect = Ext.create('Ext.data.JsonStore', {
-        fields: ['TIMES', 'STATUS'],
-        proxy: {
-            type: 'ajax',
-            url: '/Common/LoadInspectReceipt?bjdcode=' + code_bjd,
-            reader: {
-                root: 'rows',
-                type: 'json'
-            }
-        },
-        autoLoad: true
-    })
-    var grid_inspect = Ext.create('Ext.grid.Panel', {
-        title: '国检状态回执',
-        store: store_inspect,
-        height: 100,
-        columns: [
-            { xtype: 'rownumberer', width: 35 },
-            { header: '时间', dataIndex: 'TIMES', width: 130 },
-            { header: '国检状态', dataIndex: 'STATUS', flex: 1 }
-        ]
-    })
-    var win_inspect_status = Ext.create("Ext.window.Window", {
-        title: "",
-        width: 400,
-        height: 400,
-        layout: "fit",
-        modal: true,
-        items: [grid_inspect]
-    });
-    win_inspect_status.show();
-}
 
 function MultiPrint() {
     var recs = Ext.getCmp("inspect_grid").getSelectionModel().getSelection();
