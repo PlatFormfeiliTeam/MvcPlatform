@@ -26,11 +26,39 @@
     }
 </style>
 <script type="text/javascript">
-    var busitypeid, id;
-    var common_data_sbgq, common_data_sbfs,common_data_myfs;
+    var busitypeid, id, rowIndex;
+    var common_data_sbgq, common_data_sbfs, common_data_myfs;
+    var preUrl, nextUrl;
+
+   
+    
+
     Ext.onReady(function () {
         busitypeid = getQueryString("busitypeid");
-        id = getQueryString("id");
+        //id = getQueryString("id");
+
+        var store = opener.gridpanel.store
+        rowIndex = getQueryString("rowIndex");
+        if (rowIndex >= store.data.length) {
+            var pgbar = window.opener.Ext.getCmp('pgbar');
+            pgbar.moveNext();
+            rowIndex = 0;
+        }
+        if (rowIndex < 0) {
+            var pgbar = window.opener.Ext.getCmp('pgbar');
+            pgbar.movePrevious();
+            rowIndex = store.data.length-1;
+        }
+        var record = store.getAt(rowIndex);
+        var preIndex = eval(parseInt(rowIndex) - 1);
+        var nextIndex = eval(parseInt(rowIndex)+1);
+        id = record.data.ID;
+
+        
+
+        preUrl  ="/EnterpriseOrder/GoodsTrack?busitypeid=" + busitypeid + "&rowIndex="+preIndex;
+        nextUrl ="/EnterpriseOrder/GoodsTrack?busitypeid=" + busitypeid + "&rowIndex="+nextIndex;
+
         var busitype = "";
         switch (busitypeid) {
             case "10":
@@ -98,7 +126,7 @@
                         items.push(panel_top);
 
                         var panel_bottom = Ext.create('Ext.panel.Panel', {
-                            title: '<i class="fa fa-hand-o-right" aria-hidden="true"></i>&nbsp;订单信息',
+                            title: '<i class="fa fa-hand-o-right" aria-hidden="true"></i>&nbsp;订单信息<div style="float:right"><a href="' + preUrl + '">上一条</a>&nbsp;&nbsp;<a href="' + nextUrl + '">下一条</a></div>',
                             border: 0,
                             region: 'center',
                             //collapsed: false,//让第二项展开，达到第一项收起的目的
@@ -114,8 +142,12 @@
                         Ext.getCmp('panelbottom_1_1').getForm().setValues(data.json_order[0]);
                         Ext.getCmp('panelbottom_1_3').getForm().setValues(data.json_order[0]);
                         if (Ext.getCmp('w_grid')) { Ext.getCmp('w_grid').store.loadData(data.json_container); }
-                        var TOTALNO_DIVIDENO_value = data.json_order[0].TOTALNO+"_"+data.json_order[0].DIVIDENO
-                        Ext.getCmp('TOTALNO_DIVIDENO').setValue(TOTALNO_DIVIDENO_value);
+                        //if (typeof Ext.getCmp('TOTALNO_DIVIDENO') != "undefined") {
+                        if (Ext.getCmp('TOTALNO_DIVIDENO')) {
+                            var TOTALNO_DIVIDENO_value = data.json_order[0].TOTALNO + "_" + data.json_order[0].DIVIDENO
+                            Ext.getCmp('TOTALNO_DIVIDENO').setValue(TOTALNO_DIVIDENO_value);
+                        }
+                        
                     }
 
 
@@ -688,4 +720,4 @@
 <ul id="menu">
     
 </ul>
-<iframe id="content" name="frame" width=100% height=100% security="restricted" sandbox="allow-scripts allow-same-origin" />
+<iframe id="content" name="frame" width=100% height=100% security="restricted" sandbox="allow-scripts  allow-forms allow-same-origin" />

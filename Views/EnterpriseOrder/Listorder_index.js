@@ -258,7 +258,6 @@ Ext.onReady(function () {
 
 //=======================================================JS init end======================================================
 
-
 function initSearch() {
     var store_1 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
@@ -486,7 +485,8 @@ function Open() {
         return;
     }
     var id = recs[0].data.ID
-    openrwindow("/EnterpriseOrder/GoodsTrack?busitypeid=" + busitypeid + "&id=" + id, 1200, 800);
+    var index = gridpanel.store.indexOf(recs[0]);
+    openrwindow("/EnterpriseOrder/GoodsTrack?busitypeid=" + busitypeid + "&id=" + id + "&rowIndex=" + index, 1200, 800);
 }
 function ViewsEnterprise() {
     var recs = gridpanel.getSelectionModel().getSelection();

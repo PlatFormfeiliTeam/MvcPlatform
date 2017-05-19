@@ -40,7 +40,7 @@ namespace MvcPlatform.Controllers
         }
         public ActionResult ProcessOrder_Data()//委托任务仅显示有数据的记录
         {
-            ViewBag.navigator = "客户服务>>委托任务_数据";
+            ViewBag.navigator = "客户服务>>电子数据";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
@@ -54,6 +54,12 @@ namespace MvcPlatform.Controllers
         public ActionResult EntOrder_Detail()  //文件委托
         {
             ViewBag.navigator = "企业服务>>委托任务";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
+        public ActionResult EntOrder_Data_Detail()  //文件委托
+        {
+            ViewBag.navigator = "企业服务>>电子数据";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
@@ -195,34 +201,31 @@ namespace MvcPlatform.Controllers
             string where = "";
             if (!string.IsNullOrEmpty(Request["ENTERPRISENAME"]))//判断查询条件是否有值
             {
-                where += " and t.ENTERPRISECODE='" + GetCode(Request["ENTERPRISENAME"]) + "'";
+                where += " and b.BUSIUNITCODE='" + GetCode(Request["ENTERPRISENAME"]) + "'";
             }
             if (!string.IsNullOrEmpty(Request["CODE"]))//判断查询条件是否有值
             {
-                where += " and instr(t.CODE,'" + Request["CODE"].ToString().Trim() + "')>0 ";
+                where += " and instr(b.CUSNO,'" + Request["CODE"].ToString().Trim() + "')>0 ";
             }
-            if (!string.IsNullOrEmpty(Request["PRINTSTATUS"]))//判断查询条件是否有值
-            {
-                where += " and  t.PRINTSTATUS='" + Request["PRINTSTATUS"] + "'";
-            }
+            //if (!string.IsNullOrEmpty(Request["PRINTSTATUS"]))//判断查询条件是否有值
+            //{
+            //    where += " and  t.PRINTSTATUS='" + Request["PRINTSTATUS"] + "'";
+            //}
             if (!string.IsNullOrEmpty(Request["STARTDATE"]))//如果开始时间有值
             {
-                where += " and t.SUBMITTIME>=to_date('" + Request["STARTDATE"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                where += " and b.CREATETIME>=to_date('" + Request["STARTDATE"] + "','yyyy-mm-dd hh24:mi:ss') ";
             }
             if (!string.IsNullOrEmpty(Request["ENDDATE"]))//如果结束时间有值
             {
-                where += " and t.SUBMITTIME<=to_date('" + Request["ENDDATE"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                where += " and b.CREATETIME<=to_date('" + Request["ENDDATE"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
             }
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
             //string sql = @"select t.*,(select count(1) from list_attachment l where l.entid=t.ID ) FILENUM from ENT_ORDER t where t.FILEDECLAREUNITCODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where;
             //2016/10/9 为了提升load效能 FILENUM获取修改为：
-            string sql = @"select * 
-                            from ENT_ORDER t 
-                                left join  LIST_CUSDATA_FL b on t.code=b.cusno 
-                            where b.cusno is not null and t.FILEDECLAREUNITCODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where;
-            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "t.CREATETIME", "desc"));
+            string sql = @"select *  from LIST_CUSDATA_FL b  where b.cusno is not null and b.REPUNITCODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where;
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "b.CREATETIME", "desc"));
             var json = JsonConvert.SerializeObject(dt, iso);
             return "{rows:" + json + ",total:" + totalProperty + "}";
         }
@@ -1529,7 +1532,34 @@ namespace MvcPlatform.Controllers
         
         }
         #endregion
+        public string load_entorder_Data_detail()
+        {
+            string result = string.Empty;
+            string ID = Request["ID"]; //string busitype = Request["busitype"];
+            string sql = string.Empty;
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
+            //申报数据
+            string decl_data = "[]";
+            string product_data = "[]";
+            string file_data = "[]";
+
+                sql = "select * from LIST_CUSDATA_FL where ID='" + ID+ "'";
+                DataTable dt2 = DBMgr.GetDataTable(sql);
+                decl_data = JsonConvert.SerializeObject(dt2, iso);
+                if (dt2.Rows.Count > 0)
+                {
+                    sql = "select * from LIST_CUSDATA_SUB_FL where PCODE='" + dt2.Rows[0]["CUSNO"] + "'";
+                    DataTable dt3 = DBMgr.GetDataTable(sql);
+                    product_data = JsonConvert.SerializeObject(dt3, iso);
+                }
+                sql = "select * from list_attachment t where t.entid='" + ID + "'";
+                file_data = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso);
+            result = "{decl_data:" + decl_data + ",product_data:" + product_data + ",file_data:" + file_data + "}";
+            return result;
+
+        }
 
 
     }
