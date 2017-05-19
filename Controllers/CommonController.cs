@@ -3801,5 +3801,96 @@ namespace MvcPlatform.Controllers
            return new FileStreamResult(Response.OutputStream, "application/vnd.ms-excel");
         }
 
+
+        public string ExportInspList()
+        {
+            string dec_insp_status = Request["dec_insp_status"]; string common_data_busitype = Request["common_data_busitype"]; string common_data_inspmyfs = Request["common_data_inspmyfs"]; 
+            //string busitypeid = Request["busitypeid"];//导出暂时不用区分业务类型
+
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+            string sql = QueryConditionInsp();
+            sql = sql + " order by CREATETIME desc";
+            DataTable dt = new DataTable();
+            try
+            {
+                DataTable dt_count = DBMgr.GetDataTable("select count(1) from (" + sql + ") a");
+
+                int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
+                if (Convert.ToInt32(dt_count.Rows[0][0]) > WebDownCount)
+                {
+                    return "{success:false,WebDownCount:" + WebDownCount + "}";
+                }
+
+                dt = DBMgr.GetDataTable(sql);
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            if (dt.Rows.Count <= 0)
+            {
+                return "{success:false,WebDownCount:0}";
+            }
+
+            NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();//创建Excel文件的对象            
+            NPOI.SS.UserModel.ISheet sheet_S = book.CreateSheet("报检单信息");//添加一个导出成功sheet           
+            NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0); //给sheet1添加第一行的头部标题
+
+            row1.CreateCell(0).SetCellValue("国检状态"); row1.CreateCell(1).SetCellValue("报检状态"); row1.CreateCell(2).SetCellValue("核准单号"); row1.CreateCell(3).SetCellValue("报检单号");
+            row1.CreateCell(4).SetCellValue("经营单位"); row1.CreateCell(5).SetCellValue("通关单号"); row1.CreateCell(6).SetCellValue("监管方式"); row1.CreateCell(7).SetCellValue("打印标志");
+            row1.CreateCell(8).SetCellValue("张数"); row1.CreateCell(9).SetCellValue("删改单"); row1.CreateCell(10).SetCellValue("业务类型"); row1.CreateCell(11).SetCellValue("是否需通关单");
+            row1.CreateCell(12).SetCellValue("是否法检"); row1.CreateCell(13).SetCellValue("委托时间"); row1.CreateCell(14).SetCellValue("合同发票号"); row1.CreateCell(15).SetCellValue("订单编号");
+            row1.CreateCell(16).SetCellValue("客户编号");
+
+
+            //将数据逐步写入sheet_S各个行
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["INSPSTATUS"].ToString());
+                rowtemp.CreateCell(1).SetCellValue(getStatusName(dt.Rows[i]["STATUS"].ToString(),dec_insp_status));
+                rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["APPROVALCODE"].ToString());
+                rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["INSPECTIONCODE"].ToString());
+                rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
+                rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["CLEARANCECODE"].ToString());
+                rowtemp.CreateCell(6).SetCellValue(getStatusName(dt.Rows[i]["TRADEWAY"].ToString(), common_data_inspmyfs));
+                rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["ISPRINT"].ToString() == "0" ? "未打印" : "已打印");
+                rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
+                switch (dt.Rows[i]["MODIFYFLAG"].ToString())
+                {
+                    case "0":
+                        rowtemp.CreateCell(9).SetCellValue("正常");
+                        break;
+                    case "1":
+                        rowtemp.CreateCell(9).SetCellValue("删单");
+                        break;
+                    case "2":
+                        rowtemp.CreateCell(9).SetCellValue("改单");
+                        break;
+                    default:
+                        rowtemp.CreateCell(9).SetCellValue("");
+                        break;
+                }
+                rowtemp.CreateCell(10).SetCellValue(getStatusName(dt.Rows[i]["BUSITYPE"].ToString(), common_data_busitype));
+                rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["ISNEEDCLEARANCE"].ToString() == "0" ? "否" : "是");
+                rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "0" ? "否" : "是");
+                rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
+                rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
+                rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+            }
+
+            // 写入到客户端 
+            //System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            //book.Write(ms);
+            //ms.Seek(0, SeekOrigin.Begin);
+            //return File(ms, "application/vnd.ms-excel", "报关单文件.xls");
+
+            return Extension.getPathname("报检单文件.xls", book);
+        }
+
     }
 }

@@ -61,7 +61,8 @@ Ext.onReady(function () {
                             CONDITION1: Ext.getCmp('CONDITION1').getValue(), VALUE1: Ext.getCmp("CONDITION1_1").getValue(),
                             CONDITION2: Ext.getCmp('CONDITION2').getValue(), VALUE2: Ext.getCmp("CONDITION2_1").getValue(),
                             CONDITION3: Ext.getCmp('CONDITION3').getValue(), VALUE3: Ext.getCmp("CONDITION3_1").getValue(),
-                            CONDITION4: Ext.getCmp('CONDITION4').getValue(), VALUE4_1: Ext.Date.format(Ext.getCmp("CONDITION4_1").getValue(), 'Y-m-d H:i:s'), VALUE4_2: Ext.Date.format(Ext.getCmp("CONDITION4_2").getValue(), 'Y-m-d H:i:s'),
+                            CONDITION4: Ext.getCmp('CONDITION4').getValue(),
+                            VALUE4_1: Ext.Date.format(Ext.getCmp("CONDITION4_1").getValue(), 'Y-m-d H:i:s'), VALUE4_2: Ext.Date.format(Ext.getCmp("CONDITION4_2").getValue(), 'Y-m-d H:i:s')
                         }
                     }
                 }
@@ -88,6 +89,7 @@ Ext.onReady(function () {
                 { header: '是否需通关单', dataIndex: 'ISNEEDCLEARANCE', width: 80, renderer: render },
                 { header: '是否法检', dataIndex: 'LAWFLAG', width: 60, renderer: render },
                 { header: '委托时间', dataIndex: 'SUBMITTIME', width: 130 },
+                { header: '合同发票号', dataIndex: 'CONTRACTNO', width: 120 },
                 { header: '订单编号', dataIndex: 'ORDERCODE', width: 120 },
                 { header: '客户编号', dataIndex: 'CUSNO', width: 130 }
             ]
@@ -372,4 +374,46 @@ function MultiPrint() {
         }
     }
     opencenterwin("/Common/MultiPrint?source=inspect&data=" + data, 1100, 700);
+}
+
+
+function ExportInsp() {
+
+    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "数据导出中，请稍等..." });
+    myMask.show();
+
+    var data = {
+        dec_insp_status: JSON.stringify(orderstatus_js_data), common_data_busitype: JSON.stringify(common_data_busitype), common_data_inspmyfs: JSON.stringify(common_data_inspmyfs),
+        busitypeid: busitypeid, role: role,
+        CONDITION1: Ext.getCmp('CONDITION1').getValue(), VALUE1: Ext.getCmp("CONDITION1_1").getValue(),
+        CONDITION2: Ext.getCmp('CONDITION2').getValue(), VALUE2: Ext.getCmp("CONDITION2_1").getValue(),
+        CONDITION3: Ext.getCmp('CONDITION3').getValue(), VALUE3: Ext.getCmp("CONDITION3_1").getValue(),
+        CONDITION4: Ext.getCmp('CONDITION4').getValue(),
+        VALUE4_1: Ext.Date.format(Ext.getCmp("CONDITION4_1").getValue(), 'Y-m-d H:i:s'), VALUE4_2: Ext.Date.format(Ext.getCmp("CONDITION4_2").getValue(), 'Y-m-d H:i:s')
+    }
+
+    Ext.Ajax.request({
+        url: '/Common/ExportInspList',
+        params: data,
+        success: function (response, option) {
+            var json = Ext.decode(response.responseText);
+            if (json.success == false) {
+                if (json.WebDownCount == 0) {
+                    Ext.MessageBox.alert('提示', '记录为空！');
+                } else {
+                    Ext.MessageBox.alert('提示', '综合需求及性能，导出记录限制' + json.WebDownCount + '！');
+                }
+            } else {
+                Ext.Ajax.request({
+                    url: '/Common/DownloadFile',
+                    method: 'POST',
+                    params: Ext.decode(response.responseText),
+                    form: 'exportform',
+                    success: function (response, option) {
+                    }
+                });
+            }
+            myMask.hide();
+        }
+    });
 }
