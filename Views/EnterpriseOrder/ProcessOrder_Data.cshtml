@@ -21,7 +21,7 @@
             data: common_data_busitype
         });
         var store = Ext.create('Ext.data.JsonStore', {
-            fields: ['ID', 'CUSNO', 'BUSIUNITNAME', 'CREATETIME', 'REPUNITNAME', 'RECORDCODE', 'CONTRACTNO', 'BUSIUNITNAME', 'RECORDCODE'],
+            fields: ['ID', 'CUSNO', 'BUSIUNITNAME', 'CREATETIME', 'REPUNITNAME', 'RECORDCODE', 'CONTRACTNO', 'BUSIUNITNAME', 'RECORDCODE','ISUSE'],
             pageSize: 20,
             proxy: {
                 type: 'ajax',
@@ -65,7 +65,8 @@
             { header: '委托时间', dataIndex: 'CREATETIME', width: 130, locked: true },
             { header: '合同协议号', dataIndex: 'CONTRACTNO', width: 110, locked: true },
             { header: '收/发货单位', dataIndex: 'BUSIUNITNAME', width: 220, locked: true },
-            { header: '备案号', dataIndex: 'RECORDCODE', width: 220, locked: true }
+            { header: '备案号', dataIndex: 'RECORDCODE', width: 220, locked: true },
+            { header: '提取标志', dataIndex: 'ISUSE', width: 220, renderer: render, locked: true }
             
             
             ],
@@ -196,7 +197,11 @@
                 break;
             case "ISREADPDF":
                 rtn = value == "1" ? "已解析" : "未解析";
-                break
+                break;
+            case "ISUSE":
+                rtn = value ? "已提取" : "";
+                break;
+ 
         }
         return rtn;
     }
@@ -267,6 +272,7 @@
         }
         opencenterwin("/EnterpriseOrder/EntOrder_Data_Detail?ID=" + recs[0].data.ID, 1300, 700);
     }
+
 </script>
 
 <div class="container">

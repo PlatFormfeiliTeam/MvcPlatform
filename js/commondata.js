@@ -60,6 +60,8 @@ var menu_js_data = [{ "NAME": "I跟踪", "URL": "http://www.igenzong.com/air/tra
                     { "NAME": "转关信息查询", "URL": "http://www.haiguan.info/onlinesearch/gateway/CabinOrder2.aspx", "busitypeid": "10" },
                     { "NAME": "快件舱单确认信息查询", "URL": "http://www.haiguan.info/onlinesearch/gateway/FormHeadRtnAndEntryHead.aspx", "busitypeid": "11" },
                     { "NAME": "快件舱单确认信息查询", "URL": "http://www.haiguan.info/onlinesearch/gateway/FormHeadRtnAndEntryHead.aspx", "busitypeid": "10" },
+                    { "NAME": "新舱单信息查询", "URL": "http://query.customs.gov.cn/MNFTQ/", "busitypeid": "11" },
+                    { "NAME": "新舱单信息查询", "URL": "http://query.customs.gov.cn/MNFTQ/", "busitypeid": "10" },
                     { "NAME": "海勃", "URL": "http://www.hb56.com/Main.aspx", "busitypeid": "21" },
                     { "NAME": "海勃", "URL": "http://www.hb56.com/Main.aspx", "busitypeid": "20" },
                     { "NAME": "新舱单信息查询", "URL": "http://query.customs.gov.cn/MNFTQ/ ", "busitypeid": "21" },

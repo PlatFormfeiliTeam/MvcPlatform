@@ -186,16 +186,22 @@
                     region: 'center',
                     columns: [
                     { xtype: 'rownumberer', width: 35 },
-                    { header: '项号', dataIndex: 'ITEMNO', width: 80 },
-                    { header: '商品编号', dataIndex: 'COMMODITYNO', width: 110 },
-                    { header: '中文品名', dataIndex: 'COMMODITYCHNAME', width: 200 },
-                    { header: '规格型号', dataIndex: 'SPECIFICATIONSMODEL', width: 130 },
-                    { header: '成交数量', dataIndex: 'CADQUANTITY', width: 80 },
-                    { header: '成交单位', dataIndex: 'CADUNITNAME', width: 60 },
-                    { header: '单价', dataIndex: 'UNITPRICE', width: 100 },
-                    { header: '总价', dataIndex: 'TOTALPRICE', width: 100 },
-                    { header: '币种', dataIndex: 'CURRENCYNAME', width: 100 },
-                    { header: '净重', dataIndex: 'GOODSNW', width: 100 }
+                    { header: '项号', dataIndex: 'ITEMNO', width: 40 },
+                    { header: '商品编号', dataIndex: 'COMMODITYNO', width: 110},
+                    { header: '附加编码', dataIndex: 'ADDITIONALNO', width: 60},
+                    { header: '法定数量', dataIndex: 'LEGALQUANTITY', width: 60},
+                    { header: '法定单位', dataIndex: 'LEGALUNITNAME', width: 60},
+
+                    { header: '中文品名', dataIndex: 'COMMODITYCHNAME', width: 200},
+                    { header: '规格型号', dataIndex: 'SPECIFICATIONSMODEL', width: 130},
+                    { header: '成交数量', dataIndex: 'CADQUANTITY', width:60},
+                    { header: '成交单位', dataIndex: 'CADUNITNAME', width: 60},
+                    { header: '单价', dataIndex: 'UNITPRICE', width: 80},
+                    { header: '总价', dataIndex: 'TOTALPRICE', width: 100},
+                    { header: '币种', dataIndex: 'CURRENCYNAME', width: 40},
+                    { header: '净重', dataIndex: 'GOODSNW', width: 80},
+                    { header: '原产国', dataIndex: 'COUNTRYORIGINNAME', width: 100},
+                    { header: '目的国', dataIndex: 'DESTCOUNTRYNAME', width: 100}  
                     ]
                 });
 

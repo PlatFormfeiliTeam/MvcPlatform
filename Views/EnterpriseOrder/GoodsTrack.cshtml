@@ -26,38 +26,50 @@
     }
 </style>
 <script type="text/javascript">
-    var busitypeid, id, rowIndex;
+    var  busitypeid,rowIndex;
     var common_data_sbgq, common_data_sbfs, common_data_myfs;
     var preUrl, nextUrl;
-
+    var startrow = 0;
+    var store_Trade;
+    var currentPage; var pageSize, store_size, max_page;
    
     
 
     Ext.onReady(function () {
         busitypeid = getQueryString("busitypeid");
-        //id = getQueryString("id");
-
-        var store = opener.gridpanel.store
+        var id = getQueryString("id");
         rowIndex = getQueryString("rowIndex");
-        if (rowIndex >= store.data.length) {
-            var pgbar = window.opener.Ext.getCmp('pgbar');
-            pgbar.moveNext();
-            rowIndex = 0;
+        currentPage = getQueryString("currentPage");
+        if (opener.Ext.getCmp('pgbar')) {
+            pageSize = parseInt(opener.Ext.getCmp('pgbar').store.pageSize);
+            store_size = parseInt(opener.Ext.getCmp('pgbar').store.data.length);
         }
-        if (rowIndex < 0) {
-            var pgbar = window.opener.Ext.getCmp('pgbar');
-            pgbar.movePrevious();
-            rowIndex = store.data.length-1;
-        }
-        var record = store.getAt(rowIndex);
-        var preIndex = eval(parseInt(rowIndex) - 1);
-        var nextIndex = eval(parseInt(rowIndex)+1);
-        id = record.data.ID;
+        else {
+            pageSize = parseInt(opener.store_Trade.pageSize);
+            store_size = parseInt(opener.store_Trade.data.length);
 
+        }
         
+        
+        var model_fields = ['ID', 'ENTRUSTTYPE', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE', 'TURNPRENO', 'SUBMITTIME',
+                    'BUSIUNITNAME', 'BUSIUNITCODE', 'CONTRACTNO', 'TOTALNO', 'DIVIDENO', 'REPWAYID', 'GOODSNUM',
+                    'GOODSGW', 'CUSTOMAREACODE', 'LAWFLAG', 'ISINVALID', 'BUSITYPE', 'PRINTSTATUS', 'STATUS', 'REPNO', 'ASSOCIATENO',
+                   'CORRESPONDNO', 'FIRSTLADINGBILLNO', 'SECONDLADINGBILLNO', 'ARRIVEDNO', 'SUBMITUSERNAME', 'REPUNITNAME'];
+        Ext.define('ORDERLIST', {
+            extend: 'Ext.data.Model',
+            fields: model_fields
+        });
+        store_Trade = Ext.create('Ext.data.JsonStore', {
+            model: 'ORDERLIST',
+            pageSize: pageSize
+        });
+        store_Trade.proxy = opener.gridpanel.store.getProxy();
+        store_Trade.proxy.extraParams.start = pageSize * (parseInt(currentPage) - 1);;
+        store_Trade.load(function (records, operation, success) {
+            max_page = (store_Trade.totalCount % pageSize) == 0 ? parseInt(store_Trade.totalCount / pageSize) : parseInt(store_Trade.totalCount / pageSize) + 1;
+        });
+       
 
-        preUrl  ="/EnterpriseOrder/GoodsTrack?busitypeid=" + busitypeid + "&rowIndex="+preIndex;
-        nextUrl ="/EnterpriseOrder/GoodsTrack?busitypeid=" + busitypeid + "&rowIndex="+nextIndex;
 
         var busitype = "";
         switch (busitypeid) {
@@ -96,11 +108,6 @@
                 common_data_sbgq = commondata.sbgq;//申报关区
                 common_data_sbfs = commondata.sbfs;//申报方式
                 common_data_myfs = commondata.myfs;//贸易方式
-
-                Ext.Ajax.request({
-                    url: '/EnterPriseOrder/getTrack',
-                    params: { busitypeid: busitypeid, id: id },
-                    success: function (response, opts) {
                         form_ini();
                         var items = [];
                         var paneltop_2 = Ext.create('Ext.panel.Panel', {
@@ -126,7 +133,7 @@
                         items.push(panel_top);
 
                         var panel_bottom = Ext.create('Ext.panel.Panel', {
-                            title: '<i class="fa fa-hand-o-right" aria-hidden="true"></i>&nbsp;订单信息<div style="float:right"><a href="' + preUrl + '">上一条</a>&nbsp;&nbsp;<a href="' + nextUrl + '">下一条</a></div>',
+                            title: '<i class="fa fa-hand-o-right" aria-hidden="true"></i>&nbsp;订单信息<div style="float:right"><a href="javascript:reload(2);">上一条</a>&nbsp;&nbsp;<a href="javascript:reload(1);">下一条</a></div>',
                             border: 0,
                             region: 'center',
                             //collapsed: false,//让第二项展开，达到第一项收起的目的
@@ -137,21 +144,8 @@
                             //layout: 'accordion',
                             items: items
                         })
-
-                        var data = Ext.decode(response.responseText);
-                        Ext.getCmp('panelbottom_1_1').getForm().setValues(data.json_order[0]);
-                        Ext.getCmp('panelbottom_1_3').getForm().setValues(data.json_order[0]);
-                        if (Ext.getCmp('w_grid')) { Ext.getCmp('w_grid').store.loadData(data.json_container); }
-                        //if (typeof Ext.getCmp('TOTALNO_DIVIDENO') != "undefined") {
-                        if (Ext.getCmp('TOTALNO_DIVIDENO')) {
-                            var TOTALNO_DIVIDENO_value = data.json_order[0].TOTALNO + "_" + data.json_order[0].DIVIDENO
-                            Ext.getCmp('TOTALNO_DIVIDENO').setValue(TOTALNO_DIVIDENO_value);
-                        }
-                        
-                    }
-
-
-                });
+                        loadform_data(id);
+ 
 
             }
         });
@@ -187,6 +181,115 @@
             $("#content").attr("src",$(this).attr("ref"));
         });
     });
+
+    function reload(action)
+    {
+
+        if (action == "1") {
+            rowIndex = eval(parseInt(rowIndex) + 1);
+            if (rowIndex >= store_size) {
+                rowIndex = 0;
+                currentPage = parseInt(currentPage) + 1;
+                //startrow = pageSize * parseInt(currentPage) > store_Trade.totalCount ? pageSize * (parseInt(currentPage) - 1) : pageSize * parseInt(currentPage);
+                startrow = pageSize * (parseInt(currentPage) - 1);
+                
+              
+                //var params = { start: startrow, busitypeid: busitypeid };
+                store_Trade.proxy.extraParams.start = startrow;
+                store_Trade.load(function (records, operation, success) {
+                    var recs = records[rowIndex];
+                    loadform_data(recs.data.ID);
+                    store_size = records.data.length;
+                });
+
+                if (currentPage == max_page + 1) {
+                    currentPage = currentPage - 1;
+                    rowIndex = store_size - 1;
+                    Ext.MessageBox.alert('提示', '当前为尾页！');
+                    return;
+                }
+
+            }
+            else {
+                if (currentPage == max_page + 1) {
+                    //currentPage = currentPage - 1;
+                    rowIndex = store_size;
+                    Ext.MessageBox.alert('提示', '当前为尾页！');
+                }
+                else
+                {
+                    loadform_data(store_Trade.data.items[rowIndex].data.ID);
+
+                }
+                
+            }
+        } else {
+
+            rowIndex = eval(parseInt(rowIndex) - 1);
+            if (rowIndex < 0) {
+                rowIndex = pageSize - 1;
+                currentPage = parseInt(currentPage) - 1;
+                startrow = pageSize * (parseInt(currentPage) - 1) < 0 ? 0 : pageSize * (parseInt(currentPage) - 1);
+                
+
+                if (currentPage == 0) {
+                    currentPage = 1
+                    Ext.MessageBox.alert('提示', '当前为首页！');
+                    rowIndex = 0;
+                    return;
+                }
+               // var params = { start: startrow, busitypeid: busitypeid };
+                store_Trade.proxy.extraParams.start = startrow;
+                store_Trade.load(function (records, operation, success) {
+                    var recs = records[rowIndex];
+                    loadform_data(recs.data.ID);
+                    store_size = records.data.length;
+                });
+            }
+            else {
+                if (currentPage == 0) {
+                    currentPage = 1
+                    Ext.MessageBox.alert('提示', '当前为首页！');
+                }
+                else {
+                    loadform_data(store_Trade.data.items[rowIndex].data.ID);
+                }
+              
+            }
+        }
+      
+
+        //store_Trade.load(function (records, operation, success) {
+        //    var recs = records[rowIndex];
+        //    loadform_data(recs.data.ID);
+        //});
+        
+
+        
+    }
+    function loadform_data(id)
+    {
+        Ext.Ajax.request({
+        url: '/EnterPriseOrder/getTrack',
+        params: { busitypeid: busitypeid, id: id },
+        success: function (response, opts) {
+            var data = Ext.decode(response.responseText);
+            Ext.getCmp('panelbottom_1_1').getForm().setValues(data.json_order[0]);
+            Ext.getCmp('panelbottom_1_3').getForm().setValues(data.json_order[0]);
+            if (Ext.getCmp('w_grid')) { Ext.getCmp('w_grid').store.loadData(data.json_container); }
+            //if (typeof Ext.getCmp('TOTALNO_DIVIDENO') != "undefined") {
+            if (Ext.getCmp('TOTALNO_DIVIDENO')) {
+                var TOTALNO_DIVIDENO_value = data.json_order[0].TOTALNO + "_" + data.json_order[0].DIVIDENO
+                Ext.getCmp('TOTALNO_DIVIDENO').setValue(TOTALNO_DIVIDENO_value);
+            }
+
+        }
+
+
+    });
+    
+    
+    }
 
     function form_ini()
     {
