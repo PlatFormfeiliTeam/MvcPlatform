@@ -193,7 +193,12 @@
                 //startrow = pageSize * parseInt(currentPage) > store_Trade.totalCount ? pageSize * (parseInt(currentPage) - 1) : pageSize * parseInt(currentPage);
                 startrow = pageSize * (parseInt(currentPage) - 1);
                 
-              
+                if (currentPage == max_page + 1) {
+                    currentPage = currentPage - 1;
+                    rowIndex = store_size - 1;
+                    Ext.MessageBox.alert('提示', '当前为尾页！');
+                    return;
+                }
                 //var params = { start: startrow, busitypeid: busitypeid };
                 store_Trade.proxy.extraParams.start = startrow;
                 store_Trade.load(function (records, operation, success) {
@@ -202,12 +207,7 @@
                     store_size = records.data.length;
                 });
 
-                if (currentPage == max_page + 1) {
-                    currentPage = currentPage - 1;
-                    rowIndex = store_size - 1;
-                    Ext.MessageBox.alert('提示', '当前为尾页！');
-                    return;
-                }
+            
 
             }
             else {
