@@ -509,7 +509,7 @@ function DownReport_detail() {
     var data = {
         UNIT: JSON.stringify(common_data_unit), busitype: JSON.stringify(common_data_busitype),
         RECORDINFORID: Ext.getCmp('s_combo_recordid').getValue(), ITEMNO: Ext.getCmp("s_field_ITEMNO").getValue(),
-        DATE_START: Ext.Date.format(Ext.getCmp("s_date_start").getValue(), 'Y-m-d H:i:s'), DATE_END: Ext.Date.format(Ext.getCmp("s_date_end").getValue(), 'Y-m-d H:i:s'),
+        DATE_START: Ext.Date.format(Ext.getCmp("s_date_start").getValue(), 'Y-m-d'), DATE_END: Ext.Date.format(Ext.getCmp("s_date_end").getValue(), 'Y-m-d'),
         INOUT_TYPE: Ext.getCmp('s_combo_inout_type').getValue()
     }
 

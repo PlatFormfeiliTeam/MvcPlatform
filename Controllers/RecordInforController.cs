@@ -1442,7 +1442,8 @@ namespace MvcPlatform.Controllers
         public string DownReport_detail()
         {
             string sql = ""; string UNIT = Request["UNIT"]; string busitype = Request["busitype"];
-            string RECORDINFORID = Request["RECORDINFORID"]; string ITEMNO = Request["ITEMNO"];
+            string RECORDINFORID = Request["RECORDINFORID"]; string ITEMNO = Request["ITEMNO"]; string INOUT_TYPE = Request["INOUT_TYPE"];
+            string DATE_START = Request["DATE_START"]; string DATE_END = Request["DATE_END"];
 
             int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
@@ -1451,22 +1452,21 @@ namespace MvcPlatform.Controllers
             NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();
             string filename = "统一数据表.xls";
           
-            OracleParameter[] parms = new OracleParameter[10];
+            OracleParameter[] parms = new OracleParameter[9];
 
             parms[0] = new OracleParameter("WebDownCount", OracleDbType.Int32, WebDownCount, ParameterDirection.Input);
             parms[1] = new OracleParameter("busiunitcode", OracleDbType.NVarchar2, json_user.Value<string>("CUSTOMERHSCODE"), ParameterDirection.Input);
             parms[2] = new OracleParameter("recordcode", OracleDbType.NVarchar2, RECORDINFORID, ParameterDirection.Input);
             parms[3] = new OracleParameter("itemno", OracleDbType.NVarchar2, ITEMNO, ParameterDirection.Input);
-            parms[4] = new OracleParameter("inout_type", OracleDbType.NVarchar2, ParameterDirection.Input);
-            parms[5] = new OracleParameter("date_start", OracleDbType.NVarchar2, ParameterDirection.Input);
-            parms[6] = new OracleParameter("date_end", OracleDbType.NVarchar2, ParameterDirection.Input);
-            parms[7] = new OracleParameter("itemnoattribute", OracleDbType.NVarchar2, ParameterDirection.Input);
+            parms[4] = new OracleParameter("inout_type", OracleDbType.NVarchar2,INOUT_TYPE, ParameterDirection.Input);
+            parms[5] = new OracleParameter("date_start", OracleDbType.NVarchar2,DATE_START, ParameterDirection.Input);
+            parms[6] = new OracleParameter("date_end", OracleDbType.NVarchar2, DATE_END,ParameterDirection.Input);
 
-            parms[8] = new OracleParameter("p_flag_parms", OracleDbType.Varchar2, 20, null, ParameterDirection.Output);//输出参数，字符串类型的，一定要设定大小
-            parms[9] = new OracleParameter("rescur", OracleDbType.RefCursor, ParameterDirection.Output);
+            parms[7] = new OracleParameter("p_flag_parms", OracleDbType.Varchar2, 20, null, ParameterDirection.Output);//输出参数，字符串类型的，一定要设定大小
+            parms[8] = new OracleParameter("rescur", OracleDbType.RefCursor, ParameterDirection.Output);
 
             DataTable dt = DBMgr.GetDataTableParm("Pro_RecordDetail_Report", parms);
-            string p_flag_parms = parms[8].Value.ToString();
+            string p_flag_parms = parms[7].Value.ToString();
 
             if (p_flag_parms == "N")
             {
