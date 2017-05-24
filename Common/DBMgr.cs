@@ -121,5 +121,40 @@ namespace MvcPlatform.Common
             return retcount;
         }
 
+        public static DataTable GetDataTableParm(string sql, OracleParameter[] parms)
+        {
+            DataSet ds = new DataSet();
+            try
+            {
+                using (OracleConnection orclCon = new OracleConnection(ConnectionString))
+                {
+                    DbCommand oc = orclCon.CreateCommand();
+                    oc.Connection = orclCon;
+                    if (orclCon.State.ToString().Equals("Open"))
+                    {
+                        orclCon.Close();
+                    }
+                    oc.CommandType = CommandType.StoredProcedure;
+                    oc.CommandText = sql;
+                    oc.Parameters.AddRange(parms);
+                    orclCon.Open();
+                    DbDataAdapter adapter = new OracleDataAdapter();
+                    adapter.SelectCommand = oc;
+                    adapter.Fill(ds);
+                }
+            }
+            catch (Exception e)
+            {
+                //log.Error(e.Message + e.StackTrace);
+            }
+
+            DataTable dt = null;
+            if (ds.Tables.Count > 0)
+            {
+                dt = ds.Tables[0];
+            }
+            return dt;
+        }
+
     }
 }

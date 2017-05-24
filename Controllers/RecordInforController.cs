@@ -1439,6 +1439,76 @@ namespace MvcPlatform.Controllers
             return Extension.getPathname(filename, book);
         }
 
+        public string DownReport_detail()
+        {
+            string sql = ""; string UNIT = Request["UNIT"]; string busitype = Request["busitype"];
+            string RECORDINFORID = Request["RECORDINFORID"]; string ITEMNO = Request["ITEMNO"];
+
+            int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            //创建Excel文件的对象
+            NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();
+            string filename = "统一数据表.xls";
+          
+            OracleParameter[] parms = new OracleParameter[10];
+
+            parms[0] = new OracleParameter("WebDownCount", OracleDbType.Int32, WebDownCount, ParameterDirection.Input);
+            parms[1] = new OracleParameter("busiunitcode", OracleDbType.NVarchar2, json_user.Value<string>("CUSTOMERHSCODE"), ParameterDirection.Input);
+            parms[2] = new OracleParameter("recordcode", OracleDbType.NVarchar2, RECORDINFORID, ParameterDirection.Input);
+            parms[3] = new OracleParameter("itemno", OracleDbType.NVarchar2, ITEMNO, ParameterDirection.Input);
+            parms[4] = new OracleParameter("inout_type", OracleDbType.NVarchar2, ParameterDirection.Input);
+            parms[5] = new OracleParameter("date_start", OracleDbType.NVarchar2, ParameterDirection.Input);
+            parms[6] = new OracleParameter("date_end", OracleDbType.NVarchar2, ParameterDirection.Input);
+            parms[7] = new OracleParameter("itemnoattribute", OracleDbType.NVarchar2, ParameterDirection.Input);
+
+            parms[8] = new OracleParameter("p_flag_parms", OracleDbType.Varchar2, 20, null, ParameterDirection.Output);//输出参数，字符串类型的，一定要设定大小
+            parms[9] = new OracleParameter("rescur", OracleDbType.RefCursor, ParameterDirection.Output);
+
+            DataTable dt = DBMgr.GetDataTableParm("Pro_RecordDetail_Report", parms);
+            string p_flag_parms = parms[8].Value.ToString();
+
+            if (p_flag_parms == "N")
+            {
+                return "{success:false,WebDownCount:" + WebDownCount + "}";
+            }
+            
+            NPOI.SS.UserModel.ISheet sheet = book.CreateSheet("统一数据表");
+            NPOI.SS.UserModel.IRow row1 = sheet.CreateRow(0);
+            row1.CreateCell(0).SetCellValue("合同号"); row1.CreateCell(1).SetCellValue("业务类型"); row1.CreateCell(2).SetCellValue("进出类型"); row1.CreateCell(3).SetCellValue("申报日期");
+            row1.CreateCell(4).SetCellValue("报关单号"); row1.CreateCell(5).SetCellValue("贸易方式"); row1.CreateCell(6).SetCellValue("项号属性"); row1.CreateCell(7).SetCellValue("项号");
+            row1.CreateCell(8).SetCellValue("成交数量"); row1.CreateCell(9).SetCellValue("成交单位"); row1.CreateCell(10).SetCellValue("成交金额"); row1.CreateCell(11).SetCellValue("币制");
+            row1.CreateCell(12).SetCellValue("海关状态"); row1.CreateCell(13).SetCellValue("账册号");
+
+            if (dt != null)
+            {
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    NPOI.SS.UserModel.IRow rowtemp = sheet.CreateRow(i + 1);
+                    rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                    rowtemp.CreateCell(1).SetCellValue(GetName(dt.Rows[i]["BUSITYPE"].ToString(), busitype));
+                    rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["INTERNALTYPENAME"].ToString());
+                    rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["REPTIME"].ToString());
+                    rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["DECLARATIONCODE"].ToString());
+                    rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["TRADEMETHOD"].ToString());
+                    rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["ITEMNOATTRIBUTE"].ToString());
+                    rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["ITEMNO"].ToString());
+                    rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["CADQUANTITY"].ToString());
+                    rowtemp.CreateCell(9).SetCellValue(GetName(dt.Rows[i]["CADUNIT"].ToString(), UNIT));
+                    rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["TOTALPRICE"].ToString());
+                    rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["CURRENCY"].ToString());
+                    rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["CUSTOMSSTATUS"].ToString());
+                    rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["RECORDCODE"].ToString());
+                }
+            }
+            // 写入到客户端 
+            //System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            //book.Write(ms);
+            //ms.Seek(0, SeekOrigin.Begin);
+            //return File(ms, "application/vnd.ms-excel", filename);
+
+            return Extension.getPathname(filename, book);
+        }
 
         #endregion
 

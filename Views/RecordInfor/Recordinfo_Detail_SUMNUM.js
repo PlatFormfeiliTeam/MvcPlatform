@@ -502,3 +502,139 @@ function Export_SUM_D() {
     });
 }
 
+function DownReport_detail() {
+    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "数据导出中，请稍等..." });
+    myMask.show();
+
+    var data = {
+        UNIT: JSON.stringify(common_data_unit), busitype: JSON.stringify(common_data_busitype),
+        RECORDINFORID: Ext.getCmp('s_combo_recordid').getValue(), ITEMNO: Ext.getCmp("s_field_ITEMNO").getValue(),
+        DATE_START: Ext.Date.format(Ext.getCmp("s_date_start").getValue(), 'Y-m-d H:i:s'), DATE_END: Ext.Date.format(Ext.getCmp("s_date_end").getValue(), 'Y-m-d H:i:s'),
+        INOUT_TYPE: Ext.getCmp('s_combo_inout_type').getValue()
+    }
+
+    Ext.Ajax.request({
+        url: '/RecordInfor/DownReport_detail',
+        params: data,
+        success: function (response, option) {
+            var json = Ext.decode(response.responseText);
+            if (json.success == false) {
+                Ext.MessageBox.alert('提示', '综合需求及性能，导出记录限制' + json.WebDownCount + '！');
+            } else {
+                Ext.Ajax.request({
+                    url: '/Common/DownloadFile',
+                    method: 'POST',
+                    params: Ext.decode(response.responseText),
+                    form: 'exportformt_detail',
+                    success: function (response, option) {
+                    }
+                });
+            }
+            myMask.hide();
+        }
+    });
+}
+
+function DownReport_sum() {
+
+}
+
+
+/*
+function DownReport() {
+    var label_baseinfo_rep = {
+        xtype: 'label',
+        margin: '5',
+        html: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;报表分类</span></h4>'
+    }
+    var tbar_rep = Ext.create('Ext.toolbar.Toolbar', {
+        items: [label_baseinfo_rep, '->']
+    });
+
+    var bbar_r = '<div class="btn-group" role="group">'
+                       + '<form id="exportform_rep" name="form" enctype="multipart/form-data" method="post" style="display:inline-block">'
+                       + '<button onclick="DownReport_radio()" type="button" id="btn_Export" class="btn btn-primary btn-sm"><i class="fa fa-level-down"></i>&nbsp;download</button></form>'
+                  + '</div>';
+
+    var bbar = Ext.create('Ext.toolbar.Toolbar', {
+        items: ['->', bbar_r]
+    });
+
+    var field_report = Ext.create('Ext.form.RadioGroup', {
+        id: 'field_report',
+        margin: '10',
+        labelAlign: "right",
+        //fieldLabel: '报表分类',
+        columns: 3,
+        vertical: true,
+        items: [{ boxLabel: "统一数据表", name: 'rbg', inputValue: "0", checked: true }
+            , { boxLabel: "料件汇总表", name: 'rbg', inputValue: "1" }
+            , { boxLabel: "成品汇总表", name: 'rbg', inputValue: "2" }
+        ]
+    });
+
+
+    var formpanel_d = Ext.create('Ext.form.Panel', {
+        id: 'formpanel_report',
+        minHeight: 100,
+        border: 0,
+        tbar: tbar_rep,
+        bbar: bbar,
+        fieldDefaults: {
+            margin: '0 5 10 0',
+            labelWidth: 80,
+            columnWidth: 1,
+            labelAlign: 'right',
+            labelSeparator: ''
+        },
+        items: [
+                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_report] }
+        ]
+    });
+
+    var win = Ext.create("Ext.window.Window", {
+        id: "win_report",
+        title: '下载报表',
+        width: 500,
+        height: 160,
+        modal: true,
+        items: [Ext.getCmp('formpanel_report')]
+    });
+    win.show();
+}
+
+
+function DownReport_radio() {
+    //Ext.getCmp("field_report").getValue().rbg
+
+    var myMask = new Ext.LoadMask(Ext.getCmp("win_report"), { msg: "数据导出中，请稍等..." });
+    myMask.show();
+
+    var data = {
+        RBGTYPE:Ext.getCmp("field_report").getValue().rbg,UNIT: JSON.stringify(common_data_unit),
+        RECORDINFORID: Ext.getCmp('s_combo_recordid').getValue(), ITEMNO: Ext.getCmp("s_field_ITEMNO").getValue(),
+        DATE_START: Ext.Date.format(Ext.getCmp("s_date_start").getValue(), 'Y-m-d H:i:s'), DATE_END: Ext.Date.format(Ext.getCmp("s_date_end").getValue(), 'Y-m-d H:i:s'),
+        INOUT_TYPE: Ext.getCmp('s_combo_inout_type').getValue()
+    }
+
+    Ext.Ajax.request({
+        url: '/RecordInfor/DownReport_radio',
+        params: data,
+        success: function (response, option) {
+            var json = Ext.decode(response.responseText);
+            if (json.success == false) {
+                Ext.MessageBox.alert('提示', '综合需求及性能，导出记录限制' + json.WebDownCount + '！');
+            } else {
+                Ext.Ajax.request({
+                    url: '/Common/DownloadFile',
+                    method: 'POST',
+                    params: Ext.decode(response.responseText),
+                    form: 'exportform_rep',
+                    success: function (response, option) {
+                    }
+                });
+            }
+            myMask.hide();
+        }
+    });
+}*/
