@@ -309,7 +309,7 @@ function render(value, cellmeta, record, rowIndex, columnIndex, store) {
     if (dataindex == "ISPRINT") {
         rtn = value == "0" ? "未打印" : "已打印";
     }
-    if (dataindex == "MODIFYFLAG" && value) {
+    if (dataindex == "MODIFYFLAG") {
         var rec = store_modifyflag.findRecord('CODE', value);
         if (rec) {
             rtn = rec.get("NAME");

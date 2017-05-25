@@ -426,7 +426,7 @@ function Select_d() {
 function render_sum(value, cellmeta, record, rowIndex, columnIndex, store) {
     var rtn = "";
     var dataindex = cellmeta.column.dataIndex;
-    if (dataindex == "MODIFYFLAG" && value) {
+    if (dataindex == "MODIFYFLAG") {
         var rec = store_modifyflag.findRecord('CODE', value);
         if (rec) {
             rtn = rec.get("NAME");

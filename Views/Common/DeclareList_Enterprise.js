@@ -483,7 +483,7 @@ function render(value, cellmeta, record, rowIndex, columnIndex, store) {
     if (dataindex == "DECLARATIONCODE" && value) {
         rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='FileConsult(\"" + record.get("ORDERCODE") + "\",\"" + escape(record.get("BUSITYPE")) + "\",\"" + record.get("CODE") + "\")'>" + value + "</div>";
     }
-    if (dataindex == "MODIFYFLAG" && value) {
+    if (dataindex == "MODIFYFLAG") {
         var rec = store_modifyflag.findRecord('CODE', value);
         if (rec) {
             rtn = rec.get("NAME");
