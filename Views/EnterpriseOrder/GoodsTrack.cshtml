@@ -204,7 +204,7 @@
                 store_Trade.load(function (records, operation, success) {
                     var recs = records[rowIndex];
                     loadform_data(recs.data.ID);
-                    store_size = records.data.length;
+                    store_size = records.length;
                 });
 
             
@@ -219,6 +219,8 @@
                 else
                 {
                     loadform_data(store_Trade.data.items[rowIndex].data.ID);
+
+                    
 
                 }
                 
@@ -243,7 +245,7 @@
                 store_Trade.load(function (records, operation, success) {
                     var recs = records[rowIndex];
                     loadform_data(recs.data.ID);
-                    store_size = records.data.length;
+                    store_size = records.length;
                 });
             }
             else {
@@ -252,7 +254,8 @@
                     Ext.MessageBox.alert('提示', '当前为首页！');
                 }
                 else {
-                    loadform_data(store_Trade.data.items[rowIndex].data.ID);
+                   loadform_data(store_Trade.data.items[rowIndex].data.ID);
+                  
                 }
               
             }
