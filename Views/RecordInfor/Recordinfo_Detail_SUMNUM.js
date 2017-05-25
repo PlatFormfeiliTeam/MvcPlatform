@@ -1,7 +1,7 @@
 ﻿
 
 var common_data_jydw = [], common_data_unit = [];
-var store_unit, store_optionstatus, store_status;//中文所需
+var store_unit, store_optionstatus, store_status, store_modifyflag;//中文所需
 var gridpanel_lj, gridpanel_cp, gridpanel_lj_Go, gridpanel_cp_Go;
 
 Ext.onReady(function () {
@@ -13,10 +13,8 @@ Ext.onReady(function () {
             common_data_recordid = commondata.recordid;//账册号
             common_data_unit = commondata.unit;//单位
 
-            store_unit = Ext.create('Ext.data.JsonStore', {
-                fields: ['CODE', 'NAME'],
-                data: common_data_unit
-            });
+            store_unit = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_unit });
+            store_modifyflag = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: modifyflag_data });
 
             initSearch_Sum();
             itemsbind_Sum();
@@ -428,10 +426,11 @@ function Select_d() {
 function render_sum(value, cellmeta, record, rowIndex, columnIndex, store) {
     var rtn = "";
     var dataindex = cellmeta.column.dataIndex;
-    if (dataindex == "MODIFYFLAG") {
-        if (value == "0") rtn = "正常";
-        if (value == "1") rtn = "删单";
-        if (value == "2") rtn = "改单";
+    if (dataindex == "MODIFYFLAG" && value) {
+        var rec = store_modifyflag.findRecord('CODE', value);
+        if (rec) {
+            rtn = rec.get("NAME");
+        }
     }
     if (dataindex == "DATACONFIRM") {
         rtn = value == "2" ? "是" : "否";
@@ -479,6 +478,7 @@ function Export_SUM_D() {
     var data = Ext.getCmp('f_formpanel').getForm().getValues();
     data.f_field_declartioncode = Ext.getCmp("field_declartioncode_d").getValue();
     data.UNIT = JSON.stringify(common_data_unit);
+    data.modifyflag_data = JSON.stringify(modifyflag_data);
 
     Ext.Ajax.request({
         url: '/RecordInfor/Export_SUM_D',
@@ -503,49 +503,10 @@ function Export_SUM_D() {
 }
 
 function DownReport_detail() {
-    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "数据导出中，请稍等..." });
-    myMask.show();
-
-    var data = {
-        UNIT: JSON.stringify(common_data_unit), busitype: JSON.stringify(common_data_busitype),
-        RECORDINFORID: Ext.getCmp('s_combo_recordid').getValue(), ITEMNO: Ext.getCmp("s_field_ITEMNO").getValue(),
-        DATE_START: Ext.Date.format(Ext.getCmp("s_date_start").getValue(), 'Y-m-d'), DATE_END: Ext.Date.format(Ext.getCmp("s_date_end").getValue(), 'Y-m-d'),
-        INOUT_TYPE: Ext.getCmp('s_combo_inout_type').getValue()
-    }
-
-    Ext.Ajax.request({
-        url: '/RecordInfor/DownReport_detail',
-        params: data,
-        success: function (response, option) {
-            var json = Ext.decode(response.responseText);
-            if (json.success == false) {
-                Ext.MessageBox.alert('提示', '综合需求及性能，导出记录限制' + json.WebDownCount + '！');
-            } else {
-                Ext.Ajax.request({
-                    url: '/Common/DownloadFile',
-                    method: 'POST',
-                    params: Ext.decode(response.responseText),
-                    form: 'exportformt_detail',
-                    success: function (response, option) {
-                    }
-                });
-            }
-            myMask.hide();
-        }
-    });
-}
-
-function DownReport_sum() {
-
-}
-
-
-/*
-function DownReport() {
     var label_baseinfo_rep = {
         xtype: 'label',
         margin: '5',
-        html: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;报表分类</span></h4>'
+        html: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;统一数据表</span></h4>'
     }
     var tbar_rep = Ext.create('Ext.toolbar.Toolbar', {
         items: [label_baseinfo_rep, '->']
@@ -553,24 +514,53 @@ function DownReport() {
 
     var bbar_r = '<div class="btn-group" role="group">'
                        + '<form id="exportform_rep" name="form" enctype="multipart/form-data" method="post" style="display:inline-block">'
-                       + '<button onclick="DownReport_radio()" type="button" id="btn_Export" class="btn btn-primary btn-sm"><i class="fa fa-level-down"></i>&nbsp;download</button></form>'
+                       + '<button onclick="DownReport_radio()" type="button" id="btn_Export" class="btn btn-primary btn-sm"><i class="fa fa-level-down"></i>&nbsp;产生报表</button></form>'
                   + '</div>';
 
     var bbar = Ext.create('Ext.toolbar.Toolbar', {
         items: ['->', bbar_r]
     });
 
+
+    //申报日期
+    var date_start_d = Ext.create('Ext.form.field.Date', {
+        id: 'date_start_d',
+        margin: 0,
+        emptyText: '开始日期', flex: .5,
+        format: 'Y-m-d'
+    })
+    var date_end_d = Ext.create('Ext.form.field.Date', {
+        id: 'date_end_d',
+        margin: 0,
+        emptyText: '结束日期', flex: .5,
+        format: 'Y-m-d'
+    })
+    var date_container_d = {
+        xtype: 'fieldcontainer',
+        layout: 'hbox',
+        fieldLabel: '申报日期',
+        columnWidth: 1,
+        items: [date_start_d, date_end_d]
+    }
+
+    //进出类型
+    var field_inout_type = Ext.create('Ext.form.RadioGroup', {
+        id: 'field_inout_type',
+        labelAlign: "right",
+        fieldLabel: '进出类型',
+        columns: 2,
+        vertical: true,
+        items: [{ boxLabel: "进口", name: 'rbg_inout_type', inputValue: "1", checked: true }, { boxLabel: "出口", name: 'rbg_inout_type', inputValue: "0" }]
+    });
+
+    //导出格式
     var field_report = Ext.create('Ext.form.RadioGroup', {
         id: 'field_report',
-        margin: '10',
         labelAlign: "right",
-        //fieldLabel: '报表分类',
-        columns: 3,
+        fieldLabel: '导出格式',
+        columns: 2,
         vertical: true,
-        items: [{ boxLabel: "统一数据表", name: 'rbg', inputValue: "0", checked: true }
-            , { boxLabel: "料件汇总表", name: 'rbg', inputValue: "1" }
-            , { boxLabel: "成品汇总表", name: 'rbg', inputValue: "2" }
-        ]
+        items: [{ boxLabel: "昆山区内", name: 'rbg_report', inputValue: "0", checked: true }, { boxLabel: "昆山区外", name: 'rbg_report', inputValue: "1" }]
     });
 
 
@@ -588,7 +578,9 @@ function DownReport() {
             labelSeparator: ''
         },
         items: [
-                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_report] }
+                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [date_container_d] },
+                { layout: 'column', height: 42, border: 0, items: [field_inout_type] },
+                { layout: 'column', height: 42, border: 0, items: [field_report] }
         ]
     });
 
@@ -596,29 +588,25 @@ function DownReport() {
         id: "win_report",
         title: '下载报表',
         width: 500,
-        height: 160,
+        height: 250,
         modal: true,
         items: [Ext.getCmp('formpanel_report')]
     });
     win.show();
 }
 
-
 function DownReport_radio() {
-    //Ext.getCmp("field_report").getValue().rbg
-
     var myMask = new Ext.LoadMask(Ext.getCmp("win_report"), { msg: "数据导出中，请稍等..." });
     myMask.show();
 
     var data = {
-        RBGTYPE:Ext.getCmp("field_report").getValue().rbg,UNIT: JSON.stringify(common_data_unit),
-        RECORDINFORID: Ext.getCmp('s_combo_recordid').getValue(), ITEMNO: Ext.getCmp("s_field_ITEMNO").getValue(),
-        DATE_START: Ext.Date.format(Ext.getCmp("s_date_start").getValue(), 'Y-m-d H:i:s'), DATE_END: Ext.Date.format(Ext.getCmp("s_date_end").getValue(), 'Y-m-d H:i:s'),
-        INOUT_TYPE: Ext.getCmp('s_combo_inout_type').getValue()
+        UNIT: JSON.stringify(common_data_unit), busitype: JSON.stringify(common_data_busitype), modifyflag_data: JSON.stringify(modifyflag_data),
+        RBGTYPE: Ext.getCmp("field_report").getValue().rbg_report, INOUT_TYPE: Ext.getCmp("field_inout_type").getValue().rbg_inout_type,
+        DATE_START: Ext.Date.format(Ext.getCmp("date_start_d").getValue(), 'Y-m-d'), DATE_END: Ext.Date.format(Ext.getCmp("date_end_d").getValue(), 'Y-m-d')
     }
 
     Ext.Ajax.request({
-        url: '/RecordInfor/DownReport_radio',
+        url: '/RecordInfor/DownReport_detail',
         params: data,
         success: function (response, option) {
             var json = Ext.decode(response.responseText);
@@ -637,4 +625,4 @@ function DownReport_radio() {
             myMask.hide();
         }
     });
-}*/
+}

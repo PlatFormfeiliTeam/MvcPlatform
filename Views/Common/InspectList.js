@@ -1,6 +1,6 @@
 ﻿//=======================================================JS init begin======================================================
 var busitypeid = getQueryString("busitypeid"); var role = getQueryString("role");
-var pgbar; var store_busitype, store_insptradeway;
+var pgbar; var store_busitype, store_insptradeway, store_modifyflag;
 var common_data_jydw = [], common_data_inspmyfs = [];
 
 var busitype = "";
@@ -38,6 +38,7 @@ Ext.onReady(function () {
 
             store_busitype = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_busitype });
             store_insptradeway = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_inspmyfs });
+            store_modifyflag = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: modifyflag_data });
 
             var store = Ext.create('Ext.data.JsonStore', {
                 fields: ['ID', 'CODE', 'ORDERCODE', 'INSPSTATUS', 'ISPRINT', 'APPROVALCODE', 'INSPECTIONCODE', 'CLEARANCECODE'
@@ -308,10 +309,11 @@ function render(value, cellmeta, record, rowIndex, columnIndex, store) {
     if (dataindex == "ISPRINT") {
         rtn = value == "0" ? "未打印" : "已打印";
     }
-    if (dataindex == "MODIFYFLAG") {
-        if (value == "0") rtn = "正常";
-        if (value == "1") rtn = "删单";
-        if (value == "2") rtn = "改单";
+    if (dataindex == "MODIFYFLAG" && value) {
+        var rec = store_modifyflag.findRecord('CODE', value);
+        if (rec) {
+            rtn = rec.get("NAME");
+        }
     }
     if (dataindex == "INSPECTIONCODE" && value) {
         rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='showwinwj(\"" + record.get("ORDERCODE") + "\",\"" + escape(record.get("BUSITYPE")) + "\",\"" + record.get("CODE") + "\")'>" + value + "</div>";
@@ -383,7 +385,8 @@ function ExportInsp() {
     myMask.show();
 
     var data = {
-        dec_insp_status: JSON.stringify(orderstatus_js_data), common_data_busitype: JSON.stringify(common_data_busitype), common_data_inspmyfs: JSON.stringify(common_data_inspmyfs),
+        dec_insp_status: JSON.stringify(orderstatus_js_data), common_data_busitype: JSON.stringify(common_data_busitype),
+        common_data_inspmyfs: JSON.stringify(common_data_inspmyfs), modifyflag_data: JSON.stringify(modifyflag_data),
         busitypeid: busitypeid, role: role,
         CONDITION1: Ext.getCmp('CONDITION1').getValue(), VALUE1: Ext.getCmp("CONDITION1_1").getValue(),
         CONDITION2: Ext.getCmp('CONDITION2').getValue(), VALUE2: Ext.getCmp("CONDITION2_1").getValue(),

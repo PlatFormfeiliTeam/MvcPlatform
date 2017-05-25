@@ -2,7 +2,7 @@
 
 //传参示例 /Common/DeclareList?busitypeid=11&module=ddzx&role=customer
 
-var pgbar; var store_sbfs; var store_bgfs; var store_busitype;
+var pgbar; var store_sbfs; var store_bgfs; var store_busitype; var store_modifyflag;
 var common_data_jydw = [], common_data_sbfs = [], common_data_bgfs = [], common_data_sbgq = [];
 
 Ext.onReady(function () {
@@ -17,18 +17,11 @@ Ext.onReady(function () {
 
             initSearch();  //查询区域
 
-            store_sbfs = Ext.create('Ext.data.JsonStore', {
-                fields: ['CODE', 'NAME'],
-                data: common_data_sbfs
-            });
-            store_bgfs = Ext.create('Ext.data.JsonStore', {
-                fields: ['CODE', 'NAME'],
-                data: common_data_bgfs
-            });
-            store_busitype = Ext.create('Ext.data.JsonStore', {
-                fields: ['CODE', 'NAME'],
-                data: common_data_busitype
-            });
+            store_sbfs = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_sbfs });
+            store_bgfs = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_bgfs });
+            store_busitype = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_busitype });
+            store_modifyflag = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: modifyflag_data });
+
             gridpanelBind();
         }
     })
@@ -38,7 +31,6 @@ Ext.onReady(function () {
 
 function initSearch() {
     var declarationsearch_js_condition3_data_hg = [{ "NAME": "已结关", "CODE": "已结关" }, { "NAME": "未结关", "CODE": "未结关" }];
-    var declarationsearch_js_condition3_data_sg = [{ "NAME": "正常", "CODE": "0" }, { "NAME": "删单", "CODE": "1" }, { "NAME": "改单", "CODE": "2" }];
 
     var store_1 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
@@ -150,7 +142,7 @@ function initSearch() {
                        store_3_1.loadData(declarationsearch_js_condition3_data_hg);
                    }
                    if (this.getValue() == "SGD") {
-                       store_3_1.loadData(declarationsearch_js_condition3_data_sg);
+                       store_3_1.loadData(modifyflag_data);
                    }
                }
            }
@@ -325,7 +317,7 @@ function initSearch() {
                        store_7_1.loadData(declarationsearch_js_condition3_data_hg);
                    }
                    if (this.getValue() == "SGD") {
-                       store_7_1.loadData(declarationsearch_js_condition3_data_sg);
+                       store_7_1.loadData(modifyflag_data);
                    }
                }
            }
@@ -491,10 +483,11 @@ function render(value, cellmeta, record, rowIndex, columnIndex, store) {
     if (dataindex == "DECLARATIONCODE" && value) {
         rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='FileConsult(\"" + record.get("ORDERCODE") + "\",\"" + escape(record.get("BUSITYPE")) + "\",\"" + record.get("CODE") + "\")'>" + value + "</div>";
     }
-    if (dataindex == "MODIFYFLAG") {
-        if (value == "0") rtn = "正常";
-        if (value == "1") rtn = "删单";
-        if (value == "2") rtn = "改单";
+    if (dataindex == "MODIFYFLAG" && value) {
+        var rec = store_modifyflag.findRecord('CODE', value);
+        if (rec) {
+            rtn = rec.get("NAME");
+        }
     }
     if (dataindex == "REPWAYNAME" && value) {
         var rec = store_sbfs.findRecord('CODE', value);
@@ -571,7 +564,7 @@ function ExportDecl() {
     myMask.show();
 
     var data = {
-        common_data_busitype: JSON.stringify(common_data_busitype),
+        common_data_busitype: JSON.stringify(common_data_busitype), modifyflag_data: JSON.stringify(modifyflag_data),
         CONDITION1: Ext.getCmp('CONDITION1').getValue(), VALUE1: Ext.getCmp("CONDITION1_1").getValue(),
         CONDITION2: Ext.getCmp('CONDITION2').getValue(), VALUE2: Ext.getCmp("CONDITION2_1").getValue(),
         CONDITION3: Ext.getCmp('CONDITION3').getValue(), VALUE3: Ext.getCmp("CONDITION3_1").getValue(),

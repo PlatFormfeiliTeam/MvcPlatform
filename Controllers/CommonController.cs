@@ -3038,7 +3038,7 @@ namespace MvcPlatform.Controllers
 
         public string ExportDeclList()
         {
-            string common_data_busitype = Request["common_data_busitype"]; string busitypeid = Request["busitypeid"];
+            string common_data_busitype = Request["common_data_busitype"]; string busitypeid = Request["busitypeid"]; string modifyflag_data = Request["modifyflag_data"];
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
@@ -3124,22 +3124,7 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
                     rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
                     rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
-
-                    switch (dt.Rows[i]["MODIFYFLAG"].ToString())
-                    {
-                        case "0": 
-                            rowtemp.CreateCell(18).SetCellValue("正常");
-                            break;
-                        case "1":
-                            rowtemp.CreateCell(18).SetCellValue("删单");
-                            break;
-                        case "2":
-                            rowtemp.CreateCell(18).SetCellValue("改单");
-                            break;
-                        default:
-                            rowtemp.CreateCell(18).SetCellValue("");
-                            break;
-                    }
+                    rowtemp.CreateCell(18).SetCellValue(getStatusName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
                     rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
                     rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
 
@@ -3197,23 +3182,7 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
                     rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
                     rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
-
-                    switch (dt.Rows[i]["MODIFYFLAG"].ToString())
-                    {
-                        case "0":
-                            rowtemp.CreateCell(17).SetCellValue("正常");
-                            break;
-                        case "1":
-                            rowtemp.CreateCell(17).SetCellValue("删单");
-                            break;
-                        case "2":
-                            rowtemp.CreateCell(17).SetCellValue("改单");
-                            break;
-                        default:
-                            rowtemp.CreateCell(17).SetCellValue("");
-                            break;
-                    }
-
+                    rowtemp.CreateCell(17).SetCellValue(getStatusName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
                     rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
                     rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
 
@@ -3268,24 +3237,8 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
                     rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
                     rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
-                    rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
-
-                    switch (dt.Rows[i]["MODIFYFLAG"].ToString())
-                    {
-                        case "0":
-                            rowtemp.CreateCell(16).SetCellValue("正常");
-                            break;
-                        case "1":
-                            rowtemp.CreateCell(16).SetCellValue("删单");
-                            break;
-                        case "2":
-                            rowtemp.CreateCell(16).SetCellValue("改单");
-                            break;
-                        default:
-                            rowtemp.CreateCell(16).SetCellValue("");
-                            break;
-                    }
-
+                    rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString()); 
+                    rowtemp.CreateCell(16).SetCellValue(getStatusName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
                     rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
                     rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
 
@@ -3345,23 +3298,7 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
                     rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
                     rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["CORRESPONDNO"].ToString());
-
-                    switch (dt.Rows[i]["MODIFYFLAG"].ToString())
-                    {
-                        case "0":
-                            rowtemp.CreateCell(19).SetCellValue("正常");
-                            break;
-                        case "1":
-                            rowtemp.CreateCell(19).SetCellValue("删单");
-                            break;
-                        case "2":
-                            rowtemp.CreateCell(19).SetCellValue("改单");
-                            break;
-                        default:
-                            rowtemp.CreateCell(19).SetCellValue("");
-                            break;
-                    }
-
+                    rowtemp.CreateCell(19).SetCellValue(getStatusName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
                     rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
                     rowtemp.CreateCell(21).SetCellValue(dt.Rows[i]["CUSNO"].ToString());                 
 
@@ -3417,23 +3354,7 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
                     rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
                     rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
-
-                    switch (dt.Rows[i]["MODIFYFLAG"].ToString())
-                    {
-                        case "0":
-                            rowtemp.CreateCell(16).SetCellValue("正常");
-                            break;
-                        case "1":
-                            rowtemp.CreateCell(16).SetCellValue("删单");
-                            break;
-                        case "2":
-                            rowtemp.CreateCell(16).SetCellValue("改单");
-                            break;
-                        default:
-                            rowtemp.CreateCell(16).SetCellValue("");
-                            break;
-                    }
-
+                    rowtemp.CreateCell(16).SetCellValue(getStatusName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
                     rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
                     rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
 
@@ -3672,7 +3593,7 @@ namespace MvcPlatform.Controllers
         
         public string ExportDeclList_E()
         {
-            string common_data_busitype = Request["common_data_busitype"];
+            string common_data_busitype = Request["common_data_busitype"]; string modifyflag_data = Request["modifyflag_data"];
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
@@ -3749,22 +3670,7 @@ namespace MvcPlatform.Controllers
                 rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["IETYPE"].ToString());
                 rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["ASSOCIATENO"].ToString());
                 rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["CORRESPONDNO"].ToString());
-
-                switch (dt.Rows[i]["MODIFYFLAG"].ToString())
-                {
-                    case "0":
-                        rowtemp.CreateCell(21).SetCellValue("正常");
-                        break;
-                    case "1":
-                        rowtemp.CreateCell(21).SetCellValue("删单");
-                        break;
-                    case "2":
-                        rowtemp.CreateCell(21).SetCellValue("改单");
-                        break;
-                    default:
-                        rowtemp.CreateCell(21).SetCellValue("");
-                        break;
-                }
+                rowtemp.CreateCell(21).SetCellValue(getStatusName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
             }
 
 
@@ -3804,7 +3710,8 @@ namespace MvcPlatform.Controllers
 
         public string ExportInspList()
         {
-            string dec_insp_status = Request["dec_insp_status"]; string common_data_busitype = Request["common_data_busitype"]; string common_data_inspmyfs = Request["common_data_inspmyfs"]; 
+            string dec_insp_status = Request["dec_insp_status"]; string common_data_busitype = Request["common_data_busitype"];
+            string common_data_inspmyfs = Request["common_data_inspmyfs"]; string modifyflag_data = Request["modifyflag_data"];
             //string busitypeid = Request["busitypeid"];//导出暂时不用区分业务类型
 
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
@@ -3859,21 +3766,7 @@ namespace MvcPlatform.Controllers
                 rowtemp.CreateCell(6).SetCellValue(getStatusName(dt.Rows[i]["TRADEWAY"].ToString(), common_data_inspmyfs));
                 rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["ISPRINT"].ToString() == "0" ? "未打印" : "已打印");
                 rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
-                switch (dt.Rows[i]["MODIFYFLAG"].ToString())
-                {
-                    case "0":
-                        rowtemp.CreateCell(9).SetCellValue("正常");
-                        break;
-                    case "1":
-                        rowtemp.CreateCell(9).SetCellValue("删单");
-                        break;
-                    case "2":
-                        rowtemp.CreateCell(9).SetCellValue("改单");
-                        break;
-                    default:
-                        rowtemp.CreateCell(9).SetCellValue("");
-                        break;
-                }
+                rowtemp.CreateCell(9).SetCellValue(getStatusName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
                 rowtemp.CreateCell(10).SetCellValue(getStatusName(dt.Rows[i]["BUSITYPE"].ToString(), common_data_busitype));
                 rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["ISNEEDCLEARANCE"].ToString() == "0" ? "否" : "是");
                 rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "0" ? "否" : "是");

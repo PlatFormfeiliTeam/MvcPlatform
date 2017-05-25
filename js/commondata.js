@@ -67,3 +67,5 @@ var menu_js_data = [{ "NAME": "I跟踪", "URL": "http://www.igenzong.com/air/tra
                     { "NAME": "新舱单信息查询", "URL": "http://query.customs.gov.cn/MNFTQ/ ", "busitypeid": "21" },
                     { "NAME": "新舱单信息查询", "URL": "http://query.customs.gov.cn/MNFTQ/ ", "busitypeid": "20" }
 ]
+
+var modifyflag_data = [{ "NAME": "正常", "CODE": "0" }, { "NAME": "删单", "CODE": "1" }, { "NAME": "改单", "CODE": "2" }, { "NAME": "改单完成", "CODE": "2" }];
