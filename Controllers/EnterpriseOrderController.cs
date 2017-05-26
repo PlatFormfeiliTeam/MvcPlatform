@@ -34,7 +34,7 @@ namespace MvcPlatform.Controllers
 
         public ActionResult ProcessOrder()//委托任务
         {
-            ViewBag.navigator = "客户服务>>委托任务";
+            ViewBag.navigator = "客户服务>>文件委托";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
@@ -65,7 +65,7 @@ namespace MvcPlatform.Controllers
         }
         public ActionResult EntOrderList()  //文件委托
         {
-            ViewBag.navigator = "企业服务>>委托任务";
+            ViewBag.navigator = "企业服务>>文件委托";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
@@ -957,7 +957,7 @@ namespace MvcPlatform.Controllers
             IsoDateTimeConverter iso = new IsoDateTimeConverter();
             iso.DateTimeFormat = "yyyy-MM-dd";
             string json_order = JsonConvert.SerializeObject(dt_order, iso);
-            string sql_container = "select * from list_predeclcontainer where ordercode='" + dt_order.Rows[0]["ORDERCODE"].ToString() + "'";
+            string sql_container = "select * from list_predeclcontainer where ordercode='" + dt_order.Rows[0]["CODE"].ToString() + "'";
             DataTable dt_container = DBMgr.GetDataTable(sql_container);
             string json_container = JsonConvert.SerializeObject(dt_container, iso);
 

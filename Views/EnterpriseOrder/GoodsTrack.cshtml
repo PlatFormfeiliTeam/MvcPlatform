@@ -296,11 +296,7 @@
 
     function form_ini()
     {
-        var w_gridstore = Ext.create('Ext.data.JsonStore', {
-            id: 'w_gridstore',
-            fields: ['ID', 'ORDERCODE', 'CONTAINERORDER', 'CONTAINERNO', 'CONTAINERSIZEE', 'CONTAINERSIZE', 'CONTAINERWEIGHT', 'CONTAINERTYPE',
-                'HSCODE', 'CONTSPECIFICATIONS', 'FORMATNAME', 'CDCARNO', 'CDCARNAME', 'UNITNO', 'ELESHUT']
-        })
+    
         var field_ID = Ext.create('Ext.form.field.Hidden', {
             name: 'ID'
         });
@@ -709,6 +705,11 @@
 
         }
         else {
+            var w_gridstore = Ext.create('Ext.data.JsonStore', {
+                id: 'w_gridstore',
+                fields: ['ID', 'ORDERCODE', 'CONTAINERORDER', 'CONTAINERNO', 'CONTAINERSIZEE', 'CONTAINERSIZE', 'CONTAINERWEIGHT', 'CONTAINERTYPE',
+                    'HSCODE', 'CONTSPECIFICATIONS', 'FORMATNAME', 'CDCARNO', 'CDCARNAME', 'UNITNO', 'ELESHUT']
+            })
             var w_grid = Ext.create('Ext.grid.Panel', {
                 id: 'w_grid',
                 store: w_gridstore,
