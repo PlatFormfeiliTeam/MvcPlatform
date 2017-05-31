@@ -17,12 +17,18 @@
                 }
             },
             autoLoad: true
+        });
+
+        var pgbar = Ext.create('Ext.toolbar.Paging', {
+            displayMsg: '显示 {0} - {1} 条,共计 {2} 条',
+            store: store_user,
+            displayInfo: true
         })
 
         gridUser = Ext.create('Ext.grid.Panel', {
             renderTo: "div_west",
-            width: 300,
-            height: 500,
+            width: 400,
+            height: 500, bbar: pgbar,
             store: store_user,
             columns: [
                 { xtype: 'rownumberer', width: 35 },
@@ -77,7 +83,7 @@
             renderTo: "div_east",
             rootVisible: false,
             height: 500,
-            width: 900,
+            width: 800,
             store: treeModelstore,
             columns: [
             { dataIndex: 'MODULEID', width: 500, hidden: true },
