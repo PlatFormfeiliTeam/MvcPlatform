@@ -543,6 +543,21 @@ function DownReport_detail() {
         items: [date_start_d, date_end_d]
     }
 
+    //账册号
+    var store_recordid_d = Ext.create('Ext.data.JsonStore', {
+        fields: ['CODE', 'NAME'],
+        data: common_data_recordid
+    });
+    var combo_recordid_d = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_recordid_d',
+        store: store_recordid_d,
+        fieldLabel: '账册号',
+        displayField: 'NAME',
+        valueField: 'CODE',
+        triggerAction: 'all',
+        queryMode: 'local'
+    });
+
     //进出类型
     var field_inout_type = Ext.create('Ext.form.RadioGroup', {
         id: 'field_inout_type',
@@ -579,6 +594,7 @@ function DownReport_detail() {
         },
         items: [
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [date_container_d] },
+                { layout: 'column', height: 42, border: 0, items: [combo_recordid_d] },
                 { layout: 'column', height: 42, border: 0, items: [field_inout_type] },
                 { layout: 'column', height: 42, border: 0, items: [field_report] }
         ]
@@ -588,7 +604,7 @@ function DownReport_detail() {
         id: "win_report",
         title: '下载报表',
         width: 500,
-        height: 250,
+        height: 300,
         modal: true,
         items: [Ext.getCmp('formpanel_report')]
     });
@@ -602,6 +618,7 @@ function DownReport_radio() {
     var data = {
         UNIT: JSON.stringify(common_data_unit), busitype: JSON.stringify(common_data_busitype), modifyflag_data: JSON.stringify(modifyflag_data),
         RBGTYPE: Ext.getCmp("field_report").getValue().rbg_report, INOUT_TYPE: Ext.getCmp("field_inout_type").getValue().rbg_inout_type,
+        RECORDINFORID: Ext.getCmp('combo_recordid_d').getValue(),
         DATE_START: Ext.Date.format(Ext.getCmp("date_start_d").getValue(), 'Y-m-d'), DATE_END: Ext.Date.format(Ext.getCmp("date_end_d").getValue(), 'Y-m-d')
     }
 

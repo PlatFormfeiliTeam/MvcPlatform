@@ -1430,7 +1430,7 @@ namespace MvcPlatform.Controllers
         {
             string UNIT = Request["UNIT"]; string busitype = Request["busitype"]; string modifyflag_data = Request["modifyflag_data"];
             string DATE_START = Request["DATE_START"]; string DATE_END = Request["DATE_END"];
-            string INOUT_TYPE = Request["INOUT_TYPE"]; string RBGTYPE = Request["RBGTYPE"];
+            string INOUT_TYPE = Request["INOUT_TYPE"]; string RBGTYPE = Request["RBGTYPE"]; string RECORDINFORID = Request["RECORDINFORID"];
             
 
             int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
@@ -1440,7 +1440,7 @@ namespace MvcPlatform.Controllers
             NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();
             string filename = "统一数据表.xls";
 
-            OracleParameter[] parms = new OracleParameter[8];
+            OracleParameter[] parms = new OracleParameter[9];
 
             parms[0] = new OracleParameter("WebDownCount", OracleDbType.Int32, WebDownCount, ParameterDirection.Input);
             parms[1] = new OracleParameter("busiunitcode", OracleDbType.NVarchar2, json_user.Value<string>("CUSTOMERHSCODE"), ParameterDirection.Input);
@@ -1448,29 +1448,29 @@ namespace MvcPlatform.Controllers
             parms[3] = new OracleParameter("inout_type", OracleDbType.NVarchar2, INOUT_TYPE, ParameterDirection.Input);
             parms[4] = new OracleParameter("date_start", OracleDbType.NVarchar2, DATE_START, ParameterDirection.Input);
             parms[5] = new OracleParameter("date_end", OracleDbType.NVarchar2, DATE_END, ParameterDirection.Input);
+            parms[6] = new OracleParameter("recordinforid", OracleDbType.NVarchar2, RECORDINFORID, ParameterDirection.Input);
 
-            parms[6] = new OracleParameter("p_flag_parms", OracleDbType.Varchar2, 20, null, ParameterDirection.Output);//输出参数，字符串类型的，一定要设定大小
-            parms[7] = new OracleParameter("rescur", OracleDbType.RefCursor, ParameterDirection.Output);
+            parms[7] = new OracleParameter("p_flag_parms", OracleDbType.Varchar2, 20, null, ParameterDirection.Output);//输出参数，字符串类型的，一定要设定大小
+            parms[8] = new OracleParameter("rescur", OracleDbType.RefCursor, ParameterDirection.Output);
 
             DataTable dt = DBMgr.GetDataTableParm("Pro_RecordDetail_Report", parms);
-            string p_flag_parms = parms[6].Value.ToString();
+            string p_flag_parms = parms[7].Value.ToString();
 
             if (p_flag_parms == "N")
             {
                 return "{success:false,WebDownCount:" + WebDownCount + "}";
             }
 
-
-            NPOI.SS.UserModel.ISheet sheet = book.CreateSheet("统一数据表");
-
             if (RBGTYPE=="0")
             {
+                NPOI.SS.UserModel.ISheet sheet = book.CreateSheet("昆山区内");
                 NPOI.SS.UserModel.IRow row1 = sheet.CreateRow(0);
                 row1.CreateCell(0).SetCellValue("合同号"); row1.CreateCell(1).SetCellValue("业务类型"); row1.CreateCell(2).SetCellValue("进出类型"); row1.CreateCell(3).SetCellValue("申报日期");
                 row1.CreateCell(4).SetCellValue("报关单号"); row1.CreateCell(5).SetCellValue("贸易方式"); row1.CreateCell(6).SetCellValue("序号"); row1.CreateCell(7).SetCellValue("项号属性");
-                row1.CreateCell(8).SetCellValue("项号"); row1.CreateCell(9).SetCellValue("成交数量"); row1.CreateCell(10).SetCellValue("成交单位"); row1.CreateCell(11).SetCellValue("成交金额");
-                row1.CreateCell(12).SetCellValue("币制"); row1.CreateCell(13).SetCellValue("海关状态"); row1.CreateCell(14).SetCellValue("账册号"); row1.CreateCell(15).SetCellValue("删改单");
-                row1.CreateCell(16).SetCellValue("数据确认");
+                row1.CreateCell(8).SetCellValue("项号"); row1.CreateCell(9).SetCellValue("品名"); row1.CreateCell(10).SetCellValue("规格型号"); row1.CreateCell(11).SetCellValue("成交数量"); 
+                row1.CreateCell(12).SetCellValue("成交单位"); row1.CreateCell(13).SetCellValue("成交金额");row1.CreateCell(14).SetCellValue("币制"); row1.CreateCell(15).SetCellValue("海关状态");
+                row1.CreateCell(16).SetCellValue("账册号"); row1.CreateCell(17).SetCellValue("删改单"); row1.CreateCell(18).SetCellValue("数据确认"); 
+               
 
                 if (dt != null)
                 {
@@ -1486,14 +1486,16 @@ namespace MvcPlatform.Controllers
                         rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["ORDERNO"].ToString());
                         rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["ITEMNOATTRIBUTE"].ToString());
                         rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["ITEMNO"].ToString());
-                        rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["CADQUANTITY"].ToString());
-                        rowtemp.CreateCell(10).SetCellValue(GetName(dt.Rows[i]["CADUNIT"].ToString(), UNIT));
-                        rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["TOTALPRICE"].ToString());
-                        rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["CURRENCY"].ToString());
-                        rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["CUSTOMSSTATUS"].ToString());
-                        rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["RECORDCODE"].ToString());
-                        rowtemp.CreateCell(15).SetCellValue(GetName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
-                        rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["DATACONFIRM"].ToString() == "2" ? "是" : "否");
+                        rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["COMMODITYNAME"].ToString());
+                        rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["SPECIFICATIONSMODEL"].ToString());
+                        rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["CADQUANTITY"].ToString());
+                        rowtemp.CreateCell(12).SetCellValue(GetName(dt.Rows[i]["CADUNIT"].ToString(), UNIT));
+                        rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["TOTALPRICE"].ToString());
+                        rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["CURRENCY"].ToString());
+                        rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["CUSTOMSSTATUS"].ToString());
+                        rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["RECORDCODE"].ToString());
+                        rowtemp.CreateCell(17).SetCellValue(GetName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
+                        rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["DATACONFIRM"].ToString() == "2" ? "是" : "否");
                     }
                 }
             }
