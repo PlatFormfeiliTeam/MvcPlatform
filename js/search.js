@@ -1,6 +1,10 @@
 ﻿
 //////////////////////////combox开始//////////////////////
 function initSearch() {
+    var manifest_data = [{ "NAME": "已入库", "CODE": "1" }, { "NAME": "未入库", "CODE": "0" }];
+    if (busitypeid == 11) {
+        search_js_condition3_data.push({ "NAME": "舱单入库", "CODE": "MANIFEST_STORAGE" });
+    }
     var store_1 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
         data: search_js_condition1_data,
@@ -106,6 +110,9 @@ function initSearch() {
                 combo_3_1.reset();
                 if (combo_3.getValue() == "bgzt" || combo_3.getValue() == "bjzt") {
                     store_3_1.loadData(search_js_condition3_bgbjstatus_data);
+                }
+                else {
+                    store_3_1.loadData(manifest_data);
                 }
             }
         }
@@ -269,6 +276,9 @@ function initSearch() {
                 combo_7_1.reset();
                 if (combo_7.getValue() == "bgzt" || combo_7.getValue() == "bjzt") {
                     store_7_1.loadData(search_js_condition3_bgbjstatus_data);
+                }
+                else {
+                    store_7_1.loadData(manifest_data);
                 }
             }
         }

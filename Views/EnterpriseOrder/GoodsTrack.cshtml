@@ -111,6 +111,7 @@
                         form_ini();
                         var items = [];
                         var paneltop_2 = Ext.create('Ext.panel.Panel', {
+                            id:'paneltop_2',
                             border: 0,
                             region: 'center',
                             height: 430,
@@ -124,15 +125,15 @@
 
                         })
                         var panel_top = Ext.create('Ext.panel.Panel', {
-                            title: '<i class="fa fa-hand-o-right" aria-hidden="true"></i>&nbsp;网站信息',
+                            id:'panel_top',
                             border: 0,
-                            height: 460,
                             region: 'north',
                             items: [paneltop_1, paneltop_2]
                         })
                         items.push(panel_top);
 
                         var panel_bottom = Ext.create('Ext.panel.Panel', {
+                            id:'panel_buttom',
                             title: '<i class="fa fa-hand-o-right" aria-hidden="true"></i>&nbsp;订单信息<div style="float:right"><a href="javascript:reload(2);">上一条</a>&nbsp;&nbsp;<a href="javascript:reload(1);">下一条</a></div>',
                             border: 0,
                             region: 'center',
@@ -141,16 +142,29 @@
                         })
                         items.push(panel_bottom);
                         var viewport = Ext.create('Ext.container.Viewport', {
+                            id:'viewport',
                             //layout: 'accordion',
                             items: items
                         })
                         loadform_data(id);
+                //重绘窗口大小
+                        setHeight();
+                        Ext.get(window).on('resize', function () { setHeight(); });
+
+
  
 
             }
         });
 
-
+        function setHeight()
+        {
+            var V_height = Ext.getCmp('viewport').getSize().height;
+            var B_height = Ext.getCmp('panel_buttom').getSize().height;
+            Ext.getCmp('panel_top').setHeight(V_height - B_height);
+            Ext.getCmp('paneltop_2').setHeight(V_height - B_height);
+            
+        }
 
         var menu_store = Ext.create('Ext.data.JsonStore', {
             fields: ['NAME', 'URL', 'busitypeid'],
@@ -698,9 +712,20 @@
                //emptyText: '实际到达时间',
                 format: 'Y-m-d'
             });
+            var manifest_check
+            if (busitypeid == '11') {
+                manifest_check = Ext.create('Ext.form.Checkbox', {
+                    id: 'manifest_check',
+                    name: 'MANIFEST_STORAGE',
+                    fieldLabel: '舱单入库',
+                    inputValue: '1',
+                    labelAlign: "right"
+                });
+            }
+          
             itemsAll.push({ layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [label_busiinfo] },
                           { layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [field_COL001, field_COL002, field_COL003, field_COL004, field_COL005] },
-                          { layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [field_COL006] });
+                          { layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [field_COL006, manifest_check] });
 
 
         }
@@ -741,10 +766,9 @@
                 emptyText: '日期',
                 format: 'Y-m-d'
             })
-
             itemsAll.push(
                           { layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [label_busiinfo] },
-                          { layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [field_COL001] });
+                          { layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [field_COL001, manifest_check] });
         }
 
 

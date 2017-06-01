@@ -143,7 +143,7 @@ namespace MvcPlatform.Controllers
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
-            string sql = @"select * from LIST_ORDER where instr('" + Request["busitypeid"] + "',BUSITYPE)>0 and customercode='" + json_user.Value<string>("CUSTOMERCODE") + "' " + where;
+            string sql = @"select * from LIST_ORDER a left join LIST_GOOD_TRACK b on a.CODE=b.ORDERCODE where instr('" + Request["busitypeid"] + "',BUSITYPE)>0 and customercode='" + json_user.Value<string>("CUSTOMERCODE") + "' " + where;
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "createtime", "desc"));
             var json = JsonConvert.SerializeObject(dt, iso);
 
@@ -282,6 +282,16 @@ namespace MvcPlatform.Controllers
                             where += " and INSPSTATUS<130 ";
                         }
                         break;
+                    case "MANIFEST_STORAGE":
+                        if ((Request["VALUE3"] + "") == "1")
+                        {
+                            where += " and b.MANIFEST_STORAGE=1 ";
+                        }
+                        if ((Request["VALUE3"] + "") == "0")
+                        {
+                            where += " and (b.MANIFEST_STORAGE=0 or b.MANIFEST_STORAGE is null) ";
+                        }
+                        break;
                 }
             }
             switch (Request["CONDITION4"])
@@ -395,6 +405,16 @@ namespace MvcPlatform.Controllers
                         if ((Request["VALUE7"] + "") == "未完结")  //未完结
                         {
                             where += " and INSPSTATUS<130 ";
+                        }
+                        break;
+                    case "MANIFEST_STORAGE":
+                        if ((Request["VALUE7"] + "") == "1")  //草稿=草稿
+                        {
+                            where += " and b.MANIFEST_STORAGE=1 ";
+                        }
+                        if ((Request["VALUE7"] + "") == "0")  //已委托=已委托
+                        {
+                            where += " and (b.MANIFEST_STORAGE=0 or b.MANIFEST_STORAGE is null) ";
                         }
                         break;
                 }

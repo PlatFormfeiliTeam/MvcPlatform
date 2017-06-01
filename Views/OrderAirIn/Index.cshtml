@@ -146,6 +146,8 @@
 
     function openrwindow(url, width, height) {
         var iWidth = width ? width : "1000", iHeight = height ? height : "600";
+        iWidth = iWidth > window.screen.availWidth ? window.screen.availWidth - 20 : iWidth
+        iHeight = iHeight > window.screen.availHeight ? window.screen.availHeight - 120 : iHeight
         var iTop = (window.screen.availHeight - 30 - iHeight) / 2; //获得窗口的垂直位置;
         var iLeft = (window.screen.availWidth - 10 - iWidth) / 2; //获得窗口的水平位置; 
         window.open(url, '', 'height=' + iHeight + ',,innerHeight=' + iHeight + ',width=' + iWidth + ',innerWidth=' + iWidth + ',top=' + iTop + ',left=' + iLeft + ',location=yes,scrollbars=yes');
@@ -159,7 +161,7 @@
         var id = recs[0].data.ID
         var index = gridpanel.store.indexOf(recs[0]);
         var currentPage = gridpanel.store.currentPage
-        openrwindow("/EnterpriseOrder/GoodsTrack?busitypeid=" + busitypeid + "&id=" + id + "&rowIndex=" + index + "&currentPage=" + currentPage, 1200, 800);
+        openrwindow("/EnterpriseOrder/GoodsTrack?busitypeid=" + busitypeid + "&id=" + id + "&rowIndex=" + index + "&currentPage=" + currentPage, 1200,800);
     }
 </script>
 <div class="container">
