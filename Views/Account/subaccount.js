@@ -1,5 +1,5 @@
 ﻿function subaccount_init() {
-    Ext.regModel('User', { fields: ['ID', 'NAME', 'REALNAME', 'EMAIL', 'TELEPHONE', 'MOBILEPHONE', 'POSITIONID', 'SEX', 'ENABLED', 'CREATETIME', 'PARENTID'] })
+    Ext.regModel('User', { fields: ['ID', 'NAME', 'REALNAME', 'EMAIL', 'TELEPHONE', 'MOBILEPHONE', 'POSITIONID', 'SEX', 'ENABLED', 'CREATETIME', 'PARENTID', 'REMARK'] });
     store_user = Ext.create('Ext.data.JsonStore', {
         model: 'User',
         proxy: {
@@ -106,7 +106,8 @@
                     };
                 }
             },
-           { header: '创建时间', dataIndex: 'CREATETIME', flex: 1 }
+           { header: '创建时间', dataIndex: 'CREATETIME', width: 150 },
+           { header: '备注', dataIndex: 'REMARK', flex: 1 }
         ]
     })
 }

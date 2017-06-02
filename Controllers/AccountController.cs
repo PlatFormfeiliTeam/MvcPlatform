@@ -109,7 +109,7 @@ namespace MvcPlatform.Controllers
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
-            iso.DateTimeFormat = "yyyy-MM-dd hh:mm:ss";
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             string sql = @"select * from sys_user where parentid ='" + json_user.GetValue("ID") + "'";
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql));
             var json = JsonConvert.SerializeObject(dt, iso);
