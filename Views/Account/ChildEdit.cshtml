@@ -40,10 +40,11 @@
             var field_MOBILEPHONE = Ext.create('Ext.form.field.Number', {
                 name: 'MOBILEPHONE',
                 fieldLabel: '手机',
-                maxLengthText: '手机号最多位11位',
+                //maxLengthText: '手机号最多位11位',
                 maxLength: 11,
-                allowBlank: false,
-                blankText: '手机号码不能为空!',
+                enforceMaxLength: true,
+                //allowBlank: false,
+                //blankText: '手机号码不能为空!',
                 hideTrigger: true
             });
             var store_ENABLED = Ext.create('Ext.data.JsonStore', {
