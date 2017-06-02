@@ -30,7 +30,7 @@
             useArrows: true,
             region: 'west',
             rootVisible: false,
-            width: 350,
+            width: 250,
             store: store_fc,
             hideHeaders: true,
             columns: [
@@ -58,13 +58,15 @@
             disabled: true,
             items: [cbg_printtmp, {
                 text: '<i class="fa fa-print" aria-hidden="true"></i>&nbsp;标准打印', handler: function (btn) {
-                    Ext.Ajax.request({
-                        url: '/Common/SinglePrint',
-                        params: { fileid: fileid, printtype: 'standardprint', printtmp: cbg_printtmp.getValue(), busitype: busitype,role:'enterprise' },
-                        success: function (response, success) {
-                            Ext.getDom("contentIframe").src = response.responseText;
-                        }
-                    })
+                    printfile(cbg_printtmp.getValue());
+
+                    //Ext.Ajax.request({
+                    //    url: '/Common/SinglePrint',
+                    //    params: { fileid: fileid, printtype: 'standardprint', printtmp: cbg_printtmp.getValue(), busitype: busitype, role: 'enterprise' },
+                    //    success: function (response, success) {
+                    //        Ext.getDom("contentIframe").src = response.responseText;
+                    //    }
+                    //})
                 }
             }, {
                 id: 'btn_taoda', text: '<i class="fa fa-print" aria-hidden="true"></i>&nbsp;套打打印', handler: function (btn) {
@@ -77,7 +79,90 @@
                     })
                 }
             }]
-        })
+        });
+
+        var con_POSITIONWEBTOP = {
+            xtype: 'fieldcontainer',
+            columnWidth: 1,
+            layout: 'hbox',
+            items: [{
+                id: 'POSITIONWEBTOP_btn', xtype: 'button', handler: function () {
+                    printfile(cbg_printtmp.getValue());
+                },
+                text: '<span class="glyphicon glyphicon-arrow-up"></span>'
+            }]
+        };
+        var field_POSITIONWEBTOP = Ext.create('Ext.form.field.Number', {
+            id: 'POSITIONWEBTOP', hideTrigger: true, allowDecimals: false, fieldStyle: 'text-align:center;',
+            name: 'POSITIONWEBTOP', columnWidth: 1
+        });
+        var field_POSITIONWEBRIGHT = Ext.create('Ext.form.field.Number', {
+            id: 'POSITIONWEBRIGHT', hideTrigger: true, allowDecimals: false, fieldStyle: 'text-align:center;',
+            name: 'POSITIONWEBRIGHT', flex: .65, margin: 0
+        });
+        var con_POSITIONWEBRIGHT = {
+            xtype: 'fieldcontainer', margin: '5 0 0 20',
+            layout: 'hbox',
+            items: [field_POSITIONWEBRIGHT, {
+                id: 'POSITIONWEBRIGHT_btn', xtype: 'button', handler: function () {
+                    printfile(cbg_printtmp.getValue());
+                },
+                text: '<span class="glyphicon glyphicon-arrow-right"></span>', flex: .35, margin: 0
+            }]
+        }
+        var field_POSITIONWEBBUTTOM = Ext.create('Ext.form.field.Number', {
+            id: 'POSITIONWEBBUTTOM', hideTrigger: true, allowDecimals: false, fieldStyle: 'text-align:center;',
+            name: 'POSITIONWEBBUTTOM', columnWidth: 1
+        });
+        var con_POSITIONWEBBUTTOM = {
+            xtype: 'fieldcontainer',
+            columnWidth: 1,
+            layout: 'hbox',
+            items: [{
+                id: 'POSITIONWEBBUTTOM_btn', xtype: 'button', handler: function () {
+                    printfile(cbg_printtmp.getValue());
+                },
+                text: '<span class="glyphicon glyphicon-arrow-down"></span>'
+            }]
+        }
+        var field_POSITIONWEBLEFT = Ext.create('Ext.form.field.Number', {
+            id: 'POSITIONWEBLEFT', hideTrigger: true, allowDecimals: false, fieldStyle: 'text-align:center;',
+            name: 'POSITIONWEBLEFT', flex: .65, margin: 0
+        });
+        var con_POSITIONWEBLEFT = {
+            xtype: 'fieldcontainer', margin: '5 20 0 0',
+            layout: 'hbox',
+            items: [{
+                id: 'POSITIONWEBLEFT_btn', xtype: 'button', handler: function () {
+                    printfile(cbg_printtmp.getValue());
+                },
+                text: '<span class="glyphicon glyphicon-arrow-left"></span>', flex: .35, margin: 0
+            }, field_POSITIONWEBLEFT]
+        }
+
+        var formpanel_right = Ext.create('Ext.form.Panel', {
+            id: 'formpanel_right',
+            region: 'east',
+            width: 200,
+            border: 0,
+            fieldDefaults: {
+                margin: '0 5 10 0',
+                labelWidth: 8,
+                columnWidth: .5,
+                labelAlign: 'right',
+                labelSeparator: '',
+                msgTarget: 'under',
+                validateOnBlur: false,
+                validateOnChange: false
+            },
+            items: [{ layout: 'column', height: 25, margin: '80 82 0 82', border: 0, items: [con_POSITIONWEBTOP] },
+                { layout: 'column', margin: '0 70 0 70', border: 0, items: [field_POSITIONWEBTOP] },
+                { layout: 'column', height: 42, border: 0, items: [con_POSITIONWEBLEFT, con_POSITIONWEBRIGHT] },
+                { layout: 'form', margin: '5 73 0 69', border: 0, items: [field_POSITIONWEBBUTTOM] },
+                { layout: 'column', height: 25, margin: '0 82 0 82', border: 0, items: [con_POSITIONWEBBUTTOM] }
+            ]
+        });
+
         var viewport = new Ext.container.Viewport({
             layout: 'border',
             items: [treepanel_fc,
@@ -88,7 +173,7 @@
                 layout: 'fit',
                 id: 'mainContent',
                 contentEl: 'contentIframe'
-            }]
+            }, formpanel_right]
         })
         treepanel_fc.expandAll(function () {
         });
@@ -117,7 +202,36 @@
                 treepanel_fc.getSelectionModel().select([node]);
             }
         });
-        task.delay(2000);
-    })
+        task.delay(2000); loadformposition();
+    });
+
+
+    function loadformposition() {
+        Ext.Ajax.request({
+            url: "/Common/Loadwatermark",
+            success: function (response, opts) {
+                var data = Ext.decode(response.responseText);
+                Ext.getCmp("formpanel_right").getForm().setValues(data.formdata);
+            }
+        });
+    }
+
+    function printfile(printtmp) {
+
+        var top = Ext.getCmp("POSITIONWEBTOP").getValue(); var right = Ext.getCmp("POSITIONWEBRIGHT").getValue();
+        var left = Ext.getCmp("POSITIONWEBLEFT").getValue(); var buttom = Ext.getCmp("POSITIONWEBBUTTOM").getValue();
+
+        Ext.Ajax.request({
+            url: '/Common/SinglePrint',
+            params: {
+                fileid: fileid, printtype: 'standardprint', printtmp: printtmp, busitype: busitype, role: 'enterprise'
+                , top: top, right: right, left: left, buttom: buttom
+            },
+            success: function (response, success) {
+                Ext.getDom("contentIframe").src = response.responseText;
+            }
+        });
+       
+    }
 </script>
 <iframe id="contentIframe" width="100%" height="100%" name="mainContent" frameborder="no" border="0" marginwidth="0" marginheight="0"></iframe>

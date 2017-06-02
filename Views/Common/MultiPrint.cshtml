@@ -22,11 +22,11 @@
                 if (source == "declare") {
                     items = [
                         {
-                            boxLabel: '<li>报关单<span class="badge">' + json_result.bgdnum + '</span></li>',
+                            boxLabel: '<li style="list-style-type:none;">报关单<span class="badge">' + json_result.bgdnum + '</span></li>',
                             name: 'filetype', inputValue: '61'
                         },
                         {
-                            boxLabel: '<li>报关单提前<span class="badge">' + json_result.bgdtqnum + '</span></li>',
+                            boxLabel: '<li style="list-style-type:none;">报关单提前<span class="badge">' + json_result.bgdtqnum + '</span></li>',
                             name: 'filetype', inputValue: '63', disabled: json_result.bgdtqnum == 0
                         }
                     ];
@@ -34,11 +34,11 @@
                 else {
                     items = [
                       {
-                          boxLabel: '<li>报检单<span class="badge">' + json_result.bjdnum + '</span></li>',
+                          boxLabel: '<li style="list-style-type:none;">报检单<span class="badge">' + json_result.bjdnum + '</span></li>',
                           name: 'filetype', inputValue: '62'
                       },
                       {
-                          boxLabel: '<li>报检核准单<span class="badge">' + json_result.bjhzdnum + '</span></li>',
+                          boxLabel: '<li style="list-style-type:none;">报检核准单<span class="badge">' + json_result.bjhzdnum + '</span></li>',
                           name: 'filetype', inputValue: '121', disabled: json_result.bjhzdnum == 0
                       }
                     ];
@@ -103,7 +103,13 @@
                         { id: 'liucunlian', boxLabel: '企业留存联', name: 'declaretmp', inputValue: '企业留存联' },
                         { id: 'hexiaolian', boxLabel: '海关核销联', name: 'declaretmp', inputValue: '海关核销联' }
                     ]
-                })
+                });
+
+
+
+
+
+
                 var formpanel = Ext.create('Ext.form.Panel', {
                     title: source == 'declare' ? '报关单管理->批量打印' : '报检单管理->批量打印',
                     region: 'west',
