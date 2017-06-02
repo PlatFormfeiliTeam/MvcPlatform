@@ -1564,9 +1564,9 @@ namespace MvcPlatform.Controllers
         public string convertPdf()
         {
             string oldfilename =Request["filePath"]+"";
-            string newfilename = oldfilename.Replace(".pdf", "").Replace(".PDF", "") + "-view.pdf";
+            string newfilename ="view_"+Guid.NewGuid()+".pdf";
             string filePath ="D:/ftpserver"+oldfilename;
-            string toPath = "D:/ftpserver" + newfilename;
+            string toPath = Server.MapPath("/Declare")+ "/"+newfilename;
             bool print = true;
 
             PdfReader reader = new PdfReader(filePath);
