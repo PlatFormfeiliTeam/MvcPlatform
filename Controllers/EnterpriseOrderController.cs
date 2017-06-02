@@ -548,7 +548,7 @@ namespace MvcPlatform.Controllers
                 sql += where;
                 IsoDateTimeConverter iso = new IsoDateTimeConverter();
                 iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-                DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
+                DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME desc,id ", "desc"));
                 var json = JsonConvert.SerializeObject(dt, iso);
                 return "{rows:" + json + ",total:" + totalProperty + "}";
             
@@ -1559,6 +1559,38 @@ namespace MvcPlatform.Controllers
             result = "{decl_data:" + decl_data + ",product_data:" + product_data + ",file_data:" + file_data + "}";
             return result;
 
+        }
+
+        public string convertPdf()
+        {
+            string oldfilename =Request["filePath"]+"";
+            string newfilename = oldfilename.Replace(".pdf", "").Replace(".PDF", "") + "-view.pdf";
+            string filePath ="D:/ftpserver"+oldfilename;
+            string toPath = "D:/ftpserver" + newfilename;
+            bool print = true;
+
+            PdfReader reader = new PdfReader(filePath);
+            Document document = new Document(reader.GetPageSizeWithRotation(1));
+            int n = reader.NumberOfPages;
+            FileStream baos = new FileStream(toPath, FileMode.Create, FileAccess.Write);
+            PdfCopy copy = new PdfCopy(document, baos);
+            copy.ViewerPreferences = PdfWriter.HideToolbar | PdfWriter.HideMenubar;
+            //往pdf中写入内容   
+            document.Open();
+            for (int i = 1; i <= n; i++)
+            {
+                PdfImportedPage page = copy.GetImportedPage(reader, i);
+                copy.AddPage(page);
+            }
+            if (print)
+            {
+                PdfAction.JavaScript("myOnMessage();", copy);
+                copy.AddJavaScript("this.print(true);function myOnMessage(aMessage) {app.alert('Test',2);} var msgHandlerObject = new Object();doc.onWillPrint = myOnMessage;this.hostContainer.messageHandler = msgHandlerObject;");
+            }
+            document.Close();
+            reader.Close();
+
+            return "{newfilepath:\"" + newfilename + "\"}";
         }
 
 
