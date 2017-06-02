@@ -1461,7 +1461,7 @@ namespace MvcPlatform.Controllers
                 return "{success:false,WebDownCount:" + WebDownCount + "}";
             }
 
-            if (RBGTYPE=="0")
+            if (RBGTYPE == "0")//昆山区内
             {
                 NPOI.SS.UserModel.ISheet sheet = book.CreateSheet("昆山区内");
                 NPOI.SS.UserModel.IRow row1 = sheet.CreateRow(0);
@@ -1496,6 +1496,83 @@ namespace MvcPlatform.Controllers
                         rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["RECORDCODE"].ToString());
                         rowtemp.CreateCell(17).SetCellValue(GetName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
                         rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["DATACONFIRM"].ToString() == "2" ? "是" : "否");
+                    }
+                }
+            }
+
+            if (RBGTYPE == "1")//昆山区外
+            {
+                NPOI.SS.UserModel.ISheet sheet = book.CreateSheet("昆山区外");
+                NPOI.SS.UserModel.IRow row1 = sheet.CreateRow(0);
+                row1.CreateCell(0).SetCellValue("备案号"); row1.CreateCell(1).SetCellValue("企业内部编号"); row1.CreateCell(2).SetCellValue("报关单号"); row1.CreateCell(3).SetCellValue("申报日期");
+                row1.CreateCell(4).SetCellValue("退单日期"); row1.CreateCell(5).SetCellValue("贸易方式"); row1.CreateCell(6).SetCellValue("成品料件标志"); row1.CreateCell(7).SetCellValue("毛重(公斤)");
+                row1.CreateCell(8).SetCellValue("净重(公斤)"); row1.CreateCell(9).SetCellValue("序号"); row1.CreateCell(10).SetCellValue("项号"); row1.CreateCell(11).SetCellValue("料号");
+                row1.CreateCell(12).SetCellValue("商品名称"); row1.CreateCell(13).SetCellValue("规格型号"); row1.CreateCell(14).SetCellValue("申报数量"); row1.CreateCell(15).SetCellValue("单位");
+                row1.CreateCell(16).SetCellValue("法定数量"); row1.CreateCell(17).SetCellValue("法定单位"); row1.CreateCell(18).SetCellValue("第二法定数量"); row1.CreateCell(19).SetCellValue("第二法定单位");
+                row1.CreateCell(20).SetCellValue("原产国"); row1.CreateCell(21).SetCellValue("币制"); row1.CreateCell(22).SetCellValue("单价"); row1.CreateCell(23).SetCellValue("总价");
+                row1.CreateCell(24).SetCellValue("折合美元总价"); row1.CreateCell(25).SetCellValue("汇率"); row1.CreateCell(26).SetCellValue("备注1"); row1.CreateCell(27).SetCellValue("备注2");
+                row1.CreateCell(28).SetCellValue("备注3"); 
+
+
+                if (dt != null)
+                {
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        NPOI.SS.UserModel.IRow rowtemp = sheet.CreateRow(i + 1);
+                        rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["RECORDCODE"].ToString());
+                        rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                        rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["DECLARATIONCODE"].ToString());
+                        rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["REPTIME"].ToString());
+                        //rowtemp.CreateCell(4).SetCellValue("");
+                        rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["TRADEMETHOD"].ToString());
+                        if (dt.Rows[i]["ITEMNOATTRIBUTE"].ToString() == "料件")
+                        {
+                            rowtemp.CreateCell(6).SetCellValue("3");
+                        }
+                        else if (dt.Rows[i]["ITEMNOATTRIBUTE"].ToString() == "成品")
+                        {
+                            rowtemp.CreateCell(6).SetCellValue("4");
+                        }
+                        else
+                        {
+                            rowtemp.CreateCell(6).SetCellValue("");
+                        }
+                        //rowtemp.CreateCell(7).SetCellValue("");
+                        //rowtemp.CreateCell(8).SetCellValue("");
+                        rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["ORDERNO"].ToString());
+                        rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["ITEMNO"].ToString());
+                        //rowtemp.CreateCell(11).SetCellValue("");
+                        rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["COMMODITYNAME"].ToString());
+                        rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["SPECIFICATIONSMODEL"].ToString());
+                        rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["CADQUANTITY"].ToString());
+                        rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["CADUNIT"].ToString());//GetName(dt.Rows[i]["CADUNIT"].ToString(), UNIT)
+
+                        rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["LEGALQUANTITY"].ToString());
+                        rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["LEGALUNIT"].ToString());
+                        rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["SQUANTITY"].ToString());
+                        rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["SUNIT"].ToString());
+
+                        if (dt.Rows[i]["INTERNALTYPENAME"].ToString()=="进口")
+                        {
+                            rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["COUNTRYORIGINCODE"].ToString());
+                        }
+                        else if (dt.Rows[i]["INTERNALTYPENAME"].ToString() == "出口")
+                        {
+                            rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["DESTCOUNTRYCODE"].ToString());
+                        }
+                        else
+                        {
+                            rowtemp.CreateCell(20).SetCellValue("");
+                        }
+                        
+                        rowtemp.CreateCell(21).SetCellValue(dt.Rows[i]["CURRENCY"].ToString());
+                        rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["UNITPRICE"].ToString());
+                        rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["TOTALPRICE"].ToString());
+                        //rowtemp.CreateCell(24).SetCellValue("");
+                        //rowtemp.CreateCell(25).SetCellValue("");
+                        //rowtemp.CreateCell(26).SetCellValue("");
+                        //rowtemp.CreateCell(27).SetCellValue("");
+                        //rowtemp.CreateCell(28).SetCellValue("");
                     }
                 }
             }
