@@ -1695,20 +1695,21 @@ namespace MvcPlatform.Controllers
             string printtype = Request["printtype"];//打印类型
             string busitype = Request["busitype"];//业务类型
             string printtmp = Request["printtmp"];//打印模板
+            string top = Request["top"]; string right = Request["right"]; string left = Request["left"]; string buttom = Request["buttom"];
             string sql = "select t.* from List_Attachment t where t.id='" + fileid + "'";
             DataTable dt = DBMgr.GetDataTable(sql);
             string output = Guid.NewGuid() + "";
             IList<string> filelist = new List<string>();
-            string role=Request["role"];
+            string role = Request["role"];
             if (printtype == "standardprint")//如果是标准打印
-            { 
+            {
                 //报关单标准打印的时候用户必须在前端选择多个打印模板 单证二期已经删除了草单表,报关单标准打印已经摒弃了申报库别的判断 by panhuaguo2016-12-13
                 string[] tmp_array = printtmp.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
                 if (tmp_array.Length > 0)
                 {
                     foreach (string tmpname in tmp_array)
                     {
-                        string outpath = AddBackground(dt.Rows[0]["FILENAME"] + "", tmpname, busitype, "");
+                        string outpath = AddBackground(dt.Rows[0]["FILENAME"] + "", tmpname, busitype, "", top, right, buttom, left);
                         filelist.Add(outpath);
                     }
                     UpdatePrintInfo("list_declaration", dt.Rows[0]["DECLCODE"] + "", role);
@@ -1740,9 +1741,112 @@ namespace MvcPlatform.Controllers
                 bool file = ftp.DownloadFile("/" + dt.Rows[0]["FILENAME"] + "", ConfigurationManager.AppSettings["DeclareFile"] + output + ".pdf");
             }
             //将报关单打印任务推送至缓存
-            IDatabase db = SeRedis.redis.GetDatabase(); 
+            IDatabase db = SeRedis.redis.GetDatabase();
             db.ListLeftPush("fileprint", "{user:'" + HttpContext.User.Identity.Name + "',filename:'" + output + ".pdf'}");
             return result;
+        }
+
+        public string Loadwatermark()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string sql = "select t.* from config_watermark t where t.CUSTOMER='" + json_user.Value<string>("CUSTOMERID") + "'";
+            DataTable dt = new DataTable(); string formdata = "{}";
+            dt = DBMgr.GetDataTable(sql);
+            if (dt.Rows.Count > 0)
+            {
+                formdata = JsonConvert.SerializeObject(dt).TrimStart('[').TrimEnd(']');
+            }
+            else
+            {
+                formdata = "{\"POSITIONWEBTOP\":0,\"POSITIONWEBRIGHT\":0,\"POSITIONWEBBUTTOM\":0,\"POSITIONWEBLEFT\":0}";
+            }
+
+            return "{formdata:" + formdata + "}";
+        }
+
+        //给报关单文件增加背景图片 by panhuaguo 2016-04-19  
+        //修改需求 如果申报关区是昆山综保2369的话 使用进境出境作为报关单背景图 by panhuaguo 2016-08-15
+        //修改需求 依据申报库别进行判断
+        public string AddBackground(string filename, string printtmp, string busitype, string decltype, string top, string right, string buttom, string left)
+        {
+            string outname = Guid.NewGuid() + "";
+
+            int top_int = Convert.ToInt32(top == "" ? "0" : top); int right_int = Convert.ToInt32(right == "" ? "0" : right);
+            int buttom_int = Convert.ToInt32(buttom == "" ? "0" : buttom); int left_int = Convert.ToInt32(left == "" ? "0" : left);
+
+            Image img = null;
+            if (busitype == "11" || busitype == "21" || busitype == "31" || busitype == "41" || busitype == "51")
+            {
+                if (printtmp == "海关作业联")
+                {
+                    img = Image.GetInstance(Server.MapPath("/FileUpload/进口-海关作业联.png"));
+                }
+                if (printtmp == "企业留存联")
+                {
+                    img = Image.GetInstance(Server.MapPath("/FileUpload/进口-企业留存联.png"));
+                }
+                if (printtmp == "海关核销联")
+                {
+                    img = Image.GetInstance(Server.MapPath("/FileUpload/进口-海关核销联.png"));
+                }
+            }
+            else
+            {
+                if (printtmp == "海关作业联")
+                {
+                    img = Image.GetInstance(Server.MapPath("/FileUpload/出口-海关作业联.png"));
+                }
+                if (printtmp == "企业留存联")
+                {
+                    img = Image.GetInstance(Server.MapPath("/FileUpload/出口-企业留存联.png"));
+                }
+                if (printtmp == "海关核销联")
+                {
+                    img = Image.GetInstance(Server.MapPath("/FileUpload/出口-海关核销联.png"));
+                }
+            }
+            string destFile = Server.MapPath("~/Declare/") + outname + ".pdf";
+            FileStream stream = new FileStream(destFile, FileMode.Create, FileAccess.ReadWrite);
+
+            Uri url = new Uri(AdminUrl + "/file/" + filename);
+            PdfReader reader = new PdfReader(url);
+
+            iTextSharp.text.Rectangle psize = reader.GetPageSize(1);
+            var imgWidth = psize.Width + right_int;
+            var imgHeight = psize.Height - top_int + buttom_int;
+            img.ScaleAbsolute(imgWidth, imgHeight);
+            img.SetAbsolutePosition(0 + left_int, 0 - buttom_int);//坐标是从左下角开始算的，注意 
+
+            PdfStamper stamper = new PdfStamper(reader, stream);    //read pdf stream 
+            int totalPage = reader.NumberOfPages;
+            for (int current = 1; current <= totalPage; current++)
+            {
+                var canvas = stamper.GetUnderContent(current);
+                var page = stamper.GetImportedPage(reader, current);
+                canvas.AddImage(img);
+            }
+            stamper.Close();
+            reader.Close();
+
+            //记下坐标
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            DataTable dt = new DataTable(); string sql = "";
+            sql = "select t.* from config_watermark t where t.CUSTOMER='" + json_user.Value<string>("CUSTOMERID") + "'";
+            dt = DBMgr.GetDataTable(sql);
+            if (dt.Rows.Count > 0)
+            {
+                sql = @"update config_watermark set POSITIONWEBTOP={1},POSITIONWEBRIGHT={2},POSITIONWEBBUTTOM={3},POSITIONWEBLEFT={4} 
+                        where CUSTOMER='{0}'";
+            }
+            else
+            {
+                sql = @"insert into config_watermark(CUSTOMER,POSITIONWEBTOP,POSITIONWEBRIGHT,POSITIONWEBBUTTOM,POSITIONWEBLEFT) 
+                        values('{0}',{1},{2},{3},{4})";
+            }
+            sql = string.Format(sql, json_user.Value<string>("CUSTOMERID"), top_int, right_int, buttom_int, left_int);
+            DBMgr.ExecuteNonQuery(sql);
+
+            return "http://" + Request.Url.Authority + "/Declare/" + outname + ".pdf";
         }
 
         //给报关单文件增加背景图片 by panhuaguo 2016-04-19  
