@@ -10,7 +10,6 @@
     var store_Trade; var store_sbfs;
     var formpanel, gridpanel;    
     var common_data_jydw = [], common_data_sbfs = [], common_data_sbgq = [], common_data_bgfs = [], common_data_bzzl = [], common_data_myfs = [];
-    var busitypeid = 20;
     Ext.onReady(function () {
         Ext.Ajax.request({//对公共基础数据发起一次请求
             url: "/Common/Ini_Base_Data",
@@ -145,7 +144,7 @@
         var id = recs[0].data.ID
         var index = gridpanel.store.indexOf(recs[0]);
         var currentPage = gridpanel.store.currentPage
-        openrwindow("/EnterpriseOrder/GoodsTrack?busitypeid=" + busitypeid + "&id=" + id + "&rowIndex=" + index + "&currentPage=" + currentPage, 1200, 800);
+        openrwindow("/EnterpriseOrder/GoodsTrack?busitypeid=20&id=" + id + "&rowIndex=" + index + "&currentPage=" + currentPage, 1200, 800);
     }
 
 </script>

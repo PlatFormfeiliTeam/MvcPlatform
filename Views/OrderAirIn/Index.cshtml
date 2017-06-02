@@ -11,7 +11,6 @@
     var formpanel, gridpanel;
     var common_data_jydw = [], common_data_sbfs = [], common_data_sbgq = [], common_data_bgfs = [], common_data_bzzl = [], common_data_myfs = [];
     var seniorcondition = "";//高级查询参数
-    var busitypeid = 11;
 
     Ext.onReady(function () {
         Ext.Ajax.request({//对公共基础数据发起一次请求
@@ -26,7 +25,7 @@
                 common_data_bzzl = commondata.bzzl;//包装种类
                 common_data_myfs = commondata.myfs;//贸易方式
                 //查询区域
-                initSearch();
+                initSearch('11');
                 //列表
                 store_sbfs = Ext.create('Ext.data.JsonStore', {
                     fields: ['CODE', 'NAME'],
@@ -161,7 +160,7 @@
         var id = recs[0].data.ID
         var index = gridpanel.store.indexOf(recs[0]);
         var currentPage = gridpanel.store.currentPage
-        openrwindow("/EnterpriseOrder/GoodsTrack?busitypeid=" + busitypeid + "&id=" + id + "&rowIndex=" + index + "&currentPage=" + currentPage, 1200,800);
+        openrwindow("/EnterpriseOrder/GoodsTrack?busitypeid=11&id=" + id + "&rowIndex=" + index + "&currentPage=" + currentPage, 1200,800);
     }
 </script>
 <div class="container">

@@ -1,8 +1,8 @@
 ﻿
 //////////////////////////combox开始//////////////////////
-function initSearch() {
+function initSearch(busitypeid) {
     var manifest_data = [{ "NAME": "已入库", "CODE": "1" }, { "NAME": "未入库", "CODE": "0" }];
-    if (busitypeid == 11) {
+    if (busitypeid == '11') {
         search_js_condition3_data.push({ "NAME": "舱单入库", "CODE": "MANIFEST_STORAGE" });
     }
     var store_1 = Ext.create("Ext.data.JsonStore", {
