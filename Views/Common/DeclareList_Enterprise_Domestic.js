@@ -19,7 +19,7 @@ Ext.onReady(function () {
 
             store_sbfs = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_sbfs });
             store_bgfs = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_bgfs });
-            store_busitype = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_busitype_Not_Domestic });
+            store_busitype = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_busitype_Domestic });
             store_modifyflag = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: modifyflag_data });
 
             gridpanelBind();
@@ -31,10 +31,11 @@ Ext.onReady(function () {
 
 function initSearch() {
     var declarationsearch_js_condition3_data_hg = [{ "NAME": "已结关", "CODE": "已结关" }, { "NAME": "未结关", "CODE": "未结关" }];
+    var comboxsearch_js_condition = [{ "NAME": "申报单位", "CODE": "REPUNITCODE" }, { "NAME": "进出口岸", "CODE": "PORTCODE" }, { "NAME": "关联企业", "CODE": "BUSIUNITCODE_ASS" }];
 
     var store_1 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: [{ "NAME": "申报单位", "CODE": "REPUNITCODE" }, { "NAME": "进出口岸", "CODE": "PORTCODE" }]
+        data: comboxsearch_js_condition
     });
     var combo_1 = Ext.create('Ext.form.field.ComboBox', {
         id: 'CONDITION1',
@@ -49,7 +50,7 @@ function initSearch() {
         flex: .35,
         listeners:
            {
-               change: function () {
+               change: function (combo, newValue, oldValue, eOpts) {
                    combo_1_1.reset();
                    if (combo_1.getValue() == "REPUNITCODE") {
                        combo_1_1.minChars = "4";
@@ -58,6 +59,10 @@ function initSearch() {
                    if (combo_1.getValue() == "PORTCODE") {
                        combo_1_1.minChars = "1";
                        store_1_1.loadData(common_data_sbgq);
+                   }
+                   if (combo_1.getValue() == "BUSIUNITCODE_ASS") {
+                       combo_1_1.minChars = "4";
+                       store_1_1.loadData(common_data_jydw);
                    }
                }
            }
@@ -114,7 +119,7 @@ function initSearch() {
         xtype: 'fieldcontainer',
         layout: 'hbox',
         items: [combo_2, field_2_1]
-    }
+    }    
 
     var store_3 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
@@ -136,7 +141,7 @@ function initSearch() {
                change: function () {
                    combo_3_1.reset();
                    if (this.getValue() == "BUSITYPE") {
-                       store_3_1.loadData(common_data_busitype_Not_Domestic);
+                       store_3_1.loadData(common_data_busitype_Domestic);
                    }                  
                    if (this.getValue() == "HGZT") {
                        store_3_1.loadData(declarationsearch_js_condition3_data_hg);
@@ -149,7 +154,7 @@ function initSearch() {
     })
     var store_3_1 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: common_data_busitype_Not_Domestic
+        data: common_data_busitype_Domestic
     });
     var combo_3_1 = Ext.create('Ext.form.field.ComboBox', {
         id: 'CONDITION3_1',
@@ -213,7 +218,7 @@ function initSearch() {
 
     var store_5 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: [{ "NAME": "申报单位", "CODE": "REPUNITCODE" }, { "NAME": "进出口岸", "CODE": "PORTCODE" }]
+        data: comboxsearch_js_condition
     });
     var combo_5 = Ext.create('Ext.form.field.ComboBox', {
         id: 'CONDITION5',
@@ -237,6 +242,10 @@ function initSearch() {
                   if (this.getValue() == "PORTCODE") {
                       combo_5_1.minChars = "1";
                       store_5_1.loadData(common_data_sbgq);
+                  }
+                  if (this.getValue() == "BUSIUNITCODE_ASS") {
+                      combo_5_1.minChars = "4";
+                      store_5_1.loadData(common_data_jydw);
                   }
               }
           }
@@ -311,7 +320,7 @@ function initSearch() {
                change: function () {
                    combo_7_1.reset();
                    if (this.getValue() == "BUSITYPE") {
-                       store_7_1.loadData(common_data_busitype_Not_Domestic);
+                       store_7_1.loadData(common_data_busitype_Domestic);
                    }
                    if (this.getValue() == "HGZT") {
                        store_7_1.loadData(declarationsearch_js_condition3_data_hg);
@@ -401,11 +410,12 @@ function gridpanelBind() {
     var store = Ext.create('Ext.data.JsonStore', {
         fields: ['ID', 'PREDECLCODE', 'DECLARATIONCODE', 'CUSTOMSSTATUS', 'CODE', 'MODIFYFLAG', 'REPTIME', 'TRANSNAME', 'BUSIUNITCODE', 'CUSTOMERNAME', 'IETYPE',
                 'BUSIUNITNAME', 'PORTCODE', 'BLNO', 'REPWAYID', 'REPWAYNAME', 'DECLWAY', 'DECLWAYNAME', 'TRADEMETHOD', 'CONTRACTNO', 'GOODSNUM',
-                'GOODSNW', 'SHEETNUM', 'ORDERCODE', 'CUSNO', 'ASSOCIATENO', 'CORRESPONDNO', 'BUSITYPE', 'CONTRACTNOORDER', 'REPUNITNAME'],
+                'GOODSNW', 'SHEETNUM', 'ORDERCODE', 'CUSNO', 'ASSOCIATENO', 'CORRESPONDNO', 'BUSITYPE', 'CONTRACTNOORDER', 'REPUNITNAME'
+                , 'ORDERCODE_ASS', 'BUSIUNITCODE_ASS', 'BUSIUNITNAME_ASS'],
         pageSize: 22,
         proxy: {
             type: 'ajax',
-            url: '/Common/LoadDeclarationList_E',
+            url: '/Common/LoadDeclarationList_E_Domestic',
             reader: {
                 root: 'rows',
                 type: 'json',
@@ -466,7 +476,12 @@ function gridpanelBind() {
         { header: '张数', dataIndex: 'SHEETNUM', width: 60 },
         { header: '删改单', dataIndex: 'MODIFYFLAG', width: 60, renderer: render },
         { header: '订单编号', dataIndex: 'ORDERCODE', width: 100 },
-        { header: '客户编号', dataIndex: 'CUSNO', width: 125 }
+        { header: '客户编号', dataIndex: 'CUSNO', width: 125 },
+        { header: '关联企业', dataIndex: 'BUSIUNITNAME_ASS', width: 200 }
+        //{ header: '关联订单号', dataIndex: 'ORDERCODE_ASS', width: 100 }
+        //{ header: '进/出', dataIndex: 'IETYPE', width: 80}
+        //{ header: '两单关联号', dataIndex: 'ASSOCIATENO', width: 110 }//两单关联号
+        //{ header: '多单关联号', dataIndex: 'CORRESPONDNO', width: 100}//多单关联号
         ],
         viewConfig: {
             enableTextSelection: true
@@ -561,7 +576,7 @@ function ExportDecl() {
     myMask.show();
 
     var data = {
-        common_data_busitype_Not_Domestic: JSON.stringify(common_data_busitype_Not_Domestic), modifyflag_data: JSON.stringify(modifyflag_data),
+        common_data_busitype_Domestic: JSON.stringify(common_data_busitype_Domestic), modifyflag_data: JSON.stringify(modifyflag_data),
         CONDITION1: Ext.getCmp('CONDITION1').getValue(), VALUE1: Ext.getCmp("CONDITION1_1").getValue(),
         CONDITION2: Ext.getCmp('CONDITION2').getValue(), VALUE2: Ext.getCmp("CONDITION2_1").getValue(),
         CONDITION3: Ext.getCmp('CONDITION3').getValue(), VALUE3: Ext.getCmp("CONDITION3_1").getValue(),
@@ -579,7 +594,7 @@ function ExportDecl() {
     }
 
     Ext.Ajax.request({
-        url: '/Common/ExportDeclList_E',
+        url: '/Common/ExportDeclList_E_Domestic',
         params: data,
         success: function (response, option) {
             var json = Ext.decode(response.responseText);
