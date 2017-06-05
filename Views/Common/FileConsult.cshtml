@@ -44,6 +44,10 @@
                     Ext.getDom("contentIframe").src = rec.get("url");
                     fileid = rec.get("fileid");//如果是报关单或者报关单文件节点
                     tb_print.setDisabled(!Ext.String.startsWith(rec.get("id"), 'G'));
+                    Ext.getCmp("POSITIONWEBTOP_btn").setDisabled(!Ext.String.startsWith(rec.get("id"), 'G'));
+                    Ext.getCmp("POSITIONWEBRIGHT_btn").setDisabled(!Ext.String.startsWith(rec.get("id"), 'G'));
+                    Ext.getCmp("POSITIONWEBBUTTOM_btn").setDisabled(!Ext.String.startsWith(rec.get("id"), 'G'));
+                    Ext.getCmp("POSITIONWEBLEFT_btn").setDisabled(!Ext.String.startsWith(rec.get("id"), 'G'));
                 }
             }
         });
@@ -88,7 +92,7 @@
             columnWidth: 1,
             layout: 'hbox',
             items: [{
-                id: 'POSITIONWEBTOP_btn', xtype: 'button', handler: function () {
+                id: 'POSITIONWEBTOP_btn', xtype: 'button', disabled: true, handler: function () {
                     printfile(cbg_printtmp.getValue());
                 },
                 text: '<span class="glyphicon glyphicon-arrow-up"></span>'
@@ -106,7 +110,7 @@
             xtype: 'fieldcontainer', margin: '5 0 0 20',
             layout: 'hbox',
             items: [field_POSITIONWEBRIGHT, {
-                id: 'POSITIONWEBRIGHT_btn', xtype: 'button', handler: function () {
+                id: 'POSITIONWEBRIGHT_btn', xtype: 'button', disabled: true, handler: function () {
                     printfile(cbg_printtmp.getValue());
                 },
                 text: '<span class="glyphicon glyphicon-arrow-right"></span>', flex: .35, margin: 0
@@ -121,7 +125,7 @@
             columnWidth: 1,
             layout: 'hbox',
             items: [{
-                id: 'POSITIONWEBBUTTOM_btn', xtype: 'button', handler: function () {
+                id: 'POSITIONWEBBUTTOM_btn', xtype: 'button', disabled: true, handler: function () {
                     printfile(cbg_printtmp.getValue());
                 },
                 text: '<span class="glyphicon glyphicon-arrow-down"></span>'
@@ -135,7 +139,7 @@
             xtype: 'fieldcontainer', margin: '5 20 0 0',
             layout: 'hbox',
             items: [{
-                id: 'POSITIONWEBLEFT_btn', xtype: 'button', handler: function () {
+                id: 'POSITIONWEBLEFT_btn', xtype: 'button', disabled: true, handler: function () {
                     printfile(cbg_printtmp.getValue());
                 },
                 text: '<span class="glyphicon glyphicon-arrow-left"></span>', flex: .35, margin: 0
