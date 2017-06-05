@@ -33,7 +33,7 @@ namespace MvcPlatform.Controllers
                     from (
                       select a.id as type,a.sortindex,row_number() over (partition by a.id order by b.publishdate desc) numid,b.id
                         ,case when length(b.title)>50 then substr(b.title,1,50)||'...' else b.title end title
-                        ,to_char(b.publishdate,'yyyy-mm-dd') as publishdate ,to_char(b.updatetime,'yyyy-mm-dd hh24:mi') as updatetime 
+                        ,to_char(b.publishdate,'yyyy-mm-dd') as publishdate ,b.publishdate as publishdate_sort,to_char(b.updatetime,'yyyy-mm-dd hh24:mi') as updatetime 
                       from (select * from newscategory where pid is null) a
                            left join (
                                   select a.rootid,b.*
@@ -46,7 +46,7 @@ namespace MvcPlatform.Controllers
                                   ) b on a.id=b.rootid
                     ) a
                     where numid<=6
-                    order by a.sortindex,a.type,a.publishdate desc";
+                    order by a.sortindex,a.type,a.publishdate_sort desc";
             dt_notice = DBMgr.GetDataTable(sql);   
 
             dic.Add("dt_type", dt_type);
