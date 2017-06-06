@@ -23,6 +23,7 @@ namespace MvcPlatform.Controllers
             Dictionary<string, DataTable> dic = new Dictionary<string, DataTable>();//新建字典
             DataTable dt_type = new DataTable();
             DataTable dt_notice = new DataTable();
+            DataTable dt_banner = new DataTable();
 
             sql = "select id,name type from newscategory where pid is null order by sortindex,id";
             dt_type = DBMgr.GetDataTable(sql);
@@ -47,10 +48,15 @@ namespace MvcPlatform.Controllers
                     ) a
                     where numid<=6
                     order by a.sortindex,a.type,a.publishdate_sort desc";
-            dt_notice = DBMgr.GetDataTable(sql);   
+            dt_notice = DBMgr.GetDataTable(sql);
+
+            sql = @"select ID,IMGURL,LINKURL,DESCRIPTION,STATUS,FILENAME,SORTINDEX from web_banner WHERE STATUS='true' order by SORTINDEX";
+            dt_banner = DBMgr.GetDataTable(sql);
 
             dic.Add("dt_type", dt_type);
             dic.Add("dt_notice", dt_notice);
+
+            dic.Add("dt_banner", dt_banner);
 
             //ViewBag.navigator = "关务云>>首页";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
