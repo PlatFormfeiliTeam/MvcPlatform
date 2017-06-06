@@ -2,6 +2,7 @@
 @{
     string type = "";
     int count = 0;
+    string AdminUrl = System.Configuration.ConfigurationManager.AppSettings["AdminUrl"];
 }
 
 @{
@@ -54,14 +55,13 @@
             if (i == 0)
             {
              <div class="item active">
-                 <img src="http://localhost:8013/@Model["dt_banner"].Rows[i]["IMGURL"]" alt="" />
+                 <img src="@Html.Raw(AdminUrl + Model["dt_banner"].Rows[i]["IMGURL"])" alt="" />
             </div>
-
             }
             else
             { 
             <div class="item">
-                <img src="http://localhost:8013/@Model["dt_banner"].Rows[i]["IMGURL"]" alt="" />
+                <img src="@Html.Raw(AdminUrl + Model["dt_banner"].Rows[i]["IMGURL"])" alt="" />
            </div>  
             }
         }
