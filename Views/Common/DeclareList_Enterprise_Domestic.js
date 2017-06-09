@@ -410,7 +410,7 @@ function gridpanelBind() {
     var store = Ext.create('Ext.data.JsonStore', {
         fields: ['ID', 'PREDECLCODE', 'DECLARATIONCODE', 'CUSTOMSSTATUS', 'CODE', 'MODIFYFLAG', 'REPTIME', 'TRANSNAME', 'BUSIUNITCODE', 'CUSTOMERNAME', 'IETYPE',
                 'BUSIUNITNAME', 'PORTCODE', 'BLNO', 'REPWAYID', 'REPWAYNAME', 'DECLWAY', 'DECLWAYNAME', 'TRADEMETHOD', 'CONTRACTNO', 'GOODSNUM',
-                'GOODSNW', 'SHEETNUM', 'ORDERCODE', 'CUSNO', 'ASSOCIATENO', 'CORRESPONDNO', 'BUSITYPE', 'CONTRACTNOORDER', 'REPUNITNAME'
+                'GOODSNW', 'GOODSGW', 'SHEETNUM', 'ORDERCODE', 'CUSNO', 'ASSOCIATENO', 'CORRESPONDNO', 'BUSITYPE', 'CONTRACTNOORDER', 'REPUNITNAME'
                 , 'ORDERCODE_ASS', 'BUSIUNITCODE_ASS', 'BUSIUNITNAME_ASS'],
         pageSize: 22,
         proxy: {
@@ -472,7 +472,7 @@ function gridpanelBind() {
         { header: '贸易方式', dataIndex: 'TRADEMETHOD', width: 80 },
         { header: '合同协议号', dataIndex: 'CONTRACTNO', width: 110 },
         { header: '件数', dataIndex: 'GOODSNUM', width: 60 },
-        { header: '重量', dataIndex: 'GOODSNW', width: 60 },
+        { header: '重量', dataIndex: 'GOODSGW', width: 60 },
         { header: '张数', dataIndex: 'SHEETNUM', width: 60 },
         { header: '删改单', dataIndex: 'MODIFYFLAG', width: 60, renderer: render },
         { header: '订单编号', dataIndex: 'ORDERCODE', width: 100 },

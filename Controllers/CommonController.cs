@@ -1313,7 +1313,7 @@ namespace MvcPlatform.Controllers
 
 
             string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.ISPRINT,det.SHEETNUM,det.modifyflag,det.transname as pretransname,
-                              lda.declarationcode,to_char(lda.reptime,'yyyy-mm-dd') reptime,lda.contractno,lda.goodsnum,lda.goodsnw,lda.blno,
+                              lda.declarationcode,to_char(lda.reptime,'yyyy-mm-dd') reptime,lda.contractno,lda.goodsnum,lda.goodsnw,lda.goodsgw,lda.blno,
                               lda.transname,lda.voyageno,lda.portcode,
                               lda.trademethod,lda.declkind DECLWAY,lda.declkind DECLWAYNAME,  
                               ort.BUSITYPE,ort.CONTRACTNO CONTRACTNOORDER,ort.REPWAYID,ort.REPWAYID REPWAYNAME,ort.CUSNO,
@@ -3252,7 +3252,7 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["TRADEMETHOD"].ToString());
                     rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
                     rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
-                    rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
+                    rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["GOODSGW"].ToString());
                     rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
                     rowtemp.CreateCell(18).SetCellValue(getStatusName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
                     rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
@@ -3310,7 +3310,7 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["TRADEMETHOD"].ToString());
                     rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
                     rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
-                    rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
+                    rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["GOODSGW"].ToString());
                     rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
                     rowtemp.CreateCell(17).SetCellValue(getStatusName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
                     rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
@@ -3366,7 +3366,7 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["TRADEMETHOD"].ToString());
                     rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
                     rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
-                    rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
+                    rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["GOODSGW"].ToString());
                     rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString()); 
                     rowtemp.CreateCell(16).SetCellValue(getStatusName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
                     rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
@@ -3425,7 +3425,7 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["TRADEMETHOD"].ToString());
                     rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
                     rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
-                    rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
+                    rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["GOODSGW"].ToString());
                     rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
                     rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["CORRESPONDNO"].ToString());
                     rowtemp.CreateCell(19).SetCellValue(getStatusName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
@@ -3482,7 +3482,7 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["TRADEMETHOD"].ToString());
                     rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
                     rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
-                    rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
+                    rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["GOODSGW"].ToString());
                     rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
                     rowtemp.CreateCell(16).SetCellValue(getStatusName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
                     rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
@@ -3682,7 +3682,7 @@ namespace MvcPlatform.Controllers
             where += @" and lda.BUSIUNITCODE ='" + json_user.Value<string>("CUSTOMERHSCODE") + "' and ort.BUSITYPE not in('40','41')";
 
             string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.SHEETNUM,det.modifyflag,
-                              lda.declarationcode,to_char(lda.reptime,'yyyy-mm-dd') reptime,lda.contractno,lda.goodsnum,lda.goodsnw,lda.blno,
+                              lda.declarationcode,to_char(lda.reptime,'yyyy-mm-dd') reptime,lda.contractno,lda.goodsnum,lda.goodsnw,lda.goodsgw,lda.blno,
                               lda.transname,lda.voyageno,lda.busiunitcode,lda.busiunitname,lda.portcode,
                               lda.trademethod,lda.declkind DECLWAY,lda.declkind DECLWAYNAME,lda.REPUNITNAME,
                               ort.BUSITYPE,ort.CONTRACTNO CONTRACTNOORDER,ort.REPWAYID,ort.REPWAYID REPWAYNAME,ort.CUSNO,
@@ -3891,7 +3891,7 @@ namespace MvcPlatform.Controllers
             where += @" and lda.BUSIUNITCODE ='" + json_user.Value<string>("CUSTOMERHSCODE") + "' and ort.BUSITYPE in('40','41')";
 
             string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.SHEETNUM,det.modifyflag,
-                              lda.declarationcode,to_char(lda.reptime,'yyyy-mm-dd') reptime,lda.contractno,lda.goodsnum,lda.goodsnw,lda.blno,
+                              lda.declarationcode,to_char(lda.reptime,'yyyy-mm-dd') reptime,lda.contractno,lda.goodsnum,lda.goodsnw,lda.goodsgw,lda.blno,
                               lda.transname,lda.voyageno,lda.busiunitcode,lda.busiunitname,lda.portcode,
                               lda.trademethod,lda.declkind DECLWAY,lda.declkind DECLWAYNAME,lda.REPUNITNAME,
                               ort.BUSITYPE,ort.CONTRACTNO CONTRACTNOORDER,ort.REPWAYID,ort.REPWAYID REPWAYNAME,ort.CUSNO,
@@ -3990,7 +3990,7 @@ namespace MvcPlatform.Controllers
                 rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["TRADEMETHOD"].ToString());
                 rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
                 rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
-                rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
+                rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["GOODSGW"].ToString());
                 rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
                 rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
                 rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
@@ -4016,7 +4016,7 @@ namespace MvcPlatform.Controllers
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
-            string sql = QueryConditionDecl_E();
+            string sql = QueryConditionDecl_E_Domestic();
             sql = sql + " order by CREATETIME desc";
 
             DataTable dt_count = DBMgr.GetDataTable("select count(1) from (" + sql + ") a");
@@ -4082,7 +4082,7 @@ namespace MvcPlatform.Controllers
                 rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["TRADEMETHOD"].ToString());
                 rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
                 rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
-                rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["GOODSNW"].ToString());
+                rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["GOODSGW"].ToString());
                 rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
                 rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
                 rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["CUSNO"].ToString());

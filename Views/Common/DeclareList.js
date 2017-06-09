@@ -51,7 +51,7 @@ Ext.onReady(function () {
 
             var store = Ext.create('Ext.data.JsonStore', {
                 fields: ['ID', 'CODE', 'ORDERCODE', 'CUSTOMSSTATUS', 'ISPRINT', 'SHEETNUM', 'MODIFYFLAG', 'PRETRANSNAME',
-                        'DECLARATIONCODE', 'REPTIME', 'CONTRACTNO', 'GOODSNUM', 'GOODSNW', 'BLNO', 'TRANSNAME', 'VOYAGENO',
+                        'DECLARATIONCODE', 'REPTIME', 'CONTRACTNO', 'GOODSNUM', 'GOODSNW', 'GOODSGW', 'BLNO', 'TRANSNAME', 'VOYAGENO',
                         'BUSIUNITCODE', 'BUSIUNITNAME', 'PORTCODE', 'TRADEMETHOD', 'DECLWAY', 'DECLWAYNAME',
                         'BUSITYPE', 'CONTRACTNOORDER', 'REPWAYID', 'REPWAYNAME', 'TOTALNO', 'DIVIDENO', 'SECONDLADINGBILLNO',
                         'CUSNO', 'IETYPE', 'ASSOCIATENO', 'CORRESPONDNO', 'CUSTOMERNAME'],
@@ -118,7 +118,7 @@ Ext.onReady(function () {
                 { header: '贸易方式', dataIndex: 'TRADEMETHOD', width: 80 },
                 { header: '合同协议号', dataIndex: 'CONTRACTNO', width: 110 },
                 { header: '件数', dataIndex: 'GOODSNUM', width: 60 },
-                { header: '重量', dataIndex: 'GOODSNW', width: 60 },
+                { header: '重量', dataIndex: 'GOODSGW', width: 60 },
                 { header: '张数', dataIndex: 'SHEETNUM', width: 60 },
                 { header: '删改单', dataIndex: 'MODIFYFLAG', width: 60, renderer: render },
                 { header: '多单关联号', dataIndex: 'CORRESPONDNO', width: 100, hidden: busitypeid != '40-41' },//多单关联号
