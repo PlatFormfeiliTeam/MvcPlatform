@@ -21,14 +21,11 @@ namespace MvcPlatform.Controllers
         {
             string sql = "";
             Dictionary<string, DataTable> dic = new Dictionary<string, DataTable>();//新建字典
-            DataTable dt_type = new DataTable();
-            DataTable dt_notice = new DataTable();
-            DataTable dt_banner = new DataTable();
+            DataTable dt_type = new DataTable(); DataTable dt_notice = new DataTable();
+            DataTable dt_banner = new DataTable(); DataTable dt_infor_cate = new DataTable(); DataTable dt_infor = new DataTable();
 
             sql = "select id,name type from newscategory where pid is null order by sortindex,id";
             dt_type = DBMgr.GetDataTable(sql);
-
-            //'yyyy/mm/dd hh24:mi'
 
             sql = @"select *                        
                     from (
@@ -52,11 +49,17 @@ namespace MvcPlatform.Controllers
 
             sql = @"select ID,IMGURL,LINKURL,DESCRIPTION,STATUS,FILENAME,SORTINDEX from web_banner WHERE STATUS='true' order by SORTINDEX";
             dt_banner = DBMgr.GetDataTable(sql);
+            sql = @"select ID,ICON,NAME,DESCRIPTION from list_collect_infor_cate WHERE isinvalid=0 order by SORTINDEX";
+            dt_infor_cate = DBMgr.GetDataTable(sql);
 
-            dic.Add("dt_type", dt_type);
-            dic.Add("dt_notice", dt_notice);
+            sql = @"select a.NAME TYPENAME,b.*
+                    from list_collect_infor_cate a 
+                        left join (select * from list_collect_infor where isinvalid=0)b on a.id=b.rid_type 
+                    WHERE a.isinvalid=0  order by a.SORTINDEX";
+            dt_infor = DBMgr.GetDataTable(sql);
 
-            dic.Add("dt_banner", dt_banner);
+            dic.Add("dt_type", dt_type); dic.Add("dt_notice", dt_notice);
+            dic.Add("dt_banner", dt_banner); dic.Add("dt_infor_cate", dt_infor_cate); dic.Add("dt_infor", dt_infor);
 
             //ViewBag.navigator = "关务云>>首页";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);

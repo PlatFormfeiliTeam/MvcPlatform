@@ -294,6 +294,7 @@
 <link href="~/Content/outindex/changyong.css" rel="stylesheet" />
 <link href="~/Content/outindex/changyong2.css" rel="stylesheet" />
 
+
 <div class="" style="position: relative; height:380px">
     
     <div style="border-bottom: 1px solid #ccc; width: 1276px; margin: 0 auto;">
@@ -303,7 +304,43 @@
     <div class="servicesPop">
         <div id="serFocus">
             <div class="fr" style="position:relative;"><a href="javascript:void(0)" class="close" onclick="closeSerPop()">&nbsp;</a></div>
-            <div class="box" id="flash1">
+            @for (int h = 0, j = 1; h < Model["dt_infor_cate"].Rows.Count; h++, j++)
+            {
+                <div class="box" id=@Html.Raw("flash" + j)>
+                    <div class="title-bar"><i class="icon-truck"></i>@Model["dt_infor_cate"].Rows[h]["NAME"]</div>
+                    <div class="serTit">                              
+                        @foreach (var item in Model["dt_infor"].Select("rid_type=" + Model["dt_infor_cate"].Rows[h]["ID"]))
+	                    {
+		                    <div class="ir_25"><a href=@Html.Raw(item["url"])><img src=@Html.Raw(item["icon"])><p>@Html.Raw(item["NAME"])</p></a></div>
+	                    }
+                    </div>
+                </div>
+            }     
+
+            @*
+            @if (Model["dt_infor"].Rows.Count > 0)
+            {
+                type = Model["dt_infor"].Rows[0]["typename"].ToString();                
+                <div class="box" id="flash1">
+                    <div class="title-bar"><i class="icon-truck"></i>@Model["dt_infor"].Rows[0]["TYPENAME"]</div>
+                    <div class="serTit">    
+                        @for (int h = 0,j=1; h < Model["dt_infor"].Rows.Count; h++)
+                        {
+                            if (type != Model["dt_infor"].Rows[h]["typename"].ToString())
+                            {
+                                j++;
+                                type = Model["dt_infor"].Rows[h]["typename"].ToString();
+                                @Html.Raw("</div></div><div class=\"box\" id=\"flash" + j + "\">")                      
+                                <div class="title-bar"><i class="icon-truck"></i>@Model["dt_infor"].Rows[h]["TYPENAME"]</div>
+                                @Html.Raw("<div class=\"serTit\">")
+                            }
+                            <div class="ir_25"><a href=@Html.Raw(Model["dt_infor"].Rows[h]["url"])><img src=@Html.Raw(Model["dt_infor"].Rows[h]["icon"])><p>@Model["dt_infor"].Rows[h]["NAME"]</p></a></div>
+                        }
+                    </div>
+                </div>
+            }*@           
+
+            @*<div class="box" id="flash1">
                 <div class="title-bar"><i class="icon-truck"></i>基础信息</div>
                 <div class="serTit">
                     <div class="ir_25"><a href="/FrequentInfor/BaseCommodityHS"><img src="/images/changyong/tip1.png"><p>HS编码</p></a></div>
@@ -341,7 +378,7 @@
                     <div class="ir_25"><a href="#"><img src="/images/changyong/tip11.png"><p>进口许可</p></a></div>
                     <div class="ir_25"><a href="#"><img src="/images/changyong/tip12.png"><p>免表办理</p></a></div>
                 </div>
-            </div>
+            </div>*@
         </div>
         <div class="flash_bar">
             <span class="no" id="f1" onclick="changeflash(1)"></span>
@@ -352,37 +389,16 @@
     </div>
 
     <div id="servicesBox">
-        <div id="serBox1" class="serBox" onclick="serFocus(1)">
-            <div class="serBoxOn"></div>
-            <div class="pic1 mypng"><i class="iconfont" style="font-size: 105px;">&#xe630;</i></div>
-            <div class="pic2 mypng"><i class="iconfont" style="font-size: 105px; color:#007AFD;">&#xe630;</i></div>
-            <div class="txt1"><span class="tit">基础信息</span>HS编码，国检编码，白卡号信息的查询</div>
-            <div class="txt2"><span class="tit">基础信息</span>HS编码，国检编码，白卡号信息的查询</div>
-        </div>
-        <div class="fgH20"></div>
-        <div id="serBox2" class="serBox" onclick="serFocus(2)">
-            <div class="serBoxOn"></div>
-            <div class="pic1 mypng"><i class="iconfont" style="font-size: 105px;">&#xe660;</i></div>
-            <div class="pic2 mypng"><i class="iconfont" style="font-size: 105px; color:#007AFD;">&#xe660;</i></div>
-            <div class="txt1"><span class="tit">物流信息</span>船舶动态，航空动态，陆运信息的跟踪查询</div>
-            <div class="txt2"><span class="tit">物流信息</span>船舶动态，航空动态，陆运信息的跟踪查询</div>
-        </div>
-        <div class="fgH20"></div>
-        <div id="serBox3" class="serBox" onclick="serFocus(3)">
-            <div class="serBoxOn"></div>
-            <div class="pic1 mypng"><i class="iconfont" style="font-size: 105px;">&#xe668;</i></div>
-            <div class="pic2 mypng"><i class="iconfont" style="font-size: 105px; color:#007AFD;">&#xe668;</i></div>
-            <div class="txt1"><span class="tit">作业单信息</span>企业委托订单的进度跟踪查询，报关报检查询</div>
-            <div class="txt2"><span class="tit">作业单信息</span>企业委托订单的进度跟踪查询，报关报检查询</div>
-        </div>
-        <div class="fgH20"></div>
-        <div id="serBox4" class="serBox" onclick="serFocus(4)">
-            <div class="serBoxOn"></div>
-            <div class="pic1 mypng"><i class="iconfont" style="font-size: 105px;">&#xe606;</i></div>
-            <div class="pic2 mypng"><i class="iconfont" style="font-size: 105px; color:#007AFD;">&#xe606;</i></div>
-            <div class="txt1"><span class="tit">其他信息</span>常用工具下载，汇率，预录办理的相关信息</div>
-            <div class="txt2"><span class="tit">其他信息</span>常用工具下载，汇率，预录办理的相关信息</div>
-        </div>
+        @for (int h = 0, j = 1; h < Model["dt_infor_cate"].Rows.Count; h++,j++)
+        {
+            <div id=@Html.Raw("serBox" + j) class="serBox" onclick="serFocus(@j)">
+                <div class="serBoxOn"></div>
+                <div class="pic1 mypng"><i class="iconfont" style="font-size: 105px;">@Html.Raw("&#x" + Model["dt_infor_cate"].Rows[h]["ICON"] + ";")</i></div>
+                <div class="pic2 mypng"><i class="iconfont" style="font-size: 105px; color:#007AFD;">@Html.Raw("&#x" + Model["dt_infor_cate"].Rows[h]["ICON"] + ";")</i></div>
+                <div class="txt1"><span class="tit">@Model["dt_infor_cate"].Rows[h]["NAME"]</span>@Model["dt_infor_cate"].Rows[h]["DESCRIPTION"]</div>
+                <div class="txt2"><span class="tit">@Model["dt_infor_cate"].Rows[h]["NAME"]</span>@Model["dt_infor_cate"].Rows[h]["DESCRIPTION"]</div>
+            </div>
+        }        
     </div>
 </div>
 
