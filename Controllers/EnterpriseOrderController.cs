@@ -1593,6 +1593,14 @@ namespace MvcPlatform.Controllers
             return "{newfilepath:\"" + newfilename + "\"}";
         }
 
+        public void updatePrintStatus()
+        {
+           string ID= Request["ID"];
+           string sql = "update ENT_ORDER set PRINTSTATUS='1' where ID = '" + ID + "'";
+           DBMgr.ExecuteNonQuery(sql);
+
+        }
+
 
     }
 }
