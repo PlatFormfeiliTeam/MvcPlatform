@@ -311,7 +311,7 @@
                     <div class="serTit">                              
                         @foreach (var item in Model["dt_infor"].Select("rid_type=" + Model["dt_infor_cate"].Rows[h]["ID"]))
 	                    {
-		                    <div class="ir_25"><a href=@Html.Raw(item["url"])><img src=@Html.Raw(item["icon"])><p>@Html.Raw(item["NAME"])</p></a></div>
+		                    <div class="ir_25"><a href=@Html.Raw(item["url"])><img src=@Html.Raw(AdminUrl+item["icon"])><p>@Html.Raw(item["NAME"])</p></a></div>
 	                    }
                     </div>
                 </div>
