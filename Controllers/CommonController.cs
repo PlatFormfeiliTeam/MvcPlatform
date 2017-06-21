@@ -16,8 +16,6 @@ using System.Web;
 using System.Web.Mvc;
 using System.Diagnostics;
 using System.Runtime.InteropServices.ComTypes;
-using ICSharpCode.SharpZipLib.Zip;
-using ICSharpCode.SharpZipLib.Core;
 using MvcPlatform.WsZip;
 
 namespace MvcPlatform.Controllers
