@@ -12,7 +12,7 @@ Ext.onReady(function () {
     var tmp = new Ext.XTemplate(
    '<tpl for=".">',
    '<div class="panel panel-default thumb-wrap fl" style="margin-top:5px;margin-left:5px;width:95px;text-align:center;cursor:pointer">',
-   '<div class="panel-body" style="text-align:center;padding:0px"><img src="{[values.ICON]}"/></div>',
+   '<div class="panel-body" style="text-align:center;padding:0px"><img src="' + url + '{[values.ICON]}"/></div>',
    '<div class="panel-heading" style=" text-align:center;padding:5px 10px;">{[values.NAME]}</div>',
    '</div>',
    '</tpl>',
@@ -153,7 +153,7 @@ function addItem() {
     var tmp_tool = new Ext.XTemplate(
               '<tpl for=".">',
               '<div id="tpl_div_{[values.RID]}" class="panel panel-default thumb-wrap fl" style="margin-top:5px;margin-left:5px;width:95px;text-align:center;cursor:pointer">',
-              '<div class="panel-body" style="text-align:center;padding:0px"><img src="{[values.ICON]}"/></div>',
+              '<div class="panel-body" style="text-align:center;padding:0px"><img src="' + url + '{[values.ICON]}"/></div>',
               '<div class="panel-heading" style=" text-align:center;padding:5px 10px;">{[values.NAME]}</div>',
               '</div>',
               '</tpl>');
@@ -161,7 +161,7 @@ function addItem() {
               '<div style="padding-top:5px;width:100%;height:30px;background:#d9e4ec;text-align:center;color:#7a8693">已添加收藏</div>',
               '<tpl for=".">',
               '<div id="tpl_div_{[values.RID]}" class="panel panel-default thumb-wrap fl" style="margin-top:5px;margin-left:5px;width:95px;text-align:center;cursor:pointer">',
-              '<div class="panel-body" style="text-align:center;padding:0px"><img src="{[values.ICON]}"/></div>',
+              '<div class="panel-body" style="text-align:center;padding:0px"><img src="' + url + '{[values.ICON]}"/></div>',
               '<div class="panel-heading" style=" text-align:center;padding:5px 10px;">{[values.NAME]}</div>',
               '</div>',
               '</tpl>',
