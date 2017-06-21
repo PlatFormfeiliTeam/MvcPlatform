@@ -614,3 +614,28 @@ function ExportDecl() {
         }
     });
 }
+function ExportDeclFile() {
+    var recs = Ext.getCmp('declare_grid').getSelectionModel().getSelection();
+    if (recs.length == 0) {
+        Ext.MessageBox.alert('提示', '请选择需要导出的记录！');
+        return;
+    }
+    var codelist = Ext.encode(Ext.pluck(Ext.pluck(recs, 'data'), 'CODE'));
+
+    var formtemp = new Ext.form.BasicForm(Ext.get('exportfileform'));
+    formtemp.submit({
+        waitTitle: '请稍后...',
+        waitMsg: '正在下载,请稍后...',
+        url: '/Common/ExportDeclFile',
+        method: 'post',
+        params: { codelist: codelist },
+        success: function (form, action) {
+            window.location.href = action.result.url;
+        },
+        failure: function (form, action) {
+
+        }
+
+    });
+
+}

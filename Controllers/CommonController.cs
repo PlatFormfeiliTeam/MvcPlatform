@@ -16,6 +16,9 @@ using System.Web;
 using System.Web.Mvc;
 using System.Diagnostics;
 using System.Runtime.InteropServices.ComTypes;
+using ICSharpCode.SharpZipLib.Zip;
+using ICSharpCode.SharpZipLib.Core;
+using MvcPlatform.WsZip;
 
 namespace MvcPlatform.Controllers
 {
@@ -4205,5 +4208,13 @@ namespace MvcPlatform.Controllers
             return Extension.getPathname("报检单文件.xls", book);
         }
 
+        public string ExportDeclFile()
+        {
+            string codelist = Request["codelist"].Replace("[", "(").Replace("]", ")").Replace("\"", "'");
+            WsZip.WsZip wz = new WsZip.WsZip();
+            string url= wz.getZipFile(codelist);
+            return "{success:true,url:\""+url+"\"}";
+        
+        }
     }
 }

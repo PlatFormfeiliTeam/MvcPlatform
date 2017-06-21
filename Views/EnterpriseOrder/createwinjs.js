@@ -226,6 +226,7 @@ function form_ini() {
     var combo_CUSTOMDISTRICTNAME = Ext.create('Ext.form.field.ComboBox', {//申报关区 这个数据比较多需要根据输入字符到后台动态模糊匹配
         name: 'CUSTOMDISTRICTCODE',
         store: store_CUSTOMDISTRICTNAME,
+        forceSelection: true,
         fieldLabel: '申报关区',
         displayField: 'NAME',
         valueField: 'CODE',
