@@ -630,7 +630,7 @@ function ExportDeclFile() {
         method: 'post',
         params: { codelist: codelist },
         success: function (form, action) {
-            window.location.href = action.result.url;
+            window.location.href = url+action.result.url;
         },
         failure: function (form, action) {
 
