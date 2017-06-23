@@ -123,8 +123,23 @@
 </div>
 <script type="text/javascript">
     function shownotice(id) {
-        //window.location.href = "/Home/IndexNoticeDetail?id=" + id;
-        window.open("/Home/IndexNoticeDetail?id=" + id);
+        //window.open("/Home/IndexNoticeDetail?id=" + id);
+
+        $.ajax({
+            type: 'Post',
+            url: "/Home/Encrypt",
+            dataType: "text",
+            async: false,
+            data:{para:"id=" + id},
+            success: function (data) {
+                window.open("/Home/IndexNoticeDetail?" + data);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {//请求失败处理函数
+                //alert(XMLHttpRequest.status);
+                //alert(XMLHttpRequest.readyState);
+                //alert(textStatus);
+            }
+        });
     }
 
     /***滚动

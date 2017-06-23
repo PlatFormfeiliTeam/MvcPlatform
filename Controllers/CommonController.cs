@@ -26,10 +26,11 @@ namespace MvcPlatform.Controllers
         int totalProperty = 0;
         string AdminUrl = ConfigurationManager.AppSettings["AdminUrl"];
 
-        public ActionResult DeclareList()//报关单管理
+        [Filters.DecodeFilter]
+        public ActionResult DeclareList(string busitypeid)//报关单管理
         {
 
-            switch (Request["busitypeid"].ToString())
+            switch (busitypeid)
             {
                 case "11":
                     ViewBag.navigator = "空进订单>>报关单管理";
@@ -82,9 +83,11 @@ namespace MvcPlatform.Controllers
         {
             return View();
         }
-        public ActionResult InspectList()//报检单管理
+
+        [Filters.DecodeFilter]
+        public ActionResult InspectList(string busitypeid)//报检单管理
         {
-            switch (Request["busitypeid"].ToString())
+            switch (busitypeid)
             {
                 case "11":
                     ViewBag.navigator = "空进订单>>报检单管理";

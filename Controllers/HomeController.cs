@@ -239,6 +239,7 @@ namespace MvcPlatform.Controllers
 
         #endregion
 
+        [Filters.DecodeFilter]
         public ActionResult IndexNoticeDetail(string ID)
         {
             Dictionary<string, DataTable> dic = new Dictionary<string, DataTable>();//新建字典
@@ -317,7 +318,21 @@ namespace MvcPlatform.Controllers
                             }
                             else
                             {
-                                result += "<li><a href=\"" + icon + dt2.Rows[j]["URL"] + "\">" + dt2.Rows[j]["NAME"] + "</a>";
+                                //result += "<li><a href=\"" + icon + dt2.Rows[j]["URL"] + "\">" + dt2.Rows[j]["NAME"] + "</a>";
+                                //result += "<li><a href=\"" + dt2.Rows[j]["URL"] + "\">" + icon + dt2.Rows[j]["NAME"] + "</a>";
+
+                                if ( dt2.Rows[j]["URL"].ToString().IndexOf("?")>0)
+                                {
+                                    result += "<li><a href=\""
+                                        + dt2.Rows[j]["URL"].ToString().Substring(0, dt2.Rows[j]["URL"].ToString().IndexOf("?") + 1)
+                                        + DecodeBase.Encrypt(dt2.Rows[j]["URL"].ToString().Substring(dt2.Rows[j]["URL"].ToString().IndexOf("?") + 1))
+                                        + "\">" + icon + dt2.Rows[j]["NAME"] + "</a>";
+                                }
+                                else
+                                {
+                                    result += "<li><a href=\"" + dt2.Rows[j]["URL"] + "\">" + icon + dt2.Rows[j]["NAME"] + "</a>";
+                                }
+
                             }
                             sql = @"select MODULEID,NAME,PARENTID,URL,SORTINDEX,IsLeaf,ICON from sysmodule t where t.parentid='{0}' 
                             and t.MODULEID IN (select MODULEID FROM sys_moduleuser where userid='{1}') order by sortindex";
@@ -339,7 +354,18 @@ namespace MvcPlatform.Controllers
                                     }
                                     else
                                     {
-                                        result += "<li><a href=\"" + dt3.Rows[k]["URL"] + "\">" + icon + dt3.Rows[k]["NAME"] + "</a></li>";
+                                        //result += "<li><a href=\"" + dt3.Rows[k]["URL"] + "\">" + icon + dt3.Rows[k]["NAME"] + "</a></li>";
+                                        if (dt3.Rows[k]["URL"].ToString().IndexOf("?") > 0)
+                                        {
+                                            result += "<li><a href=\""
+                                                + dt3.Rows[k]["URL"].ToString().Substring(0, dt3.Rows[k]["URL"].ToString().IndexOf("?") + 1)
+                                                + DecodeBase.Encrypt(dt3.Rows[k]["URL"].ToString().Substring(dt3.Rows[k]["URL"].ToString().IndexOf("?") + 1))
+                                                + "\">" + icon + dt3.Rows[k]["NAME"] + "</a>";
+                                        }
+                                        else
+                                        {
+                                            result += "<li><a href=\"" + dt3.Rows[k]["URL"] + "\">" + icon + dt3.Rows[k]["NAME"] + "</a>";
+                                        }
                                     }
                                 }
                                 result += "</ul></li>";
@@ -358,6 +384,17 @@ namespace MvcPlatform.Controllers
                 }
             }
             return result;
+        }
+
+
+
+        public string Encrypt()//进行DES加密。
+        {
+            return DecodeBase.Encrypt(Request["para"].ToString());
+        }
+        public string Decrypt()//进行DES解密。
+        {
+            return DecodeBase.Decrypt(Request["para"].ToString());
         }
     }
 }

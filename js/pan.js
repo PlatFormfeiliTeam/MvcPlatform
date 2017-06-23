@@ -19,7 +19,28 @@ function getQueryString(name) {
     if (r != null) return unescape(r[2]); return null;
 }
 
-
+function getQueryString_new(name) {
+    var QueryString;
+    $.ajax({
+        type: 'Post',
+        url: "/Home/Decrypt",
+        dataType: "text",
+        async: false,
+        data: { para: window.location.search.substr(1) },
+        success: function (data) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+            var r = data.match(reg);
+            if (r != null) { QueryString = unescape(r[2]); }
+            else { QueryString = null; }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {//请求失败处理函数
+            //alert(XMLHttpRequest.status);
+            //alert(XMLHttpRequest.readyState);
+            //alert(textStatus);
+        }
+    });
+    return QueryString;
+}
 
 //ENTER实现TAB功能
 var maximumformpaneltabIndexi = 1;

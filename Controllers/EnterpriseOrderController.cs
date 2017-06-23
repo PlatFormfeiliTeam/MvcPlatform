@@ -74,6 +74,7 @@ namespace MvcPlatform.Controllers
             return View();
         }
 
+         [Filters.DecodeFilter]
         public ActionResult ListOrder_Index(string busitypeid)  
         {
             switch (busitypeid)

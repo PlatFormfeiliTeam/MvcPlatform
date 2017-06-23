@@ -347,8 +347,29 @@ function render(value, cellmeta, record, rowIndex, columnIndex, store) {
     var dataindex = cellmeta.column.dataIndex;
     switch (dataindex) {
         case "TITLE":
-            rtn = "<a href='/Home/IndexNoticeDetail?id=" + record.get("RID") + "' target='_blank'>" + record.get("TITLE") + "</a>";
+            //rtn = "<a href='/Home/IndexNoticeDetail?id=" + record.get("RID") + "' target='_blank'>" + record.get("TITLE") + "</a>";
+            rtn = "<a style='cursor: pointer;' onclick=shownotice(" + record.get("RID") + ") target='_blank'>" + record.get("TITLE") + "</a>";
             break;
     }
     return rtn;
+}
+
+function shownotice(id) {
+    //window.open("/Home/IndexNoticeDetail?id=" + id);
+
+    $.ajax({
+        type: 'Post',
+        url: "/Home/Encrypt",
+        dataType: "text",
+        async: false,
+        data: { para: "id=" + id },
+        success: function (data) {
+            window.open("/Home/IndexNoticeDetail?" + data);
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {//请求失败处理函数
+            //alert(XMLHttpRequest.status);
+            //alert(XMLHttpRequest.readyState);
+            //alert(textStatus);
+        }
+    });
 }

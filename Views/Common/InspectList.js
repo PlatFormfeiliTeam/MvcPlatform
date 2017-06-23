@@ -1,5 +1,5 @@
 ﻿//=======================================================JS init begin======================================================
-var busitypeid = getQueryString("busitypeid"); var role = getQueryString("role");
+var busitypeid = getQueryString_new("busitypeid"); var role = getQueryString_new("role");
 var pgbar; var store_busitype, store_insptradeway, store_modifyflag;
 var common_data_jydw = [], common_data_inspmyfs = [];
 

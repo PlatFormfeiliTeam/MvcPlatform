@@ -2,7 +2,7 @@
 var busitypeid;
 var store_busitype; var store_sbfs;
 Ext.onReady(function () {
-    busitypeid = getQueryString("busitypeid");
+    busitypeid = getQueryString_new("busitypeid");
     var busitype = "";
     var columns_order = [];
     switch (busitypeid) {

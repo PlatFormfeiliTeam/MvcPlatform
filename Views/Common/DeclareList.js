@@ -1,7 +1,7 @@
 ﻿//=======================================================JS init begin======================================================
 
 //传参示例 /Common/DeclareList?busitypeid=11&role=customer   
-var busitypeid = getQueryString("busitypeid"); var role = getQueryString("role");
+var busitypeid = getQueryString_new("busitypeid"); var role = getQueryString_new("role");
 var pgbar; var store_sbfs; var store_bgfs; var store_busitype; var store_modifyflag;
 var common_data_jydw = [], common_data_sbfs = [], common_data_bgfs = [];
 var busitype = "";

@@ -37,6 +37,24 @@
             }
         });
     }
+
+    function shownotice(id) {
+        $.ajax({
+            type: 'Post',
+            url: "/Home/Encrypt",
+            dataType: "text",
+            async: false,
+            data: { para: "id=" + id },
+            success: function (data) {
+                window.location.href = "/Home/IndexNoticeDetail?" + data;
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {//请求失败处理函数
+                //alert(XMLHttpRequest.status);
+                //alert(XMLHttpRequest.readyState);
+                //alert(textStatus);
+            }
+        });
+    }
 </script>
 <div style="overflow:hidden;">
     <img src="/Images/zxdt_header.png" alt="" />
@@ -109,7 +127,8 @@
         上一篇：
         @if (Model["dt_notice_pre"].Rows.Count > 0)
         {
-            <a href="@Html.Raw("/Home/IndexNoticeDetail?id=" + Model["dt_notice_pre"].Rows[0]["id"])" target="_self">
+            @*<a href="@Html.Raw("/Home/IndexNoticeDetail?id=" + Model["dt_notice_pre"].Rows[0]["id"])" target="_self">*@
+            <a style="cursor: pointer;" onclick=shownotice(@Html.Raw(Model["dt_notice_pre"].Rows[0]["id"]))>
                 @Html.Raw(Model["dt_notice_pre"].Rows[0]["title"].ToString())
             </a>
         }
@@ -121,7 +140,8 @@
         下一篇：
         @if (Model["dt_notice_next"].Rows.Count > 0)
         {
-            <a href="@Html.Raw("/Home/IndexNoticeDetail?id=" + Model["dt_notice_next"].Rows[0]["id"])" target="_self">
+            @*<a href="@Html.Raw("/Home/IndexNoticeDetail?id=" + Model["dt_notice_next"].Rows[0]["id"])" target="_self">*@
+            <a style="cursor: pointer;" onclick=shownotice(@Html.Raw(Model["dt_notice_next"].Rows[0]["id"]))>
                 @Html.Raw(Model["dt_notice_next"].Rows[0]["title"].ToString())
             </a>
         }
