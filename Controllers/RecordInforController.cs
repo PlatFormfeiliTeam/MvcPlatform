@@ -1317,8 +1317,8 @@ namespace MvcPlatform.Controllers
 
         public string loadRecordDetail_SUM_D()
         {
-            string sql = Query_RecordDetail_SUM_D(); 
-            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "aa.reptime", "desc"));
+            string sql = Query_RecordDetail_SUM_D();
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "aa.reptime desc,aa.declarationcode", "desc"));
 
             IsoDateTimeConverter iso = new IsoDateTimeConverter();
             iso.DateTimeFormat = "yyyy-MM-dd";      
@@ -1384,7 +1384,7 @@ namespace MvcPlatform.Controllers
             string filename = "申报数量明细.xls";
 
             sql = Query_RecordDetail_SUM_D();
-            sql = sql + " order by aa.reptime desc";
+            sql = sql + " order by aa.reptime desc,aa.declarationcode desc";
 
             DataTable dt_count = DBMgr.GetDataTable("select count(1) from (" + sql + ") a");
             int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
@@ -1406,7 +1406,7 @@ namespace MvcPlatform.Controllers
                 rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["REPUNITNAME"].ToString());
                 rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["CUSTOMSSTATUS"].ToString());
                 rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["DECLARATIONCODE"].ToString());
-                rowtemp.CreateCell(3).SetCellValue(GetName(dt.Rows[i]["CADQUANTITY"].ToString(), UNIT));
+                rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CADQUANTITY"].ToString());
                 rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["TOTALPRICE"].ToString());
                 rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["REPTIME"].ToString());
                 rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["COMMODITYNO"].ToString());
