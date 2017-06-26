@@ -662,7 +662,7 @@ function ExportDeclFile(arg) {
                         window.location.href = url + action.result.url;
                     },
                     failure: function (form, action) {
-
+                        Ext.MessageBox.alert('提示', '下载失败，请确认文件是否确实存在！');
                     }
 
                 });
