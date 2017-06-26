@@ -599,29 +599,64 @@ function ExportDecl() {
         }
     });
 }
-function ExportDeclFile()
+function ExportDeclFile(arg)
 {
-    var recs = Ext.getCmp('declare_grid').getSelectionModel().getSelection();
-    if (recs.length == 0) {
-        Ext.MessageBox.alert('提示', '请选择需要导出的记录！');
-        return;
-    }
-    var codelist = Ext.encode(Ext.pluck(Ext.pluck(recs, 'data'), 'CODE'));
-
-    var formtemp = new Ext.form.BasicForm(Ext.get('exportfileform'));
-    formtemp.submit({
-        waitTitle: '请稍后...',
-        waitMsg: '正在下载,请稍后...',
-        url: '/Common/ExportDeclFile',
-        method: 'post',
-        params: { codelist: codelist },
-        success: function (form, action) {
-            window.location.href = url+action.result.url;
-        },
-        failure: function (form, action) {
-          
+    var recs
+    if (arg == 'select') {
+       recs = Ext.getCmp('declare_grid').getSelectionModel().getSelection();
+        if (recs.length == 0) {
+            Ext.MessageBox.alert('提示', '请选择需要导出的记录！');
+            return;
         }
+        //var codelist = Ext.encode(Ext.pluck(Ext.pluck(recs, 'data'), 'CODE'));
+        var codelist = Ext.encode(Ext.pluck(recs, 'data'));
 
-    });
+        var formtemp = new Ext.form.BasicForm(Ext.get('exportfileform'));
+        formtemp.submit({
+            waitTitle: '请稍后...',
+            waitMsg: '正在下载,请稍后...',
+            url: '/Common/ExportDeclFile',
+            method: 'post',
+            params: { codelist: codelist },
+            success: function (form, action) {
+                window.location.href = url + action.result.url;
+            },
+            failure: function (form, action) {
+
+                Ext.MessageBox.alert('提示', '下载失败，请确认文件是否确实存在！');
+            }
+
+        });
+    }
+    else {
+   
+        Ext.MessageBox.confirm("提示", "全部导出时可能因为文件过多而下载缓慢，确定导出吗？", function (btn) {
+            if (btn == 'yes') {
+              
+                recs = Ext.getCmp('declare_grid').store.data.items;
+                //var codelist = Ext.encode(Ext.pluck(Ext.pluck(recs, 'data'), 'CODE'));
+                var codelist = Ext.encode(Ext.pluck(recs, 'data'));
+
+                var formtemp = new Ext.form.BasicForm(Ext.get('exportfileform'));
+                formtemp.submit({
+                    waitTitle: '请稍后...',
+                    waitMsg: '正在下载,请稍后...',
+                    url: '/Common/ExportDeclFile',
+                    method: 'post',
+                    params: { codelist: codelist },
+                    success: function (form, action) {
+                        window.location.href = url + action.result.url;
+                    },
+                    failure: function (form, action) {
+
+                    }
+
+                });
+            }
+        });
+
+    }
+  
+
 
 }

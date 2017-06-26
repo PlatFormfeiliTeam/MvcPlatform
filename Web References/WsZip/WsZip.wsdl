@@ -5,7 +5,8 @@
       <s:element name="getZipFile">
         <s:complexType>
           <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="codelist" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="filedata" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="customer" type="s:string" />
           </s:sequence>
         </s:complexType>
       </s:element>

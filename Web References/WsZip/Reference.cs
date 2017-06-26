@@ -74,24 +74,26 @@ namespace MvcPlatform.WsZip {
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://tempuri.org/getZipFile", RequestNamespace="http://tempuri.org/", ResponseNamespace="http://tempuri.org/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string getZipFile(string codelist) {
+        public string getZipFile(string filedata, string customer) {
             object[] results = this.Invoke("getZipFile", new object[] {
-                        codelist});
+                        filedata,
+                        customer});
             return ((string)(results[0]));
         }
         
         /// <remarks/>
-        public void getZipFileAsync(string codelist) {
-            this.getZipFileAsync(codelist, null);
+        public void getZipFileAsync(string filedata, string customer) {
+            this.getZipFileAsync(filedata, customer, null);
         }
         
         /// <remarks/>
-        public void getZipFileAsync(string codelist, object userState) {
+        public void getZipFileAsync(string filedata, string customer, object userState) {
             if ((this.getZipFileOperationCompleted == null)) {
                 this.getZipFileOperationCompleted = new System.Threading.SendOrPostCallback(this.OngetZipFileOperationCompleted);
             }
             this.InvokeAsync("getZipFile", new object[] {
-                        codelist}, this.getZipFileOperationCompleted, userState);
+                        filedata,
+                        customer}, this.getZipFileOperationCompleted, userState);
         }
         
         private void OngetZipFileOperationCompleted(object arg) {

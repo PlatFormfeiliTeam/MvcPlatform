@@ -4211,10 +4211,22 @@ namespace MvcPlatform.Controllers
 
         public string ExportDeclFile()
         {
-            string codelist = Request["codelist"].Replace("[", "(").Replace("]", ")").Replace("\"", "'");
+            //string codelist = Request["codelist"].Replace("[", "(").Replace("]", ")").Replace("\"", "'");
+            string codelist = Request["codelist"];
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string customer = json_user.Value<string>("CUSTOMERID");
             WsZip.WsZip wz = new WsZip.WsZip();
-            string url= wz.getZipFile(codelist);
-            return "{success:true,url:\""+url+"\"}";
+            string url = wz.getZipFile(codelist, customer);
+            if (url == "error")
+            {
+                return "{success:false}";
+            }
+            else
+            {
+                return "{success:true,url:\"" + url + "\"}";
+            
+            }
+           
         
         }
     }
