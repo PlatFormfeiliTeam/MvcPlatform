@@ -1,7 +1,10 @@
 ﻿@using Webdiyer.WebControls.Mvc;
 @using MvcPlatform.Models;
 @model PagedList<Web_Notice>
-<link href="~/Content/outindex/indexnotice_m.css" rel="stylesheet" />
+@{
+    string Version = System.Configuration.ConfigurationManager.AppSettings["Version"];
+    }
+<link href="~/Content/outindex/indexnotice_m.css?t=@Version" rel="stylesheet" />
 <script>
     function shownotice(id) {
         //window.open("/Home/IndexNoticeDetail?id=" + id);

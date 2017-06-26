@@ -7,8 +7,9 @@
 @{
     ViewBag.Title = "IndexNotice";
     Layout = "~/Views/Shared/_Layout_home.cshtml";
+    string Version = System.Configuration.ConfigurationManager.AppSettings["Version"];
 }
-<link href="~/Content/outindex/indexnotice.css" rel="stylesheet" />
+<link href="~/Content/outindex/indexnotice.css?t=@Version" rel="stylesheet" />
 
 <script type="text/javascript">
     // JS实现选项卡切换

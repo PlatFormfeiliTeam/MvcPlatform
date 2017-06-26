@@ -1,13 +1,15 @@
 ﻿@{
     ViewBag.Title = "OrderTrack";
     Layout = "~/Views/Shared/Empty.cshtml";
+    string Version = System.Configuration.ConfigurationManager.AppSettings["Version"];
 }
 <link href="/js/Extjs42/resources/css/ext-all.css" rel="stylesheet" />
 <script src="/js/Extjs42/bootstrap.js" type="text/javascript"></script>
-<script src="/js/pan.js" type="text/javascript"></script>
 <link href="/css/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
-<script src="~/js/commondata.js"></script>
 <script src="/js/echart/echarts-all.js"></script>
+
+<script src="/js/pan.js?t=@Version" type="text/javascript"></script>
+<script src="~/js/commondata.js?t=@Version"></script>
 <style type="text/css">
     .pie {
         float: left;

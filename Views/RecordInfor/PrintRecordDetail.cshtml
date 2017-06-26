@@ -1,14 +1,15 @@
 ﻿@{
     ViewBag.Title = "PrintRecordDetail";
     Layout = "~/Views/Shared/Empty.cshtml";
+    string Version = System.Configuration.ConfigurationManager.AppSettings["Version"];
 }
 <link href="/js/Extjs42/resources/css/ext-all-gray.css" rel="stylesheet" type="text/css" />
 <script src="/js/Extjs42/bootstrap.js" type="text/javascript"></script>
 <link href="~/css/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
 <script src="~/barcode/jquery-printTable-1.0.js"></script>
 <script src="~/barcode/jquery.jPrintArea.js"></script>
-<script src="~/js/pan.js"></script>
-<script src="~/js/RecordData.js"></script>
+<script src="~/js/pan.js?t=@Version"></script>
+<script src="~/js/RecordData.js?t=@Version"></script>
 
 
 

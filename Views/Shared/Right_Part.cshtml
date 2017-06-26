@@ -1,6 +1,9 @@
-﻿<!--右侧悬浮-->
-<script src="~/js/OutJs/top.js"></script>
-<link href="~/Content/outindex/float.css" rel="stylesheet" />
+﻿@{
+    string Version = System.Configuration.ConfigurationManager.AppSettings["Version"];
+}
+<!--右侧悬浮-->
+<script src="~/js/OutJs/top.js?t=@Version"></script>
+<link href="~/Content/outindex/float.css?t=@Version" rel="stylesheet" />
 <div class="floating_ck">
     <div class="kfleft" title="点击查看联系方式"></div>
     <dl>

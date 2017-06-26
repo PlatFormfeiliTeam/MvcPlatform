@@ -3,6 +3,7 @@
     string type = "";
     int count = 0;
     string AdminUrl = System.Configuration.ConfigurationManager.AppSettings["AdminUrl"];
+    string Version = System.Configuration.ConfigurationManager.AppSettings["Version"];
 }
 
 @{
@@ -69,8 +70,8 @@
 </div>
 
 <!---TAB-->
-<script src="~/js/OutJs/zxdt.js"></script>
-<link href="~/Content/outindex/zxdt.css" rel="stylesheet" />
+<script src="~/js/OutJs/zxdt.js?t=@Version"></script>
+<link href="~/Content/outindex/zxdt.css?t=@Version" rel="stylesheet" />
 <div class="lanrenzhijia">
     <div class="title cf">
         <h2 class="fl">资讯动态</h2>
@@ -159,10 +160,10 @@
 </script>
 
 
-<link href="~/Content/outindex/zhongjian.css" rel="stylesheet" />
-<link href="~/Content/outindex/zhongjian2.css" rel="stylesheet" />
-<link href="~/Content/outindex/zhongjian3.css" rel="stylesheet" />
-<link href="~/Content/outindex/zhongjian4.css" rel="stylesheet" />
+<link href="~/Content/outindex/zhongjian.css?t=@Version" rel="stylesheet" />
+<link href="~/Content/outindex/zhongjian2.css?t=@Version" rel="stylesheet" />
+<link href="~/Content/outindex/zhongjian3.css?t=@Version" rel="stylesheet" />
+<link href="~/Content/outindex/zhongjian4.css?t=@Version" rel="stylesheet" />
 
 
 @*中间层*@
@@ -270,7 +271,7 @@
         </ul>
     </div>
 </div>
-<script src="~/js/OutJs/bxslider.js"></script>
+<script src="~/js/OutJs/bxslider.js?t=@Version"></script>
 <script type="text/javascript">
     //手风琴切换
     var $list = $("#accordion li"),
@@ -306,8 +307,8 @@
 
 
 @*常用信息*@
-<link href="~/Content/outindex/changyong.css" rel="stylesheet" />
-<link href="~/Content/outindex/changyong2.css" rel="stylesheet" />
+<link href="~/Content/outindex/changyong.css?t=@Version" rel="stylesheet" />
+<link href="~/Content/outindex/changyong2.css?t=@Version" rel="stylesheet" />
 
 
 <div class="" style="position: relative; height:380px">
