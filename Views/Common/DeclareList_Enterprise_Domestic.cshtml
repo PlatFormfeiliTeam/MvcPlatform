@@ -21,7 +21,8 @@
     <div>
         <div class="btn-group" role="group">
             <form id="exportfileform" name="fileform" enctype="multipart/form-data" method="post" style="display:inline-block">
-                <button type="button" id="btn_Export" class="btn btn-primary btn-sm" onclick="ExportDeclFile()"><i class="fa fa-level-down"></i>&nbsp;导出报关单文件</button>
+                <button type="button" id="btn_Export" class="btn btn-primary btn-sm" onclick="ExportDeclFile('select')"><i class="fa fa-level-down"></i>&nbsp;导出所选报关单文件</button>
+                <button type="button" id="btn_Export" class="btn btn-primary btn-sm" onclick="ExportDeclFile('all')"><i class="fa fa-level-down"></i>&nbsp;导出全部报关单文件</button>
             </form>
         </div>
         <div class="btn-group fr" role="group">
