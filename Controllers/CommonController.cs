@@ -3516,6 +3516,18 @@ namespace MvcPlatform.Controllers
             return "{rows:" + json + ",total:" + totalProperty + "}";
         }
 
+        //导出全部报关单文件
+        public string LoadDeclarationList_E_all()
+        {
+            string sql = QueryConditionDecl_E();
+
+            DataTable dt = DBMgr.GetDataTable(sql);
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            var json = JsonConvert.SerializeObject(dt, iso);
+            totalProperty = dt.Rows.Count;
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
         public string QueryConditionDecl_E()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
@@ -3716,6 +3728,19 @@ namespace MvcPlatform.Controllers
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             var json = JsonConvert.SerializeObject(dt, iso);
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
+       //导出全部报关单文件
+        public string LoadDeclarationList_E_Domestic_all()
+        {
+            string sql = QueryConditionDecl_E_Domestic();
+
+            DataTable dt = DBMgr.GetDataTable(sql);
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            var json = JsonConvert.SerializeObject(dt, iso);
+            totalProperty = dt.Rows.Count;
             return "{rows:" + json + ",total:" + totalProperty + "}";
         }
 

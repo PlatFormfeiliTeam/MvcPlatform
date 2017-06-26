@@ -2,7 +2,7 @@
 
 //传参示例 /Common/DeclareList?busitypeid=11&module=ddzx&role=customer
 
-var pgbar; var store_sbfs; var store_bgfs; var store_busitype; var store_modifyflag;
+var pgbar; var store_sbfs; var store_bgfs; var store_busitype; var store_modifyflag; var store_EXP;
 var common_data_jydw = [], common_data_sbfs = [], common_data_bgfs = [], common_data_sbgq = [];
 
 Ext.onReady(function () {
@@ -23,8 +23,49 @@ Ext.onReady(function () {
             store_modifyflag = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: modifyflag_data });
 
             gridpanelBind();
+
+
+            //导出报关单文件用
+             store_EXP = Ext.create('Ext.data.JsonStore', {
+                fields: ['ID', 'PREDECLCODE', 'DECLARATIONCODE', 'CUSTOMSSTATUS', 'CODE', 'MODIFYFLAG', 'REPTIME', 'TRANSNAME', 'BUSIUNITCODE', 'CUSTOMERNAME', 'IETYPE',
+                        'BUSIUNITNAME', 'PORTCODE', 'BLNO', 'REPWAYID', 'REPWAYNAME', 'DECLWAY', 'DECLWAYNAME', 'TRADEMETHOD', 'CONTRACTNO', 'GOODSNUM',
+                        'GOODSNW', 'GOODSGW', 'SHEETNUM', 'ORDERCODE', 'CUSNO', 'ASSOCIATENO', 'CORRESPONDNO', 'BUSITYPE', 'CONTRACTNOORDER', 'REPUNITNAME'
+                        , 'ORDERCODE_ASS', 'BUSIUNITCODE_ASS', 'BUSIUNITNAME_ASS'],
+                proxy: {
+                    type: 'ajax',
+                    url: '/Common/LoadDeclarationList_E_Domestic_all',
+                    reader: {
+                        root: 'rows',
+                        type: 'json',
+                        totalProperty: 'total'
+                    }
+                },
+                autoLoad: true,
+                listeners: {
+                    beforeload: function () {
+                        store_EXP.getProxy().extraParams = {
+                            CONDITION1: Ext.getCmp('CONDITION1').getValue(), VALUE1: Ext.getCmp("CONDITION1_1").getValue(),
+                            CONDITION2: Ext.getCmp('CONDITION2').getValue(), VALUE2: Ext.getCmp("CONDITION2_1").getValue(),
+                            CONDITION3: Ext.getCmp('CONDITION3').getValue(), VALUE3: Ext.getCmp("CONDITION3_1").getValue(),
+                            CONDITION4: Ext.getCmp('CONDITION4').getValue(),
+                            VALUE4_1: Ext.Date.format(Ext.getCmp("CONDITION4_1").getValue(), 'Y-m-d H:i:s'),
+                            VALUE4_2: Ext.Date.format(Ext.getCmp("CONDITION4_2").getValue(), 'Y-m-d H:i:s'),
+
+                            CONDITION5: Ext.getCmp('CONDITION5').getValue(), VALUE5: Ext.getCmp("CONDITION5_1").getValue(),
+                            CONDITION6: Ext.getCmp('CONDITION6').getValue(), VALUE6: Ext.getCmp("CONDITION6_1").getValue(),
+                            CONDITION7: Ext.getCmp('CONDITION7').getValue(), VALUE7: Ext.getCmp("CONDITION7_1").getValue(),
+                            CONDITION8: Ext.getCmp('CONDITION8').getValue(),
+                            VALUE8_1: Ext.Date.format(Ext.getCmp("CONDITION8_1").getValue(), 'Y-m-d H:i:s'),
+                            VALUE8_2: Ext.Date.format(Ext.getCmp("CONDITION8_2").getValue(), 'Y-m-d H:i:s')
+                        }
+                    }
+                }
+            });
         }
     })
+
+
+
 });
 
 //=======================================================JS init end=============================================================
@@ -614,6 +655,9 @@ function ExportDecl() {
         }
     });
 }
+
+
+
 function ExportDeclFile(arg) {
     var recs
     if (arg == 'select') {
@@ -647,25 +691,31 @@ function ExportDeclFile(arg) {
         Ext.MessageBox.confirm("提示", "全部导出时可能因为文件过多而下载缓慢，确定导出吗？", function (btn) {
             if (btn == 'yes') {
 
-                recs = Ext.getCmp('declare_grid').store.data.items;
-                //var codelist = Ext.encode(Ext.pluck(Ext.pluck(recs, 'data'), 'CODE'));
-                var codelist = Ext.encode(Ext.pluck(recs, 'data'));
+                store_EXP.load(function () {
 
-                var formtemp = new Ext.form.BasicForm(Ext.get('exportfileform'));
-                formtemp.submit({
-                    waitTitle: '请稍后...',
-                    waitMsg: '正在下载,请稍后...',
-                    url: '/Common/ExportDeclFile',
-                    method: 'post',
-                    params: { codelist: codelist },
-                    success: function (form, action) {
-                        window.location.href = url + action.result.url;
-                    },
-                    failure: function (form, action) {
-                        Ext.MessageBox.alert('提示', '下载失败，请确认文件是否确实存在！');
-                    }
+                    recs = store_EXP.data.items;
 
+                    //recs = Ext.getCmp('declare_grid').store.data.items;
+                    //var codelist = Ext.encode(Ext.pluck(Ext.pluck(recs, 'data'), 'CODE'));
+                    var codelist = Ext.encode(Ext.pluck(recs, 'data'));
+
+                    var formtemp = new Ext.form.BasicForm(Ext.get('exportfileform'));
+                    formtemp.submit({
+                        waitTitle: '请稍后...',
+                        waitMsg: '正在下载,请稍后...',
+                        url: '/Common/ExportDeclFile',
+                        method: 'post',
+                        params: { codelist: codelist },
+                        success: function (form, action) {
+                            window.location.href = url + action.result.url;
+                        },
+                        failure: function (form, action) {
+                            Ext.MessageBox.alert('提示', '下载失败，请确认文件是否确实存在！');
+                        }
+
+                    });
                 });
+
             }
         });
 
