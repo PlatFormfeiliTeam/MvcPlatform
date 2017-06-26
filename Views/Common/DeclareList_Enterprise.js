@@ -24,43 +24,6 @@ Ext.onReady(function () {
 
             gridpanelBind();
 
-            //导出报关单文件用
-            store_EXP = Ext.create('Ext.data.JsonStore', {
-                fields: ['ID', 'PREDECLCODE', 'DECLARATIONCODE', 'CUSTOMSSTATUS', 'CODE', 'MODIFYFLAG', 'REPTIME', 'TRANSNAME', 'BUSIUNITCODE', 'CUSTOMERNAME', 'IETYPE',
-                        'BUSIUNITNAME', 'PORTCODE', 'BLNO', 'REPWAYID', 'REPWAYNAME', 'DECLWAY', 'DECLWAYNAME', 'TRADEMETHOD', 'CONTRACTNO', 'GOODSNUM',
-                        'GOODSNW', 'GOODSGW', 'SHEETNUM', 'ORDERCODE', 'CUSNO', 'ASSOCIATENO', 'CORRESPONDNO', 'BUSITYPE', 'CONTRACTNOORDER', 'REPUNITNAME'],
-                proxy: {
-                    type: 'ajax',
-                    url: '/Common/LoadDeclarationList_E_all',
-                    reader: {
-                        root: 'rows',
-                        type: 'json',
-                        totalProperty: 'total'
-                    }
-                },
-                autoLoad: true,
-                listeners: {
-                    beforeload: function () {
-                        store_EXP.getProxy().extraParams = {
-                            CONDITION1: Ext.getCmp('CONDITION1').getValue(), VALUE1: Ext.getCmp("CONDITION1_1").getValue(),
-                            CONDITION2: Ext.getCmp('CONDITION2').getValue(), VALUE2: Ext.getCmp("CONDITION2_1").getValue(),
-                            CONDITION3: Ext.getCmp('CONDITION3').getValue(), VALUE3: Ext.getCmp("CONDITION3_1").getValue(),
-                            CONDITION4: Ext.getCmp('CONDITION4').getValue(),
-                            VALUE4_1: Ext.Date.format(Ext.getCmp("CONDITION4_1").getValue(), 'Y-m-d H:i:s'),
-                            VALUE4_2: Ext.Date.format(Ext.getCmp("CONDITION4_2").getValue(), 'Y-m-d H:i:s'),
-
-                            CONDITION5: Ext.getCmp('CONDITION5').getValue(), VALUE5: Ext.getCmp("CONDITION5_1").getValue(),
-                            CONDITION6: Ext.getCmp('CONDITION6').getValue(), VALUE6: Ext.getCmp("CONDITION6_1").getValue(),
-                            CONDITION7: Ext.getCmp('CONDITION7').getValue(), VALUE7: Ext.getCmp("CONDITION7_1").getValue(),
-                            CONDITION8: Ext.getCmp('CONDITION8').getValue(),
-                            VALUE8_1: Ext.Date.format(Ext.getCmp("CONDITION8_1").getValue(), 'Y-m-d H:i:s'),
-                            VALUE8_2: Ext.Date.format(Ext.getCmp("CONDITION8_2").getValue(), 'Y-m-d H:i:s')
-                        }
-                    }
-                }
-            });
-
-
         }
     })
 
@@ -676,21 +639,30 @@ function ExportDeclFile(arg)
         Ext.MessageBox.confirm("提示", "全部导出时可能因为文件过多而下载缓慢，确定导出吗？", function (btn) {
             if (btn == 'yes') {
               
-                store_EXP.load(function () {
-
-                    recs = store_EXP.data.items;
-
-                    //recs = Ext.getCmp('declare_grid').store.data.items;
-                    //var codelist = Ext.encode(Ext.pluck(Ext.pluck(recs, 'data'), 'CODE'));
-                    var codelist = Ext.encode(Ext.pluck(recs, 'data'));
 
                     var formtemp = new Ext.form.BasicForm(Ext.get('exportfileform'));
                     formtemp.submit({
                         waitTitle: '请稍后...',
                         waitMsg: '正在下载,请稍后...',
-                        url: '/Common/ExportDeclFile',
+                        url: '/Common/ExpDeclarationList_E_all',
                         method: 'post',
-                        params: { codelist: codelist },
+                        params: {
+                            CONDITION1: Ext.getCmp('CONDITION1').getValue(), VALUE1: Ext.getCmp("CONDITION1_1").getValue(),
+                            CONDITION2: Ext.getCmp('CONDITION2').getValue(), VALUE2: Ext.getCmp("CONDITION2_1").getValue(),
+                            CONDITION3: Ext.getCmp('CONDITION3').getValue(), VALUE3: Ext.getCmp("CONDITION3_1").getValue(),
+                            CONDITION4: Ext.getCmp('CONDITION4').getValue(),
+                            VALUE4_1: Ext.Date.format(Ext.getCmp("CONDITION4_1").getValue(), 'Y-m-d H:i:s'),
+                            VALUE4_2: Ext.Date.format(Ext.getCmp("CONDITION4_2").getValue(), 'Y-m-d H:i:s'),
+
+                            CONDITION5: Ext.getCmp('CONDITION5').getValue(), VALUE5: Ext.getCmp("CONDITION5_1").getValue(),
+                            CONDITION6: Ext.getCmp('CONDITION6').getValue(), VALUE6: Ext.getCmp("CONDITION6_1").getValue(),
+                            CONDITION7: Ext.getCmp('CONDITION7').getValue(), VALUE7: Ext.getCmp("CONDITION7_1").getValue(),
+                            CONDITION8: Ext.getCmp('CONDITION8').getValue(),
+                            VALUE8_1: Ext.Date.format(Ext.getCmp("CONDITION8_1").getValue(), 'Y-m-d H:i:s'),
+                            VALUE8_2: Ext.Date.format(Ext.getCmp("CONDITION8_2").getValue(), 'Y-m-d H:i:s')
+
+
+                        },
                         success: function (form, action) {
                             window.location.href = url + action.result.url;
                         },
@@ -699,7 +671,7 @@ function ExportDeclFile(arg)
                         }
 
                     });
-                });
+         
                 
             }
         });

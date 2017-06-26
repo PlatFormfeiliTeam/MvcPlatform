@@ -3517,7 +3517,7 @@ namespace MvcPlatform.Controllers
         }
 
         //导出全部报关单文件
-        public string LoadDeclarationList_E_all()
+        public string ExpDeclarationList_E_all()
         {
             string sql = QueryConditionDecl_E();
 
@@ -3525,8 +3525,7 @@ namespace MvcPlatform.Controllers
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             var json = JsonConvert.SerializeObject(dt, iso);
-            totalProperty = dt.Rows.Count;
-            return "{rows:" + json + ",total:" + totalProperty + "}";
+            return ExportDeclFile(json);
         }
         public string QueryConditionDecl_E()
         {
@@ -3732,7 +3731,7 @@ namespace MvcPlatform.Controllers
         }
 
        //导出全部报关单文件
-        public string LoadDeclarationList_E_Domestic_all()
+        public string ExpDeclarationList_E_Domestic_all()
         {
             string sql = QueryConditionDecl_E_Domestic();
 
@@ -3740,8 +3739,7 @@ namespace MvcPlatform.Controllers
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             var json = JsonConvert.SerializeObject(dt, iso);
-            totalProperty = dt.Rows.Count;
-            return "{rows:" + json + ",total:" + totalProperty + "}";
+            return ExportDeclFile(json);
         }
 
         public string QueryConditionDecl_E_Domestic()
@@ -4234,10 +4232,8 @@ namespace MvcPlatform.Controllers
             return Extension.getPathname("报检单文件.xls", book);
         }
 
-        public string ExportDeclFile()
+        public string ExportDeclFile(string codelist)
         {
-            //string codelist = Request["codelist"].Replace("[", "(").Replace("]", ")").Replace("\"", "'");
-            string codelist = Request["codelist"];
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string customer = json_user.Value<string>("CUSTOMERID");
             WsZip.WsZip wz = new WsZip.WsZip();
