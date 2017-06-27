@@ -1,6 +1,5 @@
 ﻿
-
-var common_data_jydw = [], common_data_unit = [];
+var common_data_recordid = [], common_data_recordid_ex = [], common_data_unit = [];
 var store_unit, store_optionstatus, store_status, store_modifyflag;//中文所需
 var gridpanel_lj, gridpanel_cp, gridpanel_lj_Go, gridpanel_cp_Go;
 
@@ -12,6 +11,8 @@ Ext.onReady(function () {
             var commondata = Ext.decode(response.responseText);
             common_data_recordid = commondata.recordid;//账册号
             common_data_unit = commondata.unit;//单位
+
+            common_data_recordid_ex = [{ "NAME": "无账册", "CODE": "0", ID: 0 }].concat(common_data_recordid);//核销数据表
 
             store_unit = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_unit });
             store_modifyflag = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: modifyflag_data });
@@ -546,7 +547,7 @@ function DownReport_detail() {
     //账册号
     var store_recordid_d = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
-        data: common_data_recordid
+        data: common_data_recordid_ex
     });
     var combo_recordid_d = Ext.create('Ext.form.field.ComboBox', {
         id: 'combo_recordid_d',
