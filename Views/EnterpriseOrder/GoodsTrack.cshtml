@@ -133,22 +133,73 @@
                         })
                         items.push(panel_top);
 
+
+                //查询直接调用过记录
+                //start
+                        var store_cx = Ext.create('Ext.data.JsonStore', {
+                            fields: ['CODE', 'NAME'],
+                            data: [{ "NAME": "订单编号", "CODE": "ddbh" }, { "NAME": "客户编号", "CODE": "khbh" }]
+                        });
+                        var item_combo = Ext.create('Ext.form.field.ComboBox', {
+                            id: 'item_combo',
+                            store: store_cx,
+                            queryMode: 'local',
+                            value: "ddbh",
+                            displayField: 'NAME',
+                            valueField: 'CODE'
+                        });
+
+                        var cx_value = Ext.create('Ext.form.field.Text', {
+                            id: 'cx_value',
+                            margin: 0
+                        });
+                        var ddbh_label = {
+                            xtype: 'label',
+                            id: 'ddbh_label',
+                            margin: '0 0 0 10'
+                        };
+                       var khbh_label = {
+                           xtype: 'label',
+                           id: 'khbh_label',
+                           margin: '0 0 0 10'
+                       };
+                        var bbar_r = '<div><a href="javascript:reload(2);">上一条</a>&nbsp;&nbsp;<a href="javascript:reload(1);">下一条</a></div>';
+                        var buttombar = Ext.create('Ext.toolbar.Toolbar', {
+                            items: ['<span>订单编号：</span>',ddbh_label,'<span>客户编号：</span>',khbh_label, '->', item_combo, cx_value, '<button type="button" onclick="loadByInput()" class="btn btn-primary btn-sm" id="btn_saveorder"><i class="fa fa-search"></i>&nbsp;载入</button>', bbar_r]
+                        });
+
+                //end
+                        //var panel_bottom = Ext.create('Ext.panel.Panel', {
+                        //    id: 'panel_buttom',
+                        //    title: '<i class="fa fa-hand-o-right" aria-hidden="true"></i>&nbsp;订单信息<div style="float:right"><a href="javascript:reload(2);">上一条</a>&nbsp;&nbsp;<a href="javascript:reload(1);">下一条</a></div><div id="cx" style="float:right;width:300px;opacity:0.4;filter:alpha(opacity=100)"></div>',
+                        //    border: 0,
+                        //    tbar: buttombar,
+                        //    region: 'center',
+                        //    //collapsed: false,//让第二项展开，达到第一项收起的目的
+                        //    items: [Ext.getCmp('panelbottom_1')]
+                        //});
                         var panel_bottom = Ext.create('Ext.panel.Panel', {
-                            id:'panel_buttom',
-                            title: '<i class="fa fa-hand-o-right" aria-hidden="true"></i>&nbsp;订单信息<div style="float:right"><a href="javascript:reload(2);">上一条</a>&nbsp;&nbsp;<a href="javascript:reload(1);">下一条</a></div>',
+                            id: 'panel_buttom',
+                            title: '<i class="fa fa-hand-o-right" aria-hidden="true"></i>&nbsp;订单信息',
                             border: 0,
+                            tbar: buttombar,
                             region: 'center',
                             //collapsed: false,//让第二项展开，达到第一项收起的目的
                             items: [Ext.getCmp('panelbottom_1')]
-                        })
+                        });
                         items.push(panel_bottom);
                         var viewport = Ext.create('Ext.container.Viewport', {
-                            id:'viewport',
+                            id: 'viewport',
                             //layout: 'accordion',
                             items: items
-                        })
+                        });
+
+                 
+
+                
+
                         loadform_data(id);
-                //重绘窗口大小
+   
                         setHeight();
                         Ext.get(window).on('resize', function () { setHeight(); });
 
@@ -196,7 +247,30 @@
             $("#content").attr("src",$(this).attr("ref"));
         });
     });
+    function loadByInput()
+    {
 
+        var item_combo_value = Ext.getCmp('item_combo').getValue();
+        var cx_value = Ext.getCmp('cx_value').getValue();
+        Ext.getCmp('cx_value').setValue("");
+        if (Ext.String.trim(cx_value)=="") {
+            Ext.MessageBox.alert("提示","请输入载入记录的查询条件！");
+            return;
+        }
+        Ext.Ajax.request({
+            url: "/EnterpriseOrder/LoadId_index",
+            params: { busitypeid: busitypeid, item_combo_value: item_combo_value, cx_value: cx_value},
+            success: function (response,option) {
+                var json = Ext.decode(response.responseText);
+                if (json.length!=0) {
+                    loadform_data(json[0].ID);
+                }
+               
+            }
+        });
+        
+
+    }
     function reload(action)
     {
 
@@ -294,6 +368,10 @@
             var data = Ext.decode(response.responseText);
             Ext.getCmp('panelbottom_1_1').getForm().setValues(data.json_order[0]);
             Ext.getCmp('panelbottom_1_3').getForm().setValues(data.json_order[0]);
+
+            Ext.getCmp('khbh_label').setText(data.json_order[0].CODE);
+            Ext.getCmp('ddbh_label').setText(data.json_order[0].CUSNO);
+
             if (Ext.getCmp('w_grid')) { Ext.getCmp('w_grid').store.loadData(data.json_container); }
             //if (typeof Ext.getCmp('TOTALNO_DIVIDENO') != "undefined") {
             if (Ext.getCmp('TOTALNO_DIVIDENO')) {
