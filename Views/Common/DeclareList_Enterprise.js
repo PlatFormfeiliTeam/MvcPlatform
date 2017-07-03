@@ -642,6 +642,7 @@ function ExportDeclFile(arg)
 
                     var formtemp = new Ext.form.BasicForm(Ext.get('exportfileform'));
                     formtemp.submit({
+                        timeout: 600000,
                         waitTitle: '请稍后...',
                         waitMsg: '正在下载,请稍后...',
                         url: '/Common/ExpDeclarationList_E_all',
