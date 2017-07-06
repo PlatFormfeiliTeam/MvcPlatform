@@ -1097,7 +1097,7 @@ namespace MvcPlatform.Controllers
             string busitypeid = Request["busitypeid"];
 
             string where = "";
-            string role = Request["role"];
+            string role = Request["role"]; bool bf_DECLCARNO = false;
             if (!string.IsNullOrEmpty(Request["VALUE1"]))//判断查询条件1是否有值
             {
                 switch (Request["CONDITION1"])
@@ -1124,7 +1124,8 @@ namespace MvcPlatform.Controllers
                         where += " and instr(det.ORDERCODE,'" + Request["VALUE2"] + "')>0 ";
                         break;
                     case "DECLCARNO"://报关车号
-                        where += " and instr(ort.DECLCARNO,'" + Request["VALUE2"] + "')>0 ";
+                        bf_DECLCARNO = true;
+                        where += " and instr(c.CDCARNAME,'" + Request["VALUE2"] + "')>0 ";
                         break;
                     case "TRANSNAME"://运输工具名称
                         where += " and (instr(lda.TRANSNAME,'" + Request["VALUE2"] + "')>0 or instr(lda.VOYAGENO,'" + Request["VALUE2"] + "')>0)";
@@ -1219,7 +1220,8 @@ namespace MvcPlatform.Controllers
                         where += " and instr(det.ORDERCODE,'" + Request["VALUE6"] + "')>0 ";
                         break;
                     case "DECLCARNO"://报关车号
-                        where += " and instr(ort.DECLCARNO,'" + Request["VALUE6"] + "')>0 ";
+                        bf_DECLCARNO = true;
+                        where += " and instr(c.CDCARNAME,'" + Request["VALUE6"] + "')>0 ";
                         break;
                     case "TRANSNAME"://运输工具名称
                         where += " and (instr(lda.TRANSNAME,'" + Request["VALUE6"] + "')>0 or instr(lda.VOYAGENO,'" + Request["VALUE6"] + "')>0)";
@@ -1297,26 +1299,7 @@ namespace MvcPlatform.Controllers
                 where += @" and ort.customercode ='" + json_user.Value<string>("CUSTOMERCODE") + "' ";
             }
 
-//            string sql = @"select det.ID,det.DECLARATIONCODE,det.CODE,ort.CUSTOMERNAME ,det.REPENDTIME REPFINISHTIME, det.CUSTOMSSTATUS ,   
-//                           det.CONTRACTNO,det.GOODSNUM,det.GOODSNW,det.SHEETNUM,det.ORDERCODE,det.COSTARTTIME CREATEDATE,
-//                           det.TRANSNAME,det.VOYAGENO,det.ISPRINT,
-//                           det.BUSIUNITCODE, det.PORTCODE, det.BLNO, det.DECLTYPE, 
-//                           ort.REPWAYID ,ort.REPWAYID REPWAYNAME,ort.DECLWAY ,ort.DECLWAY DECLWAYNAME,ort.TRADEWAYCODES ,
-//                           ort.CUSNO ,ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.BUSIUNITNAME,ort.BUSITYPE, 
-//                           cus.SCENEDECLAREID,ort.CONTRACTNO CONTRACTNOORDER ,ort.CREATETIME                                                                      
-//                           from list_declaration det 
-//                                left join list_order ort on det.ordercode = ort.code 
-//                                left join cusdoc.sys_customer cus on ort.customercode = cus.code 
-//                                left join (
-//                                      select ASSOCIATENO from list_order l inner join list_declaration i on l.code=i.ordercode 
-//                                      where l.ASSOCIATENO is not null and l.isinvalid=0 and i.isinvalid=0 and (i.STATUS!=130 and i.STATUS!=110)          
-//                                      ) a on ort.ASSOCIATENO=a.ASSOCIATENO 
-//                                left join (select ordercode from list_declaration ld where ld.isinvalid=0 and ld.STATUS!=130 and ld.STATUS!=110) b on det.ordercode=b.ordercode
-//                           where (det.STATUS=130 or det.STATUS=110) and det.isinvalid=0 and ort.isinvalid=0 and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where
-//                      + " and a.ASSOCIATENO is null and b.ordercode is  null ";
-
-
-            string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.ISPRINT,det.SHEETNUM,det.modifyflag,det.transname as pretransname,
+            /*string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.ISPRINT,det.SHEETNUM,det.modifyflag,det.transname as pretransname,
                               lda.declarationcode,to_char(lda.reptime,'yyyy-mm-dd') reptime,lda.contractno,lda.goodsnum,lda.goodsnw,lda.goodsgw,lda.blno,
                               lda.transname,lda.voyageno,lda.portcode,
                               lda.trademethod,lda.declkind DECLWAY,lda.declkind DECLWAYNAME,  
@@ -1337,6 +1320,45 @@ namespace MvcPlatform.Controllers
                                and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where +
                       @" and a.ordercode is null 
                                and b.ASSOCIATENO is null";
+            */
+            string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.ISPRINT,det.SHEETNUM,det.modifyflag,det.transname as pretransname,
+                              lda.declarationcode,to_char(lda.reptime,'yyyy-mm-dd') reptime,lda.contractno,lda.goodsnum,lda.goodsnw,lda.goodsgw,lda.blno,
+                              lda.transname,lda.voyageno,lda.portcode,
+                              lda.trademethod,lda.declkind DECLWAY,lda.declkind DECLWAYNAME,  
+                              ort.BUSITYPE,ort.CONTRACTNO CONTRACTNOORDER,ort.REPWAYID,ort.REPWAYID REPWAYNAME,ort.CUSNO,
+                              ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.customercode,ort.CUSTOMERNAME,ort.CREATETIME, 
+                              ort.busiunitcode,ort.busiunitname,ort.totalno,ort.divideno,ort.secondladingbillno, 
+                              cus.SCENEDECLAREID                                                             
+                        from list_declaration det     
+                            left join list_order ort on det.ordercode = ort.code 
+                            left join cusdoc.sys_customer cus on ort.customercode = cus.code 
+                            left join list_declaration_after lda on det.code=lda.code and lda.csid=1
+                            left join (select ordercode from list_declaration ld where ld.isinvalid=0 and ld.STATUS!=130 and ld.STATUS!=110) a on det.ordercode=a.ordercode";
+
+            if (busitypeid == "40-41")
+            {
+                sql += @" left join (
+                                  select ASSOCIATENO from list_order l inner join list_declaration i on l.code=i.ordercode 
+                                  where l.ASSOCIATENO is not null and l.isinvalid=0 and i.isinvalid=0 and (i.STATUS!=130 and i.STATUS!=110)          
+                                  ) b on ort.ASSOCIATENO=b.ASSOCIATENO";
+            }
+
+            if (bf_DECLCARNO)
+            {
+                sql += @" left join (select ordercode,listagg(to_char(cdcarname),',') within group(order by containerorder) as cdcarname 
+                                    from list_predeclcontainer  
+                                    GROUP BY ordercode) c on det.ordercode = c.ordercode ";
+            }
+
+            sql += @" where (det.STATUS=130 or det.STATUS=110) and det.isinvalid=0 and ort.isinvalid=0 
+                        and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where
+                    + @" and a.ordercode is null";
+
+            if (busitypeid == "40-41")
+            {
+                sql += @" and b.ASSOCIATENO is null";
+            }
+
             return sql;
 
         }
