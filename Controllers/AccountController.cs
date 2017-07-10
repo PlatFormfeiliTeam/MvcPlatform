@@ -346,7 +346,7 @@ namespace MvcPlatform.Controllers
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             var fileUpload = Request.Files[0];
-            var uploadPath = Server.MapPath("/FileUpload/file");
+            var uploadPath = Server.MapPath("/FileUpload/headimage");
             chunk = chunk ?? 0;
             string new_name = json_user.GetValue("ID") + "_" + name;
             using (var fs = new FileStream(Path.Combine(uploadPath, new_name), chunk == 0 ? FileMode.Create : FileMode.Append))
@@ -355,9 +355,9 @@ namespace MvcPlatform.Controllers
                 fileUpload.InputStream.Read(buffer, 0, buffer.Length);
                 fs.Write(buffer, 0, buffer.Length);
             }
-            string sql = "update sys_user set ImgPath='" + "/FileUpload/file/" + new_name + "' where id='" + json_user.GetValue("ID") + "'";
+            string sql = "update sys_user set ImgPath='" + "/FileUpload/headimage/" + new_name + "' where id='" + json_user.GetValue("ID") + "'";
             DBMgr.ExecuteNonQuery(sql);
-            return "/FileUpload/file/" + new_name;
+            return "/FileUpload/headimage/" + new_name;
         }
 
         //更新当前账号所属客户的默认供应商
