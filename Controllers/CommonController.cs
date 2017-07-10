@@ -1021,21 +1021,32 @@ namespace MvcPlatform.Controllers
             }
             else //如果订单号不为空
             {
+                IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+                iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
                 //订单基本信息 CONTAINERTRUCK 这个字段本身不属于list_order表,虚拟出来存储集装箱和报关车号记录,是个数组形式的字符串
                 sql = @"select t.*,'' CONTAINERTRUCK from LIST_ORDER t where t.CODE = '" + Request["ordercode"] + "' and rownum=1";
                 dt = DBMgr.GetDataTable(sql);
-                IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
-                iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-                sql = "select * from list_predeclcontainer t where t.ordercode='" + dt.Rows[0]["CODE"] + "' order by containerorder";
-                DataTable dt_container = DBMgr.GetDataTable(sql);
+
+                DataTable dt_container = new DataTable();
+                sql = "select * from list_predeclcontainer t where t.ordercode='" + dt.Rows[0]["CODE"] + "' order by containerorder";                
+                dt_container = DBMgr.GetDataTable(sql);
                 dt.Rows[0]["CONTAINERTRUCK"] = JsonConvert.SerializeObject(dt_container);
+                
+                //20170710重写报关车号字段，值为：list_predeclcontainer的第一笔报关车号
+                if (dt_container.Rows.Count > 0) { dt.Rows[0]["DECLCARNO"] = dt_container.Rows[0]["CDCARNAME"]; }
+
                 string formdata = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
+
+
                 //订单随附文件
                 sql = @"select * from LIST_ATTACHMENT where instr(ordercode,'{0}') >0 
                       and ((filetype=44 or filetype=58) or ( filetype=57 AND confirmstatus = 1 )) and (abolishstatus is null or abolishstatus=0)";
                 sql = string.Format(sql, ordercode);
                 dt = DBMgr.GetDataTable(sql);
                 string filedata = JsonConvert.SerializeObject(dt, iso);
+
+
                 result = "{formdata:" + formdata + ",filedata:" + filedata + "}";
             }
             return result;
