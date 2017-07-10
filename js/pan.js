@@ -1777,6 +1777,7 @@ function Export(busitypeid) {
     myMask.show();
 
     var data = {
+        common_data_sbfs:JSON.stringify(common_data_sbfs),
         dec_insp_status: JSON.stringify(orderstatus_js_data), seniorsearch: typeof seniorcondition == "undefined" ? null : seniorcondition,
         busitypeid: busitypeid, OnlySelf: Ext.get('OnlySelfi').el.dom.className,
         CONDITION1: Ext.getCmp('CONDITION1').getValue(), VALUE1: Ext.getCmp("CONDITION1_1").getValue(),

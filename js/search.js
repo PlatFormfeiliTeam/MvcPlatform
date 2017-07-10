@@ -5,6 +5,11 @@ function initSearch(busitypeid) {
     if (busitypeid == '11') {
         search_js_condition3_data.push({ "NAME": "舱单入库", "CODE": "MANIFEST_STORAGE" });
     }
+
+    if (busitypeid == '10' || busitypeid == '30') {
+        search_js_condition2_data.push({ "NAME": "报关车号", "CODE": "DECLCARNO" });
+    }
+
     var store_1 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
         data: search_js_condition1_data,
