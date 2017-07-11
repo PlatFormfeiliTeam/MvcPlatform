@@ -100,7 +100,7 @@
         name: 'BUSIUNITCODE',
         store: store_jydw2,
         displayField: 'NAME',
-        valueField: 'QUANCODE',
+        valueField: 'CODE',
         queryMode: 'local',
         forceSelection: true,
         tabIndex: 23,
@@ -252,8 +252,9 @@
     var combo_myfs2 = Ext.create('Ext.form.field.ComboBox', {//贸易方式
         id: 'combo_myfs2',
         store: store_myfs2,
+        name: 'TRADEWAYCODES',
         fieldLabel: '贸易方式',
-        displayField: 'CODE',
+        displayField: 'NAME',
         valueField: 'CODE',
         queryMode: 'local',
         submitValue: false,//不随表单提交一起提交
@@ -271,12 +272,12 @@
         , allowBlank: false,
         blankText: '贸易方式不能为空!'
     })
-    var field_TRADEWAYCODES2 = Ext.create('Ext.form.field.Hidden', {
-        name: 'TRADEWAYCODES'
-    });
-    var field_TRADEWAYCODES12 = Ext.create('Ext.form.field.Hidden', {
-        name: 'TRADEWAYCODES1'//贸易方式多选时,保存多选的值
-    });
+    //var field_TRADEWAYCODES2 = Ext.create('Ext.form.field.Hidden', {
+    //    name: 'TRADEWAYCODES'
+    //});
+    //var field_TRADEWAYCODES12 = Ext.create('Ext.form.field.Hidden', {
+    //    name: 'TRADEWAYCODES1'//贸易方式多选时,保存多选的值
+    //});
     var field_FILINGNUMBER2 = Ext.create('Ext.form.field.Text', {
         fieldLabel: '账册备案号',
         tabIndex: 32,
@@ -301,18 +302,28 @@
         name: 'ASSOCIATEPEDECLNO'
     });
     //报关申报单位
-    var tf_bgsbdw2 = Ext.create('Ext.form.field.Text', {
+    var store_jydw = Ext.create('Ext.data.JsonStore', {
+        fields: ['CODE', 'NAME', 'QUANCODE', 'QUANNAME'],
+        data: common_data_jydw
+    })
+    var tf_bgsbdw2 = Ext.create('Ext.form.field.ComboBox', {
         id: 'tf_bgsbdw2',
         readOnly: true,
         name: 'REPUNITCODE',
-        fieldLabel: '报关申报单位'
+        fieldLabel: '报关申报单位',
+        store: store_jydw,
+        displayField: 'NAME',
+        valueField: 'CODE'
     })
     //报检申报单位   
     var tf_bjsbdw2 = Ext.create('Ext.form.field.Text', {
         id: 'tf_bjsbdw2',
         readOnly: true,
         name: 'INSPUNITCODE',
-        fieldLabel: '报检申报单位'
+        fieldLabel: '报检申报单位',
+        store: store_jydw,
+        displayField: 'NAME',
+        valueField: 'CODE'
     })
     //--------------------------------------------------------------------需求备注，业务状态---------------------------------------------------------
     //需求备注
@@ -357,6 +368,6 @@
         { layout: 'column', height: 42, border: 0, items: [field_quanpackage2, field_weight2, field_contractno2, combo_myfs2, field_FILINGNUMBER2] },
         { layout: 'column', height: 42, border: 0, items: [chk_CHKLAWCONDITION2, field_CLEARANCENO2, field_ASSOCIATEPEDECLNO2, tf_bgsbdw2, tf_bjsbdw2] },
         { layout: 'column', height: 42, border: 0, items: [field_ENTRUSTREQUEST2, field_STATUS2] },
-         field_BUSIUNITNAME2, field_BUSISHORTNAME2, field_TRADEWAYCODES2, field_TRADEWAYCODES2, field_TRADEWAYCODES12]
+         field_BUSIUNITNAME2, field_BUSISHORTNAME2]
     })
 }

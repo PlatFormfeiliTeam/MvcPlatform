@@ -115,10 +115,15 @@
                     title: source == 'declare' ? '报关单管理->批量打印' : '报检单管理->批量打印',
                     region: 'west',
                     width: 450,
-                    items: [field_type, field_printmode, cbg_printtmp],
-                    buttonAlign: 'center',
-                    buttons: [
-                        {
+                    items: [field_type, field_printmode, cbg_printtmp,{
+                        xtype: 'buttongroup',
+                        buttonAlign: 'center',
+                        layout: {
+                            type: 'hbox',
+                            pack: 'center',
+                            align: 'stretchmax'
+                        },
+                        items: [{
                             text: '<span class="glyphicon glyphicon-search"></span>&nbsp;打印预览', handler: function (btn) {
                                 if (field_type.getChecked().length == 0) {
                                     Ext.MessageBox.alert('提示', '请选择需要打印的文件类型!');
@@ -152,6 +157,8 @@
                                 window.close();
                             }
                         }]
+                    }
+                    ]
                 });
                 var panel_pdf = Ext.create('Ext.panel.Panel', {
                     title: 'PDF预览区',

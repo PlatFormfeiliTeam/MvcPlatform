@@ -437,6 +437,7 @@ function gridpanelBind() {
         }
     })
     pgbar = Ext.create('Ext.toolbar.Paging', {
+        id: 'declare_grid_pgbar',
         displayMsg: '显示 {0} - {1} 条,共计 {2} 条',
         store: store,
         displayInfo: true
@@ -681,4 +682,24 @@ function ExportDeclFile(arg)
   
 
 
+}
+
+function openrwindow(url, width, height) {
+    var iWidth = width ? width : "1000", iHeight = height ? height : "600";
+    iWidth = iWidth > window.screen.availWidth ? window.screen.availWidth - 20 : iWidth
+    iHeight = iHeight > window.screen.availHeight ? window.screen.availHeight - 120 : iHeight
+    var iTop = (window.screen.availHeight - 30 - iHeight) / 2; //获得窗口的垂直位置;
+    var iLeft = (window.screen.availWidth - 10 - iWidth) / 2; //获得窗口的水平位置; 
+    window.open(url, '', 'height=' + iHeight + ',,innerHeight=' + iHeight + ',width=' + iWidth + ',innerWidth=' + iWidth + ',top=' + iTop + ',left=' + iLeft + ',location=yes,scrollbars=yes');
+}
+function Searchstatus() {
+    var recs = Ext.getCmp('declare_grid').getSelectionModel().getSelection();
+    if (recs.length == 0) {
+        Ext.MessageBox.alert('提示', '请选择需要维护的记录！');
+        return;
+    }
+    var id = recs[0].data.ID
+    var index = Ext.getCmp('declare_grid').store.indexOf(recs[0]);
+    var currentPage = Ext.getCmp('declare_grid').store.currentPage
+    openrwindow("/Common/ClearanceStatus?&id=" + id + "&rowIndex=" + index + "&currentPage=" + currentPage, 1200, 800);
 }

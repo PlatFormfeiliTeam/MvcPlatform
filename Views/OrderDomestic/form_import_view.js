@@ -101,7 +101,7 @@
         name: 'BUSIUNITCODE',
         store: store_jydw,
         displayField: 'NAME',
-        valueField: 'QUANCODE',
+        valueField: 'CODE',
         readOnly: true,
         tabIndex: 7,
         hideTrigger: true
@@ -246,18 +246,19 @@
         fieldLabel: '贸易方式',
         id: 'combo_myfs1',
         store: store_myfs,
-        displayField: 'CODE',
+        name: 'TRADEWAYCODES',
+        displayField: 'NAME',
         readOnly: true,
         valueField: 'CODE',
         tabIndex: 14,
         hideTrigger: true
     })
-    var field_TRADEWAYCODES = Ext.create('Ext.form.field.Hidden', {
-        name: 'TRADEWAYCODES'//贸易方式多选时,保存的是第一个的值
-    });
-    var field_TRADEWAYCODES1 = Ext.create('Ext.form.field.Hidden', {
-        name: 'TRADEWAYCODES1'//贸易方式多选时,保存多选的值
-    });
+    //var field_TRADEWAYCODES = Ext.create('Ext.form.field.Hidden', {
+    //    name: 'TRADEWAYCODES'//贸易方式多选时,保存的是第一个的值
+    //});
+    //var field_TRADEWAYCODES1 = Ext.create('Ext.form.field.Hidden', {
+    //    name: 'TRADEWAYCODES1'//贸易方式多选时,保存多选的值
+    //});
     var field_FILINGNUMBER = Ext.create('Ext.form.field.Text', {
         fieldLabel: '账册备案号',
         readOnly: true,
@@ -284,18 +285,24 @@
         tabIndex: 18
     });
     //报关申报单位
-    var tf_bgsbdw1 = Ext.create('Ext.form.field.Text', {
+    var tf_bgsbdw1 = Ext.create('Ext.form.field.ComboBox', {
         fieldLabel: '报关申报单位',
         id: 'tf_bgsbdw1',
         readOnly: true,
-        name: 'REPUNITCODE'
+        name: 'REPUNITCODE',
+        store: store_jydw,
+        displayField: 'NAME',
+        valueField: 'CODE'
     })
     //报检申报单位   
     var tf_bjsbdw1 = Ext.create('Ext.form.field.Text', {
         fieldLabel: '报检申报单位',
         id: 'tf_bjsbdw1',
         readOnly: true,
-        name: 'INSPUNITCODE'
+        name: 'INSPUNITCODE',
+        store: store_jydw,
+        displayField: 'NAME',
+        valueField: 'CODE'
     })
     //--------------------------------------------------------------------需求备注，业务状态-----------------------------------------------------------------
     //需求备注
@@ -341,7 +348,7 @@
                 { layout: 'column', height: 42, border: 0, items: [field_quanpackage, field_weight, field_contractno, combo_myfs, field_FILINGNUMBER] },
                 { layout: 'column', height: 42, border: 0, items: [chk_CHKLAWCONDITION, field_CLEARANCENO, field_ASSOCIATEPEDECLNO, tf_bgsbdw1, tf_bjsbdw1] },
                 { layout: 'column', height: 42, border: 0, items: [field_ENTRUSTREQUEST, field_STATUS] },
-                field_BUSIUNITNAME, field_BUSISHORTNAME, field_TRADEWAYCODES, field_TRADEWAYCODES1
+                field_BUSIUNITNAME, field_BUSISHORTNAME
         ]
     })
 }

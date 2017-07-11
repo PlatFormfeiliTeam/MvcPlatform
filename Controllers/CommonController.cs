@@ -70,7 +70,10 @@ namespace MvcPlatform.Controllers
         {
             return View();
         }
-
+        public ActionResult FileConsult_Declare()//文件调阅
+        {
+            return View();
+        }
         public ActionResult MultiPrint()//批量打印
         {
             return View();
@@ -136,7 +139,10 @@ namespace MvcPlatform.Controllers
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
-        
+        public ActionResult ClearanceStatus()
+        {
+            return View();
+        }
         //登录后显示顶部当前用户中文名称 by heguiqin 2016-08-25
         public string CurrentUser()
         {
@@ -1457,6 +1463,10 @@ namespace MvcPlatform.Controllers
                                 result += "[{id:'order',typename:'委托',leaf:false},{id:'declare',typename:'报关'}]";
                                 break;
                         }
+                    }
+                    else if (role == "declare")
+                    {
+                        result += "[{id:'declare',typename:'报关'}]";
                     }
                     else
                     {

@@ -240,12 +240,9 @@ Ext.onReady(function () {
                 bbar: pgbar,
                 enableColumnHide: false,
                 columns: columns_order,
-                //listeners:
-                //{
-                //    'itemdblclick': function (view, record, item, index, e) {
-                //        addwin(record.data.ID);
-                //    }
-                //},
+                listeners:
+                {
+                },
                 viewConfig: {
                     enableTextSelection: true
                 }
