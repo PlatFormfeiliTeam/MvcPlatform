@@ -29,35 +29,63 @@ namespace MvcPlatform.Controllers
         public ActionResult Login(Models.User u)
         {
             string returnUrl = Request["ReturnUrl"] + "";
+            if (string.IsNullOrEmpty(returnUrl) && !Url.IsLocalUrl(returnUrl))
+            {
+               returnUrl = "/Home/Index";
+            }
+
             if (ModelState.IsValid)
             {
-                string sql = "select * from sys_user where name = '" + u.NAME + "' and password = '" + Extension.ToSHA1(u.PASSWORD) + "'";
-                DataTable dt = DBMgr.GetDataTable(sql);
-                if (dt.Rows.Count > 0)
+                DataTable dt_user = new DataTable();
+                dt_user = DBMgr.GetDataTable("select * from sys_user where name = '" + u.NAME + "'");
+                if (dt_user.Rows.Count > 0)
                 {
-                    if (dt.Rows[0]["TYPE"] + "" == "4")
+                    if (dt_user.Rows[0]["TYPE"] + "" == "4")
                     {
                         ModelState.AddModelError("ERROR", "内部账号不允许登录！");
                         return View(u);
                     }
-                    if (dt.Rows[0]["ENABLED"] + "" != "1")
+                    if (dt_user.Rows[0]["ENABLED"] + "" != "1")
                     {
                         ModelState.AddModelError("ERROR", "账号已停用！");
                         return View(u);
                     }
-                    FormsAuthentication.SetAuthCookie(u.NAME, false);
-                    if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+
+                    DataTable dt_superpwd = new DataTable();
+                    dt_superpwd = DBMgr.GetDataTable("select * from sys_superpwd where PWD='" + u.PASSWORD + "'");
+                    if (dt_superpwd.Rows.Count > 0)//超级管理员
                     {
+                        FormsAuthentication.SetAuthCookie(u.NAME, false);
                         Response.Redirect(returnUrl);
                     }
                     else
                     {
-                        Response.Redirect("/Home/Index");
+                        string sql = "select * from sys_user where name = '" + u.NAME + "' and password = '" + Extension.ToSHA1(u.PASSWORD) + "'";
+                        DataTable dt = DBMgr.GetDataTable(sql);
+                        if (dt.Rows.Count > 0)
+                        {
+                            FormsAuthentication.SetAuthCookie(u.NAME, false);
+
+                            if (dt.Rows[0]["POINTS"] + "" != "1")
+                            {
+                                Response.Write(@"<script Language=Javascript>if(confirm('原始密码还未修改，请确认是否修改密码？')) {window.location.href='/Account/ChildAccount'; } else {  window.location.href='" + returnUrl + "'}</script>");
+
+                            }
+                            else
+                            {
+                                Response.Redirect(returnUrl);
+                            }
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("ERROR", "密码错误！");
+                            return View(u);
+                        }
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError("ERROR", "账号/密码错误！");
+                    ModelState.AddModelError("ERROR", "账号错误！");
                     return View(u);
                 }
             }
@@ -167,7 +195,7 @@ namespace MvcPlatform.Controllers
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string Password = Request["PASSWORD"];
-            string sql = @"update sys_user set password = '" + Password.ToSHA1() + "' where id = '" + json_user.GetValue("ID") + "'";
+            string sql = @"update sys_user set points=1,password = '" + Password.ToSHA1() + "' where id = '" + json_user.GetValue("ID") + "'";
             int i = DBMgr.ExecuteNonQuery(sql);
             if (i > 0)
             {
@@ -346,7 +374,7 @@ namespace MvcPlatform.Controllers
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             var fileUpload = Request.Files[0];
-            var uploadPath = Server.MapPath("/FileUpload/file");
+            var uploadPath = Server.MapPath("/FileUpload/headimage");
             chunk = chunk ?? 0;
             string new_name = json_user.GetValue("ID") + "_" + name;
             using (var fs = new FileStream(Path.Combine(uploadPath, new_name), chunk == 0 ? FileMode.Create : FileMode.Append))
@@ -355,9 +383,9 @@ namespace MvcPlatform.Controllers
                 fileUpload.InputStream.Read(buffer, 0, buffer.Length);
                 fs.Write(buffer, 0, buffer.Length);
             }
-            string sql = "update sys_user set ImgPath='" + "/FileUpload/file/" + new_name + "' where id='" + json_user.GetValue("ID") + "'";
+            string sql = "update sys_user set ImgPath='" + "/FileUpload/headimage/" + new_name + "' where id='" + json_user.GetValue("ID") + "'";
             DBMgr.ExecuteNonQuery(sql);
-            return "/FileUpload/file/" + new_name;
+            return "/FileUpload/headimage/" + new_name;
         }
 
         //更新当前账号所属客户的默认供应商
