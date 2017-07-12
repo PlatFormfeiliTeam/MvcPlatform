@@ -22,6 +22,7 @@ using LumiSoft.Net.POP3.Client;
 using LumiSoft.Net.Mail;
 using LumiSoft.Net.MIME;
 using System.IO;
+using MvcPlatform.MethodSvc;
 
 namespace MvcPlatform.Controllers
 {
@@ -1629,7 +1630,23 @@ namespace MvcPlatform.Controllers
            DBMgr.ExecuteNonQuery(sql);
 
         }
+        public string LoadList_logistic(string totalno, string divdeno)
+        {
+            string sql = "select * from list_logisticsstatus where totalno='"+totalno+"' and divideno='"+divdeno+"'  order by operate_type,operate_date asc";
+            DataTable dt= DBMgr.GetDataTable(sql);
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            string result_data = JsonConvert.SerializeObject(dt,iso);
+            return "{rows:" + result_data +"}";
 
+        }
+
+        public int getLogisticStatus(string totalno, string divdeno)
+        {
+            MethodServiceClient msc = new MethodServiceClient();
+            int result = msc.Update_Blno_Status(totalno, divdeno);
+            return result;
+        }
 
     }
 }

@@ -1,6 +1,7 @@
 ﻿//=======================================================JS init begin======================================================
 var busitypeid;
 var store_busitype; var store_sbfs;
+var win_logistic;
 Ext.onReady(function () {
     busitypeid = getQueryString_new("busitypeid");
     var busitype = "";
@@ -32,6 +33,7 @@ Ext.onReady(function () {
                 { header: 'ID', dataIndex: 'ID', hidden: true, locked: true },
                 { header: '报关状态', dataIndex: 'DECLSTATUS', width: 90, renderer: renderOrder, locked: true },
                 { header: '报检状态', dataIndex: 'INSPSTATUS', width: 90, renderer: renderOrder, locked: true },
+                { header: '物流状态', dataIndex: 'LOGISTICSSTATUS', width: 180, renderer: renderLogistic, locked: true },
                 { header: '对应号', dataIndex: 'REPNO', width: 120, locked: true },
                 { header: '合同发票号', dataIndex: 'CONTRACTNO', width: 100, locked: true },
                 { header: '件数/重量', dataIndex: 'GOODSNUM', width: 65, renderer: renderOrder, locked: true },//该字段需要拼接
@@ -173,7 +175,7 @@ Ext.onReady(function () {
     var model_fields = ['ID', 'ENTRUSTTYPE', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE', 'TURNPRENO', 'SUBMITTIME',
                         'BUSIUNITNAME', 'BUSIUNITCODE', 'CONTRACTNO', 'TOTALNO', 'DIVIDENO', 'REPWAYID', 'GOODSNUM',
                         'GOODSGW', 'CUSTOMAREACODE', 'LAWFLAG', 'ISINVALID', 'BUSITYPE', 'PRINTSTATUS', 'STATUS', 'REPNO', 'ASSOCIATENO',
-                       'CORRESPONDNO', 'FIRSTLADINGBILLNO', 'SECONDLADINGBILLNO', 'ARRIVEDNO', 'SUBMITUSERNAME', 'REPUNITNAME'];
+                       'CORRESPONDNO', 'FIRSTLADINGBILLNO', 'SECONDLADINGBILLNO', 'ARRIVEDNO', 'SUBMITUSERNAME', 'REPUNITNAME', 'LOGISTICSSTATUS'];
     Ext.define('ORDERLIST', {
         extend: 'Ext.data.Model',
         fields: model_fields
@@ -189,6 +191,7 @@ Ext.onReady(function () {
             common_data_sbgq = commondata.sbgq;//申报关区
             common_data_sbfs = commondata.sbfs;//申报方式
             //查询区域
+
             initSearch();
             store_busitype = Ext.create('Ext.data.JsonStore', {
                 fields: ['CODE', 'NAME'],
@@ -242,11 +245,31 @@ Ext.onReady(function () {
                 columns: columns_order,
                 listeners:
                 {
+                    'cellclick': function (view, td, cellindex, record, tr, rowindex, e, opt) {
+                        var dataindex = gridpanel.columns[cellindex].dataIndex;
+                        if (dataindex == 'LOGISTICSSTATUS') {
+                            var totalno = record.data.TOTALNO;
+                            var divdeno = record.data.DIVIDENO;
+                            Ext.Ajax.request({
+                                url: '/EnterpriseOrder/getLogisticStatus',
+                                params: {totalno: totalno,divdeno: divdeno},
+                                success: function (response, option) {
+                                    store_Trade.getAt(rowindex).set('LOGISTICSSTATUS',response.responseText);
+                                    store_Trade.getAt(rowindex).commit();
+                                }
+
+                            });
+                            if (win_logistic) {
+                                win_logistic.close();
+                            }
+                            showLogisticStatus(totalno, divdeno);
+                        }
+                    }
                 },
                 viewConfig: {
                     enableTextSelection: true
                 }
-            })
+            });
         }
     });
 
@@ -449,7 +472,6 @@ function initSearch() {
     });
 
 }
-
 //重置
 function Reset() {
     Ext.getCmp("CONDITION1").setValue("DECLSTATUS");
@@ -464,8 +486,6 @@ function Reset() {
     Ext.getCmp("end_date").setValue("");
 
 }
-
-
 function Select() {
     Ext.getCmp('pgbar').moveFirst();
 }
@@ -500,7 +520,6 @@ function ViewsEnterprise() {
     }
 
 }
-
 function Export() {
     var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "数据导出中，请稍等..." });
     myMask.show();
@@ -535,4 +554,141 @@ function Export() {
         }
     });
 
+}
+function showLogisticStatus(totalno,divdeno)
+{
+    Ext.define('LOGISTICSTATUS', {
+        extend: 'Ext.data.Model',
+        fields: ['ID', 'MSG', 'OPERATER', 'OPERATE_TYPE', 'OPERATE_RESULT', 'OPERATE_DATE']
+    });
+    var store_logistic = Ext.create('Ext.data.JsonStore', {
+        model: 'LOGISTICSTATUS',
+        groupField: 'OPERATE_TYPE',
+        pageSize: 20,
+        proxy: {
+            type: 'ajax',
+            url: '/EnterpriseOrder/LoadList_logistic',
+            reader: {
+                root: 'rows',
+                type: 'json'
+            }
+        },
+        autoLoad: true,
+        listeners: {
+            beforeload: function () {
+                store_logistic.getProxy().extraParams = {
+                    totalno:totalno,
+                    divdeno:divdeno
+                }
+            }
+        }
+    });
+
+
+
+    var tab_0_store, tab_1_store, tab_2_store, tab_3_store;
+    store_logistic.load(function () {
+         tab_0_store = Ext.create("Ext.data.JsonStore", {
+            fields: ['ID', 'MSG', 'OPERATER', 'OPERATE_TYPE', 'OPERATE_RESULT', 'OPERATE_DATE'],
+            data: store_logistic.getGroups("抽单状态")==undefined?[]:store_logistic.getGroups("抽单状态").children
+        });
+         tab_1_store = Ext.create("Ext.data.JsonStore", {
+             fields: ['ID', 'MSG', 'OPERATER', 'OPERATE_TYPE', 'OPERATE_RESULT', 'OPERATE_DATE'],
+             //data: store_logistic.getGroups("抽单状态") == undefined ? [] : store_logistic.getGroups("抽单状态").children
+             data: store_logistic.getGroups("口岸状态")==undefined?[]:store_logistic.getGroups("口岸状态").children
+        });
+         tab_2_store = Ext.create("Ext.data.JsonStore", {
+            fields: ['ID', 'MSG', 'OPERATER', 'OPERATE_TYPE', 'OPERATE_RESULT', 'OPERATE_DATE'],
+            data: store_logistic.getGroups("报检状态") == undefined ? [] : store_logistic.getGroups("报检状态").children
+        });
+         tab_3_store = Ext.create("Ext.data.JsonStore", {
+            fields: ['ID', 'MSG', 'OPERATER', 'OPERATE_TYPE', 'OPERATE_RESULT', 'OPERATE_DATE'],
+            data: store_logistic.getGroups("运输状态") == undefined ? [] : store_logistic.getGroups("运输状态").children
+        });
+
+
+
+         var columns_logistic = [
+            { header: 'ID', dataIndex: 'ID', hidden: true, locked: true },
+            { header: '提示信息', dataIndex: 'MSG', locked: true },
+            { header: '操作人', dataIndex: 'OPERATER', locked: true },
+            { header: '状态类型', dataIndex: 'OPERATE_TYPE', locked: true },
+            { header: '状态值', dataIndex: 'OPERATE_RESULT', locked: true },
+            { header: '时间', dataIndex: 'OPERATE_DATE',width:160, locked: true },
+         ]
+         tab_0_gridpanel = Ext.create('Ext.grid.Panel', {
+             store: tab_0_store,
+             enableColumnHide: false,
+             columns: columns_logistic,
+             viewConfig: {
+                 enableTextSelection: true
+             }
+         });
+         tab_1_gridpanel = Ext.create('Ext.grid.Panel', {
+             store: tab_1_store,
+             enableColumnHide: false,
+             columns: columns_logistic,
+             viewConfig: {
+                 enableTextSelection: true
+             }
+         });
+         tab_2_gridpanel = Ext.create('Ext.grid.Panel', {
+             store: tab_2_store,
+             enableColumnHide: false,
+             columns: columns_logistic,
+             viewConfig: {
+                 enableTextSelection: true
+             }
+         });
+         tab_3_gridpanel = Ext.create('Ext.grid.Panel', {
+             store: tab_3_store,
+             enableColumnHide: false,
+             columns: columns_logistic,
+             viewConfig: {
+                 enableTextSelection: true
+             }
+         });
+
+         var items = [{ title: '抽单状态', id: "tab_0", items: [tab_0_gridpanel] }, { title: '口岸状态', id: "tab_1", items: [tab_1_gridpanel] },
+                      { title: '报检状态', id: "tab_2", items: [tab_2_gridpanel] }, { title: '运输状态', id: "tab_3", items: [tab_3_gridpanel] }];
+         var tabpanel = Ext.create('Ext.tab.Panel', {
+             id: 'tabpanel',
+             items: items,
+         });
+
+         win_logistic = Ext.create('Ext.window.Window', {
+             title: '物流状态',
+             height: 400,
+             width: 600,
+             layout: 'fit',
+             items: [tabpanel]
+         }).show();
+
+    });
+    
+
+ 
+}
+
+function renderLogistic(value, cellmeta, record, rowIndex, columnIndex, store) {
+    var rtn = "";
+    var logistic_status_data = [{ "NAME": " 初始状态，无意义", "CODE": "0" }, { "NAME": "抽单完成（抽单状态——已签收)", "CODE": "10" },
+                               { "NAME": "转关申报完成（口岸报关——转关放行)", "CODE": "20" }, { "NAME": "口岸报检完成（报检状态——商检放行)", "CODE": "30" },
+                               { "NAME": "口岸报关完成（口岸报关——报关放行)", "CODE": "40" }, { "NAME": "提货完成（运输状态——已提货", "CODE": "50" },
+                               { "NAME": "运输中（运输状态——车辆出发）", "CODE": "60" }, { "NAME": "运输完成（运输状态——到达中转站/运输完成)", "CODE": "70" }];
+    var store_render = Ext.create("Ext.data.JsonStore", {
+        fields: ['NAME', 'CODE', ],
+        data: logistic_status_data
+    });
+   
+    var dataindex = cellmeta.column.dataIndex;
+    switch (dataindex) {
+        case "LOGISTICSSTATUS":
+            var rec = store_render.findRecord('CODE', value);
+            if (rec) {
+                rtn = rec.get("NAME");
+            }
+            break;
+    }
+    return rtn;
 }
