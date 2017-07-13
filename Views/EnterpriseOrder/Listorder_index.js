@@ -251,7 +251,7 @@ Ext.onReady(function () {
                             var totalno = record.data.TOTALNO;
                             var divdeno = record.data.DIVIDENO;
                           
-                            if (record.data.LOGISTICSSTATUS ==null) {
+                            if (record.data.LOGISTICSSTATUS == null || record.data.LOGISTICSSTATUS == "") {
                                 Ext.Ajax.request({
                                     url: '/EnterpriseOrder/getLogisticStatus',
                                     params: { totalno: totalno, divdeno: divdeno },
