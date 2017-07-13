@@ -575,5 +575,348 @@ namespace MvcPlatform.Common
             return "{filename_s:'" + filename_s + "',filename:'" + filename + "'}";
         }
 
+        //基础资料 20170713
+        public static string Ini_Base_Data(JObject json_user, string ParaType, string busitype)
+        {
+            string AdminUrl = ConfigurationManager.AppSettings["AdminUrl"];
+            IDatabase db = SeRedis.redis.GetDatabase();
+            string sql = ""; 
+
+            string json_jydw = "";//经营单位 :公用
+            if (db.KeyExists("common_data:jydw"))
+            {
+                json_jydw = db.StringGet("common_data:jydw");
+            }
+            else
+            {
+                sql = "SELECT CODE,NAME||'('||CODE||')' NAME FROM BASE_COMPANY where CODE is not null and enabled=1";
+                json_jydw = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:jydw", json_jydw);
+            }
+
+            if (ParaType == "recordinfo")//备案信息
+            {
+                //========================================备案信息============================================================================
+                string json_recordid = "[]";//账册号
+                sql = @"select id,code,code||'('||bookattribute||')' as name from sys_recordinfo where enabled=1 and busiunit= '" + json_user.Value<string>("CUSTOMERHSCODE") + "' order by id";
+                json_recordid = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+
+                string json_unit = "[]";//单位
+                if (db.KeyExists("common_data:unit"))
+                {
+                    json_unit = db.StringGet("common_data:unit");
+                }
+                else
+                {
+                    sql = @"select code,name,code||'('||name||')' as codename from base_declproductunit where enabled=1 order by code";
+                    json_unit = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                    db.StringSet("common_data:unit", json_unit);
+                }
+
+                string json_customarea = "[]";//备案关区
+                sql = @"select id,name,customarea,name||'('||customarea||')' as customareaname from cusdoc.base_year where customarea is not null and enabled=1 order by id";
+                json_customarea = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+
+                //============================================================================================================================
+
+                return "{jydw:" + json_jydw + ",recordid:" + json_recordid + ",unit:" + json_unit + ",customarea:" + json_customarea + "}";
+            }
+
+            string json_sbfs_all = "[]";//申报关区 进口口岸 
+            if (db.KeyExists("common_data:sbfs_all"))
+            {
+                json_sbfs_all = db.StringGet("common_data:sbfs_all");
+            }
+            else
+            {
+                sql = "select CODE,NAME||'('||CODE||')' NAME from SYS_REPWAY where Enabled=1 ORDER BY CODE";
+                json_sbfs_all = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:sbfs_all", json_sbfs_all);
+            }
+
+            #region 申报方式
+            string json_sbfs = "[]";//申报方式
+            sql = "select CODE,NAME||'('||CODE||')' NAME from SYS_REPWAY where Enabled=1 and instr(busitype,'" + busitype + "')>0";
+            if (busitype == "空运进口")
+            {
+                if (db.KeyExists("common_data_sbfs:kj"))
+                {
+                    json_sbfs = db.StringGet("common_data_sbfs:kj");
+                }
+                else
+                {
+                    json_sbfs = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                    db.StringSet("common_data_sbfs:kj", json_sbfs);
+                }
+            }
+            if (busitype == "空运出口")
+            {
+                if (db.KeyExists("common_data_sbfs:kc"))
+                {
+                    json_sbfs = db.StringGet("common_data_sbfs:kc");
+                }
+                else
+                {
+                    json_sbfs = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                    db.StringSet("common_data_sbfs:kc", json_sbfs);
+                }
+            }
+            if (busitype == "陆运进口")
+            {
+                if (db.KeyExists("common_data_sbfs:lj"))
+                {
+                    json_sbfs = db.StringGet("common_data_sbfs:lj");
+                }
+                else
+                {
+                    json_sbfs = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                    db.StringSet("common_data_sbfs:lj", json_sbfs);
+                }
+            }
+            if (busitype == "陆运出口")
+            {
+                if (db.KeyExists("common_data_sbfs:lc"))
+                {
+                    json_sbfs = db.StringGet("common_data_sbfs:lc");
+                }
+                else
+                {
+                    json_sbfs = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                    db.StringSet("common_data_sbfs:lc", json_sbfs);
+                }
+            }
+            if (busitype == "海运进口")
+            {
+                if (db.KeyExists("common_data_sbfs:hj"))
+                {
+                    json_sbfs = db.StringGet("common_data_sbfs:hj");
+                }
+                else
+                {
+                    json_sbfs = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                    db.StringSet("common_data_sbfs:hj", json_sbfs);
+                }
+            }
+            if (busitype == "海运出口")
+            {
+                if (db.KeyExists("common_data_sbfs:hc"))
+                {
+                    json_sbfs = db.StringGet("common_data_sbfs:hc");
+                }
+                else
+                {
+                    json_sbfs = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                    db.StringSet("common_data_sbfs:hc", json_sbfs);
+                }
+            }
+            if (busitype == "特殊区域")
+            {
+                if (db.KeyExists("common_data_sbfs:ts"))
+                {
+                    json_sbfs = db.StringGet("common_data_sbfs:ts").ToString();
+                }
+                else
+                {
+                    json_sbfs = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                    db.StringSet("common_data_sbfs:ts", json_sbfs);
+                }
+            }
+            if (busitype == "国内")
+            {
+                if (db.KeyExists("common_data_sbfs:gn"))
+                {
+                    json_sbfs = db.StringGet("common_data_sbfs:gn");
+                }
+                else
+                {
+                    json_sbfs = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                    db.StringSet("common_data_sbfs:gn", json_sbfs);
+                }
+            }
+            #endregion
+
+            string json_sbgq = "[]";//申报关区 进口口岸 
+            if (db.KeyExists("common_data:sbgq"))
+            {
+                json_sbgq = db.StringGet("common_data:sbgq");
+            }
+            else
+            {
+                sql = "select CODE,NAME||'('||CODE||')' NAME from BASE_CUSTOMDISTRICT  where ENABLED=1 ORDER BY CODE";
+                json_sbgq = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:sbgq", json_sbgq);
+            }
+
+
+            string json_bgfs = "[]";//报关方式 
+            if (db.KeyExists("common_data:bgfs"))
+            {
+                json_bgfs = db.StringGet("common_data:bgfs");
+            }
+            else
+            {
+                sql = "select CODE,NAME||'('||CODE||')' NAME  from SYS_DECLWAY where enabled=1 order by id asc";
+                json_bgfs = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:bgfs", json_bgfs);
+            }
+
+            string json_bzzl = "[]";//包装种类 
+            if (db.KeyExists("common_data:bzzl"))
+            {
+                json_bzzl = db.StringGet("common_data:bzzl");
+            }
+            else
+            {
+                sql = "select CODE,NAME||'('||CODE||')' NAME from base_Packing";
+                json_bzzl = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:bzzl", json_bzzl);
+            }
+
+            string json_myfs = "[]";//贸易方式 
+            if (db.KeyExists("common_data:myfs"))
+            {
+                json_myfs = db.StringGet("common_data:myfs");
+            }
+            else
+            {
+                sql = @"select ID,CODE,NAME||'('||CODE||')' NAME from BASE_DECLTRADEWAY WHERE enabled=1";
+                json_myfs = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:myfs", json_myfs);
+            }
+
+            string json_containertype = "[]";//集装箱类型 
+            if (db.KeyExists("common_data:containertype"))
+            {
+                json_containertype = db.StringGet("common_data:containertype");
+            }
+            else
+            {
+                sql = "select CODE,NAME||'('||CONTAINERCODE||')' as MERGENAME,CONTAINERCODE from BASE_CONTAINERTYPE where enabled=1";
+                json_containertype = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:containertype", json_containertype);
+            }
+
+            string json_containersize = "[]";//集装箱尺寸 
+            if (db.KeyExists("common_data:containersize"))
+            {
+                json_containersize = db.StringGet("common_data:containersize");
+            }
+            else
+            {
+                sql = "select CODE,NAME as CONTAINERSIZE,NAME||'('||DECLSIZE||')' as MERGENAME,DECLSIZE from BASE_CONTAINERSIZE where enabled=1";
+                json_containersize = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:containersize", json_containersize);
+            }
+
+            string json_truckno = "[]";//报关车号 
+            if (db.KeyExists("common_data:truckno"))
+            {
+                json_truckno = db.StringGet("common_data:truckno");
+            }
+            else
+            {
+                sql = @"select t.license, t.license||'('||t.whitecard||')' as MERGENAME,t.whitecard,t1.NAME||'('|| t1.CODE||')' as UNITNO from sys_declarationcar t
+                left join base_motorcade t1 on t.motorcade=t1.code where t.enabled=1";
+                json_truckno = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:truckno", json_truckno);
+            }
+
+            string json_relacontainer = "[]";//关联集装箱信息  通过选择集装箱类型的CODE和集装箱尺寸的CODE,会自动匹配关联集装箱信息
+            if (db.KeyExists("common_data:relacontainer"))
+            {
+                json_relacontainer = db.StringGet("common_data:relacontainer");
+            }
+            else
+            {
+                sql = @"select CONTAINERSIZE,CONTAINERTYPE,FORMATNAME,CONTAINERHS from rela_container t where t.enabled=1";
+                json_relacontainer = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:relacontainer", json_relacontainer);
+            }
+            //木质包装
+            string json_mzbz = "[]";
+            if (db.KeyExists("common_data:mzbz"))
+            {
+                json_mzbz = db.StringGet("common_data:mzbz");
+            }
+            else
+            {
+                sql = @"select CODE,NAME||'('||CODE||')' NAME from SYS_WOODPACKING";
+                json_mzbz = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:mzbz", json_mzbz);
+            }
+            //20160918 add 暂时用在报检单展示    检验类别、申报库别
+            //检验类别
+            string json_jylb = "[]";
+            if (db.KeyExists("common_data:jylb"))
+            {
+                json_jylb = db.StringGet("common_data:jylb");
+            }
+            else
+            {
+                sql = @"select CODE,NAME||'('||CODE||')' NAME from SYS_INSPTYPE";
+                json_jylb = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:jylb", json_jylb);
+            }
+            //申报库别
+            string json_sbkb = "[]";
+            if (db.KeyExists("common_data:sbkb"))
+            {
+                json_sbkb = db.StringGet("common_data:sbkb");
+            }
+            else
+            {
+                sql = @"select CODE,NAME||'('||CODE||')' NAME from SYS_REPORTLIBRARY";
+                json_sbkb = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:sbkb", json_sbkb);
+            }
+            //报检包装种类 
+            string json_inspbzzl = "[]";
+            if (db.KeyExists("common_data:inspbzzl"))
+            {
+                json_inspbzzl = db.StringGet("common_data:inspbzzl");
+            }
+            else
+            {
+                sql = @"select CODE,NAME||'('||CODE||')' NAME from BASE_INSPPACKAGE";
+                json_inspbzzl = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:inspbzzl", json_inspbzzl);
+            }
+            //报检监管方式（贸易方式）
+            string json_inspmyfs = "[]";//贸易方式 
+            if (db.KeyExists("common_data:inspmyfs"))
+            {
+                json_inspmyfs = db.StringGet("common_data:inspmyfs");
+            }
+            else
+            {
+                sql = @"select ID,CODE,NAME||'('||CODE||')' NAME from BASE_TRADEWAY WHERE enabled=1";
+                json_inspmyfs = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:inspmyfs", json_inspmyfs);
+            }
+            //单证服务单位
+            string json_dzfwdw = "[]";
+            if (db.KeyExists("common_data:dzfwdw"))
+            {
+                json_dzfwdw = db.StringGet("common_data:dzfwdw");
+            }
+            else
+            {
+                sql = @"select * from sys_customer where DOCSERVICECOMPANY=1";
+                json_dzfwdw = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:dzfwdw", json_dzfwdw);
+            }
+
+            if (ParaType == "predata")//ListPreData.cshtml 导入用的
+            {
+                return "{sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",myfs:" + json_myfs + "}";
+            }
+
+            return "{jydw:" + json_jydw + ",sbfs_all:" + json_sbfs_all + ",sbfs:" + json_sbfs + ",sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",bzzl:" + json_bzzl
+                + ",myfs:" + json_myfs + ",containertype:" + json_containertype + ",containersize:" + json_containersize + ",truckno:" + json_truckno
+                + ",relacontainer:" + json_relacontainer + ",mzbz:" + json_mzbz + ",jylb:" + json_jylb + ",json_sbkb:" + json_sbkb
+                + ",inspbzzl:" + json_inspbzzl + ",adminurl:'" + AdminUrl + "',curuser:" + json_user
+                + ",dzfwdw:" + json_dzfwdw + ",inspmyfs:" + json_inspmyfs + "}";
+        }
+
     }
 }

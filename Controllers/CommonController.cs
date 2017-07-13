@@ -499,6 +499,10 @@ namespace MvcPlatform.Controllers
         public string Ini_Base_Data()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            return Extension.Ini_Base_Data(json_user, Request["ParaType"], Request["busitype"]);
+
+            /*
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             IDatabase db = SeRedis.redis.GetDatabase();
             string sql = ""; string ParaType = Request["ParaType"];
 
@@ -832,6 +836,7 @@ namespace MvcPlatform.Controllers
                 + ",relacontainer:" + json_relacontainer + ",mzbz:" + json_mzbz + ",jylb:" + json_jylb + ",json_sbkb:" + json_sbkb
                 + ",inspbzzl:" + json_inspbzzl + ",adminurl:'" + AdminUrl + "',curuser:" + Extension.Get_UserInfo(HttpContext.User.Identity.Name)
                 + ",dzfwdw:" + json_dzfwdw + ",inspmyfs:" + json_inspmyfs + "}";
+             */
         }
 
         /*保存查询条件设置 by panhuaguo 2016-01-17*/
