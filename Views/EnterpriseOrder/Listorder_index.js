@@ -250,15 +250,18 @@ Ext.onReady(function () {
                         if (dataindex == 'LOGISTICSSTATUS') {
                             var totalno = record.data.TOTALNO;
                             var divdeno = record.data.DIVIDENO;
-                            Ext.Ajax.request({
-                                url: '/EnterpriseOrder/getLogisticStatus',
-                                params: {totalno: totalno,divdeno: divdeno},
-                                success: function (response, option) {
-                                    store_Trade.getAt(rowindex).set('LOGISTICSSTATUS',response.responseText);
-                                    store_Trade.getAt(rowindex).commit();
-                                }
+                          
+                            if (record.data.LOGISTICSSTATUS ==null) {
+                                Ext.Ajax.request({
+                                    url: '/EnterpriseOrder/getLogisticStatus',
+                                    params: { totalno: totalno, divdeno: divdeno },
+                                    success: function (response, option) {
+                                        store_Trade.getAt(rowindex).set('LOGISTICSSTATUS', response.responseText);
+                                        store_Trade.getAt(rowindex).commit();
+                                    }
 
-                            });
+                                });
+                            }
                             if (win_logistic) {
                                 win_logistic.close();
                             }
@@ -686,7 +689,7 @@ function renderLogistic(value, cellmeta, record, rowIndex, columnIndex, store) {
         case "LOGISTICSSTATUS":
             var rec = store_render.findRecord('CODE', value);
             if (rec) {
-                rtn = rec.get("NAME");
+                rtn = "<a>" + rec.get("NAME") + "</a>";
             }
             break;
     }
