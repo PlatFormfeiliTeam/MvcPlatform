@@ -66,7 +66,7 @@ namespace MvcPlatform.Controllers
         }
         public ActionResult EntOrderList()  //文件委托
         {
-            ViewBag.navigator = "企业服务>>文件委托";
+            ViewBag.navigator = "业务管理>>文件委托";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
@@ -116,7 +116,20 @@ namespace MvcPlatform.Controllers
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
-        
+
+        public ActionResult ListPreData()
+        {
+            ViewBag.navigator = "业务管理>>预录导入";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
+
+        public ActionResult ListPreDataDetail()
+        {
+            ViewBag.navigator = "业务管理>>预录导入";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
 
         public string GetCode(string combin)
         {
@@ -1647,6 +1660,297 @@ namespace MvcPlatform.Controllers
             int result = msc.Update_Blno_Status(totalno, divdeno);
             return result;
         }
+
+
+        #region 预录导入
+
+        public string QueryConditionPreData()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            string where = "";
+            if (!string.IsNullOrEmpty(Request["CUSNO"]))
+            {
+                where += " and instr(lp.CUSNO,'" + Request["CUSNO"] + "')>0";
+            }
+            if (!string.IsNullOrEmpty(Request["FLAG"]))
+            {
+                where += " and lp.FLAG='" + Request["FLAG"] + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["STARTDATE"]))
+            {
+                where += " and lp.REPDATE>=to_date('" + Request["STARTDATE"] + "','yyyy-mm-dd hh24:mi:ss')";
+            }
+            if (!string.IsNullOrEmpty(Request["ENDDATE"]))
+            {
+                where += " and lp.REPDATE<=to_date('" + Request["ENDDATE"] + "','yyyy-mm-dd hh24:mi:ss')+1";
+            }
+
+            where += @" and lp.customercode ='" + json_user.Value<string>("CUSTOMERCODE") + "' ";
+
+            string sql = @"select lp.* from list_predata lp";
+
+            sql += " where lp.ISINVALID=0 " + where;
+
+            return sql;
+
+        }
+
+        public string loadpredata()
+        {            
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
+            iso.DateTimeFormat = "yyyy-MM-dd";
+            string sql = QueryConditionPreData();
+
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "DESC"));
+            var json = JsonConvert.SerializeObject(dt, iso);
+
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
+        public string getStatusCode(string name, JArray jarray)
+        {
+            string code = "";
+            foreach (JObject json in jarray)
+            {
+                if (json.Value<string>("NAME").Substring(0,json.Value<string>("NAME").IndexOf("(")) == name) 
+                { 
+                    code = json.Value<string>("CODE");
+                    break;
+                }
+            }
+            return code;
+        }
+        public string getStatusCodebyname(string name, JArray jarray)
+        {
+            string code = "";
+            foreach (JObject json in jarray)
+            {
+                if (json.Value<string>("NAME") == name)
+                {
+                    code = json.Value<string>("CODE");
+                    break;
+                }
+            }
+            return code;
+        }
+
+        public string ImportExcelData()
+        {
+            HttpPostedFileBase postedFile = Request.Files["UPLOADFILE"];//获取上传信息对象  
+            string fileName = Path.GetFileName(postedFile.FileName);
+
+            string newfile = @"~/FileUpload/PreData/" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_" + fileName;
+            if (!Directory.Exists(Server.MapPath("~/FileUpload/PreData")))
+            {
+                Directory.CreateDirectory(Server.MapPath("~/FileUpload/PreData"));
+            }
+            postedFile.SaveAs(Server.MapPath(newfile));
+
+            DataTable dtExcel = ExcelToDatatalbe(Server.MapPath(newfile));
+
+            //Rows：表头11行+一行表体列名+至少一行表体数据；Columns：18列
+            if (dtExcel == null || dtExcel.Rows.Count <= 13 || dtExcel.Columns.Count != 17)
+            {
+                return "No Data";
+            }
+            //验证列名称
+            int colcount = 0;
+            for (int i = 0; i < dtExcel.Columns.Count; i++)
+            {
+                if (dtExcel.Columns[i].ColumnName == "报关单证录入") { colcount++; }
+            }
+
+            if (colcount == 0)
+            {
+                return "No Columns";
+            }
+            //====================================================================================================
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            
+
+            //类型//地址//电话//客户全称
+            string var1 = dtExcel.Rows[0][1].ToString(); string var2 = dtExcel.Rows[0][3].ToString(); string var3 = dtExcel.Rows[0][12].ToString(); string var4 = dtExcel.Rows[1][2].ToString();
+            //客户地址//客户电话//发票号码//发票日期
+            string var5 = dtExcel.Rows[1][7].ToString(); string var6 = dtExcel.Rows[1][14].ToString(); string var7 = dtExcel.Rows[2][2].ToString(); string var8 = dtExcel.Rows[2][5].ToString();
+            //合同号码//合同日期//签约地//报关单号
+            string var9 = dtExcel.Rows[2][8].ToString(); string var10 = dtExcel.Rows[2][12].ToString(); string var11 = dtExcel.Rows[2][15].ToString(); string var12 = dtExcel.Rows[3][2].ToString();
+            //放行日期//退税日期//航次号//运输工具
+            string var13 = dtExcel.Rows[3][5].ToString(); string var14 = dtExcel.Rows[3][9].ToString(); string var15 = dtExcel.Rows[3][12].ToString(); string var16 = dtExcel.Rows[4][2].ToString();
+
+            //提运单号//出口日期//申报日期//贸易国
+            string var17 = dtExcel.Rows[4][5].ToString(); string var18 = dtExcel.Rows[4][9].ToString(); string var19 = dtExcel.Rows[4][11].ToString(); string var20 = dtExcel.Rows[4][14].ToString();
+            //经营单位//出口口岸//备案号//运输方式
+            string var21 = dtExcel.Rows[5][2].ToString(); string var21_1 = dtExcel.Rows[5][4].ToString();
+            string var22 = dtExcel.Rows[5][10].ToString(); string var23 = dtExcel.Rows[5][13].ToString(); string var24 = dtExcel.Rows[5][15].ToString();
+            //发货单位//贸易方式//征免性质//运抵国
+            string var25 = dtExcel.Rows[6][2].ToString(); string var25_1 = dtExcel.Rows[6][4].ToString();
+            string var26 = dtExcel.Rows[6][10].ToString(); string var27 = dtExcel.Rows[6][13].ToString(); string var28 = dtExcel.Rows[7][3].ToString();
+            //指运港//境内货源地//成交方式//运费
+            string var29 = dtExcel.Rows[7][8].ToString(); string var30 = dtExcel.Rows[7][13].ToString(); string var31 = dtExcel.Rows[8][2].ToString();
+            string var32 = dtExcel.Rows[8][5].ToString(); string var32_1 = dtExcel.Rows[8][6].ToString(); string var32_2 = dtExcel.Rows[8][7].ToString();
+
+            //保费//杂费//许可证号//件数
+            string var33 = dtExcel.Rows[8][9].ToString(); string var33_1 = dtExcel.Rows[8][10].ToString(); string var33_2 = dtExcel.Rows[8][11].ToString();
+            string var34 = dtExcel.Rows[8][13].ToString(); string var34_1 = dtExcel.Rows[8][14].ToString(); string var34_2 = dtExcel.Rows[8][15].ToString();
+            string var35 = dtExcel.Rows[9][2].ToString(); string var36 = dtExcel.Rows[9][5].ToString();
+            //包装种类//毛重//净重//备注
+            string var37 = dtExcel.Rows[9][9].ToString(); string var38 = dtExcel.Rows[9][11].ToString(); string var39 = dtExcel.Rows[9][14].ToString(); string var40 = dtExcel.Rows[10][2].ToString();
+            //特殊关系确认//价格影响确认//支付特许权使用费确认//报关类型
+            string var41 = dtExcel.Rows[10][8].ToString(); string var42 = dtExcel.Rows[10][10].ToString(); string var43 = dtExcel.Rows[10][13].ToString(); string var44 = dtExcel.Rows[10][15].ToString();
+
+            //基础资料 获取code
+            string jsonstr = Extension.Ini_Base_Data(json_user, "predata", "");
+            JObject json = (JObject)JsonConvert.DeserializeObject(jsonstr);
+            
+            //贸易方式//出口口岸
+            string var26_code = getStatusCode(var26, json.Value<JArray>("myfs"));
+            string var22_code = getStatusCode(var22, json.Value<JArray>("sbgq"));
+            //报关类型string var44_code = getStatusCode(var44, json.Value<JArray>("bgfs"));
+
+
+            DataTable dt_id = new DataTable();
+            dt_id = DBMgr.GetDataTable("select LIST_PREDATA_ID.Nextval from dual");
+            if (dt_id.Rows.Count <= 0) { return "error"; }
+            Int32 pre_id = Convert.ToInt32(dt_id.Rows[0][0].ToString());
+
+
+            //类型//合同号码//航次号//运输工具//提运单号//出口日期
+            //申报日期//贸易国//出口口岸//备案号//运输方式
+            //发货单位//贸易方式//征免性质//运抵国
+            //指运港//境内货源地//成交方式//运费
+            //保费//杂费
+            //许可证号//件数//包装种类//毛重//净重
+            //报关类型//文件路径//原始文件名//委托单位代码//委托单位名称
+            string sql = @"insert into list_predata(ID,ISINVALID,CREATETIME,FLAG,CUSNO
+                            ,INOUTTYPE,CONTRACTNO,VOYAGENO,TRANSNAME,BLNO,INOUTDATE
+                            ,REPDATE,TRADECOUNTRYNAME,PORTNAME,RECORDCODE,TRANSMODEL
+                            ,BUSIUNITCODE,BUSIUNITNAME,TRADENAME,EXEMPTIONNAME,SECOUNTRYNAME
+                            ,SEPORTNAME,SEPLACENAME,TRADETERMSNAME,FGCODE,FGNAME
+                            ,FREIGHT,FGUNITNAME,IPCODE,IPNAME,INSURANCEPREMIUM
+                            ,IPUNITNAME,AECODE,AENAME,ADDITIONALEXPENSES,AEUNITNAME
+                            ,LICENSENO,GOODSNUM,PACKAGENAME,GOODSGW,GOODSNW
+                            ,DECLWAY,FILEPATH,OLDFILENAME,CUSTOMERCODE,CUSTOMERNAME
+                            ,TRADECODE,PORTCODE
+                        ) VALUES (" + pre_id + @",0,sysdate,0,(select fun_AutoCUSNO(sysdate) from dual)
+                            ,'{0}','{1}','{2}','{3}','{4}',to_date('{5}','yyyy/mm/dd')
+                            ,to_date('{6}','yyyy/mm/dd'),'{7}','{8}','{9}','{10}'
+                            ,'{11}','{12}','{13}','{14}','{15}'
+                            ,'{16}','{17}','{18}','{19}','{20}'
+                            ,'{21}','{22}','{23}','{24}','{25}'
+                            ,'{26}','{27}','{28}','{29}','{30}'
+                            ,'{31}','{32}','{33}','{34}','{35}'
+                            ,'{36}','{37}','{38}','{39}','{40}'
+                            ,'{41}','{42}')";
+
+            sql = string.Format(sql, var1, var9, var15, var16, var17, var18
+                                , var19, var20, var22, var23, var24
+                                , var25, var25_1, var26, var27, var28
+                                , var29, var30, var31, var32.Substring(0, 1), var32.Substring(2)
+                                , var32_1, var32_2, var33.Substring(0, 1), var33.Substring(2), var33_1
+                                , var33_2, var34.Substring(0, 1), var34.Substring(2), var34_1, var34_2
+                                , var35, var36, var37, var38, var39
+                                , var44, newfile.Substring(1), fileName, json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
+                                , var26_code, var22_code);
+
+            int recount = DBMgr.ExecuteNonQuery(sql);
+            if (recount > 0)
+            {
+                DataTable dt_cusno = DBMgr.GetDataTable("select CUSNO from list_predata where id=" + pre_id);
+
+                //项号//商品编码//商品名称//商品规格//净重
+                //成交数量//法一数量//法二数量//成交单位//法一单位
+                //法二单位//原产国//总价//单价//币制
+                //征免//目的国//企业编号（外键）//成交单位CODE//法一单位CODE
+                //法二单位CODE
+                string sql_detail = @"insert into list_predata_sub(ID,ISINVALID,CREATEDATE,FLAG
+                            ,ORDERNO,COMMODITYNO,ADDITIONALNO,COMMODITYCHNAME,SPECIFICATIONSMODEL,GOODSNW
+                            ,CADQUANTITY,LEGALQUANTITY,SQUANTITY,CADUNITNAME,LEGALUNITNAME
+                            ,SUNITNAME,COUNTRYORIGINNAME,TOTALPRICE,UNITPRICE,CURRENCYNAME
+                            ,TAXPAIDNAME,DESTCOUNTRYNAME,PCODE,CADUNITCODE,LEGALUNITCODE
+                            ,SUNITCODE
+                        ) VALUES (LIST_PREDATA_SUB_ID.Nextval,0,sysdate,0
+                            ,'{0}','{1}','{2}','{3}','{4}','{5}'
+                            ,'{6}','{7}','{8}','{9}','{10}'
+                            ,'{11}','{12}','{13}','{14}','{15}'
+                            ,'{16}','{17}','{18}','{19}','{20}'
+                            ,'{21}')";
+                JArray ja_unit = json.Value<JArray>("unit");
+
+                for (int j = 12; j < dtExcel.Rows.Count; j = j + 3)
+                {
+                    if (dtExcel.Rows[j][1].ToString().Trim() == "")
+                    {
+                        break;
+                    }
+
+                    sql = string.Format(sql_detail
+                        , dtExcel.Rows[j][0].ToString(), dtExcel.Rows[j][1].ToString().Substring(0, 8), dtExcel.Rows[j][1].ToString().Substring(8), dtExcel.Rows[j][2].ToString(), dtExcel.Rows[j][4].ToString(), dtExcel.Rows[j][8].ToString()
+                        , dtExcel.Rows[j][9].ToString(), dtExcel.Rows[j + 1][9].ToString(), dtExcel.Rows[j + 2][9].ToString(), dtExcel.Rows[j][10].ToString(), dtExcel.Rows[j + 1][10].ToString()
+                        , dtExcel.Rows[j + 2][10].ToString(), dtExcel.Rows[j][11].ToString(), dtExcel.Rows[j][12].ToString(), dtExcel.Rows[j][13].ToString(), dtExcel.Rows[j][14].ToString()
+                        , dtExcel.Rows[j][15].ToString(), dtExcel.Rows[j][16].ToString(), dt_cusno.Rows[0][0].ToString(), getStatusCodebyname(dtExcel.Rows[j][10].ToString(), ja_unit), getStatusCodebyname(dtExcel.Rows[j + 1][10].ToString(), ja_unit)
+                        , getStatusCodebyname(dtExcel.Rows[j + 2][10].ToString(), ja_unit)
+                        );
+                    DBMgr.ExecuteNonQuery(sql);
+                }
+            }
+
+            return "{success:true}";
+        }
+
+        public string DeletePreData()
+        {
+            string result = "{success:false}";
+
+            string sql = "select * from LIST_PREDATA where ID='" + Request["ID"] + "'";
+            DataTable dt = DBMgr.GetDataTable(sql);
+
+            if (dt.Rows[0]["FLAG"] + "" != "0" )
+            {
+                return result;
+            }
+            
+            sql = "delete from LIST_PREDATA_SUB where PCODE='" + dt.Rows[0]["CUSNO"] + "'";
+            DBMgr.ExecuteNonQuery(sql);
+
+            sql = "delete from LIST_PREDATA where ID='" + Request["ID"] + "'";
+            DBMgr.ExecuteNonQuery(sql);
+
+            FileInfo fi = new FileInfo(Server.MapPath(@"~" + dt.Rows[0]["FILEPATH"]));
+            if (fi.Exists)
+            {
+                fi.Delete();
+            }
+
+            return "{success:true}"; ;
+        }
+
+        public string loadPreDataDetail()
+        {
+            string CUSNO = Request["CUSNO"];
+
+            string result = string.Empty;
+            string sql = string.Empty; string head_data = "[]"; string sub_data = "[]";
+         
+            
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd";
+
+            sql = "select * from list_predata where cusno='" + CUSNO + "'";
+            DataTable dt = DBMgr.GetDataTable(sql);
+            head_data = JsonConvert.SerializeObject(dt, iso);
+            
+            sql = "select * from list_predata_sub where pcode='" + CUSNO + "' order by orderno";
+            DataTable dt_sub = DBMgr.GetDataTable(sql);
+            sub_data = JsonConvert.SerializeObject(dt_sub, iso);
+
+            result = "{head_data:" + head_data + ",sub_data:" + sub_data + "}";
+            return result;
+        }
+
+        #endregion
+
+
 
     }
 }

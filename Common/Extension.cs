@@ -594,24 +594,24 @@ namespace MvcPlatform.Common
                 db.StringSet("common_data:jydw", json_jydw);
             }
 
+            string json_unit = "[]";//单位 :公用
+            if (db.KeyExists("common_data:unit"))
+            {
+                json_unit = db.StringGet("common_data:unit");
+            }
+            else
+            {
+                sql = @"select code,name,code||'('||name||')' as codename from base_declproductunit where enabled=1 order by code";
+                json_unit = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                db.StringSet("common_data:unit", json_unit);
+            }
+
             if (ParaType == "recordinfo")//备案信息
             {
                 //========================================备案信息============================================================================
                 string json_recordid = "[]";//账册号
                 sql = @"select id,code,code||'('||bookattribute||')' as name from sys_recordinfo where enabled=1 and busiunit= '" + json_user.Value<string>("CUSTOMERHSCODE") + "' order by id";
                 json_recordid = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
-
-                string json_unit = "[]";//单位
-                if (db.KeyExists("common_data:unit"))
-                {
-                    json_unit = db.StringGet("common_data:unit");
-                }
-                else
-                {
-                    sql = @"select code,name,code||'('||name||')' as codename from base_declproductunit where enabled=1 order by code";
-                    json_unit = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
-                    db.StringSet("common_data:unit", json_unit);
-                }
 
                 string json_customarea = "[]";//备案关区
                 sql = @"select id,name,customarea,name||'('||customarea||')' as customareaname from cusdoc.base_year where customarea is not null and enabled=1 order by id";
@@ -908,7 +908,7 @@ namespace MvcPlatform.Common
 
             if (ParaType == "predata")//ListPreData.cshtml 导入用的
             {
-                return "{sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",myfs:" + json_myfs + "}";
+                return "{sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",myfs:" + json_myfs + ",unit:" + json_unit + "}";
             }
 
             return "{jydw:" + json_jydw + ",sbfs_all:" + json_sbfs_all + ",sbfs:" + json_sbfs + ",sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",bzzl:" + json_bzzl
