@@ -240,24 +240,23 @@ function Delete() {
         return;
     }
 
-    if (recs[0].data.NEWSTATUS != '5') {
-        Ext.MessageBox.alert('提示', '只能删除状态为草稿的记录！');
-        return;
-    }
-
+    //if (recs[0].data.NEWSTATUS != '5') {
+    //    Ext.MessageBox.alert('提示', '只能删除状态为草稿的记录！');
+    //    return;
+    //}
     Ext.MessageBox.confirm("提示", "确定要删除所选择的记录吗？", function (btn) {
         if (btn == 'yes') {
             Ext.Ajax.request({
-                url: '/EnterpriseOrder/Delete',
-                params: { id: recs[0].get("ID") },
+                url: '/EnterpriseOrder/DeleteList',
+                params: { recs: Ext.encode(Ext.pluck(recs,'data')) },
                 success: function (response, success, option) {
                     var res = Ext.decode(response.responseText);
                     if (res.success) {
-                        Ext.MessageBox.alert('提示', '删除成功！');
+                        Ext.MessageBox.alert('提示', '删除成功！' + res.message);
                         gridpanel.store.reload();
                     }
                     else {
-                        Ext.MessageBox.alert('提示', '删除失败！');
+                        Ext.MessageBox.alert('提示', '删除失败！' + res.message);
                     }
                 }
             });

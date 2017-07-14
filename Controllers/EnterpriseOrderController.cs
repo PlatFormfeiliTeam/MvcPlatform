@@ -487,32 +487,69 @@ namespace MvcPlatform.Controllers
                     return "{success:false}";
                 }
             }
-
-            public string Delete()
+            public string DeleteList(string recs)
             {
-                string id = Request["id"].ToString();
-                string json = "{success:false}"; string sql = "";
-
-                //删除订单随附文件
-                System.Uri Uri = new Uri("ftp://" + ConfigurationManager.AppSettings["FTPServer"] + ":" + ConfigurationManager.AppSettings["FTPPortNO"]);
-                string UserName = ConfigurationManager.AppSettings["FTPUserName"];
-                string Password = ConfigurationManager.AppSettings["FTPPassword"];
-                FtpHelper ftp = new FtpHelper(Uri, UserName, Password);
-                sql = "select * from list_attachment where entid='" + id + "'";
-                DataTable dt = DBMgr.GetDataTable(sql);
-                foreach (DataRow dr in dt.Rows)
+                bool flag = true; string UNITCODE = string.Empty;
+                JArray ja = JArray.Parse(recs);
+                string message = string.Empty;
+                foreach (JToken jt  in ja)
                 {
-                    ftp.DeleteFile(dr["FILENAME"] + "");
+                    if (jt.Value<string>("NEWSTATUS") == "5")
+                    {
+                     flag=Delete(jt.Value<string>("ID"));
+                     if (!flag)
+                     {
+                         UNITCODE += jt.Value<string>("UNITCODE")+" ";
+                     }
+                    }
+                    else
+                    {
+                        message = "某些记录为非草稿状态，本次操作只删除草稿状态的记录！";
+                    }
                 }
+                if (UNITCODE!="")
+                {
+                   
+                    message = "如下编号:" + UNITCODE + "的记录删除失败。";
+                    return "{success:false,message:'" + message + "'}";
+                }
+                else
+                {
+                    return "{success:true,message:'" + message + "'}";
+                }
+                
+            }
+            public bool Delete(string id)
+            {
+                try
+                {
+                    string sql = "";
 
-                sql = "delete from list_attachment where entid='" + id + "'";
-                DBMgr.ExecuteNonQuery(sql);
+                    //删除订单随附文件
+                    System.Uri Uri = new Uri("ftp://" + ConfigurationManager.AppSettings["FTPServer"] + ":" + ConfigurationManager.AppSettings["FTPPortNO"]);
+                    string UserName = ConfigurationManager.AppSettings["FTPUserName"];
+                    string Password = ConfigurationManager.AppSettings["FTPPassword"];
+                    FtpHelper ftp = new FtpHelper(Uri, UserName, Password);
+                    sql = "select * from list_attachment where entid='" + id + "'";
+                    DataTable dt = DBMgr.GetDataTable(sql);
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        ftp.DeleteFile(dr["FILENAME"] + "");
+                    }
 
-                sql = "delete from ENT_ORDER where id = '" + id + "'";
-                DBMgr.ExecuteNonQuery(sql);
+                    sql = "delete from list_attachment where entid='" + id + "'";
+                    DBMgr.ExecuteNonQuery(sql);
 
-                json = "{success:true}";
-                return json;
+                    sql = "delete from ENT_ORDER where id = '" + id + "'";
+                    DBMgr.ExecuteNonQuery(sql);
+                }
+                catch (Exception)
+                {
+
+                    return false;
+                }
+                return true;
+               
             }
             public string loadOrderList()
             {
