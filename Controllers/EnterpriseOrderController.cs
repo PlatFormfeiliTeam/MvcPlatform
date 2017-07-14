@@ -1774,6 +1774,9 @@ namespace MvcPlatform.Controllers
 
         public string ImportExcelData()
         {
+            string formdata = Request["formdata"];
+            JObject json_formdata = (JObject)JsonConvert.DeserializeObject(formdata);
+
             HttpPostedFileBase postedFile = Request.Files["UPLOADFILE"];//获取上传信息对象  
             string fileName = Path.GetFileName(postedFile.FileName);
 
@@ -1784,6 +1787,21 @@ namespace MvcPlatform.Controllers
             }
             postedFile.SaveAs(Server.MapPath(newfile));
 
+            string result = "";
+            if (json_formdata.Value<string>("RADIO_MODULE") == "1")
+            {
+                result = ModuleOne(newfile, fileName);
+            }
+            if (json_formdata.Value<string>("RADIO_MODULE") == "2")
+            {
+                result = ModuleTwo(newfile, fileName);
+            }
+
+            return result;
+        }
+
+        public string ModuleOne(string newfile, string fileName)
+        {
             DataTable dtExcel = ExcelToDatatalbe(Server.MapPath(newfile));
 
             //Rows：表头11行+一行表体列名+至少一行表体数据；Columns：18列
@@ -1804,7 +1822,7 @@ namespace MvcPlatform.Controllers
             }
             //====================================================================================================
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            
+
 
             //类型//地址//电话//客户全称
             string var1 = dtExcel.Rows[0][1].ToString(); string var2 = dtExcel.Rows[0][3].ToString(); string var3 = dtExcel.Rows[0][12].ToString(); string var4 = dtExcel.Rows[1][2].ToString();
@@ -1835,14 +1853,18 @@ namespace MvcPlatform.Controllers
             string var37 = dtExcel.Rows[9][9].ToString(); string var38 = dtExcel.Rows[9][11].ToString(); string var39 = dtExcel.Rows[9][14].ToString(); string var40 = dtExcel.Rows[10][2].ToString();
             //特殊关系确认//价格影响确认//支付特许权使用费确认//报关类型
             string var41 = dtExcel.Rows[10][8].ToString(); string var42 = dtExcel.Rows[10][10].ToString(); string var43 = dtExcel.Rows[10][13].ToString(); string var44 = dtExcel.Rows[10][15].ToString();
+            if (var41 == "是") { var41 = "1"; } else if (var41 == "否") { var41 = "0"; } else { var41 = "9"; }
+            if (var42 == "是") { var42 = "1"; } else if (var42 == "否") { var42 = "0"; } else { var42 = "9"; }
+            if (var43 == "是") { var43 = "1"; } else if (var43 == "否") { var43 = "0"; } else { var43 = "9"; }
+
 
             //基础资料 获取code
-            string jsonstr = Extension.Ini_Base_Data(json_user, "predata", "");
-            JObject json = (JObject)JsonConvert.DeserializeObject(jsonstr);
-            
+            //string jsonstr = Extension.Ini_Base_Data(json_user, "predata", "");
+            //JObject json = (JObject)JsonConvert.DeserializeObject(jsonstr);
+
             //贸易方式//出口口岸
-            string var26_code = getStatusCode(var26, json.Value<JArray>("myfs"));
-            string var22_code = getStatusCode(var22, json.Value<JArray>("sbgq"));
+            //string var26_code = getStatusCode(var26, json.Value<JArray>("myfs"));
+            //string var22_code = getStatusCode(var22, json.Value<JArray>("sbgq"));
             //报关类型string var44_code = getStatusCode(var44, json.Value<JArray>("bgfs"));
 
 
@@ -1859,6 +1881,7 @@ namespace MvcPlatform.Controllers
             //保费//杂费
             //许可证号//件数//包装种类//毛重//净重
             //报关类型//文件路径//原始文件名//委托单位代码//委托单位名称
+            //备注//特殊关系确认//价格影响确认//支付特许权使用费确认
             string sql = @"insert into list_predata(ID,ISINVALID,CREATETIME,FLAG,CUSNO
                             ,INOUTTYPE,CONTRACTNO,VOYAGENO,TRANSNAME,BLNO,INOUTDATE
                             ,REPDATE,TRADECOUNTRYNAME,PORTNAME,RECORDCODE,TRANSMODEL
@@ -1868,7 +1891,7 @@ namespace MvcPlatform.Controllers
                             ,IPUNITNAME,AECODE,AENAME,ADDITIONALEXPENSES,AEUNITNAME
                             ,LICENSENO,GOODSNUM,PACKAGENAME,GOODSGW,GOODSNW
                             ,DECLWAY,FILEPATH,OLDFILENAME,CUSTOMERCODE,CUSTOMERNAME
-                            ,TRADECODE,PORTCODE
+                            ,REMARK,SPECIALRELATION,PRICEIMPACT,PAYPOYALTIES
                         ) VALUES (" + pre_id + @",0,sysdate,0,(select fun_AutoCUSNO(sysdate) from dual)
                             ,'{0}','{1}','{2}','{3}','{4}',to_date('{5}','yyyy/mm/dd')
                             ,to_date('{6}','yyyy/mm/dd'),'{7}','{8}','{9}','{10}'
@@ -1878,7 +1901,7 @@ namespace MvcPlatform.Controllers
                             ,'{26}','{27}','{28}','{29}','{30}'
                             ,'{31}','{32}','{33}','{34}','{35}'
                             ,'{36}','{37}','{38}','{39}','{40}'
-                            ,'{41}','{42}')";
+                            ,'{41}','{42}','{43}','{44}')";
 
             sql = string.Format(sql, var1, var9, var15, var16, var17, var18
                                 , var19, var20, var22, var23, var24
@@ -1888,7 +1911,7 @@ namespace MvcPlatform.Controllers
                                 , var33_2, var34.Substring(0, 1), var34.Substring(2), var34_1, var34_2
                                 , var35, var36, var37, var38, var39
                                 , var44, newfile.Substring(1), fileName, json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
-                                , var26_code, var22_code);
+                                , var40, var41, var42, var43);
 
             int recount = DBMgr.ExecuteNonQuery(sql);
             if (recount > 0)
@@ -1898,21 +1921,20 @@ namespace MvcPlatform.Controllers
                 //项号//商品编码//商品名称//商品规格//净重
                 //成交数量//法一数量//法二数量//成交单位//法一单位
                 //法二单位//原产国//总价//单价//币制
-                //征免//目的国//企业编号（外键）//成交单位CODE//法一单位CODE
-                //法二单位CODE
+                //征免//目的国//企业编号（外键）              
+
                 string sql_detail = @"insert into list_predata_sub(ID,ISINVALID,CREATEDATE,FLAG
                             ,ORDERNO,COMMODITYNO,ADDITIONALNO,COMMODITYCHNAME,SPECIFICATIONSMODEL,GOODSNW
                             ,CADQUANTITY,LEGALQUANTITY,SQUANTITY,CADUNITNAME,LEGALUNITNAME
                             ,SUNITNAME,COUNTRYORIGINNAME,TOTALPRICE,UNITPRICE,CURRENCYNAME
-                            ,TAXPAIDNAME,DESTCOUNTRYNAME,PCODE,CADUNITCODE,LEGALUNITCODE
-                            ,SUNITCODE
+                            ,TAXPAIDNAME,DESTCOUNTRYNAME,PCODE
                         ) VALUES (LIST_PREDATA_SUB_ID.Nextval,0,sysdate,0
                             ,'{0}','{1}','{2}','{3}','{4}','{5}'
                             ,'{6}','{7}','{8}','{9}','{10}'
                             ,'{11}','{12}','{13}','{14}','{15}'
-                            ,'{16}','{17}','{18}','{19}','{20}'
-                            ,'{21}')";
-                JArray ja_unit = json.Value<JArray>("unit");
+                            ,'{16}','{17}','{18}')";
+                /*暂时不用：//成交单位CODE//法一单位CODE//法二单位CODE//,CADUNITCODE,LEGALUNITCODE,SUNITCODE    
+                //JArray ja_unit = json.Value<JArray>("unit");//,'{19}','{20}','{21}' */
 
                 for (int j = 12; j < dtExcel.Rows.Count; j = j + 3)
                 {
@@ -1925,13 +1947,18 @@ namespace MvcPlatform.Controllers
                         , dtExcel.Rows[j][0].ToString(), dtExcel.Rows[j][1].ToString().Substring(0, 8), dtExcel.Rows[j][1].ToString().Substring(8), dtExcel.Rows[j][2].ToString(), dtExcel.Rows[j][4].ToString(), dtExcel.Rows[j][8].ToString()
                         , dtExcel.Rows[j][9].ToString(), dtExcel.Rows[j + 1][9].ToString(), dtExcel.Rows[j + 2][9].ToString(), dtExcel.Rows[j][10].ToString(), dtExcel.Rows[j + 1][10].ToString()
                         , dtExcel.Rows[j + 2][10].ToString(), dtExcel.Rows[j][11].ToString(), dtExcel.Rows[j][12].ToString(), dtExcel.Rows[j][13].ToString(), dtExcel.Rows[j][14].ToString()
-                        , dtExcel.Rows[j][15].ToString(), dtExcel.Rows[j][16].ToString(), dt_cusno.Rows[0][0].ToString(), getStatusCodebyname(dtExcel.Rows[j][10].ToString(), ja_unit), getStatusCodebyname(dtExcel.Rows[j + 1][10].ToString(), ja_unit)
-                        , getStatusCodebyname(dtExcel.Rows[j + 2][10].ToString(), ja_unit)
-                        );
+                        , dtExcel.Rows[j][15].ToString(), dtExcel.Rows[j][16].ToString(), dt_cusno.Rows[0][0].ToString()
+                        );/*, getStatusCodebyname(dtExcel.Rows[j][10].ToString(), ja_unit), getStatusCodebyname(dtExcel.Rows[j + 1][10].ToString(), ja_unit)
+                        , getStatusCodebyname(dtExcel.Rows[j + 2][10].ToString(), ja_unit)*/
                     DBMgr.ExecuteNonQuery(sql);
                 }
             }
+            return "{success:true}";
+        }
 
+        public string ModuleTwo(string newfile, string fileName)
+        {
+            
             return "{success:true}";
         }
 

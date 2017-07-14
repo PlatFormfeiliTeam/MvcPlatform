@@ -183,22 +183,34 @@ function predata(data) {
 
     var store_flag = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: flag_data });
     var combo_flag = Ext.create('Ext.form.field.ComboBox', {
-        id: 'combo_flag',
-        name: 'FLAG',
-        store: store_flag,
-        fieldLabel: '转换状态',
-        displayField: 'NAME',        
-        valueField: 'CODE',
-        queryMode: 'local',
-        editable: false,
-        hiddenTrigger: true,
+        id: 'combo_flag', name: 'FLAG', store: store_flag, fieldLabel: '转换状态',
+        displayField: 'NAME', valueField: 'CODE', queryMode: 'local', editable: false, hiddenTrigger: true, readOnly: true
+    });
+
+    var store_special = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: [{ "NAME": "否", "CODE": 0 }, { "NAME": "是", "CODE": 1 }, { "NAME": "", "CODE": 9 }] });
+    var combo_SPECIALRELATION = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_SPECIALRELATION', name: 'SPECIALRELATION', store: store_special, fieldLabel: '特殊关系',
+        displayField: 'NAME', valueField: 'CODE', queryMode: 'local', editable: false, hiddenTrigger: true, readOnly: true
+    });
+    var combo_PRICEIMPACT = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_PRICEIMPACT', name: 'PRICEIMPACT', store: store_special, fieldLabel: '特殊价格',
+        displayField: 'NAME', valueField: 'CODE', queryMode: 'local', editable: false, hiddenTrigger: true, readOnly: true
+    });
+    var combo_PAYPOYALTIES = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_PAYPOYALTIES', name: 'PAYPOYALTIES', store: store_special, fieldLabel: '特殊支付',
+        displayField: 'NAME', valueField: 'CODE', queryMode: 'local', editable: false, hiddenTrigger: true, readOnly: true
+    });
+
+    var field_REMARK = Ext.create('Ext.form.field.Text', {
+        name: 'REMARK',
+        fieldLabel: '备注',
         readOnly: true
     });
 
     var formpane_declare = Ext.create('Ext.form.Panel', {
         id:'formpane_declare',
         region: 'north',
-        height: 270,
+        height: 330,
         fieldDefaults: {
             margin: '5 5 10 0',
             labelWidth: 80,
@@ -216,7 +228,8 @@ function predata(data) {
                 { layout: 'column', border: 0, items: [field_TRADETERMSNAME, field_FREIGHT, field_INSURANCEPREMIUM, field_CONTRACTNO] },
                 { layout: 'column', border: 0, items: [field_GOODSNUM, field_PACKAGENAME, field_GOODSGW, field_GOODSNW] },
                 { layout: 'column', border: 0, items: [field_DECLWAY, field_TRADECOUNTRYNAME, field_CUSNO, combo_flag] },
-                { layout: 'column', border: 0, items: [field_CONSHIPPERNAME, field_APPROVALNO] }
+                { layout: 'column', border: 0, items: [field_CONSHIPPERNAME, combo_SPECIALRELATION, combo_PRICEIMPACT, combo_PAYPOYALTIES] },
+                { layout: 'column', border: 0, items: [field_APPROVALNO, field_REMARK] }
         ]
     });
 
