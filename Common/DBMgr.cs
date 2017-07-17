@@ -14,6 +14,12 @@ namespace MvcPlatform.Common
     {
         private static readonly string ConnectionString = ConfigurationManager.AppSettings["strconn"];
 
+        public static OracleConnection getOrclCon()
+        {
+            OracleConnection orclCon = new OracleConnection(ConnectionString);
+            return orclCon;
+        }
+
         public static DataSet GetDataSet(string sql)
         {
             DataSet ds = new DataSet();
@@ -154,6 +160,15 @@ namespace MvcPlatform.Common
                 dt = ds.Tables[0];
             }
             return dt;
+        }
+
+        public static int ExecuteNonQuery(string sql, OracleConnection orclCon)
+        {
+            int retcount = -1;
+            OracleCommand oc = new OracleCommand(sql, orclCon);
+            retcount = oc.ExecuteNonQuery();
+            oc.Parameters.Clear();
+            return retcount;
         }
 
     }
