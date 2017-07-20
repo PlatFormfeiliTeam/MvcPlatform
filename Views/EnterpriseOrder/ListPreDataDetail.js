@@ -9,7 +9,7 @@ Ext.onReady(function () {
             var data = Ext.decode(response.responseText);          
             
             predata(data);
-            griddata(data);            
+            griddata(data);
 
             var panel = Ext.create('Ext.panel.Panel', {
                 title: '报关单证录入',
@@ -20,20 +20,13 @@ Ext.onReady(function () {
                 //buttonAlign: 'center',
                 buttons: [
                     {
-                        text: '<i class="iconfont">&#xe633;</i>&nbsp;撤  销', handler: function () {
-                       
+                        text: '<i class="iconfont">&#xe633;</i>&nbsp;撤  回', id: 'btn_cancel', disabled: (data.declstatus == "0" && data.head_data.FLAG != "0")? false : true, handler: function () {
+                            cancel();
                         }
-                    }, '-',
-                    //{
-                    //    text: '<i class="iconfont">&#xe60c;</i>&nbsp;保  存', handler: function () {
-                       
-                    //    }
-                    //}
-                    //, '-'
-                    ,
+                    }, '-',                   
                     {
-                        text: '<i class="iconfont">&#xe628;</i>&nbsp;提  交', handler: function () {
-                            
+                        text: '<i class="iconfont">&#xe628;</i>&nbsp;提  交', id: 'btn_submit', disabled: data.head_data.FLAG == "0" ? false : true, handler: function () {
+                            save(cusno);
                         }
                     }
                 ]
@@ -41,7 +34,9 @@ Ext.onReady(function () {
             var viewport = new Ext.container.Viewport({
                 layout: 'border',
                 items: [panel]
-            })
+            });
+
+            $(window).unload(function () { window.opener.pgbar.moveFirst(); });
             
         }
     });
@@ -171,20 +166,18 @@ function predata(data) {
         readOnly: true
     });
     var field_CUSNO = Ext.create('Ext.form.field.Text', {
+        id: 'field_CUSNO',
         name: 'CUSNO',
         fieldLabel: '企业编号',
-        readOnly: true
-    });
-    var field_FLAG = Ext.create('Ext.form.field.Text', {
-        name: 'FLAG',
-        fieldLabel: '转换标记',
-        readOnly: true
+        readOnly: true,
+        fieldStyle: 'color: blue'
     });
 
     var store_flag = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: flag_data });
     var combo_flag = Ext.create('Ext.form.field.ComboBox', {
         id: 'combo_flag', name: 'FLAG', store: store_flag, fieldLabel: '转换状态',
-        displayField: 'NAME', valueField: 'CODE', queryMode: 'local', editable: false, hiddenTrigger: true, readOnly: true
+        displayField: 'NAME', valueField: 'CODE', queryMode: 'local', editable: false, hiddenTrigger: true, readOnly: true,
+        fieldStyle:'color: red'
     });
 
     var store_special = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: [{ "NAME": "否", "CODE": 0 }, { "NAME": "是", "CODE": 1 }, { "NAME": "", "CODE": 9 }] });
@@ -207,6 +200,12 @@ function predata(data) {
         readOnly: true
     });
 
+    var field_INOUTTYPE = Ext.create('Ext.form.field.Text', {
+        name: 'INOUTTYPE',
+        fieldLabel: '申报类型',
+        readOnly: true, fieldStyle: 'color: blue'
+    });
+
     var formpane_declare = Ext.create('Ext.form.Panel', {
         id:'formpane_declare',
         region: 'north',
@@ -227,15 +226,12 @@ function predata(data) {
                 { layout: 'column', border: 0, items: [field_LICENSENO, field_SECOUNTRYNAME, field_SEPORTNAME, field_SEPLACENAME] },
                 { layout: 'column', border: 0, items: [field_TRADETERMSNAME, field_FREIGHT, field_INSURANCEPREMIUM, field_CONTRACTNO] },
                 { layout: 'column', border: 0, items: [field_GOODSNUM, field_PACKAGENAME, field_GOODSGW, field_GOODSNW] },
-                { layout: 'column', border: 0, items: [field_DECLWAY, field_TRADECOUNTRYNAME, field_CUSNO, combo_flag] },
+                { layout: 'column', border: 0, items: [field_DECLWAY, field_INOUTTYPE, field_CUSNO, combo_flag] },
                 { layout: 'column', border: 0, items: [field_CONSHIPPERNAME, combo_SPECIALRELATION, combo_PRICEIMPACT, combo_PAYPOYALTIES] },
-                { layout: 'column', border: 0, items: [field_APPROVALNO, field_REMARK] }
+                { layout: 'column', border: 0, items: [field_TRADECOUNTRYNAME, field_APPROVALNO, field_REMARK] }
         ]
     });
-
-    if (data.head_data.length > 0) {
-        Ext.getCmp("formpane_declare").getForm().setValues(data.head_data[0]);
-    }
+    Ext.getCmp("formpane_declare").getForm().setValues(data.head_data);
 }
 
 function griddata(data) {
@@ -273,5 +269,60 @@ function griddata(data) {
         { header: '原产国', dataIndex: 'COUNTRYORIGINNAME', width: 100 },
         { header: '目的国', dataIndex: 'DESTCOUNTRYNAME', width: 100 }
         ]
+    });
+}
+
+function cancel() {
+    var mask = new Ext.LoadMask(Ext.get(Ext.getBody()), { msg: "撤回中，请稍等..." });
+
+   
+    Ext.MessageBox.confirm("提示", "确定要执行撤回操作吗？", function (btn) {
+        if (btn == "yes") {
+            mask.show();
+            Ext.Ajax.request({
+                url: '/EnterpriseOrder/cancelPreData',
+                params: { cusno: Ext.getCmp("field_CUSNO").getValue() },
+                success: function (response, options) {
+                    mask.hide();
+                    var json = Ext.decode(response.responseText);
+                    if (json.success == true) {
+                        Ext.MessageBox.alert("提示", "撤单成功！");
+                        Ext.getCmp("combo_flag").setValue(0);
+                        Ext.getCmp("btn_cancel").setDisabled(true);
+                        Ext.getCmp("btn_submit").setDisabled(Ext.getCmp("combo_flag").getValue() == "0" ? false : true);
+                    }
+                    else {
+                        Ext.MessageBox.alert("提示", "撤单失败：" + json.error);
+                    }
+                }
+            });
+        }
+    });
+}
+
+function save(cusno) {
+    
+    var mask = new Ext.LoadMask(Ext.get(Ext.getBody()), { msg: "提交中，请稍等..." });
+
+    mask.show();
+    Ext.Ajax.request({
+        url: "/EnterpriseOrder/SavePreDataToPrd",
+        params: { cusno: cusno },
+        success: function (response, option) {
+            if (response.responseText) {
+                mask.hide();
+                var data = Ext.decode(response.responseText);
+                if (data.success) {
+                    Ext.MessageBox.alert("提示","提交成功！", function () {
+                        Ext.getCmp("combo_flag").setValue(1);
+                        Ext.getCmp("btn_cancel").setDisabled(false);
+                        Ext.getCmp("btn_submit").setDisabled(true);
+                    });
+                }
+                else {
+                    Ext.MessageBox.alert("提示", "提交失败:" + data.error);
+                }
+            }
+        }
     });
 }

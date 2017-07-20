@@ -622,7 +622,7 @@ namespace MvcPlatform.Common
                 return "{jydw:" + json_jydw + ",recordid:" + json_recordid + ",unit:" + json_unit + ",customarea:" + json_customarea + "}";
             }
 
-            string json_sbfs_all = "[]";//申报关区 进口口岸 
+            string json_sbfs_all = "[]";//申报方式
             if (db.KeyExists("common_data:sbfs_all"))
             {
                 json_sbfs_all = db.StringGet("common_data:sbfs_all");

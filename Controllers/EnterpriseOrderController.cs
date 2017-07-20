@@ -1775,7 +1775,7 @@ namespace MvcPlatform.Controllers
 
         public string ImportExcelData()
         {
-            string formdata = Request["formdata"];
+            string formdata = Request["formdata"]; string action = Request["action"]; string cusno = Request["cusno"];
             JObject json_formdata = (JObject)JsonConvert.DeserializeObject(formdata);
 
             HttpPostedFileBase postedFile = Request.Files["UPLOADFILE"];//获取上传信息对象  
@@ -1791,24 +1791,66 @@ namespace MvcPlatform.Controllers
             string result = "";
             if (json_formdata.Value<string>("RADIO_MODULE") == "1")
             {
-                result = ModuleOne(newfile, fileName);
+                result = ModuleOne(newfile, fileName, action, cusno);
             }
             if (json_formdata.Value<string>("RADIO_MODULE") == "2")
             {
-                result = ModuleTwo(newfile, fileName);
+                result = ModuleTwo(newfile, fileName, action, cusno);
+            }
+
+            if (result != "{success:true}")//上传不成功，删除源文件
+            {
+                FileInfo fi = new FileInfo(Server.MapPath(newfile));
+                if (fi.Exists)
+                {
+                    fi.Delete();
+                }
             }
 
             return result;
         }
 
-        public string ModuleOne(string newfile, string fileName)
+        //获取企业编号
+        public string getcusno()
+        {
+            string cusno = "";
+
+            string prefix = DateTime.Now.ToString("yyyyMMdd");
+            OracleParameter[] parms = new OracleParameter[3];
+            parms[0] = new OracleParameter("p_prefix", OracleDbType.NVarchar2, prefix, ParameterDirection.Input);
+            parms[1] = new OracleParameter("p_type", OracleDbType.NVarchar2, "cusno", ParameterDirection.Input);
+            parms[2] = new OracleParameter("p_increase", OracleDbType.Int32, ParameterDirection.Output);
+
+            DBMgr.ExecuteNonQueryParm("PRO_Sequencegenerator_Web", parms);
+            cusno = "CUS" + prefix + Convert.ToInt32(parms[2].Value.ToString()).ToString("0000");
+
+            return cusno;
+        }
+
+        //作废旧的临时表
+        public void ISINVALID_Predata(string cusno, OracleConnection conn)
+        {
+            DBMgr.ExecuteNonQuery("update list_predata set ISINVALID=1 where cusno='" + cusno + "'", conn);
+            DBMgr.ExecuteNonQuery("update list_predata_sub set ISINVALID=1 where pcode='" + cusno + "'", conn);
+        }
+
+        //撤回：更新上传、撤回按钮调用
+        public void cancel_pub(string cusno, OracleConnection conn)
+        {
+            DBMgr.ExecuteNonQuery(@"update list_decllist set ISINVALID=1
+                                    where predeclcode=(select code from  list_declaration where ordercode=(select code from list_order where cusno='" + cusno + "' and ISINVALID=0) and ISINVALID=0)", conn);
+            DBMgr.ExecuteNonQuery("update list_declaration set ISINVALID=1 where ordercode=(select code from list_order where cusno='" + cusno + "' and ISINVALID=0)", conn);
+            DBMgr.ExecuteNonQuery("update list_order set ISINVALID=1 where cusno='" + cusno + "' and ISINVALID=0", conn);
+        }
+
+        public string ModuleOne(string newfile, string fileName, string action, string cusno)
         {
             DataTable dtExcel = ExcelToDatatalbe(Server.MapPath(newfile));
 
             //Rows：表头11行+一行表体列名+至少一行表体数据；Columns：18列
             if (dtExcel == null || dtExcel.Rows.Count < 13 || dtExcel.Columns.Count != 17)
             {
-                return "No Data";
+                return "{success:false,error:'No Data'}";
             }
             //验证列名称
             int colcount = 0;
@@ -1819,7 +1861,7 @@ namespace MvcPlatform.Controllers
 
             if (colcount == 0)
             {
-                return "No Columns";
+                return "{success:false,error:'No Columns'}";
             }
             //====================================================================================================
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
@@ -1869,20 +1911,8 @@ namespace MvcPlatform.Controllers
             //报关类型string var44_code = getStatusCode(var44, json.Value<JArray>("bgfs"));
 
 
-            //企业编号
-            string cusno = string.Empty;
-
-            string prefix = DateTime.Now.ToString("yyyyMMdd");
-            OracleParameter[] parms = new OracleParameter[3];
-            parms[0] = new OracleParameter("p_prefix", OracleDbType.NVarchar2, prefix, ParameterDirection.Input);
-            parms[1] = new OracleParameter("p_type", OracleDbType.NVarchar2, "cusno", ParameterDirection.Input);
-            parms[2] = new OracleParameter("p_increase", OracleDbType.Int32, ParameterDirection.Output);
-
-            DBMgr.ExecuteNonQueryParm("PRO_Sequencegenerator_Web", parms);
-            cusno = "CUS" + prefix + Convert.ToInt32(parms[2].Value.ToString()).ToString("0000");
-
-
-
+            //企业编号            
+            if (action == "add") { cusno = getcusno(); }  
 
             //类型//合同号码//航次号//运输工具//提运单号//出口日期
             //申报日期//贸易国//出口口岸//备案号//运输方式
@@ -1932,6 +1962,12 @@ namespace MvcPlatform.Controllers
                 conn.Open();
                 ot = conn.BeginTransaction();
 
+                //更新，需要作废前一笔数据；正式表数据需要作废（撤回）
+                if (action == "update") { 
+                    ISINVALID_Predata(cusno, conn); 
+                    cancel_pub(cusno, conn); 
+                }
+
                 int recount = DBMgr.ExecuteNonQuery(sql, conn);
                 if (recount > 0)
                 {
@@ -1971,28 +2007,40 @@ namespace MvcPlatform.Controllers
                         DBMgr.ExecuteNonQuery(sql, conn);
                     }
                 }
-                ot.Commit();
+
+                if (action == "update")//更新上传 需要判断之前的数据已经提交
+                {
+                    if (GetDeclStatus(cusno) == "{success:false}")//再次及时判断一次报关状态
+                    {
+                        ot.Commit();
+                    }
+                    else
+                    {
+                        ot.Rollback();
+                        result = "{success:false,error:'状态已经是预录中，不能更新数据'}";
+                    }
+
+                }
+                else
+                {
+                    ot.Commit();
+                }
+                
             }
             catch (Exception ex)
             {
                 ot.Rollback();
-                result = "{success:false}";
-                FileInfo fi=new FileInfo(Server.MapPath(newfile));
-                if (fi.Exists)
-                {
-                    fi.Delete();
-                }
+                result = "{success:false,error:'" + ex .Message+ "'}";
 
             }
             finally
             {
                 conn.Close();
             }
-
             return result;
         }
 
-        public string ModuleTwo(string newfile, string fileName)
+        public string ModuleTwo(string newfile, string fileName, string action, string cusno)
         {
             DataTable dtExcel = ExcelToDatatalbe(Server.MapPath(newfile));
 
@@ -2049,16 +2097,7 @@ namespace MvcPlatform.Controllers
             //string var2_code = getStatusCode(var2, json.Value<JArray>("sbgq"));
 
             //企业编号
-            string cusno = string.Empty;
-
-            string prefix = DateTime.Now.ToString("yyyyMMdd");
-            OracleParameter[] parms = new OracleParameter[3];
-            parms[0] = new OracleParameter("p_prefix", OracleDbType.NVarchar2, prefix, ParameterDirection.Input);
-            parms[1] = new OracleParameter("p_type", OracleDbType.NVarchar2, "cusno", ParameterDirection.Input);
-            parms[2] = new OracleParameter("p_increase", OracleDbType.Int32, ParameterDirection.Output);
-
-            DBMgr.ExecuteNonQueryParm("PRO_Sequencegenerator_Web", parms);
-            cusno = "CUS" + prefix + Convert.ToInt32(parms[2].Value.ToString()).ToString("0000");
+            if (action == "add") { cusno = getcusno(); }  
 
             //申报类别//进口口岸//手册号/合同协议号//申报日期//收发货单位
             //收发货单位//运输方式//运输工具//提运单号//消费使用单位
@@ -2102,6 +2141,13 @@ namespace MvcPlatform.Controllers
                 conn.Open();
                 ot = conn.BeginTransaction();
 
+                //更新，需要作废前一笔数据；正式表数据需要作废（撤回）
+                if (action == "update")
+                {
+                    ISINVALID_Predata(cusno, conn);
+                    cancel_pub(cusno, conn);
+                }
+
                 int recount = DBMgr.ExecuteNonQuery(sql, conn);
                 if (recount > 0)
                 {
@@ -2139,17 +2185,164 @@ namespace MvcPlatform.Controllers
                         DBMgr.ExecuteNonQuery(sql, conn);
                     }
                 }
-                ot.Commit();
+                if (action == "update")//更新上传 需要判断之前的数据已经提交
+                {
+                    if (GetDeclStatus(cusno) == "{success:false}")//再次及时判断一次报关状态
+                    {
+                        ot.Commit();
+                    }
+                    else
+                    {
+                        ot.Rollback();
+                        result = "{success:false,error:'状态已经是预录中，不能更新数据'}";
+                    }
+
+                }
+                else
+                {
+                    ot.Commit();
+                }
+
             }
             catch (Exception ex)
             {
                 ot.Rollback();
-                result = "{success:false}";
-                FileInfo fi = new FileInfo(Server.MapPath(newfile));
-                if (fi.Exists)
+                result = "{success:false,error:'" + ex.Message + "'}";
+
+            }
+            finally
+            {
+                conn.Close();
+            }
+            return result;
+        }
+
+        public string DeletePreData()
+        {
+            string result = "{success:false}";
+            //string str = "";
+
+            try
+            {
+                string sql = "select * from LIST_PREDATA where ID in(" + Request["ids"] + ")";
+                DataTable dt = DBMgr.GetDataTable(sql);
+                
+                foreach (DataRow dr in dt.Rows)
                 {
-                    fi.Delete();
+                    if (dr["FLAG"] + "" == "0")
+                    {
+                        sql = "delete from LIST_PREDATA_SUB where PCODE='" + dr["CUSNO"] + "' and ISINVALID=0";
+                        DBMgr.ExecuteNonQuery(sql);
+
+                        sql = "delete from LIST_PREDATA where ID='" + dr["ID"] + "'";
+                        DBMgr.ExecuteNonQuery(sql);
+
+                        FileInfo fi = new FileInfo(Server.MapPath(@"~" + dr["FILEPATH"]));
+                        if (fi.Exists)
+                        {
+                            fi.Delete();
+                        }
+                    }
+                    //else
+                    //{
+                    //    str += "," + dr["CUSNO"];
+                    //}
                 }
+
+                //if (str != "") { str = str.Substring(1); }
+                //result = "{success:true,str:'" + str + "'}"; 
+                result = "{success:true}";
+            }
+            catch (Exception ex)
+            {
+                
+               
+            }
+
+            return result;
+        }
+
+        public string loadPreDataDetail()
+        {
+            string CUSNO = Request["CUSNO"];
+
+            string result = string.Empty;
+            string sql = string.Empty; string head_data = "{}"; string sub_data = "[]";string declstatus="";
+         
+            
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd";
+
+            sql = "select * from list_predata where ISINVALID=0 and cusno='" + CUSNO + "'";
+            DataTable dt = DBMgr.GetDataTable(sql);
+            head_data = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
+
+            sql = "select * from list_predata_sub where ISINVALID=0 and pcode='" + CUSNO + "' order by orderno";
+            DataTable dt_sub = DBMgr.GetDataTable(sql);
+            sub_data = JsonConvert.SerializeObject(dt_sub, iso);
+
+            if (GetDeclStatus(CUSNO) == "{success:true}")//状态>=70了
+            {
+                declstatus = "1";
+            }
+            else
+            {
+                declstatus = "0";
+            }
+
+            result = "{head_data:" + head_data + ",sub_data:" + sub_data + ",declstatus:'" + declstatus + "'}";
+            return result;
+        }
+
+        public string GetDeclStatus(string CUSNO)
+        {
+            string result = "{success:false}";
+
+            string sql = @"select * from list_declaration where ISINVALID=0 and ordercode=(select code from list_order where ISINVALID=0 and cusno='{0}') and status>=70";
+            sql = string.Format(sql, CUSNO);
+            DataTable dt = new DataTable();
+            dt = DBMgr.GetDataTable(sql);
+
+            if (dt.Rows.Count > 0)
+            {
+                result = "{success:true}";
+            }
+            return result;
+        }
+
+        public string cancelPreData(string cusno)
+        {
+            OracleConnection conn = null;
+            OracleTransaction ot = null;
+            string result = "{success:true}";
+            try
+            {
+                conn = DBMgr.getOrclCon();
+                conn.Open();
+                ot = conn.BeginTransaction();
+
+                cancel_pub(cusno, conn);//作废正式表数据
+
+                //临时表数据标记为未转化
+                DBMgr.ExecuteNonQuery("update list_predata set flag=0 where cusno='" + cusno + "' and ISINVALID=0", conn);
+                DBMgr.ExecuteNonQuery("update list_predata_sub set flag=0 where pcode='" + cusno + "' and ISINVALID=0", conn);
+
+
+                if (GetDeclStatus(cusno) == "{success:false}")//再次及时判断一次报关状态
+                {
+                    ot.Commit();
+                }
+                else
+                {
+                    ot.Rollback();
+                    result = "{success:false,error:'状态已经是预录中，不能撤回'}";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                ot.Rollback();
+                result = "{success:false,error:'" + ex.Message + "'}";
 
             }
             finally
@@ -2160,54 +2353,35 @@ namespace MvcPlatform.Controllers
             return result;
         }
 
-        public string DeletePreData()
+        public string SavePreDataToPrd()
         {
-            string result = "{success:false}";
-
-            string sql = "select * from LIST_PREDATA where ID='" + Request["ID"] + "'";
-            DataTable dt = DBMgr.GetDataTable(sql);
-
-            if (dt.Rows[0]["FLAG"] + "" != "0" )
+            string cusno = Request["cusno"];           
+            string result = "{success:true}";
+            try
             {
-                return result;
+                JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+                OracleParameter[] parms = new OracleParameter[4];
+                parms[0] = new OracleParameter("p_cusno", OracleDbType.NVarchar2, cusno, ParameterDirection.Input);
+                parms[1] = new OracleParameter("p_userid", OracleDbType.NVarchar2, json_user.Value<string>("ID"), ParameterDirection.Input);
+                parms[2] = new OracleParameter("p_username", OracleDbType.NVarchar2, json_user.Value<string>("REALNAME"), ParameterDirection.Input);
+
+                parms[3] = new OracleParameter("p_flag_parms", OracleDbType.Varchar2, 20, null, ParameterDirection.Output);//输出参数，字符串类型的，一定要设定大小
+
+                DataTable dt = DBMgr.GetDataTableParm("Pro_SavePreDataToPrd", parms);
+                string p_flag_parms = parms[3].Value.ToString();
+                if (p_flag_parms == "N")
+                {
+                    result = "{success:false,error:'数据执行失败'}";
+                }
             }
-            
-            sql = "delete from LIST_PREDATA_SUB where PCODE='" + dt.Rows[0]["CUSNO"] + "'";
-            DBMgr.ExecuteNonQuery(sql);
-
-            sql = "delete from LIST_PREDATA where ID='" + Request["ID"] + "'";
-            DBMgr.ExecuteNonQuery(sql);
-
-            FileInfo fi = new FileInfo(Server.MapPath(@"~" + dt.Rows[0]["FILEPATH"]));
-            if (fi.Exists)
+            catch (Exception ex)
             {
-                fi.Delete();
+                result = "{success:false,error:'" + ex.Message + "'}";
+
             }
-
-            return "{success:true}"; ;
-        }
-
-        public string loadPreDataDetail()
-        {
-            string CUSNO = Request["CUSNO"];
-
-            string result = string.Empty;
-            string sql = string.Empty; string head_data = "[]"; string sub_data = "[]";
-         
-            
-            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
-            iso.DateTimeFormat = "yyyy-MM-dd";
-
-            sql = "select * from list_predata where cusno='" + CUSNO + "'";
-            DataTable dt = DBMgr.GetDataTable(sql);
-            head_data = JsonConvert.SerializeObject(dt, iso);
-            
-            sql = "select * from list_predata_sub where pcode='" + CUSNO + "' order by orderno";
-            DataTable dt_sub = DBMgr.GetDataTable(sql);
-            sub_data = JsonConvert.SerializeObject(dt_sub, iso);
-
-            result = "{head_data:" + head_data + ",sub_data:" + sub_data + "}";
             return result;
+
         }
 
         #endregion

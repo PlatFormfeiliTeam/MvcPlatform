@@ -66,7 +66,7 @@ function initSearch() {
 function gridbind() {
     Ext.regModel('LISTPREDATA', {
         fields: ['ID', 'CUSNO', 'CONTRACTNO', 'REPDATE', 'RECORDCODE', 'INOUTTYPE', 'TRADECODE', 'TRADENAME'
-            , 'GOODSNUM', 'GOODSGW', 'GOODSNW', 'OLDFILENAME','FLAG','CREATETIME','FILEPATH']
+            , 'GOODSNUM', 'GOODSGW', 'GOODSNW', 'OLDFILENAME', 'FLAG', 'CREATETIME', 'FILEPATH', 'CUSTOMERCODE', 'CUSTOMERNAME']
     });
 
     var store_predata = Ext.create('Ext.data.JsonStore', {
@@ -166,7 +166,37 @@ function Select() {
     pgbar.moveFirst();
 }
 
-function importfile() {
+function importfile(action) {
+
+    if (action == "add") {
+        importexcel(action, "");
+    }
+
+    if (action == "update") {
+        var recs = Ext.getCmp("gridpanel").getSelectionModel().getSelection();
+        if (recs.length != 1) {
+            Ext.MessageBox.alert('提示', '请选择需要修改一笔的记录！');
+            return;
+        }
+
+        var cusno = recs[0].get("CUSNO");
+        Ext.Ajax.request({
+            url: '/EnterpriseOrder/GetDeclStatus',
+            params: { CUSNO: cusno },
+            success: function (response, success, option) {
+                var res = Ext.decode(response.responseText);
+                if (res.success) {
+                    Ext.MessageBox.alert('提示', '当前数据状态已经为预录，不可修改！');
+                    return;
+                } else {
+                    importexcel(action, cusno);
+                }
+            }
+        });
+    }    
+}
+
+function importexcel(action,cusno) {
     var radio_module = Ext.create('Ext.form.RadioGroup', {
         name: "RADIO_MODULE", id: "RADIO_MODULE", fieldLabel: '模板类型', labelAlign: 'right', anchor: '90%', margin: '15 5 15 5',
         items: [
@@ -178,11 +208,11 @@ function importfile() {
     var uploadfile = Ext.create('Ext.form.field.File', {
         id: 'UPLOADFILE', name: 'UPLOADFILE', fieldLabel: '导入数据', labelAlign: 'right', msgTarget: 'under'
         , margin: '15 5 15 5', anchor: '90%', buttonText: '浏览文件', regex: /.*(.xls|.xlsx)$/, regexText: '只能上传xls,xlsx文件'
-        ,allowBlank: false,blankText: '文件不能为空!'
+        , allowBlank: false, blankText: '文件不能为空!'
     });
 
     var formpanel_upload = Ext.create('Ext.form.Panel', {
-        id: 'formpanel_upload', height: 170, 
+        id: 'formpanel_upload', height: 170,
         buttonAlign: 'center',
         items: [radio_module, uploadfile],
         buttons: [{
@@ -194,10 +224,10 @@ function importfile() {
 
                     Ext.getCmp('formpanel_upload').getForm().submit({
                         url: '/EnterpriseOrder/ImportExcelData',
-                        params: { formdata: formdata },
-                        waitMsg: '数据导入中...',   
+                        params: { formdata: formdata, action: action, cusno: cusno },
+                        waitMsg: '数据导入中...',
                         success: function (form, action) {
-                            Ext.Msg.alert('提示', '保存成功', function () {                                
+                            Ext.Msg.alert('提示', '保存成功', function () {
                                 pgbar.moveFirst();
                                 //Ext.getCmp('win_upload').close();
                             });
@@ -230,16 +260,22 @@ function deletedata() {
         return;
     }
 
-    if (recs[0].data.FLAG != "0") {
+    var ids = ""; var bf = false;
+    Ext.each(recs, function (rec) {
+        if (rec.get("FLAG") != "0") { bf = true; }
+        ids += rec.get("ID") + ",";
+    });
+    if (bf) {
         Ext.MessageBox.alert('提示', '只可以删除未转化的数据！');
         return;
     }
+    ids = ids.substr(0, ids.length - 1);
 
     Ext.MessageBox.confirm("提示", "确定要删除所选择的记录吗？", function (btn) {
         if (btn == 'yes') {
             Ext.Ajax.request({
                 url: '/EnterpriseOrder/DeletePreData',
-                params: { ID: recs[0].get("ID")},
+                params: { ids: ids},
                 success: function (response, success, option) {
                     var res = Ext.decode(response.responseText);
                     if (res.success) {
