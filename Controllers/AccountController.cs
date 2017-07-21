@@ -433,7 +433,8 @@ namespace MvcPlatform.Controllers
                                 else
                                 {
                                     UpPassword(ucp.NAME, ucp.NEWPASSWORD);
-                                    Response.Redirect("/Account/Login");
+                                    Response.Write(@"<script Language=Javascript> alert('密码修改成功，请重新登陆！');window.location.href='/Account/Login'; </script>");
+                                   // Response.Redirect("/Account/Login");
                                 }
                                
                             }
