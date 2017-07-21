@@ -1,0 +1,68 @@
+﻿@{
+    ViewBag.Title = "Modpwd";
+    Layout = "~/Views/Shared/Empty.cshtml";
+}
+@model MvcPlatform.Models.UserChangePWD
+<div style="min-height: 657px;">
+    <div style="border: 1px solid #c1c0c0; width: 450px; padding: 10px 50px 42px 50px; margin: 150px auto 0 auto; background-color: #ffffff">
+        <form action="/Account/Modpwd" method="post">
+            <div style="width:350px;height:40px;text-align:center; font-size:20px">
+               修改密码
+            </div>
+            <div style="width:350px;height:80px">
+                <label for="user_name" style="width: 80px;float: left;padding-top:7px">登录名</label>
+                <div class="input-group" style="width: 248px;float:left;margin-right:5px">
+                    <span class="input-group-addon icon iconfont">&#xe611;</span>
+                    @Html.TextBoxFor(u => u.NAME, new { @class = "form-control", @readonly = "readonly", @value = Model.NAME })
+                </div>
+                <div style="line-height: 35px;width: 248px;float:left;padding-left:80px">
+                    <label style="color:red" id="validate">
+                        @Html.ValidationMessageFor(u => u.NAME)
+                    </label>
+                </div>
+            </div>
+            
+            <div style="width: 350px; height: 80px">
+                <label for="password" style="width: 80px; float: left; padding-top: 7px">原密码</label>
+                <div class="input-group" style="width: 248px; float: left; margin-right: 5px">
+                    <span class="input-group-addon icon iconfont">&#xe65e;</span>
+                    @Html.PasswordFor(u => u.PASSWORD, new { @class = "form-control", @value = Model.PASSWORD })
+                </div>
+                <div style="line-height: 35px; width: 248px; float: left; padding-left: 80px;">
+                    <label style="color:red" id="validate">
+                        @Html.ValidationMessageFor(u => u.PASSWORD)
+                        @Html.ValidationMessage("OLD_ERROR")
+                    </label>
+                </div>
+                </div>
+            <div style="width: 350px; height: 80px">
+                <label for="password" style="width: 80px; float: left; padding-top: 7px">新密码</label>
+                <div class="input-group" style="width: 248px; float: left; margin-right: 5px">
+                    <span class="input-group-addon icon iconfont">&#xe65e;</span>
+                    @Html.PasswordFor(u => u.NEWPASSWORD, new { @class = "form-control" })
+                </div>
+                <div style="line-height: 35px; width: 248px; float: left; padding-left: 80px">
+                    <label style="color:red" id="validate">
+                        @Html.ValidationMessageFor(u => u.NEWPASSWORD)
+                    </label>
+                </div>
+                </div>
+            <div style="width: 350px; height:80px">
+                <label for="password" style="width: 80px; float: left; padding-top: 7px">确认新密码</label>
+                <div class="input-group" style="width: 248px; float: left; margin-right: 5px">
+                    <span class="input-group-addon icon iconfont">&#xe65e;</span>
+                    @Html.PasswordFor(u => u.CONFIRMPASSWORD, new { @class = "form-control" })
+                </div>
+                <div style="line-height: 35px; width: 248px; float: left; padding-left: 80px">
+                    <label style="color:red" id="validate">
+                        @Html.ValidationMessageFor(u => u.CONFIRMPASSWORD)
+                        @Html.ValidationMessage("ERROR")
+                    </label>
+                </div>
+                </div>
+            <div style="width: 350px; height:60px; align-content:center">
+                <button type="submit" id='btn_login' class="btn btn-primary btn-group-justified" style="width:328px">确认修改</button>
+           </div>
+</form>
+    </div>
+</div>

@@ -588,7 +588,10 @@ function showLogisticStatus(totalno,divdeno)
     });
 
 
-
+    var data_kazt;
+    var data1 = store_logistic.getGroups("报关申报状态") == undefined ? [] : store_logistic.getGroups("报关申报状态").children
+    var data2 = store_logistic.getGroups("转关申报状态") == undefined ? [] : store_logistic.getGroups("转关申报状态").children
+    data_kazt = data1.concat(data2);
     var tab_0_store, tab_1_store, tab_2_store, tab_3_store;
     store_logistic.load(function () {
          tab_0_store = Ext.create("Ext.data.JsonStore", {
@@ -598,7 +601,7 @@ function showLogisticStatus(totalno,divdeno)
          tab_1_store = Ext.create("Ext.data.JsonStore", {
              fields: ['ID', 'MSG', 'OPERATER', 'OPERATE_TYPE', 'OPERATE_RESULT', 'OPERATE_DATE'],
              //data: store_logistic.getGroups("抽单状态") == undefined ? [] : store_logistic.getGroups("抽单状态").children
-             data: store_logistic.getGroups("口岸状态")==undefined?[]:store_logistic.getGroups("口岸状态").children
+             data:data_kazt
         });
          tab_2_store = Ext.create("Ext.data.JsonStore", {
             fields: ['ID', 'MSG', 'OPERATER', 'OPERATE_TYPE', 'OPERATE_RESULT', 'OPERATE_DATE'],

@@ -26,6 +26,7 @@ namespace MvcPlatform.Controllers
         }
 
         [HttpPost]
+        [Filters.ModPasswodFilter]
         public ActionResult Login(Models.User u)
         {
             string returnUrl = Request["ReturnUrl"] + "";
@@ -206,7 +207,20 @@ namespace MvcPlatform.Controllers
                 return "{result:false}";
             }
         }
-
+        public string UpPassword(string name,string password) 
+        {
+            JObject json_user = Extension.Get_UserInfo(name);
+            string sql = @"update sys_user set points=1,password = '" + password.ToSHA1() + "' where id = '" + json_user.GetValue("ID") + "'";
+            int i = DBMgr.ExecuteNonQuery(sql);
+            if (i > 0)
+            {
+                return "{result:true}";
+            }
+            else
+            {
+                return "{result:false}";
+            }
+        }
         public string ValidPassword()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
@@ -400,6 +414,45 @@ namespace MvcPlatform.Controllers
         }
 
         #endregion
+
+        public ActionResult Modpwd(UserChangePWD ucp)
+        {
+            if (ModelState.IsValid)
+            {
+                string sql = "select * from sys_user where name = '" + ucp.NAME + "' and password = '" + Extension.ToSHA1(ucp.PASSWORD) + "'";
+                        DataTable dt = DBMgr.GetDataTable(sql);
+                        if (dt.Rows.Count > 0)
+                        {
+                            if (ucp.NEWPASSWORD == ucp.CONFIRMPASSWORD)
+                            {
+                                if (ucp.NEWPASSWORD == ucp.PASSWORD)
+                                {
+                                    ModelState.AddModelError("ERROR", "新旧密码不能相同！");
+                                    return View(ucp);
+                                }
+                                else
+                                {
+                                    UpPassword(ucp.NAME, ucp.NEWPASSWORD);
+                                    Response.Redirect("/Account/Login");
+                                }
+                               
+                            }
+                            else
+                            {
+                                ModelState.AddModelError("ERROR", "两次密码不一致！");
+                                return View(ucp);
+                            }
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("OLD_ERROR", "原密码错误！");
+                            return View(ucp);
+                        }
+                
+            }
+            return View(ucp);
+
+        }
     }
 
 
