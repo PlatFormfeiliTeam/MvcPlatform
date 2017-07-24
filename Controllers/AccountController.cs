@@ -297,7 +297,7 @@ namespace MvcPlatform.Controllers
         //初始化密码
         public string InitialPsd()
         {
-            string sql = "update sys_user set password='" + Request["NAME"].ToSHA1() + "' where id='" + Request["ID"] + "'";
+            string sql = "update sys_user set points=0,password='" + Request["NAME"].ToSHA1() + "' where id='" + Request["ID"] + "'";
             try
             {
                 DBMgr.ExecuteNonQuery(sql);
