@@ -588,12 +588,13 @@ function showLogisticStatus(totalno,divdeno)
     });
 
 
-    var data_kazt;
-    var data1 = store_logistic.getGroups("报关申报状态") == undefined ? [] : store_logistic.getGroups("报关申报状态").children
-    var data2 = store_logistic.getGroups("转关申报状态") == undefined ? [] : store_logistic.getGroups("转关申报状态").children
-    data_kazt = data1.concat(data2);
+   
     var tab_0_store, tab_1_store, tab_2_store, tab_3_store;
     store_logistic.load(function () {
+        var data_kazt;
+        var data1 = store_logistic.getGroups("报关申报状态") == undefined ? [] : store_logistic.getGroups("报关申报状态").children
+        var data2 = store_logistic.getGroups("转关申报状态") == undefined ? [] : store_logistic.getGroups("转关申报状态").children
+        data_kazt = data1.concat(data2);
          tab_0_store = Ext.create("Ext.data.JsonStore", {
             fields: ['ID', 'MSG', 'OPERATER', 'OPERATE_TYPE', 'OPERATE_RESULT', 'OPERATE_DATE'],
             data: store_logistic.getGroups("抽单状态")==undefined?[]:store_logistic.getGroups("抽单状态").children
@@ -678,10 +679,10 @@ function showLogisticStatus(totalno,divdeno)
 
 function renderLogistic(value, cellmeta, record, rowIndex, columnIndex, store) {
     var rtn = "";
-    var logistic_status_data = [{ "NAME": " 初始状态，无意义", "CODE": "0" }, { "NAME": "抽单完成（抽单状态——已签收)", "CODE": "10" },
-                               { "NAME": "转关申报完成（口岸报关——转关放行)", "CODE": "20" }, { "NAME": "口岸报检完成（报检状态——商检放行)", "CODE": "30" },
-                               { "NAME": "口岸报关完成（口岸报关——报关放行)", "CODE": "40" }, { "NAME": "提货完成（运输状态——已提货", "CODE": "50" },
-                               { "NAME": "运输中（运输状态——车辆出发）", "CODE": "60" }, { "NAME": "运输完成（运输状态——到达中转站/运输完成)", "CODE": "70" }];
+    var logistic_status_data = [{ "NAME": " 初始状态，无意义", "CODE": "0" }, { "NAME": "抽单完成", "CODE": "10" },
+                               { "NAME": "转关申报完成", "CODE": "20" }, { "NAME": "口岸报检完成", "CODE": "30" },
+                               { "NAME": "口岸报关完成", "CODE": "40" }, { "NAME": "提货完成", "CODE": "50" },
+                               { "NAME": "运输中", "CODE": "60" }, { "NAME": "运输完成", "CODE": "70" }];
     var store_render = Ext.create("Ext.data.JsonStore", {
         fields: ['NAME', 'CODE', ],
         data: logistic_status_data
