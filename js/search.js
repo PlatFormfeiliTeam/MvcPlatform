@@ -4,6 +4,7 @@ function initSearch(busitypeid) {
     var manifest_data = [{ "NAME": "已入库", "CODE": "1" }, { "NAME": "未入库", "CODE": "0" }];
     if (busitypeid == '11') {
         search_js_condition3_data.push({ "NAME": "舱单入库", "CODE": "MANIFEST_STORAGE" });
+        search_js_condition3_data.push({ "NAME": "物流状态", "CODE": "LOGISTICSSTATUS" });
     }
 
     if (busitypeid == '10' || busitypeid == '30') {
@@ -115,6 +116,10 @@ function initSearch(busitypeid) {
                 combo_3_1.reset();
                 if (combo_3.getValue() == "bgzt" || combo_3.getValue() == "bjzt") {
                     store_3_1.loadData(search_js_condition3_bgbjstatus_data);
+                }
+                else if (combo_3.getValue() == "LOGISTICSSTATUS")
+                {
+                    store_3_1.loadData(logistic_status_data);
                 }
                 else {
                     store_3_1.loadData(manifest_data);
@@ -281,6 +286,9 @@ function initSearch(busitypeid) {
                 combo_7_1.reset();
                 if (combo_7.getValue() == "bgzt" || combo_7.getValue() == "bjzt") {
                     store_7_1.loadData(search_js_condition3_bgbjstatus_data);
+                }
+                else if (combo_7.getValue() == "LOGISTICSSTATUS") {
+                    store_7_1.loadData(logistic_status_data);
                 }
                 else {
                     store_7_1.loadData(manifest_data);

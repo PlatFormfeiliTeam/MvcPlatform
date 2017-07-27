@@ -31,10 +31,10 @@ Ext.onReady(function () {
             busitype = "空运进口";
             columns_order = [{ xtype: 'rownumberer', width: 35 },
                 { header: 'ID', dataIndex: 'ID', hidden: true, locked: true },
-                { header: '报关状态', dataIndex: 'DECLSTATUS', width: 90, renderer: renderOrder, locked: true },
-                { header: '报检状态', dataIndex: 'INSPSTATUS', width: 90, renderer: renderOrder, locked: true },
-                { header: '物流状态', dataIndex: 'LOGISTICSSTATUS', width: 180, renderer: renderLogistic, locked: true },
-                { header: '对应号', dataIndex: 'REPNO', width: 120, locked: true },
+                { header: '报关状态', dataIndex: 'DECLSTATUS', width: 70, renderer: renderOrder, locked: true },
+                { header: '报检状态', dataIndex: 'INSPSTATUS', width: 70, renderer: renderOrder, locked: true },
+                { header: '物流状态', dataIndex: 'LOGISTICSSTATUS', width: 80, renderer: renderLogistic, locked: true },
+                { header: '对应号', dataIndex: 'REPNO', width: 100, locked: true },
                 { header: '合同发票号', dataIndex: 'CONTRACTNO', width: 100, locked: true },
                 { header: '件数/重量', dataIndex: 'GOODSNUM', width: 65, renderer: renderOrder, locked: true },//该字段需要拼接
                 { header: '总单号', dataIndex: 'TOTALNO', width: 90 },//需要确定具体字段
@@ -46,7 +46,7 @@ Ext.onReady(function () {
                 { header: '法检', dataIndex: 'LAWFLAG', width: 60, renderer: renderOrder },
                 { header: '受理时间', dataIndex: 'SUBMITTIME', width: 130, locked: true },
                 { header: '订单编号', dataIndex: 'CODE', width: 100 },
-                { header: '委托人员', dataIndex: 'SUBMITUSERNAME', width: 80, locked: true },
+                { header: '委托人员', dataIndex: 'SUBMITUSERNAME', width: 70, locked: true },
                 { header: '报关申报单位', dataIndex: 'REPUNITNAME', width: 180, locked: true }];
             break;
         case "20":
@@ -284,7 +284,7 @@ Ext.onReady(function () {
 function initSearch() {
     var store_1 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: [{ "NAME": "报关状态", "CODE": "DECLSTATUS" }, { "NAME": "报检状态", "CODE": "INSPSTATUS" }]
+        data: [{ "NAME": "报关状态", "CODE": "DECLSTATUS" }, { "NAME": "报检状态", "CODE": "INSPSTATUS" }, { "NAME": "物流状态", "CODE": "LOGISTICSSTATUS" }]
     });
     var combo_1 = Ext.create('Ext.form.field.ComboBox', {
         id: 'CONDITION1',
@@ -296,7 +296,18 @@ function initSearch() {
         editable: false,
         queryMode: 'local',
         margin: 0,
-        flex: .35
+        flex: .35,
+        listeners: {
+            change: function () {
+                combo_1_1.reset();
+                if (combo_1.getValue() == "LOGISTICSSTATUS") {
+                    store_1_1.loadData(logistic_status_data);
+                }
+                else {
+                    store_1_1.loadData(search_js_condition3_bgbjstatus_data);
+                }
+            }
+        }
     })
     var store_1_1 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
@@ -616,12 +627,12 @@ function showLogisticStatus(totalno,divdeno)
 
 
          var columns_logistic = [
-            { header: 'ID', dataIndex: 'ID', hidden: true, locked: true },
-            { header: '提示信息', dataIndex: 'MSG', locked: true },
-            { header: '操作人', dataIndex: 'OPERATER', locked: true },
-            { header: '状态类型', dataIndex: 'OPERATE_TYPE', locked: true },
-            { header: '状态值', dataIndex: 'OPERATE_RESULT', locked: true },
-            { header: '时间', dataIndex: 'OPERATE_DATE',width:160, locked: true },
+            { header: 'ID', dataIndex: 'ID', hidden: true},
+            { header: '提示信息', dataIndex: 'MSG' },
+            { header: '操作人', dataIndex: 'OPERATER' },
+            { header: '状态类型', dataIndex: 'OPERATE_TYPE'},
+            { header: '状态值', dataIndex: 'OPERATE_RESULT'},
+            { header: '时间', dataIndex: 'OPERATE_DATE',width:160}
          ]
          tab_0_gridpanel = Ext.create('Ext.grid.Panel', {
              store: tab_0_store,
@@ -679,10 +690,6 @@ function showLogisticStatus(totalno,divdeno)
 
 function renderLogistic(value, cellmeta, record, rowIndex, columnIndex, store) {
     var rtn = "";
-    var logistic_status_data = [{ "NAME": " 初始状态，无意义", "CODE": "0" }, { "NAME": "抽单完成", "CODE": "10" },
-                               { "NAME": "转关申报完成", "CODE": "20" }, { "NAME": "口岸报检完成", "CODE": "30" },
-                               { "NAME": "口岸报关完成", "CODE": "40" }, { "NAME": "提货完成", "CODE": "50" },
-                               { "NAME": "运输中", "CODE": "60" }, { "NAME": "运输完成", "CODE": "70" }];
     var store_render = Ext.create("Ext.data.JsonStore", {
         fields: ['NAME', 'CODE', ],
         data: logistic_status_data
@@ -693,7 +700,7 @@ function renderLogistic(value, cellmeta, record, rowIndex, columnIndex, store) {
         case "LOGISTICSSTATUS":
             var rec = store_render.findRecord('CODE', value);
             if (rec) {
-                rtn = "<a>" + rec.get("NAME") + "</a>";
+                rtn = "<a style='color:blue'>" + rec.get("NAME") + "</a>";
             }
             break;
     }

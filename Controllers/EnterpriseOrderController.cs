@@ -970,6 +970,12 @@ namespace MvcPlatform.Controllers
                             where += " and INSPSTATUS<130 ";
                         }
                         break;
+                    case "LOGISTICSSTATUS":
+                        if (!string.IsNullOrEmpty(Request["VALUE1"]))
+                        {
+                            where += " and LOGISTICSSTATUS='" + Request["VALUE1"] + "'";
+                        }
+                        break;
                 }
             }
             if (!string.IsNullOrEmpty(Request["VALUE2"]))//判断查询条件2是否有值

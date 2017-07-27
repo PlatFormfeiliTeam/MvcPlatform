@@ -310,6 +310,12 @@ namespace MvcPlatform.Controllers
                             where += " and (b.MANIFEST_STORAGE=0 or b.MANIFEST_STORAGE is null) ";
                         }
                         break;
+                    case "LOGISTICSSTATUS":
+                        if (!string.IsNullOrEmpty(Request["VALUE3"]))
+                        {
+                            where += " and a.LOGISTICSSTATUS='" + Request["VALUE3"]+ "'";
+                        }
+                        break;
                 }
             }
             switch (Request["CONDITION4"])
@@ -438,6 +444,12 @@ namespace MvcPlatform.Controllers
                         if ((Request["VALUE7"] + "") == "0")  //已委托=已委托
                         {
                             where += " and (b.MANIFEST_STORAGE=0 or b.MANIFEST_STORAGE is null) ";
+                        }
+                        break;
+                    case "LOGISTICSSTATUS":
+                        if (!string.IsNullOrEmpty(Request["VALUE7"]))
+                        {
+                            where += " and a.LOGISTICSSTATUS='" + Request["VALUE7"] + "'";
                         }
                         break;
                 }

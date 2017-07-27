@@ -76,3 +76,8 @@ var menu_js_data = [{ "NAME": "I跟踪", "URL": "http://www.igenzong.com/air/tra
 ]
 
 var modifyflag_data = [{ "NAME": "正常", "CODE": "0" }, { "NAME": "删单", "CODE": "1" }, { "NAME": "改单", "CODE": "2" }, { "NAME": "改单完成", "CODE": "3" }];
+
+var logistic_status_data = [{ "NAME": "", "CODE": "0" }, { "NAME": "抽单受理", "CODE": "5" }, { "NAME": "抽单完成", "CODE": "10" },
+                                 { "NAME": "转关申报完成", "CODE": "20" }, { "NAME": "口岸报检完成", "CODE": "30" },
+                                 { "NAME": "口岸报关完成", "CODE": "40" }, { "NAME": " 已派车", "CODE": "45" }, { "NAME": "提货完成", "CODE": "50" },
+                                 { "NAME": "运输中", "CODE": "60" }, { "NAME": "运输完成", "CODE": "70" }];
