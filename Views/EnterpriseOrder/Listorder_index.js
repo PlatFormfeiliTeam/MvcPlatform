@@ -517,8 +517,37 @@ function Open() {
     }
     var id = recs[0].data.ID
     var index = gridpanel.store.indexOf(recs[0]);
-    var currentPage = gridpanel.store.currentPage
-    openrwindow("/EnterpriseOrder/GoodsTrack?busitypeid=" + busitypeid + "&id=" + id + "&rowIndex=" + index + "&currentPage=" + currentPage, 1200, 800);
+    var currentPage = gridpanel.store.currentPage;
+
+    var menuxml = "";
+    switch (recs[0].get("BUSITYPE")) {
+        case "11":
+            menuxml = "ent_airin";
+            break;
+        case "10":
+            menuxml = "ent_airout";
+            break;
+        case "21":
+            menuxml = "ent_seain";
+            break;
+        case "20":
+            menuxml = "ent_seaout";
+            break;
+        case "31":
+            menuxml = "ent_landin";
+            break;
+        case "30":
+            menuxml = "ent_landout";
+            break;
+        case "40": case "41":
+            menuxml = "ent_domestic";
+            break;
+        case "50": case "51":
+            menuxml = "ent_special";
+            break;
+    }
+
+    openrwindow("/EnterpriseOrder/GoodsTrack?menuxml=" + menuxml + "&busitypeid=" + busitypeid + "&id=" + id + "&rowIndex=" + index + "&currentPage=" + currentPage, 1200, 800);
 }
 function ViewsEnterprise() {
     var recs = gridpanel.getSelectionModel().getSelection();
@@ -526,11 +555,40 @@ function ViewsEnterprise() {
         Ext.MessageBox.alert('提示', '请选择需要查看的记录！');
         return;
     }
+
+    var menuxml = "";
+    switch (recs[0].get("BUSITYPE")) {
+        case "11":
+            menuxml = "ent_airin";
+            break;
+        case "10":
+            menuxml = "ent_airout";
+            break;
+        case "21":
+            menuxml = "ent_seain";
+            break;
+        case "20":
+            menuxml = "ent_seaout";
+            break;
+        case "31":
+            menuxml = "ent_landin";
+            break;
+        case "30":
+            menuxml = "ent_landout";
+            break;
+        case "40": case "41":
+            menuxml = "ent_domestic";
+            break;
+        case "50": case "51":
+            menuxml = "ent_special";
+            break;
+    }
+
     if (busitypeid == "40-41") {
-        opencenterwin("/OrderDomestic/OrderView?Role=enterprise&OrderId=" + recs[0].get("ID") + "&OrderCode=" + recs[0].get("CODE") + "&busitypeid=" + recs[0].get("BUSITYPE"), 1500, 800);
+        opencenterwin("/OrderDomestic/OrderView?menuxml=" + menuxml + "&Role=enterprise&OrderId=" + recs[0].get("ID") + "&OrderCode=" + recs[0].get("CODE") + "&busitypeid=" + recs[0].get("BUSITYPE"), 1500, 800);
     }
     else {
-        opencenterwin("/Common/OrderView?Role=enterprise&OrderId=" + recs[0].get("ID") + "&ordercode=" + recs[0].get("CODE") + "&busitypeid=" + recs[0].get("BUSITYPE"), 1200, 800);
+        opencenterwin("/Common/OrderView?menuxml=" + menuxml + "&Role=enterprise&OrderId=" + recs[0].get("ID") + "&ordercode=" + recs[0].get("CODE") + "&busitypeid=" + recs[0].get("BUSITYPE"), 1200, 800);
     }
 
 }

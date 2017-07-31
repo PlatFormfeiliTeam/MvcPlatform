@@ -97,10 +97,14 @@
                                     }
                                     var actab = tabpanel.getActiveTab();
                                     if (actab.title == '订单跟踪') {
-                                        Ext.getDom("trackIframe").src = "/Common/OrderTrack?ORDERCODE=" + newValue.ordergroup;
+                                        Ext.getDom("trackIframe").src = "/Common/OrderTrack?menuxml=domestic&ORDERCODE=" + newValue.ordergroup;
                                     }
                                     if (actab.title == '随附文件') {
-                                        Ext.getDom("fileIframe").src = "/Common/FileConsult?ORDERCODE=" + newValue.ordergroup + "&BUSITYPE=" + busitypeid;
+                                        if (role == "enterprise") {
+                                            Ext.getDom("fileIframe").src = "/Common/FileConsult_E?menuxml=domestic&ORDERCODE=" + newValue.ordergroup + "&BUSITYPE=" + busitypeid;
+                                        } else {
+                                            Ext.getDom("fileIframe").src = "/Common/FileConsult?menuxml=domestic&ORDERCODE=" + newValue.ordergroup + "&BUSITYPE=" + busitypeid;
+                                        }
                                     }
 
                                     //保证载入跟踪信息及随附文件时传入的ordercode随订单类型改变的
@@ -178,14 +182,14 @@
                             listeners: {
                                 tabchange: function (tabPanel, newCard, oldCard, eOpts) {
                                     if (newCard.title == "随附文件") {
-                                   if (role == "enterprise") {
-                                            Ext.getDom("fileIframe").src = "/Common/FileConsult_E?ORDERCODE=" + ordercode + "&BUSITYPE=" + busitypeid;
+                                        if (role == "enterprise") {
+                                            Ext.getDom("fileIframe").src = "/Common/FileConsult_E?menuxml=domestic&ORDERCODE=" + ordercode + "&BUSITYPE=" + busitypeid;
                                         } else {
-                                            Ext.getDom("fileIframe").src = "/Common/FileConsult?ORDERCODE=" + ordercode + "&BUSITYPE=" + busitypeid;
+                                            Ext.getDom("fileIframe").src = "/Common/FileConsult?menuxml=domestic&ORDERCODE=" + ordercode + "&BUSITYPE=" + busitypeid;
                                         }
                                     }
                                     if (newCard.title == "订单跟踪") {
-                                        Ext.getDom("trackIframe").src = "/Common/OrderTrack?ORDERCODE=" + ordercode;
+                                        Ext.getDom("trackIframe").src = "/Common/OrderTrack?menuxml=domestic&ORDERCODE=" + ordercode;
                                     }
                                 }
                             }

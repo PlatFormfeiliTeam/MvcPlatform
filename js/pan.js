@@ -1708,7 +1708,7 @@ function renderOrder(value, cellmeta, record, rowIndex, columnIndex, store) {
     return rtn;
 }
 
-function openwin(type) {
+function openwin(type,paramenu) {
     var recs = gridpanel.getSelectionModel().getSelection();
     if (recs.length == 0) {
         Ext.MessageBox.alert('提示', '请选择需要维护的记录！');
@@ -1719,17 +1719,17 @@ function openwin(type) {
         plwhids += recs[i].data.ID + ',';
     }
     plwhids = plwhids.substr(0, plwhids.length - 1);
-    opencenterwin("/Common/BatchMaintain?ids=" + plwhids + "&type=" + type, 1200, 600);
+    opencenterwin("/Common/BatchMaintain?menuxml=" + paramenu + "&ids=" + plwhids + "&type=" + type, 1200, 600);
 }
 
 
-function Views() {
+function Views(paramenu) {
     var recs = gridpanel.getSelectionModel().getSelection();
     if (recs.length == 0) {
         Ext.MessageBox.alert('提示', '请选择需要查看详细的记录！');
         return;
     }
-    opencenterwin("/Common/OrderView?OrderId=" + recs[0].get("ID") + "&ordercode=" + recs[0].get("CODE") + "&busitypeid=" + recs[0].get("BUSITYPE"), 1200, 800);
+    opencenterwin("/Common/OrderView?menuxml=" + paramenu + "&OrderId=" + recs[0].get("ID") + "&ordercode=" + recs[0].get("CODE") + "&busitypeid=" + recs[0].get("BUSITYPE"), 1200, 800);
 }
 //打印pdf文件 by panhuaguo 2016-09-02  打印时,在原始随附文件的基础上增加订单号和申报方式的选择
 function printFile(type) {

@@ -718,7 +718,7 @@
 function form_ini_btn() {
 
     var bbar_r = '<div class="btn-group" role="group">'
-                        + '<button type="button" onclick="printitemno(' + id + ')" id="btn_print" class="btn btn-primary btn-sm"><i class="fa fa-print"></i>&nbsp;申请表打印</button>'
+                        + '<button type="button" onclick="printitemno_change()" id="btn_print" class="btn btn-primary btn-sm"><i class="fa fa-print"></i>&nbsp;申请表打印</button>'
                         + '<button type="button" onclick="create_save(\'save\')" id="btn_save" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;保存</button>'
                         + '<button type="button" onclick="create_save(\'submit\')" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;提交申请</button></div>'
 
@@ -860,3 +860,6 @@ function formpanelcontrol() {
 
 }
 
+function printitemno_change() {
+    opencenterwin("/RecordInfor/PrintRecordDetail?ids=" + id, 1600, 900);
+}

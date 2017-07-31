@@ -21,6 +21,7 @@ using MvcPlatform.WsZip;
 namespace MvcPlatform.Controllers
 {
     [Authorize]
+    [Filters.AuthFilter]
     public class CommonController : Controller
     {
         int totalProperty = 0;

@@ -346,7 +346,35 @@ function Select() {
 
 //打开调阅信息
 function showwinwj(ORDERCODE, BUSITYPE, PREINSPCODE) {
-    opencenterwin("/Common/FileConsult?source=inspect&ORDERCODE=" + ORDERCODE + "&BUSITYPE=" + BUSITYPE + "&PREINSPCODE=" + PREINSPCODE, 1200, 900);
+    var menuxml = "";
+    switch (BUSITYPE) {
+        case "11":
+            menuxml = "insp_airin";
+            break;
+        case "10":
+            menuxml = "insp_airout";
+            break;
+        case "21":
+            menuxml = "insp_seain";
+            break;
+        case "20":
+            menuxml = "insp_seaout";
+            break;
+        case "31":
+            menuxml = "insp_landin";
+            break;
+        case "30":
+            menuxml = "insp_landout";
+            break;
+        case "40": case "41":
+            menuxml = "insp_domestic";
+            break;
+        case "50": case "51":
+            menuxml = "insp_special";
+            break;
+    }
+
+    opencenterwin("/Common/FileConsult?menuxml=" + menuxml + "&source=inspect&ORDERCODE=" + ORDERCODE + "&BUSITYPE=" + BUSITYPE + "&PREINSPCODE=" + PREINSPCODE, 1200, 900);
 }
 
 //打开调阅信息
@@ -356,7 +384,35 @@ function ClickShowwinwj() {
         Ext.MessageBox.alert('提示', '请选择需要调阅的记录！');
         return;
     }
-    opencenterwin("/Common/FileConsult?source=inspect&ORDERCODE=" + recs[0].get("ORDERCODE") + "&BUSITYPE=" + recs[0].get("BUSITYPE") + "&PREINSPCODE=" + recs[0].get("CODE"), 1200, 900);
+    var menuxml = "";
+    switch (recs[0].get("BUSITYPE")) {
+        case "11":
+            menuxml = "insp_airin";
+            break;
+        case "10":
+            menuxml = "insp_airout";
+            break;
+        case "21":
+            menuxml = "insp_seain";
+            break;
+        case "20":
+            menuxml = "insp_seaout";
+            break;
+        case "31":
+            menuxml = "insp_landin";
+            break;
+        case "30":
+            menuxml = "insp_landout";
+            break;
+        case "40": case "41":
+            menuxml = "insp_domestic";
+            break;
+        case "50": case "51":
+            menuxml = "insp_special";
+            break;
+    }
+
+    opencenterwin("/Common/FileConsult?menuxml=" + menuxml + "&source=inspect&ORDERCODE=" + recs[0].get("ORDERCODE") + "&BUSITYPE=" + recs[0].get("BUSITYPE") + "&PREINSPCODE=" + recs[0].get("CODE"), 1200, 900);
 }
 
 
@@ -375,7 +431,36 @@ function MultiPrint() {
             data += "{BUSITYPE:'" + recs[i].get("BUSITYPE") + "',CODE:'" + recs[i].get("CODE") + "'},"
         }
     }
-    opencenterwin("/Common/MultiPrint?source=inspect&data=" + data, 1100, 700);
+
+    var menuxml = "";
+    switch (recs[0].get("BUSITYPE")) {
+        case "11":
+            menuxml = "insp_mul_airin";
+            break;
+        case "10":
+            menuxml = "insp_mul_airout";
+            break;
+        case "21":
+            menuxml = "insp_mul_seain";
+            break;
+        case "20":
+            menuxml = "insp_mul_seaout";
+            break;
+        case "31":
+            menuxml = "insp_mul_landin";
+            break;
+        case "30":
+            menuxml = "insp_mul_landout";
+            break;
+        case "40": case "41":
+            menuxml = "insp_mul_domestic";
+            break;
+        case "50": case "51":
+            menuxml = "insp_mul_special";
+            break;
+    }
+
+    opencenterwin("/Common/MultiPrint?menuxml=" + menuxml + "&source=inspect&data=" + data, 1100, 700);
 }
 
 

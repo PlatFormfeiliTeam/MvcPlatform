@@ -27,7 +27,8 @@ using Oracle.ManagedDataAccess.Client;
 
 namespace MvcPlatform.Controllers
 {
-     [Authorize]
+    [Authorize]
+    [Filters.AuthFilter]
     public class EnterpriseOrderController : Controller
     {
         int totalProperty = 0;
@@ -76,11 +77,11 @@ namespace MvcPlatform.Controllers
             return View();
         }
 
-         [Filters.DecodeFilter]
-        public ActionResult ListOrder_Index(string busitypeid)  
+        [Filters.DecodeFilter]
+        public ActionResult ListOrder_Index(string busitypeid)
         {
             switch (busitypeid)
-          {
+            {
                 case "10":
                     ViewBag.navigator = "业务管理>>空运出口";
                     break;
@@ -105,8 +106,8 @@ namespace MvcPlatform.Controllers
                 case "50-51":
                     ViewBag.navigator = "业务管理>>特殊区域";
                     break;
-          }
-            
+            }
+
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
@@ -339,88 +340,105 @@ namespace MvcPlatform.Controllers
 
             return "{sbfs:" + json_sbfs + "}";
         }
-            public string Ini_Base_Data_TEMPLATENAME()
-        { 
+        public string Ini_Base_Data_TEMPLATENAME()
+        {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            string busiunitcode=json_user.Value<string>("CUSTOMERHSCODE");
+            string busiunitcode = json_user.Value<string>("CUSTOMERHSCODE");
             string sql = "select to_char(ID) ID,TEMPLATENAME from list_declaration_template where busiunitcode='" + busiunitcode + "'";
             string json_templatename = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
             return "{templatename:" + json_templatename + "}";
         }
-            public ActionResult Upload_WebServer(int? chunk, string name)
+        public ActionResult Upload_WebServer(int? chunk, string name)
+        {
+            var fileUpload = Request.Files[0];
+            var uploadPath = Server.MapPath("/FileUpload/file");
+            chunk = chunk ?? 0;
+            using (var fs = new FileStream(Path.Combine(uploadPath, name), chunk == 0 ? FileMode.Create : FileMode.Append))
             {
-                var fileUpload = Request.Files[0];
-                var uploadPath = Server.MapPath("/FileUpload/file");
-                chunk = chunk ?? 0;
-                using (var fs = new FileStream(Path.Combine(uploadPath, name), chunk == 0 ? FileMode.Create : FileMode.Append))
-                {
-                    var buffer = new byte[fileUpload.InputStream.Length];
-                    fileUpload.InputStream.Read(buffer, 0, buffer.Length);
-                    fs.Write(buffer, 0, buffer.Length);
-                }
-                return Content("chunk uploaded", "text/plain");
+                var buffer = new byte[fileUpload.InputStream.Length];
+                fileUpload.InputStream.Read(buffer, 0, buffer.Length);
+                fs.Write(buffer, 0, buffer.Length);
             }
-            public FileResult DownFile(string filename, string ID)//ActionResult
+            return Content("chunk uploaded", "text/plain");
+        }
+        public FileResult DownFile(string filename, string ID)//ActionResult
+        {
+            string url = ""; byte[] bytes;
+            if (ID != "")//文件在文件服务器上
             {
-                string url = ""; byte[] bytes;
-                if (ID != "")//文件在文件服务器上
-                {
-                    url = ConfigurationManager.AppSettings["AdminUrl"] + "/file" + filename;
-                    WebClient wc = new WebClient();
-                    bytes = wc.DownloadData(url);
-                    wc.Dispose();
-                }
-                else//企业端上传的文件，未保存前还在当前服务器上
-                {
-                    url = Server.MapPath(filename);
-                    FileStream fs = new FileStream(url, FileMode.Open);
-                    bytes = new byte[(int)fs.Length];
-                    fs.Read(bytes, 0, bytes.Length);
-                    fs.Close();
-                }
-                MemoryStream ms = new MemoryStream(bytes);
-                return File(ms, "application/octet-stream", Path.GetFileName(filename));
+                url = ConfigurationManager.AppSettings["AdminUrl"] + "/file" + filename;
+                WebClient wc = new WebClient();
+                bytes = wc.DownloadData(url);
+                wc.Dispose();
             }
-
-            public string Save()
+            else//企业端上传的文件，未保存前还在当前服务器上
             {
-                try
+                url = Server.MapPath(filename);
+                FileStream fs = new FileStream(url, FileMode.Open);
+                bytes = new byte[(int)fs.Length];
+                fs.Read(bytes, 0, bytes.Length);
+                fs.Close();
+            }
+            MemoryStream ms = new MemoryStream(bytes);
+            return File(ms, "application/octet-stream", Path.GetFileName(filename));
+        }
+
+        public string Save()
+        {
+            try
+            {
+                JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+                JObject json_data = (JObject)JsonConvert.DeserializeObject(Request["data"]);
+                string filedata = Request["filedata"] + "";
+                string action = Request["action"] + "";
+                string status = action == "delegate" ? "10" : json_data.Value<string>("STATUS");
+                string insert_sql = "";
+                string update_sql = "";
+                string sql = "";
+                string ent_id = "";
+
+
+                if (!string.IsNullOrEmpty(json_data.Value<string>("CODE")))
                 {
-                    JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-                    JObject json_data = (JObject)JsonConvert.DeserializeObject(Request["data"]);
-                    string filedata = Request["filedata"] + "";
-                    string action=Request["action"]+"";
-                    string status =action=="delegate"?"10":json_data.Value<string>("STATUS");
-                    string insert_sql = "";
-                    string update_sql = "";
-                    string sql = "";
-                    string ent_id = "";
-
-
-                    if (!string.IsNullOrEmpty(json_data.Value<string>("CODE")))
+                    string sql_check = "select * from ENT_ORDER where CODE='" + json_data.Value<string>("CODE") + "'";
+                    if (!string.IsNullOrEmpty(json_data.Value<string>("ID")))
                     {
-                        string sql_check="select * from ENT_ORDER where CODE='"+json_data.Value<string>("CODE")+"'";
-                        if (!string.IsNullOrEmpty(json_data.Value<string>("ID")))
-                        {
-                            sql_check += " and ID !='" + json_data.Value<string>("ID") + "'";
-                        }
-                        DataTable dt_itemno = new DataTable();
-                        dt_itemno = DBMgr.GetDataTable(sql_check);
-                        if (dt_itemno.Rows.Count > 0) {  return "{success:false,isrepeate:'Y'}"; }
-
+                        sql_check += " and ID !='" + json_data.Value<string>("ID") + "'";
                     }
-                    if (string.IsNullOrEmpty(json_data.Value<string>("ID")))//新增
-                    {
+                    DataTable dt_itemno = new DataTable();
+                    dt_itemno = DBMgr.GetDataTable(sql_check);
+                    if (dt_itemno.Rows.Count > 0) { return "{success:false,isrepeate:'Y'}"; }
+
+                }
+                if (string.IsNullOrEmpty(json_data.Value<string>("ID")))//新增
+                {
                     insert_sql = @"insert into ENT_ORDER (id,createtime, unitcode,filerecevieunitcode, filerecevieunitname,
                     filedeclareunitcode,filedeclareunitname, busitypeid,customdistrictcode,customdistrictname,repwayid, 
                     createid, createname,enterprisecode, enterprisename,remark,code,createmode,status,isreadpdf,templatename) 
                     values ('{0}',sysdate,(select fun_AutoQYBH(sysdate) from dual),'{1}','{2}','{3}','{4}','{5}',
                      '{6}','{7}','{8}','{9}','{10}', '{11}','{12}','{13}','{14}','{15}','{16}',{17},'{18}')";
-                        if (json_data.Value<string>("CREATEMODE") == "按批次")
+                    if (json_data.Value<string>("CREATEMODE") == "按批次")
+                    {
+                        sql = "select ENT_ORDER_ID.Nextval from dual";
+                        ent_id = DBMgr.GetDataTable(sql).Rows[0][0] + "";//获取ID
+                        sql = string.Format(insert_sql, ent_id, json_data.Value<string>("FILERECEVIEUNITCODE"), json_data.Value<string>("FILERECEVIEUNITNAME"),
+                              json_data.Value<string>("FILEDECLAREUNITCODE"), json_data.Value<string>("FILEDECLAREUNITNAME"),
+                              json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"), json_data.Value<string>("CUSTOMDISTRICTNAME"),
+                              json_data.Value<string>("REPWAYID"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),
+                              json_user.Value<string>("CUSTOMERHSCODE"), json_user.Value<string>("CUSTOMERNAME"), json_data.Value<string>("REMARK"),
+                              json_data.Value<string>("CODE"), json_data.Value<string>("CREATEMODE"), status, json_data.Value<string>("ISREADPDF"), json_data.Value<string>("TEMPLATENAME"));
+                        DBMgr.ExecuteNonQuery(sql);
+                        //更新随附文件
+                        Extension.Update_Attachment_ForEnterprise(ent_id, filedata, json_data.Value<string>("ORIGINALFILEIDS"), json_user, "");
+                    }
+                    if (json_data.Value<string>("CREATEMODE") == "按文件")
+                    {
+                        JArray jarry = JsonConvert.DeserializeObject<JArray>(filedata);
+                        foreach (JObject json in jarry)
                         {
                             sql = "select ENT_ORDER_ID.Nextval from dual";
                             ent_id = DBMgr.GetDataTable(sql).Rows[0][0] + "";//获取ID
-                            sql = string.Format(insert_sql, ent_id,json_data.Value<string>("FILERECEVIEUNITCODE"), json_data.Value<string>("FILERECEVIEUNITNAME"),
+                            sql = string.Format(insert_sql, ent_id, json_data.Value<string>("FILERECEVIEUNITCODE"), json_data.Value<string>("FILERECEVIEUNITNAME"),
                                   json_data.Value<string>("FILEDECLAREUNITCODE"), json_data.Value<string>("FILEDECLAREUNITNAME"),
                                   json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"), json_data.Value<string>("CUSTOMDISTRICTNAME"),
                                   json_data.Value<string>("REPWAYID"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),
@@ -428,185 +446,168 @@ namespace MvcPlatform.Controllers
                                   json_data.Value<string>("CODE"), json_data.Value<string>("CREATEMODE"), status, json_data.Value<string>("ISREADPDF"), json_data.Value<string>("TEMPLATENAME"));
                             DBMgr.ExecuteNonQuery(sql);
                             //更新随附文件
-                            Extension.Update_Attachment_ForEnterprise(ent_id, filedata, json_data.Value<string>("ORIGINALFILEIDS"), json_user,"");
+                            Extension.Update_Attachment_ForEnterprise(ent_id, "[" + JsonConvert.SerializeObject(json) + "]", json_data.Value<string>("ORIGINALFILEIDS"), json_user, "");
                         }
-                        if (json_data.Value<string>("CREATEMODE") == "按文件")
-                        {
-                            JArray jarry = JsonConvert.DeserializeObject<JArray>(filedata);
-                            foreach (JObject json in jarry)
-                            {
-                                sql = "select ENT_ORDER_ID.Nextval from dual";
-                                ent_id = DBMgr.GetDataTable(sql).Rows[0][0] + "";//获取ID
-                                sql = string.Format(insert_sql, ent_id,json_data.Value<string>("FILERECEVIEUNITCODE"), json_data.Value<string>("FILERECEVIEUNITNAME"),
-                                      json_data.Value<string>("FILEDECLAREUNITCODE"), json_data.Value<string>("FILEDECLAREUNITNAME"),
-                                      json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"), json_data.Value<string>("CUSTOMDISTRICTNAME"),
-                                      json_data.Value<string>("REPWAYID"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),
-                                      json_user.Value<string>("CUSTOMERHSCODE"), json_user.Value<string>("CUSTOMERNAME"), json_data.Value<string>("REMARK"),
-                                      json_data.Value<string>("CODE"), json_data.Value<string>("CREATEMODE"), status, json_data.Value<string>("ISREADPDF"), json_data.Value<string>("TEMPLATENAME"));
-                                DBMgr.ExecuteNonQuery(sql);
-                                //更新随附文件
-                                Extension.Update_Attachment_ForEnterprise(ent_id, "[" + JsonConvert.SerializeObject(json) + "]", json_data.Value<string>("ORIGINALFILEIDS"), json_user,"");
-                            }
-                        }
+                    }
 
 
 
-                    }
-                    else
-                    {
-                        if (action == "ch")
-                        {
-                            update_sql = @"update ENT_ORDER  set status='5' where id='" + json_data.Value<string>("ID") + "'";
-                            DBMgr.ExecuteNonQuery(update_sql);
-                            return "{success:true}";
-                        }
-
-                        if (action == "delegate")
-                        {
-                            update_sql = @"update ENT_ORDER  set filerecevieunitcode='{1}',filerecevieunitname='{2}',filedeclareunitcode='{3}',
-                            filedeclareunitname='{4}',busitypeid='{5}',customdistrictcode='{6}', customdistrictname='{7}',
-                            repwayid='{8}',remark='{9}',code='{10}',status='{11}',templatename='{12}',submittime=sysdate where id='{0}'";
-                        }
-                        else
-                        {
-                         update_sql = @"update ENT_ORDER  set filerecevieunitcode='{1}',filerecevieunitname='{2}',filedeclareunitcode='{3}',
-                        filedeclareunitname='{4}',busitypeid='{5}',customdistrictcode='{6}', customdistrictname='{7}',
-                        repwayid='{8}',remark='{9}',code='{10}',status='{11}',templatename='{12}' where id='{0}'";
-                        }
-                        sql = string.Format(update_sql, json_data.Value<string>("ID"), json_data.Value<string>("FILERECEVIEUNITCODE"),
-                        json_data.Value<string>("FILERECEVIEUNITNAME"), json_data.Value<string>("FILEDECLAREUNITCODE"),
-                        json_data.Value<string>("FILEDECLAREUNITNAME"), json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"),
-                        json_data.Value<string>("CUSTOMDISTRICTNAME"), json_data.Value<string>("REPWAYID"), json_data.Value<string>("REMARK"), json_data.Value<string>("CODE"), status, json_data.Value<string>("TEMPLATENAME"));
-                        DBMgr.ExecuteNonQuery(sql);
-                        //更新随附文件
-                        Extension.Update_Attachment_ForEnterprise(json_data.Value<string>("ID"), filedata, json_data.Value<string>("ORIGINALFILEIDS"), json_user,"");
-                    }
-                    return "{success:true}";
-                }
-                catch (Exception ex)
-                {
-                    return "{success:false}";
-                }
-            }
-            public string DeleteList(string recs)
-            {
-                bool flag = true; string UNITCODE = string.Empty;
-                JArray ja = JArray.Parse(recs);
-                string message = string.Empty;
-                foreach (JToken jt  in ja)
-                {
-                    if (jt.Value<string>("NEWSTATUS") == "5")
-                    {
-                     flag=Delete(jt.Value<string>("ID"));
-                     if (!flag)
-                     {
-                         UNITCODE += jt.Value<string>("UNITCODE")+" ";
-                     }
-                    }
-                    else
-                    {
-                        message = "某些记录为非草稿状态，本次操作只删除草稿状态的记录！";
-                    }
-                }
-                if (UNITCODE!="")
-                {
-                   
-                    message = "如下编号:" + UNITCODE + "的记录删除失败。";
-                    return "{success:false,message:'" + message + "'}";
                 }
                 else
                 {
-                    return "{success:true,message:'" + message + "'}";
-                }
-                
-            }
-            public bool Delete(string id)
-            {
-                try
-                {
-                    string sql = "";
-
-                    //删除订单随附文件
-                    System.Uri Uri = new Uri("ftp://" + ConfigurationManager.AppSettings["FTPServer"] + ":" + ConfigurationManager.AppSettings["FTPPortNO"]);
-                    string UserName = ConfigurationManager.AppSettings["FTPUserName"];
-                    string Password = ConfigurationManager.AppSettings["FTPPassword"];
-                    FtpHelper ftp = new FtpHelper(Uri, UserName, Password);
-                    sql = "select * from list_attachment where entid='" + id + "'";
-                    DataTable dt = DBMgr.GetDataTable(sql);
-                    foreach (DataRow dr in dt.Rows)
+                    if (action == "ch")
                     {
-                        ftp.DeleteFile(dr["FILENAME"] + "");
+                        update_sql = @"update ENT_ORDER  set status='5' where id='" + json_data.Value<string>("ID") + "'";
+                        DBMgr.ExecuteNonQuery(update_sql);
+                        return "{success:true}";
                     }
 
-                    sql = "delete from list_attachment where entid='" + id + "'";
-                    DBMgr.ExecuteNonQuery(sql);
-
-                    sql = "delete from ENT_ORDER where id = '" + id + "'";
-                    DBMgr.ExecuteNonQuery(sql);
-                }
-                catch (Exception)
-                {
-
-                    return false;
-                }
-                return true;
-               
-            }
-            public string loadOrderList()
-            {
-                JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-                string enterprisecode=json_user.Value<string>("CUSTOMERHSCODE");
-                string sql="select t.*,l.FILENUM ,(case printstatus when '1' then 15 else (case when status is null then 10 else status end) end) as newstatus "+
-                           "from ENT_ORDER t left join (select entid,count(1) as FILENUM from list_attachment where entid is not null group by entid) l on t.ID=l.entid "+
-                           "where t.enterprisecode="+enterprisecode;
-                string where = "";
-                if (!string.IsNullOrEmpty(Request["FILERECEVIEUNIT"]))
-                {
-                    where += " and t.filerecevieunitcode='" + Request["FILERECEVIEUNIT"] + "'";
-                }
-                if (!string.IsNullOrEmpty(Request["FILEDECLAREUNIT"]))
-                {
-                    where += " and t.filedeclareunitcode='" + Request["FILEDECLAREUNIT"] + "'";
-                }
-                if (!string.IsNullOrEmpty(Request["CODE"]))
-                {
-                    where += " and instr(t.CODE,'"+Request["CODE"]+"')>0";
-                }
-                if (!string.IsNullOrEmpty(Request["STARTDATE"]))
-                {
-                    where += " and t.SUBMITTIME>=to_date('" + Request["STARTDATE"] + "','yyyy-mm-dd hh24:mi:ss')";
-                }
-                if (!string.IsNullOrEmpty(Request["ENDDATE"]))
-                {
-                    where += " and t.SUBMITTIME<=to_date('" + Request["ENDDATE"] + "','yyyy-mm-dd hh24:mi:ss')+1";
-                }
-                if (!string.IsNullOrEmpty(Request["STATUS"]))
-                {
-                    string status=Request["STATUS"] ;
-                    switch (status)
+                    if (action == "delegate")
                     {
-                      case "10":
-                            where += " and (t.STATUS='" + Request["STATUS"] + "' or (t.STATUS is null and t.printstatus!='1' ))";
-                          break;
-                      case "15":
-                          where += " and (t.STATUS='" + Request["STATUS"] + "' or  t.printstatus='1')";
-                          break;
-                     default:
-                       where += " and t.STATUS='" + Request["STATUS"] + "'";
-                       break;
-
+                        update_sql = @"update ENT_ORDER  set filerecevieunitcode='{1}',filerecevieunitname='{2}',filedeclareunitcode='{3}',
+                            filedeclareunitname='{4}',busitypeid='{5}',customdistrictcode='{6}', customdistrictname='{7}',
+                            repwayid='{8}',remark='{9}',code='{10}',status='{11}',templatename='{12}',submittime=sysdate where id='{0}'";
                     }
-                        
+                    else
+                    {
+                        update_sql = @"update ENT_ORDER  set filerecevieunitcode='{1}',filerecevieunitname='{2}',filedeclareunitcode='{3}',
+                        filedeclareunitname='{4}',busitypeid='{5}',customdistrictcode='{6}', customdistrictname='{7}',
+                        repwayid='{8}',remark='{9}',code='{10}',status='{11}',templatename='{12}' where id='{0}'";
+                    }
+                    sql = string.Format(update_sql, json_data.Value<string>("ID"), json_data.Value<string>("FILERECEVIEUNITCODE"),
+                    json_data.Value<string>("FILERECEVIEUNITNAME"), json_data.Value<string>("FILEDECLAREUNITCODE"),
+                    json_data.Value<string>("FILEDECLAREUNITNAME"), json_data.Value<string>("BUSITYPEID"), json_data.Value<string>("CUSTOMDISTRICTCODE"),
+                    json_data.Value<string>("CUSTOMDISTRICTNAME"), json_data.Value<string>("REPWAYID"), json_data.Value<string>("REMARK"), json_data.Value<string>("CODE"), status, json_data.Value<string>("TEMPLATENAME"));
+                    DBMgr.ExecuteNonQuery(sql);
+                    //更新随附文件
+                    Extension.Update_Attachment_ForEnterprise(json_data.Value<string>("ID"), filedata, json_data.Value<string>("ORIGINALFILEIDS"), json_user, "");
                 }
-                sql += where;
-                IsoDateTimeConverter iso = new IsoDateTimeConverter();
-                iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-                DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME desc,id ", "desc"));
-                var json = JsonConvert.SerializeObject(dt, iso);
-                return "{rows:" + json + ",total:" + totalProperty + "}";
-            
-            
+                return "{success:true}";
             }
+            catch (Exception ex)
+            {
+                return "{success:false}";
+            }
+        }
+        public string DeleteList(string recs)
+        {
+            bool flag = true; string UNITCODE = string.Empty;
+            JArray ja = JArray.Parse(recs);
+            string message = string.Empty;
+            foreach (JToken jt in ja)
+            {
+                if (jt.Value<string>("NEWSTATUS") == "5")
+                {
+                    flag = Delete(jt.Value<string>("ID"));
+                    if (!flag)
+                    {
+                        UNITCODE += jt.Value<string>("UNITCODE") + " ";
+                    }
+                }
+                else
+                {
+                    message = "某些记录为非草稿状态，本次操作只删除草稿状态的记录！";
+                }
+            }
+            if (UNITCODE != "")
+            {
+
+                message = "如下编号:" + UNITCODE + "的记录删除失败。";
+                return "{success:false,message:'" + message + "'}";
+            }
+            else
+            {
+                return "{success:true,message:'" + message + "'}";
+            }
+
+        }
+        public bool Delete(string id)
+        {
+            try
+            {
+                string sql = "";
+
+                //删除订单随附文件
+                System.Uri Uri = new Uri("ftp://" + ConfigurationManager.AppSettings["FTPServer"] + ":" + ConfigurationManager.AppSettings["FTPPortNO"]);
+                string UserName = ConfigurationManager.AppSettings["FTPUserName"];
+                string Password = ConfigurationManager.AppSettings["FTPPassword"];
+                FtpHelper ftp = new FtpHelper(Uri, UserName, Password);
+                sql = "select * from list_attachment where entid='" + id + "'";
+                DataTable dt = DBMgr.GetDataTable(sql);
+                foreach (DataRow dr in dt.Rows)
+                {
+                    ftp.DeleteFile(dr["FILENAME"] + "");
+                }
+
+                sql = "delete from list_attachment where entid='" + id + "'";
+                DBMgr.ExecuteNonQuery(sql);
+
+                sql = "delete from ENT_ORDER where id = '" + id + "'";
+                DBMgr.ExecuteNonQuery(sql);
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
+            return true;
+
+        }
+        public string loadOrderList()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string enterprisecode = json_user.Value<string>("CUSTOMERHSCODE");
+            string sql = "select t.*,l.FILENUM ,(case printstatus when '1' then 15 else (case when status is null then 10 else status end) end) as newstatus " +
+                       "from ENT_ORDER t left join (select entid,count(1) as FILENUM from list_attachment where entid is not null group by entid) l on t.ID=l.entid " +
+                       "where t.enterprisecode=" + enterprisecode;
+            string where = "";
+            if (!string.IsNullOrEmpty(Request["FILERECEVIEUNIT"]))
+            {
+                where += " and t.filerecevieunitcode='" + Request["FILERECEVIEUNIT"] + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["FILEDECLAREUNIT"]))
+            {
+                where += " and t.filedeclareunitcode='" + Request["FILEDECLAREUNIT"] + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["CODE"]))
+            {
+                where += " and instr(t.CODE,'" + Request["CODE"] + "')>0";
+            }
+            if (!string.IsNullOrEmpty(Request["STARTDATE"]))
+            {
+                where += " and t.SUBMITTIME>=to_date('" + Request["STARTDATE"] + "','yyyy-mm-dd hh24:mi:ss')";
+            }
+            if (!string.IsNullOrEmpty(Request["ENDDATE"]))
+            {
+                where += " and t.SUBMITTIME<=to_date('" + Request["ENDDATE"] + "','yyyy-mm-dd hh24:mi:ss')+1";
+            }
+            if (!string.IsNullOrEmpty(Request["STATUS"]))
+            {
+                string status = Request["STATUS"];
+                switch (status)
+                {
+                    case "10":
+                        where += " and (t.STATUS='" + Request["STATUS"] + "' or (t.STATUS is null and t.printstatus!='1' ))";
+                        break;
+                    case "15":
+                        where += " and (t.STATUS='" + Request["STATUS"] + "' or  t.printstatus='1')";
+                        break;
+                    default:
+                        where += " and t.STATUS='" + Request["STATUS"] + "'";
+                        break;
+
+                }
+
+            }
+            sql += where;
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME desc,id ", "desc"));
+            var json = JsonConvert.SerializeObject(dt, iso);
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+
+
+        }
         public FileResult ExportStu2()
         {
             string filepath = Request["filepath"];
@@ -782,9 +783,9 @@ namespace MvcPlatform.Controllers
             return dt;
         }
 
-      
 
-       
+
+
         /// <summary>
         /// 重组临时表数据，组合后格式为：34061(30);34062(4)
         /// </summary>
@@ -885,7 +886,7 @@ namespace MvcPlatform.Controllers
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "createtime", "desc"));
             var json = JsonConvert.SerializeObject(dt, iso);
 
-            return "{rows:" + json + ",total:" + totalProperty +"}";
+            return "{rows:" + json + ",total:" + totalProperty + "}";
         }
 
         public string LoadId_index()
@@ -906,7 +907,7 @@ namespace MvcPlatform.Controllers
                         where += " and CUSNO='" + Request["cx_value"] + "'";
                         break;
                 }
-                
+
             }
             string item_combo_value = Request["item_combo_value"] + "";
             string cx_value = Request["cx_value"] + "";
@@ -1006,7 +1007,7 @@ namespace MvcPlatform.Controllers
                 }
             }
 
-              if (!string.IsNullOrEmpty(Request["VALUE4"]))//判断查询条件2是否有值
+            if (!string.IsNullOrEmpty(Request["VALUE4"]))//判断查询条件2是否有值
             {
                 switch (Request["CONDITION4"])
                 {
@@ -1021,14 +1022,14 @@ namespace MvcPlatform.Controllers
                         break;
                 }
             }
-              if (!string.IsNullOrEmpty(Request["STARTDATE"]))
-              {
-                  where += " and SUBMITTIME>=to_date('" + Request["STARTDATE"] + "','yyyy-mm-dd hh24:mi:ss')";
-              }
-              if (!string.IsNullOrEmpty(Request["ENDDATE"]))
-              {
-                  where += " and SUBMITTIME<=to_date('" + Request["ENDDATE"] + "','yyyy-mm-dd hh24:mi:ss')+1";
-              }
+            if (!string.IsNullOrEmpty(Request["STARTDATE"]))
+            {
+                where += " and SUBMITTIME>=to_date('" + Request["STARTDATE"] + "','yyyy-mm-dd hh24:mi:ss')";
+            }
+            if (!string.IsNullOrEmpty(Request["ENDDATE"]))
+            {
+                where += " and SUBMITTIME<=to_date('" + Request["ENDDATE"] + "','yyyy-mm-dd hh24:mi:ss')+1";
+            }
 
             where += " and ISINVALID=0 ";//?是否需要
             return where;
@@ -1049,7 +1050,7 @@ namespace MvcPlatform.Controllers
             string json_container = JsonConvert.SerializeObject(dt_container, iso);
 
             return "{\"json_order\":" + json_order + ",\"json_container\":" + json_container + "}";
-        
+
         }
         public string GoodsTrackSave()
         {
@@ -1057,28 +1058,28 @@ namespace MvcPlatform.Controllers
             string fieldList = string.Empty;
             string fieldValueList = string.Empty;
             foreach (JToken item in json_data.Values<JToken>())
-	            {   
-                    string colName = ((JProperty)item).Name;
-                    string colValue = ((JProperty)item).Value.ToString();
-                    if (colName!="CODE")
+            {
+                string colName = ((JProperty)item).Name;
+                string colValue = ((JProperty)item).Value.ToString();
+                if (colName != "CODE")
+                {
+                    if (item.Next == null)
                     {
-                         if (item.Next == null)
-                        {
-                             fieldList += colName;
-                             fieldValueList += "'" + colValue + "'";
-                        }
-                        else
-                        {
-                             fieldList += colName + ",";
-                             fieldValueList += "'" + colValue + "',";
-                        }
+                        fieldList += colName;
+                        fieldValueList += "'" + colValue + "'";
                     }
-                                 
-	            }
-             fieldList="ID,ORDERCODE,"+fieldList;
-             fieldValueList = "LIST_GOOD_TRACK_ID.Nextval,'" + json_data.Value<string>("CODE") + "'," + fieldValueList; 
-            string sql_del="delete from LIST_GOOD_TRACK where ordercode='"+json_data.Value<string>("CODE")+"'";
-            int i=DBMgr.ExecuteNonQuery(sql_del);
+                    else
+                    {
+                        fieldList += colName + ",";
+                        fieldValueList += "'" + colValue + "',";
+                    }
+                }
+
+            }
+            fieldList = "ID,ORDERCODE," + fieldList;
+            fieldValueList = "LIST_GOOD_TRACK_ID.Nextval,'" + json_data.Value<string>("CODE") + "'," + fieldValueList;
+            string sql_del = "delete from LIST_GOOD_TRACK where ordercode='" + json_data.Value<string>("CODE") + "'";
+            int i = DBMgr.ExecuteNonQuery(sql_del);
             if (i >= 0)
             {
                 DBMgr.ExecuteNonQuery("insert into LIST_GOOD_TRACK(" + fieldList + ") values(" + fieldValueList + ")");
@@ -1103,7 +1104,7 @@ namespace MvcPlatform.Controllers
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string where = QueryCondition();
-            string dec_insp_status = Request["dec_insp_status"]; 
+            string dec_insp_status = Request["dec_insp_status"];
             string busitypeid = Request["busitypeid"];
             string busitype = "";
 
@@ -1138,15 +1139,15 @@ namespace MvcPlatform.Controllers
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             string sql = @"select * from LIST_ORDER a  left join (select CODE,NAME||'('||CODE||')' REPWAYNAME from cusdoc.SYS_REPWAY where Enabled=1 and instr(busitype,'" + busitype + "')>0) b on a.REPWAYID=b.CODE "
-                      +"where instr('" + Request["busitypeid"] + "',BUSITYPE)>0 and BUSIUNITCODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "' " + where;
+                      + "where instr('" + Request["busitypeid"] + "',BUSITYPE)>0 and BUSIUNITCODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "' " + where;
 
-            DataTable dt_count = DBMgr.GetDataTable("select count(1) from ("+sql+") a");
+            DataTable dt_count = DBMgr.GetDataTable("select count(1) from (" + sql + ") a");
             int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
             if (Convert.ToInt32(dt_count.Rows[0][0]) > WebDownCount)
             {
                 return "{success:false,WebDownCount:" + WebDownCount + "}";
             }
-            
+
             DataTable dt = DBMgr.GetDataTable(sql);
 
             //创建Excel文件的对象
@@ -1165,7 +1166,7 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(0).SetCellValue("报关状态"); row1.CreateCell(1).SetCellValue("报检状态"); row1.CreateCell(2).SetCellValue("订单编号"); row1.CreateCell(3).SetCellValue("对应号");
                 row1.CreateCell(4).SetCellValue("客户编号"); row1.CreateCell(5).SetCellValue("合同发票号"); row1.CreateCell(6).SetCellValue("总单号"); row1.CreateCell(7).SetCellValue("分单号");
                 row1.CreateCell(8).SetCellValue("件数/重量"); row1.CreateCell(9).SetCellValue("打印状态"); row1.CreateCell(10).SetCellValue("申报关区"); row1.CreateCell(11).SetCellValue("进/出口岸");
-                row1.CreateCell(12).SetCellValue("申报方式"); row1.CreateCell(13).SetCellValue("转关预录号"); row1.CreateCell(14).SetCellValue("法检"); 
+                row1.CreateCell(12).SetCellValue("申报方式"); row1.CreateCell(13).SetCellValue("转关预录号"); row1.CreateCell(14).SetCellValue("法检");
 
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
@@ -1176,7 +1177,7 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["REPNO"].ToString());
                     rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
 
-                    
+
                     rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
                     rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["TOTALNO"].ToString());
                     rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["DIVIDENO"].ToString());
@@ -1196,7 +1197,7 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());//REPWAYID
                     rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["TURNPRENO"].ToString());
                     rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
-                   
+
                 }
             }
             #endregion
@@ -1210,7 +1211,7 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(0).SetCellValue("报关状态"); row1.CreateCell(1).SetCellValue("报检状态"); row1.CreateCell(2).SetCellValue("订单编号"); row1.CreateCell(3).SetCellValue("对应号");
                 row1.CreateCell(4).SetCellValue("客户编号"); row1.CreateCell(5).SetCellValue("合同号"); row1.CreateCell(6).SetCellValue("总单号"); row1.CreateCell(7).SetCellValue("分单号");
                 row1.CreateCell(8).SetCellValue("件数/重量"); row1.CreateCell(9).SetCellValue("打印状态"); row1.CreateCell(10).SetCellValue("申报关区"); row1.CreateCell(11).SetCellValue("进/出口岸");
-                row1.CreateCell(12).SetCellValue("申报方式"); row1.CreateCell(13).SetCellValue("运抵编号"); row1.CreateCell(14).SetCellValue("法检"); 
+                row1.CreateCell(12).SetCellValue("申报方式"); row1.CreateCell(13).SetCellValue("运抵编号"); row1.CreateCell(14).SetCellValue("法检");
 
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
@@ -1250,7 +1251,7 @@ namespace MvcPlatform.Controllers
                 sheet_S = book.CreateSheet("订单信息_海进"); filename = filename + "_海进.xls";
 
                 NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
-                row1.CreateCell(0).SetCellValue("报关状态"); row1.CreateCell(1).SetCellValue("报检状态"); row1.CreateCell(2).SetCellValue("订单编号"); row1.CreateCell(3).SetCellValue("对应号"); 
+                row1.CreateCell(0).SetCellValue("报关状态"); row1.CreateCell(1).SetCellValue("报检状态"); row1.CreateCell(2).SetCellValue("订单编号"); row1.CreateCell(3).SetCellValue("对应号");
                 row1.CreateCell(4).SetCellValue("客户编号"); row1.CreateCell(5).SetCellValue("合同号"); row1.CreateCell(6).SetCellValue("打印状态"); row1.CreateCell(7).SetCellValue("国检提单号");
                 row1.CreateCell(8).SetCellValue("海关提单号"); row1.CreateCell(9).SetCellValue("件数/重量"); row1.CreateCell(10).SetCellValue("申报关区"); row1.CreateCell(11).SetCellValue("进/出口岸");
                 row1.CreateCell(12).SetCellValue("申报方式"); row1.CreateCell(13).SetCellValue("转关预录号"); row1.CreateCell(14).SetCellValue("法检");
@@ -1420,9 +1421,9 @@ namespace MvcPlatform.Controllers
 
                 NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
                 row1.CreateCell(0).SetCellValue("报关状态"); row1.CreateCell(1).SetCellValue("报检状态"); row1.CreateCell(2).SetCellValue("订单编号"); row1.CreateCell(3).SetCellValue("客户编号");
-                row1.CreateCell(4).SetCellValue("对应号");   row1.CreateCell(5).SetCellValue("合同号"); row1.CreateCell(6).SetCellValue("件数/重量");
+                row1.CreateCell(4).SetCellValue("对应号"); row1.CreateCell(5).SetCellValue("合同号"); row1.CreateCell(6).SetCellValue("件数/重量");
                 row1.CreateCell(7).SetCellValue("打印状态"); row1.CreateCell(8).SetCellValue("申报关区"); row1.CreateCell(9).SetCellValue("申报方式"); row1.CreateCell(10).SetCellValue("法检");
-                row1.CreateCell(11).SetCellValue("业务类型");row1.CreateCell(12).SetCellValue("两单关联号"); row1.CreateCell(13).SetCellValue("多单关联号");
+                row1.CreateCell(11).SetCellValue("业务类型"); row1.CreateCell(12).SetCellValue("两单关联号"); row1.CreateCell(13).SetCellValue("多单关联号");
 
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
@@ -1473,8 +1474,8 @@ namespace MvcPlatform.Controllers
                 sheet_S = book.CreateSheet("订单信息_特殊"); filename = filename + "_特殊.xls";
 
                 NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
-                row1.CreateCell(0).SetCellValue("报关状态"); row1.CreateCell(1).SetCellValue("报检状态"); row1.CreateCell(2).SetCellValue("订单编号"); row1.CreateCell(3).SetCellValue("对应号"); 
-                row1.CreateCell(4).SetCellValue("客户编号");  row1.CreateCell(5).SetCellValue("合同号"); row1.CreateCell(6).SetCellValue("打印状态"); row1.CreateCell(7).SetCellValue("申报方式");
+                row1.CreateCell(0).SetCellValue("报关状态"); row1.CreateCell(1).SetCellValue("报检状态"); row1.CreateCell(2).SetCellValue("订单编号"); row1.CreateCell(3).SetCellValue("对应号");
+                row1.CreateCell(4).SetCellValue("客户编号"); row1.CreateCell(5).SetCellValue("合同号"); row1.CreateCell(6).SetCellValue("打印状态"); row1.CreateCell(7).SetCellValue("申报方式");
                 row1.CreateCell(8).SetCellValue("件数/重量"); row1.CreateCell(9).SetCellValue("申报关区"); row1.CreateCell(10).SetCellValue("进/出口岸"); row1.CreateCell(11).SetCellValue("转关预录号");
                 row1.CreateCell(12).SetCellValue("法检");
 
@@ -1529,63 +1530,73 @@ namespace MvcPlatform.Controllers
             using (POP3_Client client = new POP3_Client())
             {
 
-            client.Connect(mailAddress, 110, false);
-            client.Login(mailUserName, mailPassword);//两个参数，前者为Email的账号，后者为Email的密码
-            POP3_ClientMessageCollection messages = client.Messages;
-           // Console.WriteLine("共{0}封邮件", messages.Count);
+                client.Connect(mailAddress, 110, false);
+                client.Login(mailUserName, mailPassword);//两个参数，前者为Email的账号，后者为Email的密码
+                POP3_ClientMessageCollection messages = client.Messages;
+                // Console.WriteLine("共{0}封邮件", messages.Count);
 
-            foreach (POP3_ClientMessage message in messages)
-            {
-                
+                foreach (POP3_ClientMessage message in messages)
+                {
 
-                Mail_Message mime = Mail_Message.ParseFromByte(message.MessageToByte());
 
-                string address = mime.Sender == null ? mime.ReturnPath.Address : mime.Sender.Address;//发件人地址
-                if (address == sendAddress)
-                 {
-                    JArray JA_file = new JArray();
-                     var uploadPath = Server.MapPath("/FileUpload/file/");
-                    foreach (MIME_Entity entity in mime.Attachments)
+                    Mail_Message mime = Mail_Message.ParseFromByte(message.MessageToByte());
+
+                    //string address = mime.Sender == null ? mime.ReturnPath.Address : mime.Sender.Address;//发件人地址
+                    string address = string.Empty;//发件人地址 
+                    if (mime.Sender != null)
                     {
-                       
+                        address = mime.Sender.Address;
+                    }
+                    else if (mime.ReturnPath != null)
+                    {
+                        address = mime.ReturnPath.Address;
+                    }
 
-                        if (entity.ContentDisposition != null && entity.ContentDisposition.Param_FileName != null)
-                        { 
-                            string remote=DateTime.Now.ToString("yyyy-MM-dd");
-                            string ORIGINALNAME=entity.ContentDisposition.Param_FileName;
-                            string NEWNAME=Guid.NewGuid().ToString() + ORIGINALNAME.Substring(ORIGINALNAME.IndexOf("."));
-                            string filePath = "/FileUpload/file/" + NEWNAME;
-                            string savePath = uploadPath+NEWNAME;
-                            int size = ((MIME_b_SinglepartBase)entity.Body).Data.Length;
-                            System.IO.File.WriteAllBytes(savePath, ((MIME_b_SinglepartBase)entity.Body).Data);
-                            string fileContent = "{\"FILENAME\":\"" + filePath + "\",\"NEWNAME\":\"" + NEWNAME + "\",\"ORIGINALNAME\":\"" + ORIGINALNAME + "\",\"SIZES\":\"" + size + "\",\"UPLOADTIME\":\"" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "\",\"FILETYPE\":\"44\"}";
-                            JObject JO_file = JObject.Parse(fileContent);
-                            JA_file.Add(JO_file);
+                    if (address == sendAddress)
+                    {
+                        JArray JA_file = new JArray();
+                        var uploadPath = Server.MapPath("/FileUpload/file/");
+                        foreach (MIME_Entity entity in mime.Attachments)
+                        {
+
+
+                            if (entity.ContentDisposition != null && entity.ContentDisposition.Param_FileName != null)
+                            {
+                                string remote = DateTime.Now.ToString("yyyy-MM-dd");
+                                string ORIGINALNAME = entity.ContentDisposition.Param_FileName;
+                                string NEWNAME = Guid.NewGuid().ToString() + ORIGINALNAME.Substring(ORIGINALNAME.IndexOf("."));
+                                string filePath = "/FileUpload/file/" + NEWNAME;
+                                string savePath = uploadPath + NEWNAME;
+                                int size = ((MIME_b_SinglepartBase)entity.Body).Data.Length;
+                                System.IO.File.WriteAllBytes(savePath, ((MIME_b_SinglepartBase)entity.Body).Data);
+                                string fileContent = "{\"FILENAME\":\"" + filePath + "\",\"NEWNAME\":\"" + NEWNAME + "\",\"ORIGINALNAME\":\"" + ORIGINALNAME + "\",\"SIZES\":\"" + size + "\",\"UPLOADTIME\":\"" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "\",\"FILETYPE\":\"44\"}";
+                                JObject JO_file = JObject.Parse(fileContent);
+                                JA_file.Add(JO_file);
+
+                            }
+
 
                         }
-
-                         
+                        filedata = JsonConvert.SerializeObject(JA_file);
+                        JObject JO = JObject.Parse("{\"SUBJECT\":\"" + mime.Subject + "\",\"FILECOUNT\":\"" + mime.Attachments.Length + "\",\"FILEDATA\":" + filedata + "}");
+                        JA.Add(JO);
+                        message.MarkForDeletion();//删除邮件,测试时先不删除  
                     }
-                    filedata = JsonConvert.SerializeObject(JA_file);
-                    JObject JO = JObject.Parse("{\"SUBJECT\":\"" + mime.Subject + "\",\"FILECOUNT\":\"" + mime.Attachments.Length + "\",\"FILEDATA\":" + filedata + "}");
-                    JA.Add(JO);
-                    message.MarkForDeletion();//删除邮件,测试时先不删除  
+
                 }
-               
-            }
 
             }
             string result = string.Empty;
             if (JA.Count == 0)
             {
-              result="{success:true}";
+                result = "{success:true}";
             }
             else
-            { 
-              result=JsonConvert.SerializeObject(JA);
+            {
+                result = JsonConvert.SerializeObject(JA);
             }
             return result;
-        
+
         }
 
         public string import()
@@ -1606,7 +1617,7 @@ namespace MvcPlatform.Controllers
                     string ent_id = DBMgr.GetDataTable(sql).Rows[0][0] + "";//获取ID
                     sql = string.Format(insert_sql, ent_id, json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"), json_user.Value<string>("CUSTOMERHSCODE"), json_user.Value<string>("CUSTOMERNAME"));
                     DBMgr.ExecuteNonQuery(sql);
-                    Extension.Update_Attachment_ForEnterprise(ent_id, filedata, "", json_user,"mailimport/"+DateTime.Now.ToString("yyyy-MM-dd"));
+                    Extension.Update_Attachment_ForEnterprise(ent_id, filedata, "", json_user, "mailimport/" + DateTime.Now.ToString("yyyy-MM-dd"));
                 }
                 return "{success:true}";
             }
@@ -1615,8 +1626,8 @@ namespace MvcPlatform.Controllers
 
                 return "{success:false}";
             }
-            
-        
+
+
         }
         #endregion
         public string load_entorder_Data_detail()
@@ -1632,17 +1643,17 @@ namespace MvcPlatform.Controllers
             string product_data = "[]";
             string file_data = "[]";
 
-                sql = "select * from LIST_CUSDATA_FL where ID='" + ID+ "'";
-                DataTable dt2 = DBMgr.GetDataTable(sql);
-                decl_data = JsonConvert.SerializeObject(dt2, iso);
-                if (dt2.Rows.Count > 0)
-                {
-                    sql = "select * from LIST_CUSDATA_SUB_FL where PCODE='" + dt2.Rows[0]["CUSNO"] + "'";
-                    DataTable dt3 = DBMgr.GetDataTable(sql);
-                    product_data = JsonConvert.SerializeObject(dt3, iso);
-                }
-                sql = "select * from list_attachment t where t.entid='" + ID + "'";
-                file_data = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso);
+            sql = "select * from LIST_CUSDATA_FL where ID='" + ID + "'";
+            DataTable dt2 = DBMgr.GetDataTable(sql);
+            decl_data = JsonConvert.SerializeObject(dt2, iso);
+            if (dt2.Rows.Count > 0)
+            {
+                sql = "select * from LIST_CUSDATA_SUB_FL where PCODE='" + dt2.Rows[0]["CUSNO"] + "'";
+                DataTable dt3 = DBMgr.GetDataTable(sql);
+                product_data = JsonConvert.SerializeObject(dt3, iso);
+            }
+            sql = "select * from list_attachment t where t.entid='" + ID + "'";
+            file_data = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso);
             result = "{decl_data:" + decl_data + ",product_data:" + product_data + ",file_data:" + file_data + "}";
             return result;
 
@@ -1650,10 +1661,10 @@ namespace MvcPlatform.Controllers
 
         public string convertPdf()
         {
-            string oldfilename =Request["filePath"]+"";
-            string newfilename ="view_"+Guid.NewGuid()+".pdf";
-            string filePath ="D:/ftpserver"+oldfilename;
-            string toPath = Server.MapPath("/Declare")+ "/"+newfilename;
+            string oldfilename = Request["filePath"] + "";
+            string newfilename = "view_" + Guid.NewGuid() + ".pdf";
+            string filePath = "D:/ftpserver" + oldfilename;
+            string toPath = Server.MapPath("/Declare") + "/" + newfilename;
             bool print = true;
 
             PdfReader reader = new PdfReader(filePath);
@@ -1682,19 +1693,19 @@ namespace MvcPlatform.Controllers
 
         public void updatePrintStatus()
         {
-           string ID= Request["ID"];
-           string sql = "update ENT_ORDER set PRINTSTATUS='1' where ID = '" + ID + "'";
-           DBMgr.ExecuteNonQuery(sql);
+            string ID = Request["ID"];
+            string sql = "update ENT_ORDER set PRINTSTATUS='1' where ID = '" + ID + "'";
+            DBMgr.ExecuteNonQuery(sql);
 
         }
         public string LoadList_logistic(string totalno, string divdeno)
         {
-            string sql = "select * from list_logisticsstatus where totalno='"+totalno+"' and divideno='"+divdeno+"'  order by operate_type,operate_date asc";
-            DataTable dt= DBMgr.GetDataTable(sql);
+            string sql = "select * from list_logisticsstatus where totalno='" + totalno + "' and divideno='" + divdeno + "'  order by operate_type,operate_date asc";
+            DataTable dt = DBMgr.GetDataTable(sql);
             IsoDateTimeConverter iso = new IsoDateTimeConverter();
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-            string result_data = JsonConvert.SerializeObject(dt,iso);
-            return "{rows:" + result_data +"}";
+            string result_data = JsonConvert.SerializeObject(dt, iso);
+            return "{rows:" + result_data + "}";
 
         }
 
@@ -1741,7 +1752,7 @@ namespace MvcPlatform.Controllers
         }
 
         public string loadpredata()
-        {            
+        {
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
             iso.DateTimeFormat = "yyyy-MM-dd";
             string sql = QueryConditionPreData();
@@ -1757,8 +1768,8 @@ namespace MvcPlatform.Controllers
             string code = "";
             foreach (JObject json in jarray)
             {
-                if (json.Value<string>("NAME").Substring(0,json.Value<string>("NAME").IndexOf("(")) == name) 
-                { 
+                if (json.Value<string>("NAME").Substring(0, json.Value<string>("NAME").IndexOf("(")) == name)
+                {
                     code = json.Value<string>("CODE");
                     break;
                 }
@@ -1918,7 +1929,7 @@ namespace MvcPlatform.Controllers
 
 
             //企业编号            
-            if (action == "add") { cusno = getcusno(); }  
+            if (action == "add") { cusno = getcusno(); }
 
             //类型//合同号码//航次号//运输工具//提运单号//出口日期
             //申报日期//贸易国//出口口岸//备案号//运输方式
@@ -1969,9 +1980,10 @@ namespace MvcPlatform.Controllers
                 ot = conn.BeginTransaction();
 
                 //更新，需要作废前一笔数据；正式表数据需要作废（撤回）
-                if (action == "update") { 
-                    ISINVALID_Predata(cusno, conn); 
-                    cancel_pub(cusno, conn); 
+                if (action == "update")
+                {
+                    ISINVALID_Predata(cusno, conn);
+                    cancel_pub(cusno, conn);
                 }
 
                 int recount = DBMgr.ExecuteNonQuery(sql, conn);
@@ -2031,12 +2043,12 @@ namespace MvcPlatform.Controllers
                 {
                     ot.Commit();
                 }
-                
+
             }
             catch (Exception ex)
             {
                 ot.Rollback();
-                result = "{success:false,error:'" + ex .Message+ "'}";
+                result = "{success:false,error:'" + ex.Message + "'}";
 
             }
             finally
@@ -2103,7 +2115,7 @@ namespace MvcPlatform.Controllers
             //string var2_code = getStatusCode(var2, json.Value<JArray>("sbgq"));
 
             //企业编号
-            if (action == "add") { cusno = getcusno(); }  
+            if (action == "add") { cusno = getcusno(); }
 
             //申报类别//进口口岸//手册号/合同协议号//申报日期//收发货单位
             //收发货单位//运输方式//运输工具//提运单号//消费使用单位
@@ -2232,7 +2244,7 @@ namespace MvcPlatform.Controllers
             {
                 string sql = "select * from LIST_PREDATA where ID in(" + Request["ids"] + ")";
                 DataTable dt = DBMgr.GetDataTable(sql);
-                
+
                 foreach (DataRow dr in dt.Rows)
                 {
                     if (dr["FLAG"] + "" == "0")
@@ -2261,8 +2273,8 @@ namespace MvcPlatform.Controllers
             }
             catch (Exception ex)
             {
-                
-               
+
+
             }
 
             return result;
@@ -2273,9 +2285,9 @@ namespace MvcPlatform.Controllers
             string CUSNO = Request["CUSNO"];
 
             string result = string.Empty;
-            string sql = string.Empty; string head_data = "{}"; string sub_data = "[]";string declstatus="";
-         
-            
+            string sql = string.Empty; string head_data = "{}"; string sub_data = "[]"; string declstatus = "";
+
+
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd";
 
@@ -2361,7 +2373,7 @@ namespace MvcPlatform.Controllers
 
         public string SavePreDataToPrd()
         {
-            string cusno = Request["cusno"];           
+            string cusno = Request["cusno"];
             string result = "{success:true}";
             try
             {

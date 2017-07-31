@@ -605,7 +605,34 @@ function Select() {
 
 //打开调阅信息
 function FileConsult(ORDERCODE, BUSITYPE, PREDECLCODE) {
-    opencenterwin("/Common/FileConsult?source=declare&ORDERCODE=" + ORDERCODE + "&BUSITYPE=" + BUSITYPE + "&PREDECLCODE=" + PREDECLCODE, 1200, 900);
+    var menuxml = "";
+    switch (BUSITYPE) {
+        case "11":
+            menuxml = "dec_airin";
+            break;
+        case "10":
+            menuxml = "dec_airout";
+            break;
+        case "21":
+            menuxml = "dec_seain";
+            break;
+        case "20":
+            menuxml = "dec_seaout";
+            break;
+        case "31":
+            menuxml = "dec_landin";
+            break;
+        case "30":
+            menuxml = "dec_landout";
+            break;
+        case "40": case "41":
+            menuxml = "dec_domestic";
+            break;
+        case "50": case "51":
+            menuxml = "dec_special";
+            break;
+    }
+    opencenterwin("/Common/FileConsult?menuxml=" + menuxml + "&source=declare&ORDERCODE=" + ORDERCODE + "&BUSITYPE=" + BUSITYPE + "&PREDECLCODE=" + PREDECLCODE, 1200, 900);
 }
 
 function ClickShowwinwj() {   //打开调阅信息
@@ -614,7 +641,35 @@ function ClickShowwinwj() {   //打开调阅信息
         Ext.MessageBox.alert('提示', '请选择需要调阅的记录！');
         return;
     }
-    opencenterwin("/Common/FileConsult?source=declare&ORDERCODE=" + recs[0].get("ORDERCODE") + "&BUSITYPE=" + recs[0].get("BUSITYPE") + "&PREDECLCODE=" + recs[0].get("CODE"), 1200, 900);
+    var menuxml = "";
+    switch (recs[0].get("BUSITYPE")) {
+        case "11":
+            menuxml = "dec_airin";
+            break;
+        case "10":
+            menuxml = "dec_airout";
+            break;
+        case "21":
+            menuxml = "dec_seain";
+            break;
+        case "20":
+            menuxml = "dec_seaout";
+            break;
+        case "31":
+            menuxml = "dec_landin";
+            break;
+        case "30":
+            menuxml = "dec_landout";
+            break;
+        case "40": case "41":
+            menuxml = "dec_domestic";
+            break;
+        case "50": case "51":
+            menuxml = "dec_special";
+            break;
+    }
+
+    opencenterwin("/Common/FileConsult?menuxml=" + menuxml + "&source=declare&ORDERCODE=" + recs[0].get("ORDERCODE") + "&BUSITYPE=" + recs[0].get("BUSITYPE") + "&PREDECLCODE=" + recs[0].get("CODE"), 1200, 900);
 }
 
 function MultiPrint() {
@@ -632,7 +687,36 @@ function MultiPrint() {
             data += "{BUSITYPE:'" + recs[i].get("BUSITYPE") + "',CODE:'" + recs[i].get("CODE") + "'},"
         }
     }
-    opencenterwin("/Common/MultiPrint?source=declare&data=" + data, 1100, 700);
+
+    var menuxml = "";
+    switch (recs[0].get("BUSITYPE")) {
+        case "11":
+            menuxml = "dec_mul_airin";
+            break;
+        case "10":
+            menuxml = "dec_mul_airout";
+            break;
+        case "21":
+            menuxml = "dec_mul_seain";
+            break;
+        case "20":
+            menuxml = "dec_mul_seaout";
+            break;
+        case "31":
+            menuxml = "dec_mul_landin";
+            break;
+        case "30":
+            menuxml = "dec_mul_landout";
+            break;
+        case "40": case "41":
+            menuxml = "dec_mul_domestic";
+            break;
+        case "50": case "51":
+            menuxml = "dec_mul_special";
+            break;
+    }
+
+    opencenterwin("/Common/MultiPrint?menuxml=" + menuxml + "&source=declare&data=" + data, 1100, 700);
 }
 
 function openrwindow(url, width, height) {
@@ -651,8 +735,37 @@ function Searchstatus() {
     }
     var id = recs[0].data.ID
     var index = Ext.getCmp('declare_grid').store.indexOf(recs[0]);
-    var currentPage = Ext.getCmp('declare_grid').store.currentPage
-    openrwindow("/Common/ClearanceStatus?&id=" + id + "&rowIndex=" + index + "&currentPage=" + currentPage, 1200, 800);
+    var currentPage = Ext.getCmp('declare_grid').store.currentPage;
+
+    var menuxml = "";
+    switch (recs[0].get("BUSITYPE")) {
+        case "11":
+            menuxml = "dec_cle_airin";
+            break;
+        case "10":
+            menuxml = "dec_cle_airout";
+            break;
+        case "21":
+            menuxml = "dec_cle_seain";
+            break;
+        case "20":
+            menuxml = "dec_cle_seaout";
+            break;
+        case "31":
+            menuxml = "dec_cle_landin";
+            break;
+        case "30":
+            menuxml = "dec_cle_landout";
+            break;
+        case "40": case "41":
+            menuxml = "dec_cle_domestic";
+            break;
+        case "50": case "51":
+            menuxml = "dec_cle_special";
+            break;
+    }
+
+    openrwindow("/Common/ClearanceStatus?menuxml=" + menuxml + "&id=" + id + "&rowIndex=" + index + "&currentPage=" + currentPage, 1200, 800);
 }
 
 

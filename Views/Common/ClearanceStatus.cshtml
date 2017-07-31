@@ -46,9 +46,9 @@
             store_size = parseInt(opener.Ext.getCmp('declare_grid_pgbar').store.data.length);
         }
 
-        
-        
-        var model_fields =['ID', 'CODE', 'ORDERCODE', 'CUSTOMSSTATUS', 'ISPRINT', 'SHEETNUM', 'MODIFYFLAG', 'PRETRANSNAME',
+
+
+        var model_fields = ['ID', 'CODE', 'ORDERCODE', 'CUSTOMSSTATUS', 'ISPRINT', 'SHEETNUM', 'MODIFYFLAG', 'PRETRANSNAME',
                         'DECLARATIONCODE', 'REPTIME', 'CONTRACTNO', 'GOODSNUM', 'GOODSNW', 'GOODSGW', 'BLNO', 'TRANSNAME', 'VOYAGENO',
                         'BUSIUNITCODE', 'BUSIUNITNAME', 'PORTCODE', 'TRADEMETHOD', 'DECLWAY', 'DECLWAYNAME',
                         'BUSITYPE', 'CONTRACTNOORDER', 'REPWAYID', 'REPWAYNAME', 'TOTALNO', 'DIVIDENO', 'SECONDLADINGBILLNO',
@@ -66,87 +66,83 @@
         store_Trade.load(function (records, operation, success) {
             max_page = (store_Trade.totalCount % pageSize) == 0 ? parseInt(store_Trade.totalCount / pageSize) : parseInt(store_Trade.totalCount / pageSize) + 1;
         });
-       
-
-
-
-                        form_ini();
-                        var items = [];
-                        var paneltop_2 = Ext.create('Ext.panel.Panel', {
-                            id:'paneltop_2',
-                            border: 0,
-                            region: 'center',
-                            height: 430,
-                            contentEl: 'content'
-                        })
-                        var paneltop_1 = Ext.create('Ext.panel.Panel', {
-                            border: 10,
-                            height: 30,
-                            region: 'north',
-                            contentEl: 'menu'
-
-                        })
-                        var panel_top = Ext.create('Ext.panel.Panel', {
-                            id:'panel_top',
-                            border: 0,
-                            region: 'north',
-                            items: [paneltop_1, paneltop_2]
-                        })
-                        items.push(panel_top);
-
-
-
-                        var bbar_r = '<div><a href="javascript:reload(2);">上一条</a>&nbsp;&nbsp;<a href="javascript:reload(1);">下一条</a></div>';
-                        var buttombar = Ext.create('Ext.toolbar.Toolbar', {
-                            buttonAlign: 'center',
-                            items: ['->',{
-                                text: "<font color='red' size='3'><b>打印报关单</b></font>",
-                                handler: function () {
-                                    FileConsult(param1, param2, param3)
-                                }
-                            },'->',bbar_r]
-                        });
-
-                        var panel_bottom = Ext.create('Ext.panel.Panel', {
-                            id: 'panel_buttom',
-                            title: '<i class="fa fa-hand-o-right" aria-hidden="true"></i>&nbsp;基本信息',
-                            border: 0,
-                            tbar: buttombar,
-                            region: 'center',
-                            //collapsed: false,//让第二项展开，达到第一项收起的目的
-                            items: [Ext.getCmp('panelbottom_1_1')]
-                        });
-                        items.push(panel_bottom);
-                        var viewport = Ext.create('Ext.container.Viewport', {
-                            id: 'viewport',
-                            //layout: 'accordion',
-                            items: items
-                        });
-
-                 
-
-                
-                        var recCurrent = opener.Ext.getCmp('declare_grid_pgbar').store.findRecord('ID', id);
-                        loadform_data(recCurrent);
-   
-                        setHeight();
-                        Ext.get(window).on('resize', function () { setHeight(); });
 
 
 
 
-        function setHeight()
-        {
+        form_ini();
+        var items = [];
+        var paneltop_2 = Ext.create('Ext.panel.Panel', {
+            id: 'paneltop_2',
+            border: 0,
+            region: 'center',
+            height: 430,
+            contentEl: 'content'
+        })
+        var paneltop_1 = Ext.create('Ext.panel.Panel', {
+            border: 10,
+            height: 30,
+            region: 'north',
+            contentEl: 'menu'
+
+        })
+        var panel_top = Ext.create('Ext.panel.Panel', {
+            id: 'panel_top',
+            border: 0,
+            region: 'north',
+            items: [paneltop_1, paneltop_2]
+        })
+        items.push(panel_top);
+
+
+
+        var bbar_r = '<div><a href="javascript:reload(2);">上一条</a>&nbsp;&nbsp;<a href="javascript:reload(1);">下一条</a></div>';
+        var buttombar = Ext.create('Ext.toolbar.Toolbar', {
+            buttonAlign: 'center',
+            items: ['->', {
+                text: "<font color='red' size='3'><b>打印报关单</b></font>",
+                handler: function () {
+                    FileConsult(param1, param2, param3)
+                }
+            }, '->', bbar_r]
+        });
+
+        var panel_bottom = Ext.create('Ext.panel.Panel', {
+            id: 'panel_buttom',
+            title: '<i class="fa fa-hand-o-right" aria-hidden="true"></i>&nbsp;基本信息',
+            border: 0,
+            tbar: buttombar,
+            region: 'center',
+            //collapsed: false,//让第二项展开，达到第一项收起的目的
+            items: [Ext.getCmp('panelbottom_1_1')]
+        });
+        items.push(panel_bottom);
+        var viewport = Ext.create('Ext.container.Viewport', {
+            id: 'viewport',
+            //layout: 'accordion',
+            items: items
+        });
+
+        var recCurrent = opener.Ext.getCmp('declare_grid_pgbar').store.findRecord('ID', id);
+        loadform_data(recCurrent);
+
+        setHeight();
+        Ext.get(window).on('resize', function () { setHeight(); });
+
+
+
+
+        function setHeight() {
             var V_height = Ext.getCmp('viewport').getSize().height;
             var B_height = Ext.getCmp('panel_buttom').getSize().height;
             Ext.getCmp('panel_top').setHeight(V_height - B_height);
             Ext.getCmp('paneltop_2').setHeight(V_height - B_height);
-            
+
         }
 
         $("#menu").append("<li style=\"background-color: #2a6496\" ref=\"http://www.haiguan.info/onlinesearch/gateway/Gatewaystate.aspx\">通关状态查询</li>")
-        $("#content").attr("src","http://www.haiguan.info/onlinesearch/gateway/Gatewaystate.aspx");
-       
+        $("#content").attr("src", "http://www.haiguan.info/onlinesearch/gateway/Gatewaystate.aspx");
+
     });
 
     function reload(action)
@@ -291,7 +287,7 @@
 
     }
     function FileConsult(ORDERCODE, BUSITYPE, PREDECLCODE) {
-        opencenterwin("/Common/FileConsult_Declare?source=declare&ORDERCODE=" + ORDERCODE + "&BUSITYPE=" + BUSITYPE + "&PREDECLCODE=" + PREDECLCODE, 1200, 900);
+        opencenterwin("/Common/FileConsult_Declare?menuxml=" + getQueryString("menuxml") + "&source=declare&ORDERCODE=" + ORDERCODE + "&BUSITYPE=" + BUSITYPE + "&PREDECLCODE=" + PREDECLCODE, 1200, 900);
     }
 
 

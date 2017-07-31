@@ -9,8 +9,9 @@ using System.Web;
 using System.Web.Mvc;
 
 namespace MvcPlatform.Controllers
-{
+{    
     [Authorize]
+    [Filters.AuthFilter]
     public class OrderAirInController : Controller
     {
         //

@@ -103,6 +103,7 @@ namespace MvcPlatform.Controllers
 
         int totalProperty = 0;
         [Authorize]
+        [Filters.AuthFilter]
         public ActionResult ChildAccount()
         {
             ViewBag.navigator = "账号管理>>账号信息";
@@ -110,12 +111,16 @@ namespace MvcPlatform.Controllers
 
             return View();
         }
+
         [Authorize]
+        [Filters.AuthFilter]
         public ActionResult ChildEdit()
         {
             return View();
         }
+
         [Authorize]
+        [Filters.AuthFilter]
         public ActionResult Authorization()
         {
             ViewBag.navigator = "账号管理>>权限管理";
@@ -195,8 +200,12 @@ namespace MvcPlatform.Controllers
         public string UpdatePassword()  //密码修改
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            string Password = Request["PASSWORD"];
-            string sql = @"update sys_user set points=1,password = '" + Password.ToSHA1() + "' where id = '" + json_user.GetValue("ID") + "'";
+            string Password = Request["PASSWORD"]; int points = 0;
+
+            if (Password != json_user.Value<string>("NAME")) { points = 1; }
+
+            string sql = @"update sys_user set points=" + points + ",code='" + Password 
+                + "',password = '" + Extension.ToSHA1(Password) + "' where id = '" + json_user.GetValue("ID") + "'";
             int i = DBMgr.ExecuteNonQuery(sql);
             if (i > 0)
             {
@@ -453,6 +462,12 @@ namespace MvcPlatform.Controllers
             }
             return View(ucp);
 
+        }
+
+
+        public ActionResult NoPower()
+        {
+            return View();
         }
     }
 

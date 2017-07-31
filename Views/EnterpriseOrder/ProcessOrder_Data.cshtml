@@ -212,59 +212,7 @@
             field.reset();
         });
     }
-    function upload_ini() {
-        var uploader = new plupload.Uploader({
-            runtimes: 'html5,flash,silverlight,html4',
-            browse_button: 'pickfiles', // you can pass an id...
-            url: '/EnterpriseOrder/Upload_WebServer',
-            flash_swf_url: '/js/upload/Moxie.swf',
-            silverlight_xap_url: '/js/upload/Moxie.xap',
-            unique_names: true,
-            filters: {
-                max_file_size: '500mb',
-                mime_types: [
-                    { title: "Image files", extensions: "*" },
-                    { title: "Zip files", extensions: "zip,rar" }
-                ]
-            }
-        });
-        uploader.init();
-        uploader.bind('FilesAdded', function (up, files) {
-            uploader.start();
-        });
-        uploader.bind('FileUploaded', function (up, file) {
-            var timestamp = Ext.Date.now();  //1351666679575  这个方法只是获取的时间戳
-            var date = new Date(timestamp);
-            Ext.getCmp('fileview1').store.insert(Ext.getCmp('fileview1').store.data.length
-                , { FILENAME: '/FileUpload/file/' + file.target_name, NEWNAME: file.target_name, ORIGINALNAME: file.name, SIZES: file.size, UPLOADTIME: Ext.Date.format(date, 'Y-m-d H:i:s') });
-        });
-    }
-    function SignProcess() {
-        var recs = gridpanel.getSelectionModel().getSelection();
-        if (recs.length == 0) {
-            Ext.MessageBox.alert('提示', '请选择需要操作的记录！');
-            return;
-        }
-        var ids = "";
-        for (var i = 0; i < recs.length; i++) {
-            ids += recs[i].data.ID + ',';
-        }
-        Ext.Ajax.request({
-            url: "/EnterpriseOrder/SignProcess",
-            params: { ids: ids },
-            success: function (response, option) {
-                var data = Ext.decode(response.responseText);
-                if (data.success) {
-                    Ext.MessageBox.alert("提示", "受理成功!", function () {
-                        gridpanel.store.load();
-                    });
-                }
-                else {
-                    Ext.MessageBox.alert("提示", "受理失败!");
-                }
-            }
-        });
-    }
+   
     function entorder_detail() {
         var recs = gridpanel.getSelectionModel().getSelection();
         if (recs.length == 0) {

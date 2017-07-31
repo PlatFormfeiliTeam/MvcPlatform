@@ -572,7 +572,7 @@ function Reset() {
 
 //打开调阅信息
 function FileConsult(ORDERCODE, BUSITYPE, PREDECLCODE) {
-    opencenterwin("/Common/FileConsult_E?source=declare&ORDERCODE=" + ORDERCODE + "&BUSITYPE=" + BUSITYPE + "&PREDECLCODE=" + PREDECLCODE, 1200, 900);
+    opencenterwin("/Common/FileConsult_E?menuxml=dec_domestic&source=declare&ORDERCODE=" + ORDERCODE + "&BUSITYPE=" + BUSITYPE + "&PREDECLCODE=" + PREDECLCODE, 1200, 900);
 }
 
 function ExportDecl() {
@@ -712,5 +712,5 @@ function Searchstatus() {
     var id = recs[0].data.ID
     var index = Ext.getCmp('declare_grid').store.indexOf(recs[0]);
     var currentPage = Ext.getCmp('declare_grid').store.currentPage
-    openrwindow("/Common/ClearanceStatus?&id=" + id + "&rowIndex=" + index + "&currentPage=" + currentPage, 1200, 800);
+    openrwindow("/Common/ClearanceStatus?menuxml=ent_dec_cle_domestic&id=" + id + "&rowIndex=" + index + "&currentPage=" + currentPage, 1200, 800);
 }

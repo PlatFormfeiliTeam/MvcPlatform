@@ -16,6 +16,7 @@ using System.Web.Mvc;
 namespace MvcPlatform.Controllers
 {
     [Authorize]
+    [Filters.AuthFilter]
     public class RecordInforController : Controller
     {
         //

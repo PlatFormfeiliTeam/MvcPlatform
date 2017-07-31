@@ -1,0 +1,314 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<rootmenulist>
+  
+  <rootmenu>
+    <menu>/Account/ChildAccount</menu>
+    <submenu>/Account/ChildEdit</submenu>
+  </rootmenu>
+  
+  <!-- 订单管理-->
+    
+  <rootmenu>
+    <menu>/OrderAirIn/Index</menu>
+    <submenu>/OrderAirIn/Create</submenu>
+    <submenu>/Common/BatchMaintain?menuxml=airin</submenu>
+    <submenu>/Common/OrderView?menuxml=airin</submenu>
+    <submenu>/Common/OrderTrack?menuxml=airin</submenu>
+    <submenu>/Common/OrderTrack?menuxml=airin</submenu>
+    <submenu>/Common/FileConsult?menuxml=airin</submenu>
+    <submenu>/EnterpriseOrder/GoodsTrack?menuxml=airin</submenu>
+  </rootmenu>
+  
+   <rootmenu>
+    <menu>/OrderAirOut/Index</menu>
+    <submenu>/OrderAirOut/Create</submenu>
+    <submenu>/Common/BatchMaintain?menuxml=airout</submenu>
+    <submenu>/Common/OrderView?menuxml=airout</submenu>
+    <submenu>/Common/OrderTrack?menuxml=airout</submenu>
+    <submenu>/Common/FileConsult?menuxml=airout</submenu>
+    <submenu>/EnterpriseOrder/GoodsTrack?menuxml=airout</submenu>
+  </rootmenu> 
+  
+  
+  <rootmenu>
+    <menu>/OrderLandIn/Index</menu>
+    <submenu>/OrderLandIn/Create</submenu>
+    <submenu>/Common/BatchMaintain?menuxml=landin</submenu>
+    <submenu>/Common/OrderView?menuxml=landin</submenu>
+    <submenu>/Common/OrderTrack?menuxml=landin</submenu>
+    <submenu>/Common/FileConsult?menuxml=landin</submenu>
+  </rootmenu>
+  
+    
+  <rootmenu>
+    <menu>/OrderLandOut/Index</menu>
+    <submenu>/OrderLandOut/Create</submenu>
+    <submenu>/Common/BatchMaintain?menuxml=landout</submenu>
+    <submenu>/Common/OrderView?menuxml=landout</submenu>
+    <submenu>/Common/OrderTrack?menuxml=landout</submenu>
+    <submenu>/Common/FileConsult?menuxml=landout</submenu>
+  </rootmenu>    
+    
+  
+  <rootmenu>
+    <menu>/OrderSeaIn/Index</menu>
+    <submenu>/OrderSeaIn/Create</submenu>
+    <submenu>/Common/BatchMaintain?menuxml=seain</submenu>
+    <submenu>/Common/OrderView?menuxml=seain</submenu>
+    <submenu>/Common/OrderTrack?menuxml=seain</submenu>
+    <submenu>/Common/FileConsult?menuxml=seain</submenu>    
+    <submenu>/EnterpriseOrder/GoodsTrack?menuxml=seain</submenu>
+  </rootmenu>
+    
+    
+  <rootmenu>
+    <menu>/OrderSeaOut/Index</menu>
+    <submenu>/OrderSeaOut/Create</submenu>
+    <submenu>/Common/BatchMaintain?menuxml=seaout</submenu>
+    <submenu>/Common/OrderView?menuxml=seaout</submenu>
+    <submenu>/Common/OrderTrack?menuxml=seaout</submenu>
+    <submenu>/Common/FileConsult?menuxml=seaout</submenu>
+    <submenu>/EnterpriseOrder/GoodsTrack?menuxml=seaout</submenu>
+  </rootmenu> 
+  
+    
+  <rootmenu>
+    <menu>/OrderSpecial/Index</menu>
+    <submenu>/OrderSpecial/Create</submenu>
+    <submenu>/Common/BatchMaintain?menuxml=special</submenu>
+    <submenu>/Common/OrderView?menuxml=special</submenu>
+    <submenu>/Common/OrderTrack?menuxml=special</submenu>
+    <submenu>/Common/FileConsult?menuxml=special</submenu>
+  </rootmenu>
+    
+  <rootmenu>
+    <menu>/OrderDomestic/Index</menu>
+    <submenu>/OrderDomestic/Create</submenu>
+    <submenu>/Common/BatchMaintain?menuxml=domestic</submenu>
+    <submenu>/OrderDomestic/OrderView?menuxml=domestic</submenu>
+    <submenu>/Common/OrderTrack?menuxml=domestic</submenu>
+    <submenu>/Common/FileConsult?menuxml=domestic</submenu>
+  </rootmenu>
+  
+  <!-- 报关单管理-->
+  
+  <rootmenu>
+    <menu>/Common/DeclareList?busitypeid=11&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=dec_airin</submenu>
+    <submenu>/Common/ClearanceStatus?menuxml=dec_cle_airin</submenu>
+    <submenu>/Common/FileConsult_Declare?menuxml=dec_cle_airin</submenu><!-- ClearanceStatus里的报关单打印-->
+    <submenu>/Common/MultiPrint?menuxml=dec_mul_airin</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/Common/DeclareList?busitypeid=10&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=dec_airout</submenu>
+    <submenu>/Common/ClearanceStatus?menuxml=dec_cle_airout</submenu>
+    <submenu>/Common/FileConsult_Declare?menuxml=dec_cle_airout</submenu><!-- ClearanceStatus里的报关单打印-->
+    <submenu>/Common/MultiPrint?menuxml=dec_mul_airout</submenu>
+  </rootmenu>  
+  <rootmenu>
+    <menu>/Common/DeclareList?busitypeid=31&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=dec_landin</submenu>
+    <submenu>/Common/ClearanceStatus?menuxml=dec_cle_landin</submenu>
+    <submenu>/Common/FileConsult_Declare?menuxml=dec_cle_landin</submenu><!-- ClearanceStatus里的报关单打印-->
+    <submenu>/Common/MultiPrint?menuxml=dec_mul_landin</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/Common/DeclareList?busitypeid=30&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=dec_landout</submenu>
+    <submenu>/Common/ClearanceStatus?menuxml=dec_cle_landout</submenu>
+    <submenu>/Common/FileConsult_Declare?menuxml=dec_cle_landout</submenu><!-- ClearanceStatus里的报关单打印-->
+    <submenu>/Common/MultiPrint?menuxml=dec_mul_landout</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/Common/DeclareList?busitypeid=21&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=dec_seain</submenu>
+    <submenu>/Common/ClearanceStatus?menuxml=dec_cle_seain</submenu>
+    <submenu>/Common/FileConsult_Declare?menuxml=dec_cle_seain</submenu><!-- ClearanceStatus里的报关单打印-->
+    <submenu>/Common/MultiPrint?menuxml=dec_mul_seain</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/Common/DeclareList?busitypeid=20&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=dec_seaout</submenu>
+    <submenu>/Common/ClearanceStatus?menuxml=dec_cle_seaout</submenu>
+    <submenu>/Common/FileConsult_Declare?menuxml=dec_cle_seaout</submenu><!-- ClearanceStatus里的报关单打印-->
+    <submenu>/Common/MultiPrint?menuxml=dec_mul_seaout</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/Common/DeclareList?busitypeid=40-41&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=dec_domestic</submenu>
+    <submenu>/Common/ClearanceStatus?menuxml=dec_cle_domestic</submenu>
+    <submenu>/Common/FileConsult_Declare?menuxml=dec_cle_domestic</submenu><!-- ClearanceStatus里的报关单打印-->
+    <submenu>/Common/MultiPrint?menuxml=dec_mul_domestic</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/Common/DeclareList?busitypeid=50-51&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=dec_special</submenu>
+    <submenu>/Common/ClearanceStatus?menuxml=dec_cle_special</submenu>
+    <submenu>/Common/FileConsult_Declare?menuxml=dec_cle_special</submenu><!-- ClearanceStatus里的报关单打印-->
+    <submenu>/Common/MultiPrint?menuxml=dec_mul_special</submenu>
+  </rootmenu>
+  
+  <!-- 报检单管理-->
+    
+  <rootmenu>
+    <menu>/Common/InspectList?busitypeid=11&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=insp_airin</submenu>
+    <submenu>/Common/MultiPrint?menuxml=insp_mul_airin</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/Common/InspectList?busitypeid=10&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=insp_airout</submenu>
+    <submenu>/Common/MultiPrint?menuxml=insp_mul_airout</submenu>
+  </rootmenu>  
+  <rootmenu>
+    <menu>/Common/InspectList?busitypeid=31&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=insp_landin</submenu>
+    <submenu>/Common/MultiPrint?menuxml=insp_mul_landin</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/Common/InspectList?busitypeid=30&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=insp_landout</submenu>
+    <submenu>/Common/MultiPrint?menuxml=insp_mul_landout</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/Common/InspectList?busitypeid=21&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=insp_seain</submenu>
+    <submenu>/Common/MultiPrint?menuxml=insp_mul_seain</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/Common/InspectList?busitypeid=20&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=insp_seaout</submenu>
+    <submenu>/Common/MultiPrint?menuxml=insp_mul_seaout</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/Common/InspectList?busitypeid=40-41&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=insp_domestic</submenu>
+    <submenu>/Common/MultiPrint?menuxml=insp_mul_domestic</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/Common/InspectList?busitypeid=50-51&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=insp_special</submenu>
+    <submenu>/Common/MultiPrint?menuxml=insp_mul_special</submenu>
+  </rootmenu>
+  
+  <!-- 客户服务->文件委托 -->
+  <rootmenu>
+    <menu>/EnterpriseOrder/ProcessOrder</menu>
+    <submenu>/EnterpriseOrder/EntOrder_Detail</submenu>
+  </rootmenu>   
+  
+  <!-- 客户服务->委托服务 -->
+  <rootmenu>
+    <menu>/EnterpriseOrder/ProcessServer</menu>
+    <submenu>/EnterpriseOrder/ExportStu2</submenu>
+  </rootmenu> 
+  
+  <!-- 客户服务->账册审核 -->
+  <rootmenu>
+    <menu>/RecordInfor/Recordinfo_Detail_Audit</menu>
+    <submenu>/RecordInfor/Change_Audit</submenu>
+    <submenu>/RecordInfor/Create_Audit</submenu>
+    <submenu>/RecordInfor/Delete_Audit</submenu>
+  </rootmenu> 
+  
+  <!-- 客户服务->电子数据 -->
+  <rootmenu>
+    <menu>/EnterpriseOrder/ProcessOrder_Data</menu>
+    <submenu>/EnterpriseOrder/EntOrder_Data_Detail</submenu>
+  </rootmenu> 
+  
+  <!-- 业务管理->文件委托 -->
+  <rootmenu>
+    <menu>/EnterpriseOrder/EntOrderList</menu>
+    <submenu>/EnterpriseOrder/BatchMaintain</submenu>
+  </rootmenu> 
+  
+  <!-- 业务管理 -->
+  <rootmenu>
+    <menu>/EnterpriseOrder/ListOrder_Index?busitypeid=11</menu>
+    <submenu>/Common/OrderView?menuxml=ent_airin</submenu>
+    <submenu>/Common/FileConsult_E?menuxml=airin</submenu>
+    <submenu>/EnterpriseOrder/GoodsTrack?menuxml=ent_airin</submenu>
+  </rootmenu> 
+  <rootmenu>
+    <menu>/EnterpriseOrder/ListOrder_Index?busitypeid=10</menu>
+    <submenu>/Common/OrderView?menuxml=ent_airout</submenu>
+    <submenu>/Common/FileConsult_E?menuxml=airout</submenu>
+    <submenu>/EnterpriseOrder/GoodsTrack?menuxml=ent_airout</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/EnterpriseOrder/ListOrder_Index?busitypeid=31</menu>
+    <submenu>/Common/OrderView?menuxml=ent_landin</submenu>
+    <submenu>/Common/FileConsult_E?menuxml=landin</submenu>
+    <submenu>/EnterpriseOrder/GoodsTrack?menuxml=ent_landin</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/EnterpriseOrder/ListOrder_Index?busitypeid=30</menu>
+    <submenu>/Common/OrderView?menuxml=ent_landout</submenu>
+    <submenu>/Common/FileConsult_E?menuxml=landout</submenu>
+    <submenu>/EnterpriseOrder/GoodsTrack?menuxml=ent_landout</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/EnterpriseOrder/ListOrder_Index?busitypeid=21</menu>
+    <submenu>/Common/OrderView?menuxml=ent_seain</submenu>
+    <submenu>/Common/FileConsult_E?menuxml=seain</submenu>
+    <submenu>/EnterpriseOrder/GoodsTrack?menuxml=ent_seain</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/EnterpriseOrder/ListOrder_Index?busitypeid=20</menu>
+    <submenu>/Common/OrderView?menuxml=ent_seaout</submenu>
+    <submenu>/Common/FileConsult_E?menuxml=seaout</submenu>
+    <submenu>/EnterpriseOrder/GoodsTrack?menuxml=ent_seaout</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/EnterpriseOrder/ListOrder_Index?busitypeid=40-41</menu>
+    <submenu>/OrderDomestic/OrderView?menuxml=ent_domestic</submenu>
+    <submenu>/Common/FileConsult_E?menuxml=domestic</submenu>
+    <submenu>/EnterpriseOrder/GoodsTrack?menuxml=ent_domestic</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/EnterpriseOrder/ListOrder_Index?busitypeid=50-51</menu>
+    <submenu>/Common/OrderView?menuxml=ent_special</submenu>
+    <submenu>/Common/FileConsult_E?menuxml=special</submenu>
+    <submenu>/EnterpriseOrder/GoodsTrack?menuxml=ent_special</submenu>
+  </rootmenu>
+  
+  <!-- 通关管理>进出境业务-->
+  <rootmenu>
+    <menu>/Common/DeclareList_Enterprise</menu>
+    <submenu>/Common/FileConsult_E?menuxml=dec_no_domestic</submenu>
+    <submenu>/Common/ClearanceStatus?menuxml=ent_dec_cle_no_domestic</submenu>
+    <submenu>/Common/FileConsult_Declare?menuxml=ent_dec_cle_no_domestic</submenu><!-- ClearanceStatus里的报关单打印-->
+  </rootmenu> 
+ 
+  <!-- 通关管理>国内业务-->
+  <rootmenu>
+    <menu>/Common/DeclareList_Enterprise_Domestic</menu>
+    <submenu>/Common/FileConsult_E?menuxml=dec_domestic</submenu>
+    <submenu>/Common/ClearanceStatus?menuxml=ent_dec_cle_domestic</submenu>
+    <submenu>/Common/FileConsult_Declare?menuxml=ent_dec_cle_domestic</submenu><!-- ClearanceStatus里的报关单打印-->
+  </rootmenu> 
+  
+  <!-- 备案管理>账册信息-->
+  <rootmenu>
+    <menu>/RecordInfor/Recordinfo_Detail</menu>
+    <submenu>/RecordInfor/Create</submenu>
+    <submenu>/RecordInfor/Change</submenu>
+    <submenu>/RecordInfor/Delete</submenu>
+  </rootmenu> 
+  
+  <!-- 常用工具>收藏信息-->
+  <rootmenu>
+    <menu></menu>
+  </rootmenu>
+  
+  
+  <!-- 预录导入-->
+  <rootmenu>
+    <menu>/EnterpriseOrder/ListPreData</menu>
+    <submenu>/EnterpriseOrder/ListPreDataDetail</submenu>
+  </rootmenu> 
+
+    
+</rootmenulist>

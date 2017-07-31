@@ -139,15 +139,41 @@
                             region: 'center',
                             listeners: {
                                 tabchange: function (tabPanel, newCard, oldCard, eOpts) {
+
+                                    var menuxml = "";
+                                    switch (busitypeid) {
+                                        case "11":
+                                            menuxml = "airin";
+                                            break;
+                                        case "10":
+                                            menuxml = "airout";
+                                            break;
+                                        case "21":
+                                            menuxml = "seain";
+                                            break;
+                                        case "20":
+                                            menuxml = "seaout";
+                                            break;
+                                        case "31":
+                                            menuxml = "landin";
+                                            break;
+                                        case "30":
+                                            menuxml = "landout";
+                                            break;
+                                        case "50": case "51":
+                                            menuxml = "special";
+                                            break;
+                                    }
+
                                     if (newCard.title == "随附文件") {
                                         if (role == "enterprise") {
-                                            Ext.getDom("fileIframe").src = "/Common/FileConsult_E?ORDERCODE=" + ordercode + "&BUSITYPE=" + busitypeid;
+                                            Ext.getDom("fileIframe").src = "/Common/FileConsult_E?menuxml=" + menuxml + "&ORDERCODE=" + ordercode + "&BUSITYPE=" + busitypeid;
                                         } else {
-                                            Ext.getDom("fileIframe").src = "/Common/FileConsult?ORDERCODE=" + ordercode + "&BUSITYPE=" + busitypeid;
+                                            Ext.getDom("fileIframe").src = "/Common/FileConsult?menuxml=" + menuxml + "&ORDERCODE=" + ordercode + "&BUSITYPE=" + busitypeid;
                                         }
                                     }
                                     if (newCard.title == "订单跟踪") {
-                                        Ext.getDom("trackIframe").src = "/Common/OrderTrack?ORDERCODE=" + ordercode;
+                                        Ext.getDom("trackIframe").src = "/Common/OrderTrack?menuxml=" + menuxml + "&ORDERCODE=" + ordercode;
                                     }
                                 }
                             }

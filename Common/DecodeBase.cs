@@ -46,22 +46,32 @@ namespace MvcPlatform.Common
         // <returns>已解密的字符串。</returns>
         public static string Decrypt(string pToDecrypt)
         {
-            byte[] inputByteArray = Convert.FromBase64String(pToDecrypt);
-            using (DESCryptoServiceProvider des = new DESCryptoServiceProvider())
+            string str = "";
+            try
             {
-                des.Key = ASCIIEncoding.ASCII.GetBytes(sKey);
-                des.IV = ASCIIEncoding.ASCII.GetBytes(sKey);
-                System.IO.MemoryStream ms = new System.IO.MemoryStream();
-                using (CryptoStream cs = new CryptoStream(ms, des.CreateDecryptor(), CryptoStreamMode.Write))
+                byte[] inputByteArray = Convert.FromBase64String(pToDecrypt);
+                using (DESCryptoServiceProvider des = new DESCryptoServiceProvider())
                 {
-                    cs.Write(inputByteArray, 0, inputByteArray.Length);
-                    cs.FlushFinalBlock();
-                    cs.Close();
+                    des.Key = ASCIIEncoding.ASCII.GetBytes(sKey);
+                    des.IV = ASCIIEncoding.ASCII.GetBytes(sKey);
+                    System.IO.MemoryStream ms = new System.IO.MemoryStream();
+                    using (CryptoStream cs = new CryptoStream(ms, des.CreateDecryptor(), CryptoStreamMode.Write))
+                    {
+                        cs.Write(inputByteArray, 0, inputByteArray.Length);
+                        cs.FlushFinalBlock();
+                        cs.Close();
+                    }
+                    str = Encoding.UTF8.GetString(ms.ToArray());
+                    ms.Close();
+                    
                 }
-                string str = Encoding.UTF8.GetString(ms.ToArray());
-                ms.Close();
-                return str;
             }
+            catch (Exception ex)
+            {
+                
+                
+            }
+            return str;
         }
     }
 }
