@@ -37,7 +37,7 @@
                 Ext.regModel('TRADE', {
                     fields: ['ID', 'ENTRUSTTYPE', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE', 'TURNPRENO', 'SUBMITTIME',
                         'BUSIUNITNAME', 'BUSIUNITCODE', 'CONTRACTNO', 'TOTALNO', 'DIVIDENO', 'REPWAYID', 'GOODSNUM',
-                        'GOODSGW', 'CUSTOMAREACODE', 'LAWFLAG', 'ISINVALID', 'BUSITYPE', 'PRINTSTATUS', 'STATUS', 'LOGISTICSSTATUS']
+                        'GOODSGW', 'CUSTOMAREACODE', 'LAWFLAG', 'ISINVALID', 'BUSITYPE', 'PRINTSTATUS', 'STATUS', 'LOGISTICSNAME']
                 })
                 store_Trade = Ext.create('Ext.data.JsonStore', {
                     model: 'TRADE',
@@ -95,7 +95,7 @@
                     { header: 'ID', dataIndex: 'ID', hidden: true, locked: true },
                     { header: '报关状态', dataIndex: 'DECLSTATUS', width: 70, renderer: renderOrder, locked: true },
                     { header: '报检状态', dataIndex: 'INSPSTATUS', width: 70, renderer: renderOrder, locked: true },
-                     { header: '物流状态', dataIndex: 'LOGISTICSSTATUS', width: 80, renderer: renderLogistic, locked: true },
+                    { header: '物流状态', dataIndex: 'LOGISTICSNAME', width: 80, renderer: renderLogistic, locked: true },
                     { header: '订单编号', dataIndex: 'CODE', width: 90, locked: true },
                     { header: '客户编号', dataIndex: 'CUSNO', width: 90, locked: true },
                     { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 150, locked: true },
@@ -119,7 +119,7 @@
 
                         'cellclick': function (view, td, cellindex, record, tr, rowindex, e, opt) {
                             var dataindex = gridpanel.columns[cellindex].dataIndex;
-                            if (dataindex == 'LOGISTICSSTATUS') {
+                            if (dataindex == 'LOGISTICSNAME') {
                                 var totalno = record.data.TOTALNO;
                                 var divdeno = record.data.DIVIDENO;
                                 if (record.data.LOGISTICSSTATUS==null||record.data.LOGISTICSSTATUS=="") {
@@ -127,7 +127,7 @@
                                         url: '/EnterpriseOrder/getLogisticStatus',
                                         params: { totalno: totalno, divdeno: divdeno },
                                         success: function (response, option) {
-                                            store_Trade.getAt(rowindex).set('LOGISTICSSTATUS', response.responseText);
+                                            store_Trade.getAt(rowindex).set('LOGISTICSNAME', response.responseText);
                                             store_Trade.getAt(rowindex).commit();
                                         }
 
@@ -235,7 +235,12 @@
             tab_1_store = Ext.create("Ext.data.JsonStore", {
                 fields: ['ID', 'MSG', 'OPERATER', 'OPERATE_TYPE', 'OPERATE_RESULT', 'OPERATE_DATE'],
                 data: data_kazt
-            });
+            }).sort([
+                    {
+                        property: 'OPERATE_DATE',
+                        direction: 'ASC'
+                    }
+            ]);
             tab_2_store = Ext.create("Ext.data.JsonStore", {
                 fields: ['ID', 'MSG', 'OPERATER', 'OPERATE_TYPE', 'OPERATE_RESULT', 'OPERATE_DATE'],
                 data: store_logistic.getGroups("报检状态") == undefined ? [] : store_logistic.getGroups("报检状态").children
@@ -288,8 +293,8 @@
                 }
             });
 
-            var items = [{ title: '抽单状态', id: "tab_0", items: [tab_0_gridpanel] }, { title: '口岸状态', id: "tab_1", items: [tab_1_gridpanel] },
-                         { title: '报检状态', id: "tab_2", items: [tab_2_gridpanel] }, { title: '运输状态', id: "tab_3", items: [tab_3_gridpanel] }];
+            var items = [{ title: '口岸抽单', id: "tab_0", items: [tab_0_gridpanel] }, { title: '口岸报关', id: "tab_1", items: [tab_1_gridpanel] },
+                         { title: '口岸报检', id: "tab_2", items: [tab_2_gridpanel] }, { title: '运输状态', id: "tab_3", items: [tab_3_gridpanel] }];
             var tabpanel = Ext.create('Ext.tab.Panel', {
                 id: 'tabpanel',
                 items: items,
@@ -310,17 +315,17 @@
     }
     function renderLogistic(value, cellmeta, record, rowIndex, columnIndex, store) {
         var rtn = "";
-        var store_render = Ext.create("Ext.data.JsonStore", {
-            fields: ['NAME', 'CODE', ],
-            data: logistic_status_data
-        });
+        //var store_render = Ext.create("Ext.data.JsonStore", {
+        //    fields: ['NAME', 'CODE', ],
+        //    data: logistic_status_data
+        //});
 
         var dataindex = cellmeta.column.dataIndex;
         switch (dataindex) {
-            case "LOGISTICSSTATUS":
-                var rec = store_render.findRecord('CODE', value);
-                if (rec) {
-                    rtn = "<a style='color:blue'>" + rec.get("NAME") + "</a>";
+            case "LOGISTICSNAME":
+                //var rec = store_render.findRecord('CODE', value);
+                if (value) {
+                    rtn = "<a style='color:blue'>" + value + "</a>";
                 }
                 break;
         }

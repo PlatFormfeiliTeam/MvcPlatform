@@ -191,13 +191,21 @@ namespace MvcPlatform.MethodSvc {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMethodService/redis_SupplyLog", ReplyAction="http://tempuri.org/IMethodService/redis_SupplyLogResponse")]
         System.Threading.Tasks.Task<MvcPlatform.MethodSvc.redis_SupplyLogResponse> redis_SupplyLogAsync(MvcPlatform.MethodSvc.redis_SupplyLogRequest request);
         
-        // CODEGEN: 参数“totalNo”需要其他方案信息，使用参数模式无法捕获这些信息。特定特性为“System.Xml.Serialization.XmlElementAttribute”。
+        // CODEGEN: 参数“Update_Blno_StatusResult”需要其他方案信息，使用参数模式无法捕获这些信息。特定特性为“System.Xml.Serialization.XmlElementAttribute”。
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMethodService/Update_Blno_Status", ReplyAction="http://tempuri.org/IMethodService/Update_Blno_StatusResponse")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
         MvcPlatform.MethodSvc.Update_Blno_StatusResponse Update_Blno_Status(MvcPlatform.MethodSvc.Update_Blno_StatusRequest request);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMethodService/Update_Blno_Status", ReplyAction="http://tempuri.org/IMethodService/Update_Blno_StatusResponse")]
         System.Threading.Tasks.Task<MvcPlatform.MethodSvc.Update_Blno_StatusResponse> Update_Blno_StatusAsync(MvcPlatform.MethodSvc.Update_Blno_StatusRequest request);
+        
+        // CODEGEN: 参数“declarationCode”需要其他方案信息，使用参数模式无法捕获这些信息。特定特性为“System.Xml.Serialization.XmlElementAttribute”。
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMethodService/Invalid_Offline_OrderAndDecl", ReplyAction="http://tempuri.org/IMethodService/Invalid_Offline_OrderAndDeclResponse")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        MvcPlatform.MethodSvc.Invalid_Offline_OrderAndDeclResponse Invalid_Offline_OrderAndDecl(MvcPlatform.MethodSvc.Invalid_Offline_OrderAndDeclRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMethodService/Invalid_Offline_OrderAndDecl", ReplyAction="http://tempuri.org/IMethodService/Invalid_Offline_OrderAndDeclResponse")]
+        System.Threading.Tasks.Task<MvcPlatform.MethodSvc.Invalid_Offline_OrderAndDeclResponse> Invalid_Offline_OrderAndDeclAsync(MvcPlatform.MethodSvc.Invalid_Offline_OrderAndDeclRequest request);
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4005,8 +4013,6 @@ namespace MvcPlatform.MethodSvc {
         
         private System.Nullable<System.DateTime> mOSTARTTIMEk__BackingFieldField;
         
-        private string oNLINESk__BackingFieldField;
-        
         private string oRDERREQUESTk__BackingFieldField;
         
         private string oRDERWAYk__BackingFieldField;
@@ -5858,19 +5864,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<ONLINES>k__BackingField", IsNullable=true, Order=143)]
-        public string ONLINESk__BackingField {
-            get {
-                return this.oNLINESk__BackingFieldField;
-            }
-            set {
-                this.oNLINESk__BackingFieldField = value;
-                this.RaisePropertyChanged("ONLINESk__BackingField");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<ORDERREQUEST>k__BackingField", IsNullable=true, Order=144)]
+        [System.Xml.Serialization.XmlElementAttribute("<ORDERREQUEST>k__BackingField", IsNullable=true, Order=143)]
         public string ORDERREQUESTk__BackingField {
             get {
                 return this.oRDERREQUESTk__BackingFieldField;
@@ -5882,7 +5876,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<ORDERWAY>k__BackingField", IsNullable=true, Order=145)]
+        [System.Xml.Serialization.XmlElementAttribute("<ORDERWAY>k__BackingField", IsNullable=true, Order=144)]
         public string ORDERWAYk__BackingField {
             get {
                 return this.oRDERWAYk__BackingFieldField;
@@ -5894,7 +5888,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<OUTREQUEST>k__BackingField", IsNullable=true, Order=146)]
+        [System.Xml.Serialization.XmlElementAttribute("<OUTREQUEST>k__BackingField", IsNullable=true, Order=145)]
         public string OUTREQUESTk__BackingField {
             get {
                 return this.oUTREQUESTk__BackingFieldField;
@@ -5906,7 +5900,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<OUTSTATUS>k__BackingField", IsNullable=true, Order=147)]
+        [System.Xml.Serialization.XmlElementAttribute("<OUTSTATUS>k__BackingField", IsNullable=true, Order=146)]
         public System.Nullable<decimal> OUTSTATUSk__BackingField {
             get {
                 return this.oUTSTATUSk__BackingFieldField;
@@ -5918,7 +5912,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<PACKKIND>k__BackingField", IsNullable=true, Order=148)]
+        [System.Xml.Serialization.XmlElementAttribute("<PACKKIND>k__BackingField", IsNullable=true, Order=147)]
         public string PACKKINDk__BackingField {
             get {
                 return this.pACKKINDk__BackingFieldField;
@@ -5930,7 +5924,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<PAUSEREASON>k__BackingField", IsNullable=true, Order=149)]
+        [System.Xml.Serialization.XmlElementAttribute("<PAUSEREASON>k__BackingField", IsNullable=true, Order=148)]
         public string PAUSEREASONk__BackingField {
             get {
                 return this.pAUSEREASONk__BackingFieldField;
@@ -5942,7 +5936,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<PAUSEUSERID>k__BackingField", IsNullable=true, Order=150)]
+        [System.Xml.Serialization.XmlElementAttribute("<PAUSEUSERID>k__BackingField", IsNullable=true, Order=149)]
         public System.Nullable<decimal> PAUSEUSERIDk__BackingField {
             get {
                 return this.pAUSEUSERIDk__BackingFieldField;
@@ -5954,7 +5948,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<PAUSEUSERNAME>k__BackingField", IsNullable=true, Order=151)]
+        [System.Xml.Serialization.XmlElementAttribute("<PAUSEUSERNAME>k__BackingField", IsNullable=true, Order=150)]
         public string PAUSEUSERNAMEk__BackingField {
             get {
                 return this.pAUSEUSERNAMEk__BackingFieldField;
@@ -5966,7 +5960,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<PAYPOYALTIES>k__BackingField", IsNullable=true, Order=152)]
+        [System.Xml.Serialization.XmlElementAttribute("<PAYPOYALTIES>k__BackingField", IsNullable=true, Order=151)]
         public System.Nullable<decimal> PAYPOYALTIESk__BackingField {
             get {
                 return this.pAYPOYALTIESk__BackingFieldField;
@@ -5978,7 +5972,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<PLATFORMCODE>k__BackingField", IsNullable=true, Order=153)]
+        [System.Xml.Serialization.XmlElementAttribute("<PLATFORMCODE>k__BackingField", IsNullable=true, Order=152)]
         public string PLATFORMCODEk__BackingField {
             get {
                 return this.pLATFORMCODEk__BackingFieldField;
@@ -5990,7 +5984,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<PORTCODE>k__BackingField", IsNullable=true, Order=154)]
+        [System.Xml.Serialization.XmlElementAttribute("<PORTCODE>k__BackingField", IsNullable=true, Order=153)]
         public string PORTCODEk__BackingField {
             get {
                 return this.pORTCODEk__BackingFieldField;
@@ -6002,7 +5996,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<PREEDIT>k__BackingField", IsNullable=true, Order=155)]
+        [System.Xml.Serialization.XmlElementAttribute("<PREEDIT>k__BackingField", IsNullable=true, Order=154)]
         public System.Nullable<decimal> PREEDITk__BackingField {
             get {
                 return this.pREEDITk__BackingFieldField;
@@ -6014,7 +6008,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<PREENDID>k__BackingField", IsNullable=true, Order=156)]
+        [System.Xml.Serialization.XmlElementAttribute("<PREENDID>k__BackingField", IsNullable=true, Order=155)]
         public System.Nullable<decimal> PREENDIDk__BackingField {
             get {
                 return this.pREENDIDk__BackingFieldField;
@@ -6026,7 +6020,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<PREENDNAME>k__BackingField", IsNullable=true, Order=157)]
+        [System.Xml.Serialization.XmlElementAttribute("<PREENDNAME>k__BackingField", IsNullable=true, Order=156)]
         public string PREENDNAMEk__BackingField {
             get {
                 return this.pREENDNAMEk__BackingFieldField;
@@ -6038,7 +6032,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<PREENDTIME>k__BackingField", IsNullable=true, Order=158)]
+        [System.Xml.Serialization.XmlElementAttribute("<PREENDTIME>k__BackingField", IsNullable=true, Order=157)]
         public System.Nullable<System.DateTime> PREENDTIMEk__BackingField {
             get {
                 return this.pREENDTIMEk__BackingFieldField;
@@ -6050,7 +6044,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<PREPDF>k__BackingField", IsNullable=true, Order=159)]
+        [System.Xml.Serialization.XmlElementAttribute("<PREPDF>k__BackingField", IsNullable=true, Order=158)]
         public System.Nullable<decimal> PREPDFk__BackingField {
             get {
                 return this.pREPDFk__BackingFieldField;
@@ -6062,7 +6056,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<PRESTARTID>k__BackingField", IsNullable=true, Order=160)]
+        [System.Xml.Serialization.XmlElementAttribute("<PRESTARTID>k__BackingField", IsNullable=true, Order=159)]
         public System.Nullable<decimal> PRESTARTIDk__BackingField {
             get {
                 return this.pRESTARTIDk__BackingFieldField;
@@ -6074,7 +6068,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<PRESTARTNAME>k__BackingField", IsNullable=true, Order=161)]
+        [System.Xml.Serialization.XmlElementAttribute("<PRESTARTNAME>k__BackingField", IsNullable=true, Order=160)]
         public string PRESTARTNAMEk__BackingField {
             get {
                 return this.pRESTARTNAMEk__BackingFieldField;
@@ -6086,7 +6080,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<PRESTARTTIME>k__BackingField", IsNullable=true, Order=162)]
+        [System.Xml.Serialization.XmlElementAttribute("<PRESTARTTIME>k__BackingField", IsNullable=true, Order=161)]
         public System.Nullable<System.DateTime> PRESTARTTIMEk__BackingField {
             get {
                 return this.pRESTARTTIMEk__BackingFieldField;
@@ -6098,7 +6092,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<PRETRANSTIME>k__BackingField", IsNullable=true, Order=163)]
+        [System.Xml.Serialization.XmlElementAttribute("<PRETRANSTIME>k__BackingField", IsNullable=true, Order=162)]
         public System.Nullable<System.DateTime> PRETRANSTIMEk__BackingField {
             get {
                 return this.pRETRANSTIMEk__BackingFieldField;
@@ -6110,7 +6104,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<PRICEIMPACT>k__BackingField", IsNullable=true, Order=164)]
+        [System.Xml.Serialization.XmlElementAttribute("<PRICEIMPACT>k__BackingField", IsNullable=true, Order=163)]
         public System.Nullable<decimal> PRICEIMPACTk__BackingField {
             get {
                 return this.pRICEIMPACTk__BackingFieldField;
@@ -6122,7 +6116,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<PRINTSTATUS>k__BackingField", Order=165)]
+        [System.Xml.Serialization.XmlElementAttribute("<PRINTSTATUS>k__BackingField", Order=164)]
         public decimal PRINTSTATUSk__BackingField {
             get {
                 return this.pRINTSTATUSk__BackingFieldField;
@@ -6134,7 +6128,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<PRODUCTNUM>k__BackingField", IsNullable=true, Order=166)]
+        [System.Xml.Serialization.XmlElementAttribute("<PRODUCTNUM>k__BackingField", IsNullable=true, Order=165)]
         public System.Nullable<decimal> PRODUCTNUMk__BackingField {
             get {
                 return this.pRODUCTNUMk__BackingFieldField;
@@ -6146,7 +6140,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<RECEIVETIME>k__BackingField", IsNullable=true, Order=167)]
+        [System.Xml.Serialization.XmlElementAttribute("<RECEIVETIME>k__BackingField", IsNullable=true, Order=166)]
         public System.Nullable<System.DateTime> RECEIVETIMEk__BackingField {
             get {
                 return this.rECEIVETIMEk__BackingFieldField;
@@ -6158,7 +6152,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<RECEIVEUSERID>k__BackingField", IsNullable=true, Order=168)]
+        [System.Xml.Serialization.XmlElementAttribute("<RECEIVEUSERID>k__BackingField", IsNullable=true, Order=167)]
         public System.Nullable<decimal> RECEIVEUSERIDk__BackingField {
             get {
                 return this.rECEIVEUSERIDk__BackingFieldField;
@@ -6170,7 +6164,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<RECEIVEUSERNAME>k__BackingField", IsNullable=true, Order=169)]
+        [System.Xml.Serialization.XmlElementAttribute("<RECEIVEUSERNAME>k__BackingField", IsNullable=true, Order=168)]
         public string RECEIVEUSERNAMEk__BackingField {
             get {
                 return this.rECEIVEUSERNAMEk__BackingFieldField;
@@ -6182,7 +6176,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<RECORDCODE>k__BackingField", IsNullable=true, Order=170)]
+        [System.Xml.Serialization.XmlElementAttribute("<RECORDCODE>k__BackingField", IsNullable=true, Order=169)]
         public string RECORDCODEk__BackingField {
             get {
                 return this.rECORDCODEk__BackingFieldField;
@@ -6194,7 +6188,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<RELATEDTIME>k__BackingField", IsNullable=true, Order=171)]
+        [System.Xml.Serialization.XmlElementAttribute("<RELATEDTIME>k__BackingField", IsNullable=true, Order=170)]
         public System.Nullable<System.DateTime> RELATEDTIMEk__BackingField {
             get {
                 return this.rELATEDTIMEk__BackingFieldField;
@@ -6206,7 +6200,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<RELATEDUSERID>k__BackingField", IsNullable=true, Order=172)]
+        [System.Xml.Serialization.XmlElementAttribute("<RELATEDUSERID>k__BackingField", IsNullable=true, Order=171)]
         public System.Nullable<decimal> RELATEDUSERIDk__BackingField {
             get {
                 return this.rELATEDUSERIDk__BackingFieldField;
@@ -6218,7 +6212,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<RELATEDUSERNAME>k__BackingField", IsNullable=true, Order=173)]
+        [System.Xml.Serialization.XmlElementAttribute("<RELATEDUSERNAME>k__BackingField", IsNullable=true, Order=172)]
         public string RELATEDUSERNAMEk__BackingField {
             get {
                 return this.rELATEDUSERNAMEk__BackingFieldField;
@@ -6230,7 +6224,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<REPENDID>k__BackingField", IsNullable=true, Order=174)]
+        [System.Xml.Serialization.XmlElementAttribute("<REPENDID>k__BackingField", IsNullable=true, Order=173)]
         public System.Nullable<decimal> REPENDIDk__BackingField {
             get {
                 return this.rEPENDIDk__BackingFieldField;
@@ -6242,7 +6236,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<REPENDNAME>k__BackingField", IsNullable=true, Order=175)]
+        [System.Xml.Serialization.XmlElementAttribute("<REPENDNAME>k__BackingField", IsNullable=true, Order=174)]
         public string REPENDNAMEk__BackingField {
             get {
                 return this.rEPENDNAMEk__BackingFieldField;
@@ -6254,7 +6248,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<REPENDTIME>k__BackingField", IsNullable=true, Order=176)]
+        [System.Xml.Serialization.XmlElementAttribute("<REPENDTIME>k__BackingField", IsNullable=true, Order=175)]
         public System.Nullable<System.DateTime> REPENDTIMEk__BackingField {
             get {
                 return this.rEPENDTIMEk__BackingFieldField;
@@ -6266,7 +6260,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<REPID>k__BackingField", IsNullable=true, Order=177)]
+        [System.Xml.Serialization.XmlElementAttribute("<REPID>k__BackingField", IsNullable=true, Order=176)]
         public System.Nullable<decimal> REPIDk__BackingField {
             get {
                 return this.rEPIDk__BackingFieldField;
@@ -6278,7 +6272,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<REPLYCONTENT>k__BackingField", IsNullable=true, Order=178)]
+        [System.Xml.Serialization.XmlElementAttribute("<REPLYCONTENT>k__BackingField", IsNullable=true, Order=177)]
         public string REPLYCONTENTk__BackingField {
             get {
                 return this.rEPLYCONTENTk__BackingFieldField;
@@ -6290,7 +6284,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<REPNAME>k__BackingField", IsNullable=true, Order=179)]
+        [System.Xml.Serialization.XmlElementAttribute("<REPNAME>k__BackingField", IsNullable=true, Order=178)]
         public string REPNAMEk__BackingField {
             get {
                 return this.rEPNAMEk__BackingFieldField;
@@ -6302,7 +6296,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<REPNO>k__BackingField", IsNullable=true, Order=180)]
+        [System.Xml.Serialization.XmlElementAttribute("<REPNO>k__BackingField", IsNullable=true, Order=179)]
         public string REPNOk__BackingField {
             get {
                 return this.rEPNOk__BackingFieldField;
@@ -6314,7 +6308,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<REPOVERID>k__BackingField", IsNullable=true, Order=181)]
+        [System.Xml.Serialization.XmlElementAttribute("<REPOVERID>k__BackingField", IsNullable=true, Order=180)]
         public System.Nullable<decimal> REPOVERIDk__BackingField {
             get {
                 return this.rEPOVERIDk__BackingFieldField;
@@ -6326,7 +6320,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<REPOVERNAME>k__BackingField", IsNullable=true, Order=182)]
+        [System.Xml.Serialization.XmlElementAttribute("<REPOVERNAME>k__BackingField", IsNullable=true, Order=181)]
         public string REPOVERNAMEk__BackingField {
             get {
                 return this.rEPOVERNAMEk__BackingFieldField;
@@ -6338,7 +6332,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<REPOVERTIME>k__BackingField", IsNullable=true, Order=183)]
+        [System.Xml.Serialization.XmlElementAttribute("<REPOVERTIME>k__BackingField", IsNullable=true, Order=182)]
         public System.Nullable<System.DateTime> REPOVERTIMEk__BackingField {
             get {
                 return this.rEPOVERTIMEk__BackingFieldField;
@@ -6350,7 +6344,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<REPSTARTTIME>k__BackingField", IsNullable=true, Order=184)]
+        [System.Xml.Serialization.XmlElementAttribute("<REPSTARTTIME>k__BackingField", IsNullable=true, Order=183)]
         public System.Nullable<System.DateTime> REPSTARTTIMEk__BackingField {
             get {
                 return this.rEPSTARTTIMEk__BackingFieldField;
@@ -6362,7 +6356,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<REPUNITCODE>k__BackingField", IsNullable=true, Order=185)]
+        [System.Xml.Serialization.XmlElementAttribute("<REPUNITCODE>k__BackingField", IsNullable=true, Order=184)]
         public string REPUNITCODEk__BackingField {
             get {
                 return this.rEPUNITCODEk__BackingFieldField;
@@ -6374,7 +6368,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<REPUNITNAME>k__BackingField", IsNullable=true, Order=186)]
+        [System.Xml.Serialization.XmlElementAttribute("<REPUNITNAME>k__BackingField", IsNullable=true, Order=185)]
         public string REPUNITNAMEk__BackingField {
             get {
                 return this.rEPUNITNAMEk__BackingFieldField;
@@ -6386,7 +6380,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<REPWAYID>k__BackingField", IsNullable=true, Order=187)]
+        [System.Xml.Serialization.XmlElementAttribute("<REPWAYID>k__BackingField", IsNullable=true, Order=186)]
         public string REPWAYIDk__BackingField {
             get {
                 return this.rEPWAYIDk__BackingFieldField;
@@ -6398,7 +6392,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<SECONDLADINGBILLNO>k__BackingField", IsNullable=true, Order=188)]
+        [System.Xml.Serialization.XmlElementAttribute("<SECONDLADINGBILLNO>k__BackingField", IsNullable=true, Order=187)]
         public string SECONDLADINGBILLNOk__BackingField {
             get {
                 return this.sECONDLADINGBILLNOk__BackingFieldField;
@@ -6410,7 +6404,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<SHIPNAME>k__BackingField", IsNullable=true, Order=189)]
+        [System.Xml.Serialization.XmlElementAttribute("<SHIPNAME>k__BackingField", IsNullable=true, Order=188)]
         public string SHIPNAMEk__BackingField {
             get {
                 return this.sHIPNAMEk__BackingFieldField;
@@ -6422,7 +6416,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<SITEAPPLYTIME>k__BackingField", IsNullable=true, Order=190)]
+        [System.Xml.Serialization.XmlElementAttribute("<SITEAPPLYTIME>k__BackingField", IsNullable=true, Order=189)]
         public System.Nullable<System.DateTime> SITEAPPLYTIMEk__BackingField {
             get {
                 return this.sITEAPPLYTIMEk__BackingFieldField;
@@ -6434,7 +6428,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<SITEAPPLYUSERID>k__BackingField", IsNullable=true, Order=191)]
+        [System.Xml.Serialization.XmlElementAttribute("<SITEAPPLYUSERID>k__BackingField", IsNullable=true, Order=190)]
         public System.Nullable<decimal> SITEAPPLYUSERIDk__BackingField {
             get {
                 return this.sITEAPPLYUSERIDk__BackingFieldField;
@@ -6446,7 +6440,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<SITEAPPLYUSERNAME>k__BackingField", IsNullable=true, Order=192)]
+        [System.Xml.Serialization.XmlElementAttribute("<SITEAPPLYUSERNAME>k__BackingField", IsNullable=true, Order=191)]
         public string SITEAPPLYUSERNAMEk__BackingField {
             get {
                 return this.sITEAPPLYUSERNAMEk__BackingFieldField;
@@ -6458,7 +6452,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<SITEPASSTIME>k__BackingField", IsNullable=true, Order=193)]
+        [System.Xml.Serialization.XmlElementAttribute("<SITEPASSTIME>k__BackingField", IsNullable=true, Order=192)]
         public System.Nullable<System.DateTime> SITEPASSTIMEk__BackingField {
             get {
                 return this.sITEPASSTIMEk__BackingFieldField;
@@ -6470,7 +6464,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<SITEPASSUSERID>k__BackingField", IsNullable=true, Order=194)]
+        [System.Xml.Serialization.XmlElementAttribute("<SITEPASSUSERID>k__BackingField", IsNullable=true, Order=193)]
         public System.Nullable<decimal> SITEPASSUSERIDk__BackingField {
             get {
                 return this.sITEPASSUSERIDk__BackingFieldField;
@@ -6482,7 +6476,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<SITEPASSUSERNAME>k__BackingField", IsNullable=true, Order=195)]
+        [System.Xml.Serialization.XmlElementAttribute("<SITEPASSUSERNAME>k__BackingField", IsNullable=true, Order=194)]
         public string SITEPASSUSERNAMEk__BackingField {
             get {
                 return this.sITEPASSUSERNAMEk__BackingFieldField;
@@ -6494,7 +6488,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<SPECIALRELATIONSHIP>k__BackingField", IsNullable=true, Order=196)]
+        [System.Xml.Serialization.XmlElementAttribute("<SPECIALRELATIONSHIP>k__BackingField", IsNullable=true, Order=195)]
         public System.Nullable<decimal> SPECIALRELATIONSHIPk__BackingField {
             get {
                 return this.sPECIALRELATIONSHIPk__BackingFieldField;
@@ -6506,7 +6500,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<STATUS>k__BackingField", IsNullable=true, Order=197)]
+        [System.Xml.Serialization.XmlElementAttribute("<STATUS>k__BackingField", IsNullable=true, Order=196)]
         public System.Nullable<decimal> STATUSk__BackingField {
             get {
                 return this.sTATUSk__BackingFieldField;
@@ -6518,7 +6512,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<STOWAGENO>k__BackingField", IsNullable=true, Order=198)]
+        [System.Xml.Serialization.XmlElementAttribute("<STOWAGENO>k__BackingField", IsNullable=true, Order=197)]
         public string STOWAGENOk__BackingField {
             get {
                 return this.sTOWAGENOk__BackingFieldField;
@@ -6530,7 +6524,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<SUBMITTIME>k__BackingField", IsNullable=true, Order=199)]
+        [System.Xml.Serialization.XmlElementAttribute("<SUBMITTIME>k__BackingField", IsNullable=true, Order=198)]
         public System.Nullable<System.DateTime> SUBMITTIMEk__BackingField {
             get {
                 return this.sUBMITTIMEk__BackingFieldField;
@@ -6542,7 +6536,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<SUBMITUSERID>k__BackingField", IsNullable=true, Order=200)]
+        [System.Xml.Serialization.XmlElementAttribute("<SUBMITUSERID>k__BackingField", IsNullable=true, Order=199)]
         public System.Nullable<decimal> SUBMITUSERIDk__BackingField {
             get {
                 return this.sUBMITUSERIDk__BackingFieldField;
@@ -6554,7 +6548,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<SUBMITUSERNAME>k__BackingField", IsNullable=true, Order=201)]
+        [System.Xml.Serialization.XmlElementAttribute("<SUBMITUSERNAME>k__BackingField", IsNullable=true, Order=200)]
         public string SUBMITUSERNAMEk__BackingField {
             get {
                 return this.sUBMITUSERNAMEk__BackingFieldField;
@@ -6566,7 +6560,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<TOTALNO>k__BackingField", IsNullable=true, Order=202)]
+        [System.Xml.Serialization.XmlElementAttribute("<TOTALNO>k__BackingField", IsNullable=true, Order=201)]
         public string TOTALNOk__BackingField {
             get {
                 return this.tOTALNOk__BackingFieldField;
@@ -6578,7 +6572,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<TRADEWAYCODES>k__BackingField", IsNullable=true, Order=203)]
+        [System.Xml.Serialization.XmlElementAttribute("<TRADEWAYCODES>k__BackingField", IsNullable=true, Order=202)]
         public string TRADEWAYCODESk__BackingField {
             get {
                 return this.tRADEWAYCODESk__BackingFieldField;
@@ -6590,7 +6584,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<TURNPRENO>k__BackingField", IsNullable=true, Order=204)]
+        [System.Xml.Serialization.XmlElementAttribute("<TURNPRENO>k__BackingField", IsNullable=true, Order=203)]
         public string TURNPRENOk__BackingField {
             get {
                 return this.tURNPRENOk__BackingFieldField;
@@ -6602,7 +6596,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<WEIGHTCHECK>k__BackingField", IsNullable=true, Order=205)]
+        [System.Xml.Serialization.XmlElementAttribute("<WEIGHTCHECK>k__BackingField", IsNullable=true, Order=204)]
         public System.Nullable<decimal> WEIGHTCHECKk__BackingField {
             get {
                 return this.wEIGHTCHECKk__BackingFieldField;
@@ -6614,7 +6608,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<WOODPACKINGID>k__BackingField", IsNullable=true, Order=206)]
+        [System.Xml.Serialization.XmlElementAttribute("<WOODPACKINGID>k__BackingField", IsNullable=true, Order=205)]
         public string WOODPACKINGIDk__BackingField {
             get {
                 return this.wOODPACKINGIDk__BackingFieldField;
@@ -6626,7 +6620,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<WPID>k__BackingField", IsNullable=true, Order=207)]
+        [System.Xml.Serialization.XmlElementAttribute("<WPID>k__BackingField", IsNullable=true, Order=206)]
         public System.Nullable<decimal> WPIDk__BackingField {
             get {
                 return this.wPIDk__BackingFieldField;
@@ -6638,7 +6632,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<WPNAME>k__BackingField", IsNullable=true, Order=208)]
+        [System.Xml.Serialization.XmlElementAttribute("<WPNAME>k__BackingField", IsNullable=true, Order=207)]
         public string WPNAMEk__BackingField {
             get {
                 return this.wPNAMEk__BackingFieldField;
@@ -6650,7 +6644,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<WPTIME>k__BackingField", IsNullable=true, Order=209)]
+        [System.Xml.Serialization.XmlElementAttribute("<WPTIME>k__BackingField", IsNullable=true, Order=208)]
         public System.Nullable<System.DateTime> WPTIMEk__BackingField {
             get {
                 return this.wPTIMEk__BackingFieldField;
@@ -6662,7 +6656,7 @@ namespace MvcPlatform.MethodSvc {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("<ZGDPDF>k__BackingField", Order=210)]
+        [System.Xml.Serialization.XmlElementAttribute("<ZGDPDF>k__BackingField", Order=209)]
         public decimal ZGDPDFk__BackingField {
             get {
                 return this.zGDPDFk__BackingFieldField;
@@ -7990,13 +7984,42 @@ namespace MvcPlatform.MethodSvc {
     public partial class Update_Blno_StatusResponse {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=0)]
-        public int Update_Blno_StatusResult;
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string Update_Blno_StatusResult;
         
         public Update_Blno_StatusResponse() {
         }
         
-        public Update_Blno_StatusResponse(int Update_Blno_StatusResult) {
+        public Update_Blno_StatusResponse(string Update_Blno_StatusResult) {
             this.Update_Blno_StatusResult = Update_Blno_StatusResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="Invalid_Offline_OrderAndDecl", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
+    public partial class Invalid_Offline_OrderAndDeclRequest {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string declarationCode;
+        
+        public Invalid_Offline_OrderAndDeclRequest() {
+        }
+        
+        public Invalid_Offline_OrderAndDeclRequest(string declarationCode) {
+            this.declarationCode = declarationCode;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="Invalid_Offline_OrderAndDeclResponse", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
+    public partial class Invalid_Offline_OrderAndDeclResponse {
+        
+        public Invalid_Offline_OrderAndDeclResponse() {
         }
     }
     
@@ -8601,7 +8624,7 @@ namespace MvcPlatform.MethodSvc {
             return base.Channel.Update_Blno_Status(request);
         }
         
-        public int Update_Blno_Status(string totalNo, string divideNo) {
+        public string Update_Blno_Status(string totalNo, string divideNo) {
             MvcPlatform.MethodSvc.Update_Blno_StatusRequest inValue = new MvcPlatform.MethodSvc.Update_Blno_StatusRequest();
             inValue.totalNo = totalNo;
             inValue.divideNo = divideNo;
@@ -8619,6 +8642,28 @@ namespace MvcPlatform.MethodSvc {
             inValue.totalNo = totalNo;
             inValue.divideNo = divideNo;
             return ((MvcPlatform.MethodSvc.IMethodService)(this)).Update_Blno_StatusAsync(inValue);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        MvcPlatform.MethodSvc.Invalid_Offline_OrderAndDeclResponse MvcPlatform.MethodSvc.IMethodService.Invalid_Offline_OrderAndDecl(MvcPlatform.MethodSvc.Invalid_Offline_OrderAndDeclRequest request) {
+            return base.Channel.Invalid_Offline_OrderAndDecl(request);
+        }
+        
+        public void Invalid_Offline_OrderAndDecl(string declarationCode) {
+            MvcPlatform.MethodSvc.Invalid_Offline_OrderAndDeclRequest inValue = new MvcPlatform.MethodSvc.Invalid_Offline_OrderAndDeclRequest();
+            inValue.declarationCode = declarationCode;
+            MvcPlatform.MethodSvc.Invalid_Offline_OrderAndDeclResponse retVal = ((MvcPlatform.MethodSvc.IMethodService)(this)).Invalid_Offline_OrderAndDecl(inValue);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.Threading.Tasks.Task<MvcPlatform.MethodSvc.Invalid_Offline_OrderAndDeclResponse> MvcPlatform.MethodSvc.IMethodService.Invalid_Offline_OrderAndDeclAsync(MvcPlatform.MethodSvc.Invalid_Offline_OrderAndDeclRequest request) {
+            return base.Channel.Invalid_Offline_OrderAndDeclAsync(request);
+        }
+        
+        public System.Threading.Tasks.Task<MvcPlatform.MethodSvc.Invalid_Offline_OrderAndDeclResponse> Invalid_Offline_OrderAndDeclAsync(string declarationCode) {
+            MvcPlatform.MethodSvc.Invalid_Offline_OrderAndDeclRequest inValue = new MvcPlatform.MethodSvc.Invalid_Offline_OrderAndDeclRequest();
+            inValue.declarationCode = declarationCode;
+            return ((MvcPlatform.MethodSvc.IMethodService)(this)).Invalid_Offline_OrderAndDeclAsync(inValue);
         }
     }
 }

@@ -400,8 +400,20 @@
   <xs:element name="Update_Blno_StatusResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="Update_Blno_StatusResult" type="xs:int" />
+        <xs:element minOccurs="0" name="Update_Blno_StatusResult" nillable="true" type="xs:string" />
       </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Invalid_Offline_OrderAndDecl">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="declarationCode" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Invalid_Offline_OrderAndDeclResponse">
+    <xs:complexType>
+      <xs:sequence />
     </xs:complexType>
   </xs:element>
 </xs:schema>

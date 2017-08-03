@@ -145,7 +145,6 @@
       <xs:element name="_x003C_MOSTARTID_x003E_k__BackingField" nillable="true" type="xs:decimal" />
       <xs:element name="_x003C_MOSTARTNAME_x003E_k__BackingField" nillable="true" type="xs:string" />
       <xs:element name="_x003C_MOSTARTTIME_x003E_k__BackingField" nillable="true" type="xs:dateTime" />
-      <xs:element name="_x003C_ONLINES_x003E_k__BackingField" nillable="true" type="xs:string" />
       <xs:element name="_x003C_ORDERREQUEST_x003E_k__BackingField" nillable="true" type="xs:string" />
       <xs:element name="_x003C_ORDERWAY_x003E_k__BackingField" nillable="true" type="xs:string" />
       <xs:element name="_x003C_OUTREQUEST_x003E_k__BackingField" nillable="true" type="xs:string" />

@@ -33,7 +33,7 @@ Ext.onReady(function () {
                 { header: 'ID', dataIndex: 'ID', hidden: true, locked: true },
                 { header: '报关状态', dataIndex: 'DECLSTATUS', width: 70, renderer: renderOrder, locked: true },
                 { header: '报检状态', dataIndex: 'INSPSTATUS', width: 70, renderer: renderOrder, locked: true },
-                { header: '物流状态', dataIndex: 'LOGISTICSSTATUS', width: 80, renderer: renderLogistic, locked: true },
+                { header: '物流状态', dataIndex: 'LOGISTICSNAME', width: 80, renderer: renderLogistic, locked: true },
                 { header: '对应号', dataIndex: 'REPNO', width: 100, locked: true },
                 { header: '合同发票号', dataIndex: 'CONTRACTNO', width: 100, locked: true },
                 { header: '件数/重量', dataIndex: 'GOODSNUM', width: 65, renderer: renderOrder, locked: true },//该字段需要拼接
@@ -247,7 +247,7 @@ Ext.onReady(function () {
                 {
                     'cellclick': function (view, td, cellindex, record, tr, rowindex, e, opt) {
                         var dataindex = gridpanel.columns[cellindex].dataIndex;
-                        if (dataindex == 'LOGISTICSSTATUS') {
+                        if (dataindex == 'LOGISTICSNAME') {
                             var totalno = record.data.TOTALNO;
                             var divdeno = record.data.DIVIDENO;
                           
@@ -256,7 +256,7 @@ Ext.onReady(function () {
                                     url: '/EnterpriseOrder/getLogisticStatus',
                                     params: { totalno: totalno, divdeno: divdeno },
                                     success: function (response, option) {
-                                        store_Trade.getAt(rowindex).set('LOGISTICSSTATUS', response.responseText);
+                                        store_Trade.getAt(rowindex).set('LOGISTICSNAME', response.responseText);
                                         store_Trade.getAt(rowindex).commit();
                                     }
 
@@ -672,7 +672,12 @@ function showLogisticStatus(totalno,divdeno)
              fields: ['ID', 'MSG', 'OPERATER', 'OPERATE_TYPE', 'OPERATE_RESULT', 'OPERATE_DATE'],
              //data: store_logistic.getGroups("抽单状态") == undefined ? [] : store_logistic.getGroups("抽单状态").children
              data:data_kazt
-        });
+         }).sort([
+                    {
+                        property: 'OPERATE_DATE',
+                        direction: 'ASC'
+                    }
+         ]);
          tab_2_store = Ext.create("Ext.data.JsonStore", {
             fields: ['ID', 'MSG', 'OPERATER', 'OPERATE_TYPE', 'OPERATE_RESULT', 'OPERATE_DATE'],
             data: store_logistic.getGroups("报检状态") == undefined ? [] : store_logistic.getGroups("报检状态").children
@@ -748,17 +753,11 @@ function showLogisticStatus(totalno,divdeno)
 
 function renderLogistic(value, cellmeta, record, rowIndex, columnIndex, store) {
     var rtn = "";
-    var store_render = Ext.create("Ext.data.JsonStore", {
-        fields: ['NAME', 'CODE', ],
-        data: logistic_status_data
-    });
-   
     var dataindex = cellmeta.column.dataIndex;
     switch (dataindex) {
-        case "LOGISTICSSTATUS":
-            var rec = store_render.findRecord('CODE', value);
-            if (rec) {
-                rtn = "<a style='color:blue'>" + rec.get("NAME") + "</a>";
+        case "LOGISTICSNAME":
+            if (value) {
+                rtn = "<a style='color:blue'>" + value + "</a>";
             }
             break;
     }
