@@ -1,4 +1,5 @@
-﻿using iTextSharp.text;
+﻿using Aspose.Cells;
+using iTextSharp.text;
 using iTextSharp.text.pdf;
 //using MvcPlatform.Models;
 using Newtonsoft.Json;
@@ -908,7 +909,12 @@ namespace MvcPlatform.Common
 
             if (ParaType == "predata")//ListPreData.cshtml 导入用的
             {
-                return "{sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",myfs:" + json_myfs + ",unit:" + json_unit + "}";
+                return "{sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",myfs:" + json_myfs + ",unit:" + json_unit + ",dzfwdw:" + json_dzfwdw + "}";
+            }
+
+            if (ParaType == "verification")//VerificationList.cshtml 导入用的
+            {
+                return "{myfs:" + json_myfs + "}";
             }
 
             return "{jydw:" + json_jydw + ",sbfs_all:" + json_sbfs_all + ",sbfs:" + json_sbfs + ",sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",bzzl:" + json_bzzl
@@ -916,6 +922,18 @@ namespace MvcPlatform.Common
                 + ",relacontainer:" + json_relacontainer + ",mzbz:" + json_mzbz + ",jylb:" + json_jylb + ",json_sbkb:" + json_sbkb
                 + ",inspbzzl:" + json_inspbzzl + ",adminurl:'" + AdminUrl + "',curuser:" + json_user
                 + ",dzfwdw:" + json_dzfwdw + ",inspmyfs:" + json_inspmyfs + "}";
+        }
+
+
+        public static DataTable GetExcelData_Table(string filePath,int sheetPoint)
+        {
+            Workbook book = new Workbook(filePath);
+            //book.Open(filePath);
+            Worksheet sheet = book.Worksheets[sheetPoint];
+            Cells cells = sheet.Cells;
+            DataTable dt_Import = cells.ExportDataTableAsString(0, 0, cells.MaxDataRow + 1, cells.MaxDataColumn + 1, true);//获取excel中的数据保存到一个datatable中
+            return dt_Import;
+
         }
 
     }

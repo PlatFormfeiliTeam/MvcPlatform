@@ -17,6 +17,7 @@ using System.Web.Mvc;
 using System.Diagnostics;
 using System.Runtime.InteropServices.ComTypes;
 using MvcPlatform.WsZip;
+using Oracle.ManagedDataAccess.Client;
 
 namespace MvcPlatform.Controllers
 {
@@ -72,6 +73,10 @@ namespace MvcPlatform.Controllers
             return View();
         }
         public ActionResult FileConsult_Declare()//文件调阅
+        {
+            return View();
+        }
+        public ActionResult FileConsult_Pre()//预录导入-》文件调阅
         {
             return View();
         }
@@ -140,10 +145,19 @@ namespace MvcPlatform.Controllers
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
-        public ActionResult ClearanceStatus()
+        public ActionResult ClearanceStatus()//通关管理>>通关状态查询
         {
             return View();
         }
+
+        public ActionResult VerificationList()
+        {
+            ViewBag.navigator = "通关管理>>核销比对";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
+
+
         //登录后显示顶部当前用户中文名称 by heguiqin 2016-08-25
         public string CurrentUser()
         {
@@ -1486,6 +1500,10 @@ namespace MvcPlatform.Controllers
                     {
                         result += "[{id:'declare',typename:'报关'}]";
                     }
+                    else if (role == "declare_pre")
+                    {
+                        result += "[{id:'declare',typename:'报关'},{id:'checkout',typename:'校验'}]";
+                    }
                     else
                     {
                         switch (entrusttypeid)
@@ -1784,7 +1802,52 @@ namespace MvcPlatform.Controllers
                 result += "]";
                 return result;
             }
-            //报检单号：J16052035234001
+            
+             //校验单  涉及的文件类型有 60 
+            if (id == "checkout")
+            {
+                
+               sql = @"select f.FILETYPEID,f.FILETYPENAME  from sys_filetype f where
+                       f.FILETYPEID IN (select t.FILETYPE from List_Attachment t where t.FILETYPE='60' and t.ordercode='" + ordercode + "') order by f.FILETYPEID asc ";
+                dt = DBMgr.GetDataTable(sql);
+                int i = 0;
+                result += "[";
+                foreach (DataRow dr in dt.Rows)
+                {
+                    if (i != dt.Rows.Count - 1)
+                    {
+                        result += "{id:'" + dr["FILETYPEID"] + "',typename:'" + dr["FILETYPENAME"] + "'},";
+                    }
+                    else
+                    {
+                        result += "{id:'" + dr["FILETYPEID"] + "',typename:'" + dr["FILETYPENAME"] + "'}";
+                    }
+                    i++;
+                }
+                result += "]";
+                return result;
+            }
+            if (id == "60")
+            {
+                int i = 0;
+                sql = @"select t.* from list_attachment t where t.filetype='60' and t.ordercode='" + ordercode + "' order by uploadtime asc";
+                dt = DBMgr.GetDataTable(sql);
+                result += "[";
+                foreach (DataRow dr in dt.Rows)
+                {
+                    if (i != dt.Rows.Count - 1)
+                    {
+                        result += "{id:'" + id + "_" + (i + 1) + "',typename:'校验单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'},";
+                    }
+                    else
+                    {
+                        result += "{id:'" + id + "_" + (i + 1) + "',typename:'校验单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'}";
+                    }
+                    i++;
+                }
+                result += "]";
+                return result;
+            }
             return "";
         }
 
@@ -4298,8 +4361,274 @@ namespace MvcPlatform.Controllers
                 return "{success:true,url:\"" + url + "\"}";
             
             }
-           
-        
         }
+
+        #region LIST_VERIFICATION 核销比对
+
+        public string QueryConditionVerification()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            string where = @" where lv.CUSTOMERCODE ='" + json_user.Value<string>("CUSTOMERCODE") + "' ";
+           
+            if (!string.IsNullOrEmpty(Request["DECLARATIONCODE"]))
+            {
+                where += " and lv.DECLARATIONCODE='" + Request["DECLARATIONCODE"] + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["TRADEMETHOD"]))
+            {
+                where += " and lv.TRADEMETHOD='" + Request["TRADEMETHOD"] + "'";
+            }
+
+            string sql = @"select lv.* from list_verification lv" + where;
+
+            return sql;
+
+        }
+
+        public string loadverification()
+        {
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
+            iso.DateTimeFormat = "yyyy-MM-dd";
+            string sql = QueryConditionVerification();
+
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "DESC"));
+            var json = JsonConvert.SerializeObject(dt, iso);
+
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
+        public string ImExcel_Verification()
+        {
+            string action = Request["action"]; string declarationcode = Request["declarationcode"];//string formdata = Request["formdata"]; 
+            //JObject json_formdata = (JObject)JsonConvert.DeserializeObject(formdata);
+
+            HttpPostedFileBase postedFile = Request.Files["UPLOADFILE"];//获取上传信息对象  
+            string fileName = Path.GetFileName(postedFile.FileName);
+
+            string newfile = @"~/FileUpload/Verification/" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_" + fileName;
+            if (!Directory.Exists(Server.MapPath("~/FileUpload/Verification")))
+            {
+                Directory.CreateDirectory(Server.MapPath("~/FileUpload/Verification"));
+            }
+            postedFile.SaveAs(Server.MapPath(newfile));
+
+            string result = "";
+
+            //result = ImExcel_Verification_Data(newfile, fileName, action, declarationcode);           
+
+            if (result != "{success:true}")//上传不成功，删除源文件
+            {
+                FileInfo fi = new FileInfo(Server.MapPath(newfile));
+                if (fi.Exists)
+                {
+                    fi.Delete();
+                }
+            }
+
+            return result;
+        }
+//        public string ImExcel_Verification_Data(string newfile, string fileName, string action, string cusno)
+//        {
+//            DataTable dtExcel = Extension.GetExcelData_Table(Server.MapPath(newfile), 0);
+//            DataTable dtExcel_sub = Extension.GetExcelData_Table(Server.MapPath(newfile), 1);
+
+
+//            if (dtExcel == null || dtExcel.Rows.Count <= 0 || dtExcel.Columns.Count != 7)
+//            {
+//                return "{success:false,error:'No Data'}";
+//            }
+//            //验证列名称
+//            string data = "";
+//            foreach (DataColumn column in dtExcel.Columns)
+//            {
+//                data = data + column.ColumnName.TrimEnd() + "/";
+//            }
+
+//            if (data != "报关单号/申报单位代码/征免性质/申报日期/贸易方式/经营单位代码/账册号/")
+//            {
+//                return "{success:false,error:'Columns Error'}";
+//            }
+//            //====================================================================================================
+//            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+
+//            //类型//地址//电话//客户全称
+//            string var1 = dtExcel.Rows[0][1].ToString(); string var2 = dtExcel.Rows[0][3].ToString(); string var3 = dtExcel.Rows[0][12].ToString(); string var4 = dtExcel.Rows[1][2].ToString();
+//            //客户地址//客户电话//发票号码//发票日期
+//            string var5 = dtExcel.Rows[1][7].ToString(); string var6 = dtExcel.Rows[1][14].ToString(); string var7 = dtExcel.Rows[2][2].ToString(); string var8 = dtExcel.Rows[2][5].ToString();
+//            //合同号码//合同日期//签约地//报关单号
+//            string var9 = dtExcel.Rows[2][8].ToString(); string var10 = dtExcel.Rows[2][12].ToString(); string var11 = dtExcel.Rows[2][15].ToString(); string var12 = dtExcel.Rows[3][2].ToString();
+//            //放行日期//退税日期//航次号//运输工具
+//            string var13 = dtExcel.Rows[3][5].ToString(); string var14 = dtExcel.Rows[3][9].ToString(); string var15 = dtExcel.Rows[3][12].ToString(); string var16 = dtExcel.Rows[4][2].ToString();
+
+//            //提运单号//出口日期//申报日期//贸易国
+//            string var17 = dtExcel.Rows[4][5].ToString(); string var18 = dtExcel.Rows[4][9].ToString(); string var19 = dtExcel.Rows[4][11].ToString(); string var20 = dtExcel.Rows[4][14].ToString();
+//            //经营单位//出口口岸//备案号//运输方式
+//            string var21 = dtExcel.Rows[5][2].ToString(); string var21_1 = dtExcel.Rows[5][4].ToString();
+//            string var22 = dtExcel.Rows[5][10].ToString(); string var23 = dtExcel.Rows[5][13].ToString(); string var24 = dtExcel.Rows[5][15].ToString();
+//            //发货单位//贸易方式//征免性质//运抵国
+//            string var25 = dtExcel.Rows[6][2].ToString(); string var25_1 = dtExcel.Rows[6][4].ToString();
+//            string var26 = dtExcel.Rows[6][10].ToString(); string var27 = dtExcel.Rows[6][13].ToString(); string var28 = dtExcel.Rows[7][3].ToString();
+//            //指运港//境内货源地//成交方式//运费
+//            string var29 = dtExcel.Rows[7][8].ToString(); string var30 = dtExcel.Rows[7][13].ToString(); string var31 = dtExcel.Rows[8][2].ToString();
+//            string var32 = dtExcel.Rows[8][5].ToString(); string var32_1 = dtExcel.Rows[8][6].ToString(); string var32_2 = dtExcel.Rows[8][7].ToString();
+
+//            //保费//杂费//许可证号//件数
+//            string var33 = dtExcel.Rows[8][9].ToString(); string var33_1 = dtExcel.Rows[8][10].ToString(); string var33_2 = dtExcel.Rows[8][11].ToString();
+//            string var34 = dtExcel.Rows[8][13].ToString(); string var34_1 = dtExcel.Rows[8][14].ToString(); string var34_2 = dtExcel.Rows[8][15].ToString();
+//            string var35 = dtExcel.Rows[9][2].ToString(); string var36 = dtExcel.Rows[9][5].ToString();
+//            //包装种类//毛重//净重//备注
+//            string var37 = dtExcel.Rows[9][9].ToString(); string var38 = dtExcel.Rows[9][11].ToString(); string var39 = dtExcel.Rows[9][14].ToString(); string var40 = dtExcel.Rows[10][2].ToString();
+//            //特殊关系确认//价格影响确认//支付特许权使用费确认//报关类型
+//            string var41 = dtExcel.Rows[10][8].ToString(); string var42 = dtExcel.Rows[10][10].ToString(); string var43 = dtExcel.Rows[10][13].ToString(); string var44 = dtExcel.Rows[10][15].ToString();
+//            if (var41 == "是") { var41 = "1"; } else if (var41 == "否") { var41 = "0"; } else { var41 = "9"; }
+//            if (var42 == "是") { var42 = "1"; } else if (var42 == "否") { var42 = "0"; } else { var42 = "9"; }
+//            if (var43 == "是") { var43 = "1"; } else if (var43 == "否") { var43 = "0"; } else { var43 = "9"; }
+
+
+//            //基础资料 获取code
+//            //string jsonstr = Extension.Ini_Base_Data(json_user, "predata", "");
+//            //JObject json = (JObject)JsonConvert.DeserializeObject(jsonstr);
+
+//            //贸易方式//出口口岸
+//            //string var26_code = getStatusCode(var26, json.Value<JArray>("myfs"));
+//            //string var22_code = getStatusCode(var22, json.Value<JArray>("sbgq"));
+//            //报关类型string var44_code = getStatusCode(var44, json.Value<JArray>("bgfs"));
+
+
+//            //企业编号            
+//            if (action == "add") { cusno = getcusno(); }
+
+//            //类型//合同号码//航次号//运输工具//提运单号//出口日期
+//            //申报日期//贸易国//出口口岸//备案号//运输方式
+//            //发货单位//贸易方式//征免性质//运抵国
+//            //指运港//境内货源地//成交方式//运费
+//            //保费//杂费
+//            //许可证号//件数//包装种类//毛重//净重
+//            //报关类型//文件路径//原始文件名//委托单位代码//委托单位名称
+//            //备注//特殊关系确认//价格影响确认//支付特许权使用费确认
+//            string sql = @"insert into list_predata(ID,ISINVALID,CREATETIME,FLAG,CUSNO
+//                            ,INOUTTYPE,CONTRACTNO,VOYAGENO,TRANSNAME,BLNO,INOUTDATE
+//                            ,REPDATE,TRADECOUNTRYNAME,PORTNAME,RECORDCODE,TRANSMODEL
+//                            ,BUSIUNITCODE,BUSIUNITNAME,TRADENAME,EXEMPTIONNAME,SECOUNTRYNAME
+//                            ,SEPORTNAME,SEPLACENAME,TRADETERMSNAME,FGCODE,FGNAME
+//                            ,FREIGHT,FGUNITNAME,IPCODE,IPNAME,INSURANCEPREMIUM
+//                            ,IPUNITNAME,AECODE,AENAME,ADDITIONALEXPENSES,AEUNITNAME
+//                            ,LICENSENO,GOODSNUM,PACKAGENAME,GOODSGW,GOODSNW
+//                            ,DECLWAY,FILEPATH,OLDFILENAME,CUSTOMERCODE,CUSTOMERNAME
+//                            ,REMARK,SPECIALRELATION,PRICEIMPACT,PAYPOYALTIES
+//                        ) VALUES ( LIST_PREDATA_ID.Nextval,0,sysdate,0,'" + cusno + @"'
+//                            ,'{0}','{1}','{2}','{3}','{4}',to_date('{5}','yyyy/mm/dd')
+//                            ,to_date('{6}','yyyy/mm/dd'),'{7}','{8}','{9}','{10}'
+//                            ,'{11}','{12}','{13}','{14}','{15}'
+//                            ,'{16}','{17}','{18}','{19}','{20}'
+//                            ,'{21}','{22}','{23}','{24}','{25}'
+//                            ,'{26}','{27}','{28}','{29}','{30}'
+//                            ,'{31}','{32}','{33}','{34}','{35}'
+//                            ,'{36}','{37}','{38}','{39}','{40}'
+//                            ,'{41}','{42}','{43}','{44}')";
+
+//            sql = string.Format(sql, var1, var9, var15, var16, var17, var18
+//                                , var19, var20, var22, var23, var24
+//                                , var25, var25_1, var26, var27, var28
+//                                , var29, var30, var31, var32.Substring(0, 1), var32.Substring(2)
+//                                , var32_1, var32_2, var33.Substring(0, 1), var33.Substring(2), var33_1
+//                                , var33_2, var34.Substring(0, 1), var34.Substring(2), var34_1, var34_2
+//                                , var35, var36, var37, var38, var39
+//                                , var44, newfile.Substring(1), fileName, json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
+//                                , var40, var41, var42, var43);
+
+//            OracleConnection conn = null;
+//            OracleTransaction ot = null;
+//            string result = "{success:true}";
+//            try
+//            {
+//                conn = DBMgr.getOrclCon();
+//                conn.Open();
+//                ot = conn.BeginTransaction();
+
+//                //更新，需要作废前一笔数据；正式表数据需要作废（撤回）
+//                if (action == "update")
+//                {
+//                    ISINVALID_Predata(cusno, conn);
+//                    cancel_pub(cusno, conn);
+//                }
+
+//                int recount = DBMgr.ExecuteNonQuery(sql, conn);
+//                if (recount > 0)
+//                {
+
+//                    //项号//商品编码//商品名称//商品规格//净重
+//                    //成交数量//法一数量//法二数量//成交单位//法一单位
+//                    //法二单位//原产国//总价//单价//币制
+//                    //征免//目的国//企业编号（外键）              
+
+//                    string sql_detail = @"insert into list_predata_sub(ID,ISINVALID,CREATEDATE,FLAG
+//                            ,ORDERNO,COMMODITYNO,ADDITIONALNO,COMMODITYCHNAME,SPECIFICATIONSMODEL,GOODSNW
+//                            ,CADQUANTITY,LEGALQUANTITY,SQUANTITY,CADUNITNAME,LEGALUNITNAME
+//                            ,SUNITNAME,COUNTRYORIGINNAME,TOTALPRICE,UNITPRICE,CURRENCYNAME
+//                            ,TAXPAIDNAME,DESTCOUNTRYNAME,PCODE
+//                        ) VALUES (LIST_PREDATA_SUB_ID.Nextval,0,sysdate,0
+//                            ,'{0}','{1}','{2}','{3}','{4}','{5}'
+//                            ,'{6}','{7}','{8}','{9}','{10}'
+//                            ,'{11}','{12}','{13}','{14}','{15}'
+//                            ,'{16}','{17}','{18}')";
+//                    /*暂时不用：//成交单位CODE//法一单位CODE//法二单位CODE//,CADUNITCODE,LEGALUNITCODE,SUNITCODE    
+//                    //JArray ja_unit = json.Value<JArray>("unit");//,'{19}','{20}','{21}' */
+
+//                    for (int j = 12; j < dtExcel.Rows.Count; j = j + 3)
+//                    {
+//                        if (dtExcel.Rows[j][1].ToString().Trim() == "")
+//                        {
+//                            break;
+//                        }
+
+//                        sql = string.Format(sql_detail
+//                            , dtExcel.Rows[j][0].ToString(), dtExcel.Rows[j][1].ToString().Substring(0, 8), dtExcel.Rows[j][1].ToString().Substring(8), dtExcel.Rows[j][2].ToString(), dtExcel.Rows[j][4].ToString(), dtExcel.Rows[j][8].ToString()
+//                            , dtExcel.Rows[j][9].ToString(), dtExcel.Rows[j + 1][9].ToString(), dtExcel.Rows[j + 2][9].ToString(), dtExcel.Rows[j][10].ToString(), dtExcel.Rows[j + 1][10].ToString()
+//                            , dtExcel.Rows[j + 2][10].ToString(), dtExcel.Rows[j][11].ToString(), dtExcel.Rows[j][12].ToString(), dtExcel.Rows[j][13].ToString(), dtExcel.Rows[j][14].ToString()
+//                            , dtExcel.Rows[j][15].ToString(), dtExcel.Rows[j][16].ToString(), cusno
+//                            );/*, getStatusCodebyname(dtExcel.Rows[j][10].ToString(), ja_unit), getStatusCodebyname(dtExcel.Rows[j + 1][10].ToString(), ja_unit)
+//                        , getStatusCodebyname(dtExcel.Rows[j + 2][10].ToString(), ja_unit)*/
+//                        DBMgr.ExecuteNonQuery(sql, conn);
+//                    }
+//                }
+
+//                if (action == "update")//更新上传 需要判断之前的数据已经提交
+//                {
+//                    if (GetDeclStatus(cusno) == "{success:false}")//再次及时判断一次报关状态
+//                    {
+//                        ot.Commit();
+//                    }
+//                    else
+//                    {
+//                        ot.Rollback();
+//                        result = "{success:false,error:'状态已经是预录中，不能更新数据'}";
+//                    }
+
+//                }
+//                else
+//                {
+//                    ot.Commit();
+//                }
+
+//            }
+//            catch (Exception ex)
+//            {
+//                ot.Rollback();
+//                result = "{success:false,error:'" + ex.Message + "'}";
+
+//            }
+//            finally
+//            {
+//                conn.Close();
+//            }
+//            return result;
+//        }
+
+        #endregion
+
+
     }
 }

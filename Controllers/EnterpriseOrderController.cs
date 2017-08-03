@@ -24,6 +24,7 @@ using LumiSoft.Net.MIME;
 using System.IO;
 using MvcPlatform.MethodSvc;
 using Oracle.ManagedDataAccess.Client;
+using MvcPlatform.MethodSvc;
 
 namespace MvcPlatform.Controllers
 {
@@ -121,14 +122,14 @@ namespace MvcPlatform.Controllers
 
         public ActionResult ListPreData()
         {
-            ViewBag.navigator = "业务管理>>预录导入";
+            ViewBag.navigator = "订单中心>>预录导入";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
 
         public ActionResult ListPreDataDetail()
         {
-            ViewBag.navigator = "业务管理>>预录导入";
+            ViewBag.navigator = "订单中心>>预录导入";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
@@ -666,7 +667,7 @@ namespace MvcPlatform.Controllers
 
 
 
-            DataTable dtExcel = ExcelToDatatalbe(Server.MapPath(filepath));
+            DataTable dtExcel = Extension.GetExcelData_Table(Server.MapPath(filepath),0);
 
 
             /* string strConn = string.Format("Provider=Microsoft.Jet.OLEDB.{0}.0;" +
@@ -843,16 +844,6 @@ namespace MvcPlatform.Controllers
             return newdt;
         }
 
-        public DataTable ExcelToDatatalbe(string filePath)
-        {
-            Workbook book = new Workbook(filePath);
-            //book.Open(filePath);
-            Worksheet sheet = book.Worksheets[0];
-            Cells cells = sheet.Cells;
-            DataTable dt_Import = cells.ExportDataTableAsString(0, 0, cells.MaxDataRow + 1, cells.MaxDataColumn + 1, true);//获取excel中的数据保存到一个datatable中
-            return dt_Import;
-
-        }
         public string DealCode()
         {
             string flag = string.Empty;
@@ -1743,7 +1734,11 @@ namespace MvcPlatform.Controllers
 
             where += @" and lp.customercode ='" + json_user.Value<string>("CUSTOMERCODE") + "' ";
 
-            string sql = @"select lp.* from list_predata lp";
+            string sql = @"select lp.*,lo.busitype,ld.STATUS,ld.CUSTOMSSTATUS,ld.ordercode,ld.code,lda.declarationcode 
+                        from list_predata lp 
+                            left join list_order lo on lp.cusno=lo.cusno and lo.ISINVALID=0 
+                            left join list_declaration ld on lp.cusno=ld.cusno and ld.ISINVALID=0
+                            left join list_declaration_after lda on ld.code=lda.code and lda.csid=1";
 
             sql += " where lp.ISINVALID=0 " + where;
 
@@ -1757,7 +1752,7 @@ namespace MvcPlatform.Controllers
             iso.DateTimeFormat = "yyyy-MM-dd";
             string sql = QueryConditionPreData();
 
-            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "DESC"));
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "lp.CREATETIME", "DESC"));
             var json = JsonConvert.SerializeObject(dt, iso);
 
             return "{rows:" + json + ",total:" + totalProperty + "}";
@@ -1808,11 +1803,11 @@ namespace MvcPlatform.Controllers
             string result = "";
             if (json_formdata.Value<string>("RADIO_MODULE") == "1")
             {
-                result = ModuleOne(newfile, fileName, action, cusno);
+                result = ModuleOne(newfile, fileName, action, cusno, json_formdata);
             }
             if (json_formdata.Value<string>("RADIO_MODULE") == "2")
             {
-                result = ModuleTwo(newfile, fileName, action, cusno);
+                result = ModuleTwo(newfile, fileName, action, cusno, json_formdata);
             }
 
             if (result != "{success:true}")//上传不成功，删除源文件
@@ -1860,9 +1855,9 @@ namespace MvcPlatform.Controllers
             DBMgr.ExecuteNonQuery("update list_order set ISINVALID=1 where cusno='" + cusno + "' and ISINVALID=0", conn);
         }
 
-        public string ModuleOne(string newfile, string fileName, string action, string cusno)
+        public string ModuleOne(string newfile, string fileName, string action, string cusno, JObject json_formdata)
         {
-            DataTable dtExcel = ExcelToDatatalbe(Server.MapPath(newfile));
+            DataTable dtExcel = Extension.GetExcelData_Table(Server.MapPath(newfile),0);
 
             //Rows：表头11行+一行表体列名+至少一行表体数据；Columns：18列
             if (dtExcel == null || dtExcel.Rows.Count < 13 || dtExcel.Columns.Count != 17)
@@ -1948,7 +1943,8 @@ namespace MvcPlatform.Controllers
                             ,IPUNITNAME,AECODE,AENAME,ADDITIONALEXPENSES,AEUNITNAME
                             ,LICENSENO,GOODSNUM,PACKAGENAME,GOODSGW,GOODSNW
                             ,DECLWAY,FILEPATH,OLDFILENAME,CUSTOMERCODE,CUSTOMERNAME
-                            ,REMARK,SPECIALRELATION,PRICEIMPACT,PAYPOYALTIES
+                            ,REMARK,SPECIALRELATION,PRICEIMPACT,PAYPOYALTIES,DOCSERVICECODE
+                            ,DOCSERVICENAME
                         ) VALUES ( LIST_PREDATA_ID.Nextval,0,sysdate,0,'" + cusno + @"'
                             ,'{0}','{1}','{2}','{3}','{4}',to_date('{5}','yyyy/mm/dd')
                             ,to_date('{6}','yyyy/mm/dd'),'{7}','{8}','{9}','{10}'
@@ -1958,7 +1954,8 @@ namespace MvcPlatform.Controllers
                             ,'{26}','{27}','{28}','{29}','{30}'
                             ,'{31}','{32}','{33}','{34}','{35}'
                             ,'{36}','{37}','{38}','{39}','{40}'
-                            ,'{41}','{42}','{43}','{44}')";
+                            ,'{41}','{42}','{43}','{44}','{45}'
+                            ,'{46}')";
 
             sql = string.Format(sql, var1, var9, var15, var16, var17, var18
                                 , var19, var20, var22, var23, var24
@@ -1968,7 +1965,9 @@ namespace MvcPlatform.Controllers
                                 , var33_2, var34.Substring(0, 1), var34.Substring(2), var34_1, var34_2
                                 , var35, var36, var37, var38, var39
                                 , var44, newfile.Substring(1), fileName, json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
-                                , var40, var41, var42, var43);
+                                , var40, var41, var42, var43, json_formdata.Value<string>("DOCSERVICECODE")
+                                , json_formdata.Value<string>("DOCSERVICENAME")
+                                );
 
             OracleConnection conn = null;
             OracleTransaction ot = null;
@@ -2058,9 +2057,9 @@ namespace MvcPlatform.Controllers
             return result;
         }
 
-        public string ModuleTwo(string newfile, string fileName, string action, string cusno)
+        public string ModuleTwo(string newfile, string fileName, string action, string cusno, JObject json_formdata)
         {
-            DataTable dtExcel = ExcelToDatatalbe(Server.MapPath(newfile));
+            DataTable dtExcel = Extension.GetExcelData_Table(Server.MapPath(newfile),0);
 
             //Rows：表头11行+一行表体列名+至少一行表体数据；Columns：18列
             if (dtExcel == null || dtExcel.Rows.Count < 12 || dtExcel.Columns.Count != 35)
@@ -2131,7 +2130,7 @@ namespace MvcPlatform.Controllers
                             ,SEPORTNAME,SEPLACENAME,REMARK,TRADETERMSNAME,LICENSENO
                             ,TRADECOUNTRYNAME,PACKAGENAME,GOODSGW,GOODSNW,GOODSNUM
                             ,SPECIALRELATION,PRICEIMPACT,PAYPOYALTIES,FILEPATH,OLDFILENAME
-                            ,CUSTOMERCODE,CUSTOMERNAME                            
+                            ,CUSTOMERCODE,CUSTOMERNAME,DOCSERVICECODE,DOCSERVICENAME                            
                         ) VALUES ( LIST_PREDATA_ID.Nextval,0,sysdate,0,'" + cusno + @"'
                             ,'{0}','{1}','{2}','{3}',to_date('{4}','yyyy/mm/dd'),'{5}'
                             ,'{6}','{7}','{8}','{9}','{10}'
@@ -2139,7 +2138,7 @@ namespace MvcPlatform.Controllers
                             ,'{16}','{17}','{18}','{19}','{20}'
                             ,'{21}','{22}','{23}','{24}','{25}'
                             ,'{26}','{27}','{28}','{29}','{30}'
-                            ,'{31}','{32}'
+                            ,'{31}','{32}','{33}','{34}'
                             )";
             sql = string.Format(sql, var1, var2, var4, var5, var6, var7
                                , var7_1, var8, var9, var10, var11
@@ -2147,7 +2146,7 @@ namespace MvcPlatform.Controllers
                                , var17, var18, var19, var20, var21
                                , var22, var23, var24, var25, var27
                                , var28, var29, var30, newfile.Substring(1), fileName
-                               , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
+                               , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json_formdata.Value<string>("DOCSERVICECODE"), json_formdata.Value<string>("DOCSERVICENAME")
                                );
 
             OracleConnection conn = null;
@@ -2396,6 +2395,73 @@ namespace MvcPlatform.Controllers
             catch (Exception ex)
             {
                 result = "{success:false,error:'" + ex.Message + "'}";
+
+            }
+            return result;
+
+        }
+
+        public string Declare_Pre()
+        {
+            string result = "{success:false}";
+
+            try
+            {
+                JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+                string cusno = Request["cusno"]; string ordercode = Request["ordercode"]; string declcode = Request["declcode"];
+                string sql = "";
+
+                MethodSvc.MethodServiceClient msc = new MethodSvc.MethodServiceClient();
+                msc.ChangeStatus(100, ordercode, json_user.Value<int>("ID"), json_user.Value<string>("REALNAME"), declcode, 0);
+
+                //更新task_bgd数据 
+                sql = "update TASK_BGD set SBZT='1',SBSJHQ='1',SBSJ=sysdate,SBRY='{1}',RWRY='{1}' where DJBM='{0}'";
+                sql = string.Format(sql, declcode, json_user.Value<string>("NAME"));
+                DBMgr.ExecuteNonQuery(sql);
+
+                //删除task_zt数据 
+                DBMgr.ExecuteNonQuery("delete TASK_ZT where DJBM='" + declcode + "'");
+
+                //插入task_zt数据 
+                DataTable dt = new DataTable();
+                dt = DBMgr.GetDataTable(@"select ld.DECLTYPE,ld.CURRENTCODE,lo.REPUNITCODE 
+                                            from list_declaration ld 
+                                                left join list_order lo on ld.ordercode=lo.code 
+                                            where ld.code='" + declcode + "'");
+                string DECLTYPE = "", CURRENTCODE = "", REPUNITCODE = "";
+                if (dt.Rows.Count > 0)
+                {
+                    DECLTYPE = dt.Rows[0]["DECLTYPE"].ToString();
+                    CURRENTCODE = dt.Rows[0]["CURRENTCODE"].ToString();
+                    REPUNITCODE = dt.Rows[0]["REPUNITCODE"].ToString();
+                }
+                string SBKB = "";
+                if (DECLTYPE == "1" || DECLTYPE == "3" || DECLTYPE == "5" || DECLTYPE == "7" || DECLTYPE == "9" || DECLTYPE == "11")
+                {
+                    SBKB = "0";
+                }
+                else if (DECLTYPE == "2" || DECLTYPE == "4" || DECLTYPE == "6" || DECLTYPE == "8" || DECLTYPE == "10" || DECLTYPE == "12" || DECLTYPE == "19")
+                {
+                    SBKB = "1";
+                }
+                else if (DECLTYPE == "13" || DECLTYPE == "15" || DECLTYPE == "17")
+                {
+                    SBKB = "2";
+                }
+                else if (DECLTYPE == "16" || DECLTYPE == "14" || DECLTYPE == "18")
+                {
+                    SBKB = "3";
+                }
+
+                sql = @"insert into TASK_ZT(DJBM,SBKB,ZCTY_NO,RWRY,RWSJ,KSCX,WCBZ,SBDW_NO) 
+                            values('{0}','{1}','{2}','{3}',sysdate,'0','0','{4}')";
+                sql = string.Format(sql, declcode, SBKB, CURRENTCODE, json_user.Value<string>("NAME"), REPUNITCODE);
+                DBMgr.ExecuteNonQuery(sql);
+
+                result = "{success:true}";
+            }
+            catch (Exception ex)
+            {
 
             }
             return result;

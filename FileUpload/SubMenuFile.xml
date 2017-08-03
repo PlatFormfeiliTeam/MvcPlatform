@@ -308,6 +308,9 @@
   <rootmenu>
     <menu>/EnterpriseOrder/ListPreData</menu>
     <submenu>/EnterpriseOrder/ListPreDataDetail</submenu>
+    <submenu>/EnterpriseOrder/ImportExcelData</submenu>
+    <submenu>/Common/FileConsult_Pre</submenu>
+    <submenu>/Common/MultiPrint?menuxml=dec_mul_pre</submenu>
   </rootmenu> 
 
     
