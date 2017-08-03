@@ -1700,10 +1700,10 @@ namespace MvcPlatform.Controllers
 
         }
 
-        public int getLogisticStatus(string totalno, string divdeno)
+        public string getLogisticStatus(string totalno, string divdeno)
         {
             MethodServiceClient msc = new MethodServiceClient();
-            int result = msc.Update_Blno_Status(totalno, divdeno);
+            string result = msc.Update_Blno_Status(totalno, divdeno);
             return result;
         }
 

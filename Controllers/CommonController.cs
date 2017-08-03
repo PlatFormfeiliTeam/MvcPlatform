@@ -328,7 +328,7 @@ namespace MvcPlatform.Controllers
                     case "LOGISTICSSTATUS":
                         if (!string.IsNullOrEmpty(Request["VALUE3"]))
                         {
-                            where += " and a.LOGISTICSSTATUS='" + Request["VALUE3"]+ "'";
+                            where += " and to_number(nvl(a.LOGISTICSSTATUS,0))" + Request["VALUE3"];
                         }
                         break;
                 }
@@ -464,7 +464,7 @@ namespace MvcPlatform.Controllers
                     case "LOGISTICSSTATUS":
                         if (!string.IsNullOrEmpty(Request["VALUE7"]))
                         {
-                            where += " and a.LOGISTICSSTATUS='" + Request["VALUE7"] + "'";
+                            where += " and to_number(nvl(a.LOGISTICSSTATUS,0))" + Request["VALUE7"];
                         }
                         break;
                 }
