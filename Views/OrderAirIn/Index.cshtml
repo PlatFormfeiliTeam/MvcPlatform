@@ -235,7 +235,8 @@
             tab_1_store = Ext.create("Ext.data.JsonStore", {
                 fields: ['ID', 'MSG', 'OPERATER', 'OPERATE_TYPE', 'OPERATE_RESULT', 'OPERATE_DATE'],
                 data: data_kazt
-            }).sort([
+            });
+            tab_1_store.sort([
                     {
                         property: 'OPERATE_DATE',
                         direction: 'ASC'

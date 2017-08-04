@@ -672,7 +672,8 @@ function showLogisticStatus(totalno,divdeno)
              fields: ['ID', 'MSG', 'OPERATER', 'OPERATE_TYPE', 'OPERATE_RESULT', 'OPERATE_DATE'],
              //data: store_logistic.getGroups("抽单状态") == undefined ? [] : store_logistic.getGroups("抽单状态").children
              data:data_kazt
-         }).sort([
+         });
+         tab_1_store.sort([
                     {
                         property: 'OPERATE_DATE',
                         direction: 'ASC'
