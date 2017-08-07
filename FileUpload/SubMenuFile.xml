@@ -311,7 +311,12 @@
     <submenu>/EnterpriseOrder/ImportExcelData</submenu>
     <submenu>/Common/FileConsult_Pre</submenu>
     <submenu>/Common/MultiPrint?menuxml=dec_mul_pre</submenu>
-  </rootmenu> 
+  </rootmenu>
 
-    
+  <!-- 核销比对-->
+  <rootmenu>
+    <menu>/Common/VerificationList</menu>
+    <submenu>/Common/ImExcel_Verification</submenu>
+  </rootmenu>
+  
 </rootmenulist>
