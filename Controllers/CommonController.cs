@@ -4414,8 +4414,10 @@ namespace MvcPlatform.Controllers
             postedFile.SaveAs(Server.MapPath(newfile));
 
             string result = "";
+            DataTable dtExcel = Extension.GetExcelData_Table(Server.MapPath(newfile), 0);
+            DataTable dtExcel_sub = Extension.GetExcelData_Table(Server.MapPath(newfile), 1);
 
-            result = ImExcel_Verification_Data(newfile, fileName);           
+            result = ImExcel_Verification_Data(dtExcel, dtExcel_sub, "线下");           
 
             if (result != "{success:true}")//上传不成功，删除源文件
             {
@@ -4429,12 +4431,8 @@ namespace MvcPlatform.Controllers
             return result;
         }
 
-        public string ImExcel_Verification_Data(string newfile, string fileName)
+        public string ImExcel_Verification_Data(DataTable dtExcel, DataTable dtExcel_sub, string datadource)
         {
-            DataTable dtExcel = Extension.GetExcelData_Table(Server.MapPath(newfile), 0);
-            DataTable dtExcel_sub = Extension.GetExcelData_Table(Server.MapPath(newfile), 1);
-
-
             if (dtExcel == null || dtExcel.Rows.Count <= 0)
             {
                 return "{success:false,error:'导入资料为空'}";
@@ -4469,7 +4467,7 @@ namespace MvcPlatform.Controllers
             string result = "{success:true,json:[]}";
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
 
-            string datadource = "线下", status = "待比对";
+            string status = "待比对";
             string createuserid = json_user.Value<string>("ID"), createusername = json_user.Value<string>("REALNAME"), customercode = json_user.Value<string>("CUSTOMERCODE");
 
             string declarationcode = "", repunitcode = "", kindoftax = "", reptime = "", trademethod = "", busiunitcode = "", recordcode = "";
