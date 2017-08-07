@@ -404,7 +404,9 @@ function gridpanelBind() {
     var store = Ext.create('Ext.data.JsonStore', {
         fields: ['ID', 'PREDECLCODE', 'DECLARATIONCODE', 'CUSTOMSSTATUS', 'CODE', 'MODIFYFLAG', 'REPTIME', 'TRANSNAME', 'BUSIUNITCODE', 'CUSTOMERNAME', 'IETYPE',
                 'BUSIUNITNAME', 'PORTCODE', 'BLNO', 'REPWAYID', 'REPWAYNAME', 'DECLWAY', 'DECLWAYNAME', 'TRADEMETHOD', 'CONTRACTNO', 'GOODSNUM',
-                'GOODSNW', 'GOODSGW', 'SHEETNUM', 'ORDERCODE', 'CUSNO', 'ASSOCIATENO', 'CORRESPONDNO', 'BUSITYPE', 'CONTRACTNOORDER', 'REPUNITNAME'],
+                'GOODSNW', 'GOODSGW', 'SHEETNUM', 'ORDERCODE', 'CUSNO', 'ASSOCIATENO', 'CORRESPONDNO', 'BUSITYPE', 'CONTRACTNOORDER', 'REPUNITNAME',
+                'VERSTATUS'
+                ],
         pageSize: 22,
         proxy: {
             type: 'ajax',
@@ -702,4 +704,8 @@ function Searchstatus() {
     var index = Ext.getCmp('declare_grid').store.indexOf(recs[0]);
     var currentPage = Ext.getCmp('declare_grid').store.currentPage
     openrwindow("/Common/ClearanceStatus?menuxml=ent_dec_cle_no_domestic&id=" + id + "&rowIndex=" + index + "&currentPage=" + currentPage, 1200, 800);
+}
+
+function VerificationList() {
+
 }

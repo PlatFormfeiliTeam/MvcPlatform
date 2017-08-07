@@ -3816,7 +3816,7 @@ namespace MvcPlatform.Controllers
                               lda.trademethod,lda.declkind DECLWAY,lda.declkind DECLWAYNAME,lda.REPUNITNAME,
                               ort.BUSITYPE,ort.CONTRACTNO CONTRACTNOORDER,ort.REPWAYID,ort.REPWAYID REPWAYNAME,ort.CUSNO,
                               ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.customercode,ort.CUSTOMERNAME,ort.CREATETIME, 
-                              ort.REPNO    
+                              ort.REPNO ,lv.status VERSTATUS   
                            from list_declaration det 
                                 left join list_order ort on det.ordercode = ort.code 
 								left join list_declaration_after lda on det.code=lda.code and lda.csid=1
@@ -3824,7 +3824,8 @@ namespace MvcPlatform.Controllers
                                 /* left join (
                                       select ASSOCIATENO from list_order l inner join list_declaration i on l.code=i.ordercode 
                                       where l.ASSOCIATENO is not null and l.isinvalid=0 and i.isinvalid=0 and (i.STATUS!=130 and i.STATUS!=110)    
-									   ) b on ort.ASSOCIATENO=b.ASSOCIATENO */
+									   ) b on ort.ASSOCIATENO=b.ASSOCIATENO */ 
+                                left join list_verification lv on lda.declarationcode=lv.declarationcode 
                            where (det.STATUS=130 or det.STATUS=110) and det.isinvalid=0 and ort.isinvalid=0 " + where +
                         @"  and a.ordercode is null 
                             /*and b.ASSOCIATENO is null*/ ";
@@ -4037,7 +4038,8 @@ namespace MvcPlatform.Controllers
                               lda.trademethod,lda.declkind DECLWAY,lda.declkind DECLWAYNAME,lda.REPUNITNAME,
                               ort.BUSITYPE,ort.CONTRACTNO CONTRACTNOORDER,ort.REPWAYID,ort.REPWAYID REPWAYNAME,ort.CUSNO,
                               ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.customercode,ort.CUSTOMERNAME,ort.CREATETIME, 
-                              ort.REPNO,c.code ordercode_ass,c.busiunitcode busiunitcode_ass,c.busiunitname busiunitname_ass       
+                              ort.REPNO,c.code ordercode_ass,c.busiunitcode busiunitcode_ass,c.busiunitname busiunitname_ass,    
+                              lv.status VERSTATUS      
                            from list_declaration det 
                                 left join list_order ort on det.ordercode = ort.code 
 								left join list_declaration_after lda on det.code=lda.code and lda.csid=1
@@ -4051,7 +4053,8 @@ namespace MvcPlatform.Controllers
                                                     left join list_declaration ldc on ort2.code=ldc.ordercode
                                                     left join list_declaration_after ldaf on ldc.code=ldaf.code and ldaf.csid=1
                                             where ort2.isinvalid=0 and ldc.isinvalid=0
-                                            )c on ort.ASSOCIATENO = c.ASSOCIATENO and ort.code<>c.code
+                                            )c on ort.ASSOCIATENO = c.ASSOCIATENO and ort.code<>c.code 
+                                left join list_verification lv on lda.declarationcode=lv.declarationcode 
                            where (det.STATUS=130 or det.STATUS=110) and det.isinvalid=0 and ort.isinvalid=0 " + where +
                         @"  and a.ordercode is null 
                             and b.ASSOCIATENO is null ";
