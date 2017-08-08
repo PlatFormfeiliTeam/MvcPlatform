@@ -434,10 +434,21 @@ function gridpanelBind() {
                     CONDITION8: Ext.getCmp('CONDITION8').getValue(),
                     VALUE8_1: Ext.Date.format(Ext.getCmp("CONDITION8_1").getValue(), 'Y-m-d H:i:s'),
                     VALUE8_2: Ext.Date.format(Ext.getCmp("CONDITION8_2").getValue(), 'Y-m-d H:i:s')
+
                 }
             },
             load: function () {
                 socialcreditno = store.getProxy().getReader().rawData.socialcreditno;
+                if (socialcreditno == "true") {
+                    document.getElementById("btn_VerificationList").disabled = false;
+                    Ext.getCmp('declare_grid').columns[2].setVisible(true);
+                } else {
+                    document.getElementById("btn_VerificationList").disabled = true;
+                    Ext.getCmp('declare_grid').columns[2].setVisible(false);
+                }
+
+
+
             }
         }
     });
@@ -448,37 +459,11 @@ function gridpanelBind() {
         displayInfo: true
     });
     var columns_old;
-    if (socialcreditno == "true") {
-        columns_old = [
-         { xtype: 'rownumberer', width: 35 },
-         { header: 'ID', dataIndex: 'ID', sortable: true, hidden: true },
-         { header: '海关状态', dataIndex: 'CUSTOMSSTATUS', width: 90, locked: true },
-         { header: '比对状态', dataIndex: 'VERSTATUS', width: 90, locked: true },
-         { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 140, locked: true, renderer: render },
-         { header: '申报单位', dataIndex: 'REPUNITNAME', width: 200 },
-         { header: '合同发票号', dataIndex: 'CONTRACTNOORDER', width: 140, locked: true, },
-         { header: '申报日期', dataIndex: 'REPTIME', width: 140 },
-         { header: '运输工具名称', dataIndex: 'TRANSNAME', width: 150, renderer: render },
-         { header: '业务类型', dataIndex: 'BUSITYPE', width: 90, renderer: render },// 业务类型
-         { header: '进出口岸', dataIndex: 'PORTCODE', width: 80 },
-         { header: '提运单号', dataIndex: 'BLNO', width: 180 },
-         { header: '申报方式', dataIndex: 'REPWAYNAME', width: 100, renderer: render },
-         { header: '报关方式', dataIndex: 'DECLWAYNAME', width: 100, renderer: render },
-         { header: '贸易方式', dataIndex: 'TRADEMETHOD', width: 80 },
-         { header: '合同协议号', dataIndex: 'CONTRACTNO', width: 110 },
-         { header: '件数', dataIndex: 'GOODSNUM', width: 60 },
-         { header: '重量', dataIndex: 'GOODSGW', width: 60 },
-         { header: '张数', dataIndex: 'SHEETNUM', width: 60 },
-         { header: '删改单', dataIndex: 'MODIFYFLAG', width: 60, renderer: render },
-         { header: '订单编号', dataIndex: 'ORDERCODE', width: 100 },
-         { header: '客户编号', dataIndex: 'CUSNO', width: 125 }
-        ];
-    }
-    else {
         columns_old = [
         { xtype: 'rownumberer', width: 35 },
         { header: 'ID', dataIndex: 'ID', sortable: true, hidden: true },
         { header: '海关状态', dataIndex: 'CUSTOMSSTATUS', width: 90, locked: true },
+        { header: '比对状态', dataIndex: 'VERSTATUS', width: 90, locked: true},
         { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 140, locked: true, renderer: render },
         { header: '申报单位', dataIndex: 'REPUNITNAME', width: 200 },
         { header: '合同发票号', dataIndex: 'CONTRACTNOORDER', width: 140, locked: true, },
@@ -498,8 +483,6 @@ function gridpanelBind() {
         { header: '订单编号', dataIndex: 'ORDERCODE', width: 100 },
         { header: '客户编号', dataIndex: 'CUSNO', width: 125 }
         ];
-        document.getElementById("btn_VerificationList").disabled = true;
-    }
 
     var gridpanel = Ext.create('Ext.grid.Panel', {
         id: 'declare_grid',
