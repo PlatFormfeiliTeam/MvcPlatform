@@ -60,6 +60,16 @@ namespace MvcPlatform.Common
             return (JObject)JsonConvert.DeserializeObject(result);
         }
 
+        public static bool Check_Customer(string customerid)//true:有权限，false无权限
+        {
+            DataTable dt = DBMgrBase.GetDataTable("select * from sys_customer where id='" + customerid + "'");
+            if (dt.Rows[0]["SOCIALCREDITNO"].ToString() == "N")
+            {
+                return false;
+            }
+            return true;
+        }
+
         //获取订单CODE
         public static string getOrderCode()
         {
