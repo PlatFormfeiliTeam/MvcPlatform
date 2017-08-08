@@ -3627,13 +3627,15 @@ namespace MvcPlatform.Controllers
         
         public string LoadDeclarationList_E()
         {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            bool socialcreditno=Extension.Check_Customer(json_user.Value<string>("CUSTOMERID"));
             string sql = QueryConditionDecl_E();          
 
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             var json = JsonConvert.SerializeObject(dt, iso);
-            return "{rows:" + json + ",total:" + totalProperty + "}";
+            return "{rows:" + json + ",total:" + totalProperty + ",socialcreditno:" + socialcreditno +"}";
         }
 
         //导出全部报关单文件
@@ -4399,6 +4401,17 @@ namespace MvcPlatform.Controllers
             var json = JsonConvert.SerializeObject(dt, iso);
 
             return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
+        public string dec_Verification(string declarationcode_list, string predeclcode_list)
+        {
+            declarationcode_list = declarationcode_list.TrimStart('[').TrimEnd(']').Replace("\"","'");
+            predeclcode_list = predeclcode_list.TrimStart('[').TrimEnd(']').Replace("\"", "'");
+            DataTable dt = DBMgr.GetDataTable("select DECLARATIONCODE 报关单号,REPUNITCODE 申报单位代码,KINDOFTAX 征免性质,to_char(REPTIME,'yyyymmdd') 申报日期,TRADEMETHOD 贸易方式,BUSIUNITCODE 经营单位代码,RECORDCODE 账册号 from list_declaration_after where declarationcode in (" + declarationcode_list + ") and csid=1");
+            DataTable dt_sub = DBMgr.GetDataTable(@"select a.ORDERNO 序号,a.ITEMNO 项号,a.COMMODITYNO||a.ADDITIONALNO 商品编号,a.COMMODITYNAME 商品名称,a.TAXPAID 征免,a.CADQUANTITY 成交数量,a.CADUNIT 成交单位,a.CURRENCYCODE 币制,a.TOTALPRICE 总价,b.DECLARATIONCODE 报关单号 from 
+                                                    list_decllist_after a left join list_declaration_after b on a.predeclcode=b.CODE  where a.predeclcode in (" + predeclcode_list + ") and a.isinvalid=0 and a.xzlb in('报关单','报关单解析')");
+           string  result = ImExcel_Verification_Data(dt, dt_sub, "线上");
+           return result;
         }
 
         public string ImExcel_Verification()

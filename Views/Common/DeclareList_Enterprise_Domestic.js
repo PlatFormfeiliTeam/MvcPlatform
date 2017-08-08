@@ -3,7 +3,7 @@
 //传参示例 /Common/DeclareList?busitypeid=11&module=ddzx&role=customer
 
 var pgbar; var store_sbfs; var store_bgfs; var store_busitype; var store_modifyflag; var store_EXP;
-var common_data_jydw = [], common_data_sbfs = [], common_data_bgfs = [], common_data_sbgq = [];
+var common_data_jydw = [], common_data_sbfs = [], common_data_bgfs = [], common_data_sbgq = [], socialcreditno;
 
 Ext.onReady(function () {
     Ext.Ajax.request({
@@ -443,6 +443,9 @@ function gridpanelBind() {
                     VALUE8_1: Ext.Date.format(Ext.getCmp("CONDITION8_1").getValue(), 'Y-m-d H:i:s'),
                     VALUE8_2: Ext.Date.format(Ext.getCmp("CONDITION8_2").getValue(), 'Y-m-d H:i:s')
                 }
+            },
+            load: function () {
+                socialcreditno = store.getProxy().getReader().rawData.socialcreditno;
             }
         }
     })
@@ -452,14 +455,41 @@ function gridpanelBind() {
         store: store,
         displayInfo: true
     })
-    var gridpanel = Ext.create('Ext.grid.Panel', {
-        id: 'declare_grid',
-        store: store,
-        height: 535,
-        renderTo: 'appConId',
-        selModel: { selType: 'checkboxmodel' },
-        bbar: pgbar,
-        columns: [
+
+    var columns_old;
+    if (socialcreditno == "TRUE") {
+        columns_old = [
+        { xtype: 'rownumberer', width: 35 },
+        { header: 'ID', dataIndex: 'ID', sortable: true, hidden: true },
+        { header: '海关状态', dataIndex: 'CUSTOMSSTATUS', width: 90, locked: true },
+        { header: '比对状态', dataIndex: 'VERSTATUS', width: 90, locked: true },
+        { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 140, locked: true, renderer: render },
+        { header: '申报单位', dataIndex: 'REPUNITNAME', width: 200 },
+        { header: '合同发票号', dataIndex: 'CONTRACTNOORDER', width: 140, locked: true, },
+        { header: '申报日期', dataIndex: 'REPTIME', width: 140 },
+        { header: '运输工具名称', dataIndex: 'TRANSNAME', width: 150, renderer: render },
+        { header: '业务类型', dataIndex: 'BUSITYPE', width: 90, renderer: render },// 业务类型
+        { header: '进出口岸', dataIndex: 'PORTCODE', width: 80 },
+        { header: '提运单号', dataIndex: 'BLNO', width: 180 },
+        { header: '申报方式', dataIndex: 'REPWAYNAME', width: 100, renderer: render },
+        { header: '报关方式', dataIndex: 'DECLWAYNAME', width: 100, renderer: render },
+        { header: '贸易方式', dataIndex: 'TRADEMETHOD', width: 80 },
+        { header: '合同协议号', dataIndex: 'CONTRACTNO', width: 110 },
+        { header: '件数', dataIndex: 'GOODSNUM', width: 60 },
+        { header: '重量', dataIndex: 'GOODSGW', width: 60 },
+        { header: '张数', dataIndex: 'SHEETNUM', width: 60 },
+        { header: '删改单', dataIndex: 'MODIFYFLAG', width: 60, renderer: render },
+        { header: '订单编号', dataIndex: 'ORDERCODE', width: 100 },
+        { header: '客户编号', dataIndex: 'CUSNO', width: 125 },
+        { header: '关联企业', dataIndex: 'BUSIUNITNAME_ASS', width: 200 }
+        //{ header: '关联订单号', dataIndex: 'ORDERCODE_ASS', width: 100 }
+        //{ header: '进/出', dataIndex: 'IETYPE', width: 80}
+        //{ header: '两单关联号', dataIndex: 'ASSOCIATENO', width: 110 }//两单关联号
+        //{ header: '多单关联号', dataIndex: 'CORRESPONDNO', width: 100}//多单关联号
+        ];
+    }
+    else {
+        columns_old =  [
         { xtype: 'rownumberer', width: 35 },
         { header: 'ID', dataIndex: 'ID', sortable: true, hidden: true },
         { header: '海关状态', dataIndex: 'CUSTOMSSTATUS', width: 90, locked: true },
@@ -486,7 +516,18 @@ function gridpanelBind() {
         //{ header: '进/出', dataIndex: 'IETYPE', width: 80}
         //{ header: '两单关联号', dataIndex: 'ASSOCIATENO', width: 110 }//两单关联号
         //{ header: '多单关联号', dataIndex: 'CORRESPONDNO', width: 100}//多单关联号
-        ],
+        ];
+        document.getElementById("btn_VerificationList").disabled = true;
+    }
+
+    var gridpanel = Ext.create('Ext.grid.Panel', {
+        id: 'declare_grid',
+        store: store,
+        height: 535,
+        renderTo: 'appConId',
+        selModel: { selType: 'checkboxmodel' },
+        bbar: pgbar,
+        columns: columns_old,
         viewConfig: {
             enableTextSelection: true
         }
@@ -713,4 +754,47 @@ function Searchstatus() {
     var index = Ext.getCmp('declare_grid').store.indexOf(recs[0]);
     var currentPage = Ext.getCmp('declare_grid').store.currentPage
     openrwindow("/Common/ClearanceStatus?menuxml=ent_dec_cle_domestic&id=" + id + "&rowIndex=" + index + "&currentPage=" + currentPage, 1200, 800);
+}
+
+function VerificationList() {
+
+    var recs = Ext.getCmp('declare_grid').getSelectionModel().getSelection();
+    if (recs.length == 0) {
+        Ext.MessageBox.alert('提示', '请选择需要比对的记录！');
+        return;
+    }
+    var declarationcode_list = Ext.encode(Ext.pluck(Ext.pluck(recs, 'data'), 'DECLARATIONCODE'));
+    var predeclcode_list = Ext.encode(Ext.pluck(Ext.pluck(recs, 'data'), 'CODE'));
+    Ext.Ajax.request({
+        url: '/Common/dec_Verification',
+        params: { declarationcode_list: declarationcode_list, predeclcode_list: predeclcode_list },
+        success: function (response, option) {
+            var result = Ext.decode(response.responseText);
+            if (result.success) {
+                var json = result.json; var msg = "";
+                if (json.length > 0) {
+                    msg = "操作完成";
+                } else {
+                    msg = "保存成功";
+                }
+
+                Ext.Msg.alert('提示', msg, function () {
+                    pgbar.moveFirst();
+                    if (json.length > 0) {
+                        errorwin(json);
+                    }
+                });
+            }
+            else {
+                var result = Ext.decode(response.responseText);
+                var errormsg = result.error;
+                Ext.MessageBox.alert("提示", errormsg, function () {
+                    pgbar.moveFirst();
+                });
+            }
+
+
+        }
+    });
+
 }
