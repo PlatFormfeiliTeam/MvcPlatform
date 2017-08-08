@@ -3635,7 +3635,7 @@ namespace MvcPlatform.Controllers
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             var json = JsonConvert.SerializeObject(dt, iso);
-            return "{rows:" + json + ",total:" + totalProperty + ",socialcreditno:" + socialcreditno +"}";
+            return "{rows:" + json + ",total:" + totalProperty + ",socialcreditno:\"" + socialcreditno +"\"}";
         }
 
         //导出全部报关单文件
@@ -3838,13 +3838,15 @@ namespace MvcPlatform.Controllers
 
         public string LoadDeclarationList_E_Domestic()
         {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            bool socialcreditno = Extension.Check_Customer(json_user.Value<string>("CUSTOMERID"));
             string sql = QueryConditionDecl_E_Domestic();
 
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             var json = JsonConvert.SerializeObject(dt, iso);
-            return "{rows:" + json + ",total:" + totalProperty + "}";
+            return "{rows:" + json + ",total:" + totalProperty + ",socialcreditno:\"" + socialcreditno + "\"}";
         }
 
        //导出全部报关单文件
