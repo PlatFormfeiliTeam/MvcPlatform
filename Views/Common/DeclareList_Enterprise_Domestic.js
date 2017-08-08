@@ -457,7 +457,7 @@ function gridpanelBind() {
     })
 
     var columns_old;
-    if (socialcreditno == "TRUE") {
+    if (socialcreditno == "true") {
         columns_old = [
         { xtype: 'rownumberer', width: 35 },
         { header: 'ID', dataIndex: 'ID', sortable: true, hidden: true },

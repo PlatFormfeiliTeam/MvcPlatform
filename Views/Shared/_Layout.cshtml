@@ -85,6 +85,25 @@
             $('#na_menu').superfish({
             });
         });
+
+        $("[href='/Common/VerificationList']").click(function () {
+            var str = "";
+            $.ajax({
+                type: 'Post',
+                url: "/Common/check_ver",
+                dataType: "text",
+                async: false,//此句话必须加
+                success: function (data) {
+                    str = data;                    
+                }
+            });
+            if (str == "false") {
+                alert("您不具备核销比对资格！");
+                return false;
+            }
+        });
+        
+
     </script>
 </body>
 </html>

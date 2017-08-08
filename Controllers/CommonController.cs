@@ -3635,7 +3635,7 @@ namespace MvcPlatform.Controllers
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             var json = JsonConvert.SerializeObject(dt, iso);
-            return "{rows:" + json + ",total:" + totalProperty + ",socialcreditno:\"" + socialcreditno +"\"}";
+            return "{rows:" + json + ",total:" + totalProperty + ",socialcreditno:\"" + socialcreditno.ToString().ToLower() +"\"}";
         }
 
         //导出全部报关单文件
@@ -3846,7 +3846,7 @@ namespace MvcPlatform.Controllers
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             var json = JsonConvert.SerializeObject(dt, iso);
-            return "{rows:" + json + ",total:" + totalProperty + ",socialcreditno:\"" + socialcreditno + "\"}";
+            return "{rows:" + json + ",total:" + totalProperty + ",socialcreditno:\"" + socialcreditno.ToString().ToLower() + "\"}";
         }
 
        //导出全部报关单文件
@@ -4372,6 +4372,12 @@ namespace MvcPlatform.Controllers
 
         #region LIST_VERIFICATION 核销比对
 
+        public string check_ver()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            return Extension.Check_Customer(json_user.Value<string>("CUSTOMERID")).ToString().ToLower();
+        }
+
         public string QueryConditionVerification()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
@@ -4434,7 +4440,7 @@ namespace MvcPlatform.Controllers
 
             result = ImExcel_Verification_Data(dtExcel, dtExcel_sub, "线下");           
 
-            if (result != "{success:true}")//上传不成功，删除源文件
+            if (result != "{success:true,json:[]}")//上传不成功，删除源文件
             {
                 FileInfo fi = new FileInfo(Server.MapPath(newfile));
                 if (fi.Exists)

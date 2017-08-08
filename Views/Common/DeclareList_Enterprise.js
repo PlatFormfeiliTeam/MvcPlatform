@@ -406,7 +406,7 @@ function gridpanelBind() {
                 'BUSIUNITNAME', 'PORTCODE', 'BLNO', 'REPWAYID', 'REPWAYNAME', 'DECLWAY', 'DECLWAYNAME', 'TRADEMETHOD', 'CONTRACTNO', 'GOODSNUM',
                 'GOODSNW', 'GOODSGW', 'SHEETNUM', 'ORDERCODE', 'CUSNO', 'ASSOCIATENO', 'CORRESPONDNO', 'BUSITYPE', 'CONTRACTNOORDER', 'REPUNITNAME',
                 'VERSTATUS'
-                ],
+        ],
         pageSize: 22,
         proxy: {
             type: 'ajax',
@@ -440,15 +440,15 @@ function gridpanelBind() {
                 socialcreditno = store.getProxy().getReader().rawData.socialcreditno;
             }
         }
-    })
+    });
     pgbar = Ext.create('Ext.toolbar.Paging', {
         id: 'declare_grid_pgbar',
         displayMsg: '显示 {0} - {1} 条,共计 {2} 条',
         store: store,
         displayInfo: true
-    })
+    });
     var columns_old;
-    if (socialcreditno == "TRUE") {
+    if (socialcreditno == "true") {
         columns_old = [
          { xtype: 'rownumberer', width: 35 },
          { header: 'ID', dataIndex: 'ID', sortable: true, hidden: true },

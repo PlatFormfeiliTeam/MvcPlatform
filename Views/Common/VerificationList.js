@@ -125,7 +125,8 @@ function gridbind() {
         { header: '申报单位代码', dataIndex: 'REPUNITCODE', width: 110 },
         { header: '征免性质', dataIndex: 'KINDOFTAX', width: 110 },
         {
-            header: '申报日期', dataIndex: 'REPTIME', width: 110, renderer: function (value) {
+            header: '申报日期', dataIndex: 'REPTIME', width: 110, renderer: function (value) {                
+                if (value == null) { return value;}
                 return value.substr(0, 10);
             }
         },
@@ -288,7 +289,7 @@ function form_ini_detail(recs) {
         id: 'KINDOFTAX', name: 'KINDOFTAX', fieldLabel: '征免性质', readOnly: true, value: recs[0].get("KINDOFTAX")
     });
     var field_REPTIME = Ext.create('Ext.form.field.Text', {
-        id: 'REPTIME', name: 'REPTIME', fieldLabel: '申报日期', readOnly: true, value: recs[0].get("REPTIME").substr(0, 10)
+        id: 'REPTIME', name: 'REPTIME', fieldLabel: '申报日期', readOnly: true, value: recs[0].get("REPTIME") == null ? recs[0].get("REPTIME") : recs[0].get("REPTIME").substr(0, 10)
     });
     var field_TRADEMETHOD = Ext.create('Ext.form.field.Text', {
         id: 'TRADEMETHOD', name: 'TRADEMETHOD', fieldLabel: '贸易方式', readOnly: true, value: recs[0].get("TRADEMETHOD")
