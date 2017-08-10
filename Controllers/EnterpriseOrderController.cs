@@ -1701,7 +1701,7 @@ namespace MvcPlatform.Controllers
         }
         public string LoadList_logistic(string totalno, string divdeno)
         {
-            string sql = "select * from list_logisticsstatus where totalno='" + totalno + "' and divideno='" + divdeno + "'  order by operate_type,operate_date asc";
+            string sql = "select * from list_logisticsstatus where totalno='" + totalno + "' and divideno='" + divdeno + "'  order by operate_type,operate_date desc";
             DataTable dt = DBMgr.GetDataTable(sql);
             IsoDateTimeConverter iso = new IsoDateTimeConverter();
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";

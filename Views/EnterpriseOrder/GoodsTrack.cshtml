@@ -369,8 +369,8 @@
             Ext.getCmp('panelbottom_1_1').getForm().setValues(data.json_order[0]);
             Ext.getCmp('panelbottom_1_3').getForm().setValues(data.json_order[0]);
 
-            Ext.getCmp('khbh_label').setText(data.json_order[0].CODE);
-            Ext.getCmp('ddbh_label').setText(data.json_order[0].CUSNO);
+            Ext.getCmp('khbh_label').setText(data.json_order[0].CUSNO);
+            Ext.getCmp('ddbh_label').setText(data.json_order[0].CODE);
 
             if (Ext.getCmp('w_grid')) { Ext.getCmp('w_grid').store.loadData(data.json_container); }
             //if (typeof Ext.getCmp('TOTALNO_DIVIDENO') != "undefined") {

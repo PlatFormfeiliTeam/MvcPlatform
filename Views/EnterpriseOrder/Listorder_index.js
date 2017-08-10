@@ -676,7 +676,7 @@ function showLogisticStatus(totalno,divdeno)
          tab_1_store.sort([
                     {
                         property: 'OPERATE_DATE',
-                        direction: 'ASC'
+                        direction: 'DESC'
                     }
          ]);
          tab_2_store = Ext.create("Ext.data.JsonStore", {
@@ -702,6 +702,9 @@ function showLogisticStatus(totalno,divdeno)
              store: tab_0_store,
              enableColumnHide: false,
              columns: columns_logistic,
+             height: 400,
+             width: 585,
+             overflowY: 'auto',
              viewConfig: {
                  enableTextSelection: true
              }
@@ -710,6 +713,9 @@ function showLogisticStatus(totalno,divdeno)
              store: tab_1_store,
              enableColumnHide: false,
              columns: columns_logistic,
+             height: 400,
+             width: 585,
+             overflowY: 'auto',
              viewConfig: {
                  enableTextSelection: true
              }
@@ -718,6 +724,9 @@ function showLogisticStatus(totalno,divdeno)
              store: tab_2_store,
              enableColumnHide: false,
              columns: columns_logistic,
+             height: 400,
+             width: 585,
+             overflowY: 'auto',
              viewConfig: {
                  enableTextSelection: true
              }
@@ -726,6 +735,9 @@ function showLogisticStatus(totalno,divdeno)
              store: tab_3_store,
              enableColumnHide: false,
              columns: columns_logistic,
+             height: 400,
+             width: 585,
+             overflowY: 'auto',
              viewConfig: {
                  enableTextSelection: true
              }

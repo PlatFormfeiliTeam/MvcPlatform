@@ -239,7 +239,7 @@
             tab_1_store.sort([
                     {
                         property: 'OPERATE_DATE',
-                        direction: 'ASC'
+                        direction: 'DESC'
                     }
             ]);
             tab_2_store = Ext.create("Ext.data.JsonStore", {
@@ -265,6 +265,9 @@
                 store: tab_0_store,
                 enableColumnHide: false,
                 columns: columns_logistic,
+                height: 400,
+                width: 585,
+                overflowY: 'auto',
                 viewConfig: {
                     enableTextSelection: true
                 }
@@ -273,6 +276,9 @@
                 store: tab_1_store,
                 enableColumnHide: false,
                 columns: columns_logistic,
+                height: 400,
+                width: 585,
+                overflowY: 'auto',
                 viewConfig: {
                     enableTextSelection: true
                 }
@@ -281,6 +287,9 @@
                 store: tab_2_store,
                 enableColumnHide: false,
                 columns: columns_logistic,
+                height: 400,
+                width: 585,
+                overflowY: 'auto',
                 viewConfig: {
                     enableTextSelection: true
                 }
@@ -289,6 +298,9 @@
                 store: tab_3_store,
                 enableColumnHide: false,
                 columns: columns_logistic,
+                height: 400,
+                width: 585,
+                overflowY: 'auto',
                 viewConfig: {
                     enableTextSelection: true
                 }
@@ -298,12 +310,12 @@
                          { title: '口岸报检', id: "tab_2", items: [tab_2_gridpanel] }, { title: '运输状态', id: "tab_3", items: [tab_3_gridpanel] }];
             var tabpanel = Ext.create('Ext.tab.Panel', {
                 id: 'tabpanel',
-                items: items,
+                items: items
             });
 
             win_logistic = Ext.create('Ext.window.Window', {
                 title: '物流状态',
-                height: 400,
+                height:400,
                 width: 600,
                 layout: 'fit',
                 items: [tabpanel]
