@@ -223,7 +223,7 @@ Ext.onReady(function () {
                             CONDITION3: Ext.getCmp('CONDITION3').getValue(), VALUE3: Ext.getCmp("CONDITION3_1").getValue(),
                             CONDITION4: Ext.getCmp('CONDITION4').getValue(), VALUE4: Ext.getCmp("CONDITION4_1").getValue(),
                             STARTDATE: Ext.Date.format(Ext.getCmp("start_date").getValue(), 'Y-m-d H:i:s'),
-                            ENDDATE: Ext.Date.format(Ext.getCmp("end_date").getValue(), 'Y-m-d H:i:s'),
+                            ENDDATE: Ext.Date.format(Ext.getCmp("end_date").getValue(), 'Y-m-d H:i:s')
 
                         }
                     }
@@ -602,7 +602,9 @@ function Export() {
         CONDITION1: Ext.getCmp('CONDITION1').getValue(), VALUE1: Ext.getCmp("CONDITION1_1").getValue(),
         CONDITION2: Ext.getCmp('CONDITION2').getValue(), VALUE2: Ext.getCmp("CONDITION2_1").getValue(),
         CONDITION3: Ext.getCmp('CONDITION3').getValue(), VALUE3: Ext.getCmp("CONDITION3_1").getValue(),
-        CONDITION4: Ext.getCmp('CONDITION4').getValue(), VALUE4: Ext.getCmp("CONDITION4_1").getValue()
+        CONDITION4: Ext.getCmp('CONDITION4').getValue(), VALUE4: Ext.getCmp("CONDITION4_1").getValue(),
+        STARTDATE: Ext.Date.format(Ext.getCmp("start_date").getValue(), 'Y-m-d H:i:s'),
+        ENDDATE: Ext.Date.format(Ext.getCmp("end_date").getValue(), 'Y-m-d H:i:s')
 
     }
     Ext.Ajax.request({
