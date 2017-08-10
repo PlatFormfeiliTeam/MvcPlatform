@@ -752,7 +752,7 @@ function showLogisticStatus(totalno,divdeno)
 
          win_logistic = Ext.create('Ext.window.Window', {
              title: '物流状态',
-             height: 400,
+             height: 460,
              width: 600,
              layout: 'fit',
              items: [tabpanel]
