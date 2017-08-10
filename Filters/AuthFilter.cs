@@ -93,6 +93,10 @@ namespace MvcPlatform.Filters
             {
                 return false;
             }
+            if (filterContext.ActionDescriptor.ActionName == "CurrentUser" && filterContext.ActionDescriptor.ControllerDescriptor.ControllerName == "Common")//当前用户不做验证
+            {
+                return false;
+            }
             if (filterContext.HttpContext.Request.Url.AbsolutePath == "/Home/Index")
             {
                 return false;
