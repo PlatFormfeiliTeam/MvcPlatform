@@ -2914,40 +2914,41 @@ namespace MvcPlatform.Controllers
                 sheet_S = book.CreateSheet("订单信息_空进"); filename = filename + "_空进.xls";
 
                 NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
-                row1.CreateCell(0).SetCellValue("报关状态"); row1.CreateCell(1).SetCellValue("报检状态"); row1.CreateCell(2).SetCellValue("订单编号"); row1.CreateCell(3).SetCellValue("客户编号");
-                row1.CreateCell(4).SetCellValue("经营单位"); row1.CreateCell(5).SetCellValue("合同号"); row1.CreateCell(6).SetCellValue("总单号"); row1.CreateCell(7).SetCellValue("分单号"); 
-                row1.CreateCell(8).SetCellValue("件数/重量"); row1.CreateCell(9).SetCellValue("打印状态");row1.CreateCell(10).SetCellValue("申报关区"); row1.CreateCell(11).SetCellValue("进/出口岸");
-                row1.CreateCell(12).SetCellValue("申报方式");row1.CreateCell(13).SetCellValue("转关预录号");row1.CreateCell(14).SetCellValue("法检"); row1.CreateCell(15).SetCellValue("委托时间");                 
+                row1.CreateCell(0).SetCellValue("报关状态"); row1.CreateCell(1).SetCellValue("报检状态"); row1.CreateCell(2).SetCellValue("物流状态"); row1.CreateCell(3).SetCellValue("订单编号"); row1.CreateCell(4).SetCellValue("客户编号");
+                row1.CreateCell(5).SetCellValue("经营单位"); row1.CreateCell(6).SetCellValue("合同号"); row1.CreateCell(7).SetCellValue("总单号"); row1.CreateCell(8).SetCellValue("分单号"); 
+                row1.CreateCell(9).SetCellValue("件数/重量"); row1.CreateCell(10).SetCellValue("打印状态");row1.CreateCell(11).SetCellValue("申报关区"); row1.CreateCell(12).SetCellValue("进/出口岸");
+                row1.CreateCell(13).SetCellValue("申报方式");row1.CreateCell(14).SetCellValue("转关预录号");row1.CreateCell(15).SetCellValue("法检"); row1.CreateCell(16).SetCellValue("委托时间");                 
 
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
                     NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
                     rowtemp.CreateCell(0).SetCellValue(getStatusName(dt.Rows[i]["DECLSTATUS"].ToString(), dec_insp_status));
                     rowtemp.CreateCell(1).SetCellValue(getStatusName(dt.Rows[i]["INSPSTATUS"].ToString(), dec_insp_status));
-                    rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["CODE"].ToString());
-                    rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+                    rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["LOGISTICSNAME"].ToString());
+                    rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CODE"].ToString());
+                    rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
 
-                    rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
-                    rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
-                    rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["TOTALNO"].ToString());
-                    rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["DIVIDENO"].ToString());
+                    rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
+                    rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                    rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["TOTALNO"].ToString());
+                    rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["DIVIDENO"].ToString());
 
                     if (dt.Rows[i]["GOODSNUM"].ToString() != "")
                     {
-                        rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString() + "/" + dt.Rows[i]["GOODSGW"].ToString());
+                        rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString() + "/" + dt.Rows[i]["GOODSGW"].ToString());
                     }
                     else
                     {
-                        rowtemp.CreateCell(8).SetCellValue("");
+                        rowtemp.CreateCell(9).SetCellValue("");
                     }
-                    rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["PRINTSTATUS"].ToString() == "1" ? "已打印" : "未打印");
-                    rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["CUSTOMAREACODE"].ToString());
-                    rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
+                    rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["PRINTSTATUS"].ToString() == "1" ? "已打印" : "未打印");
+                    rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["CUSTOMAREACODE"].ToString());
+                    rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
 
-                    rowtemp.CreateCell(12).SetCellValue(getStatusName(dt.Rows[i]["REPWAYID"].ToString(), common_data_sbfs));//REPWAYID
-                    rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["TURNPRENO"].ToString());
-                    rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
-                    rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
+                    rowtemp.CreateCell(13).SetCellValue(getStatusName(dt.Rows[i]["REPWAYID"].ToString(), common_data_sbfs));//REPWAYID
+                    rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["TURNPRENO"].ToString());
+                    rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
+                    rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
                 }
             }
             #endregion
