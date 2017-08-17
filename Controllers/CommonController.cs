@@ -1971,7 +1971,8 @@ namespace MvcPlatform.Controllers
             FileStream stream = new FileStream(destFile, FileMode.Create, FileAccess.ReadWrite);
 
             Uri url = new Uri(AdminUrl + "/file/" + filename);
-            PdfReader reader = new PdfReader(url);
+            byte[] pwd = System.Text.Encoding.Default.GetBytes(ConfigurationManager.AppSettings["PdfPwd"]);//密码 
+            PdfReader reader = new PdfReader(url, pwd);
 
             iTextSharp.text.Rectangle psize = reader.GetPageSize(1);
             var imgWidth = psize.Width + right_int;
@@ -2067,7 +2068,8 @@ namespace MvcPlatform.Controllers
             FileStream stream = new FileStream(destFile, FileMode.Create, FileAccess.ReadWrite);
 
             Uri url = new Uri(AdminUrl + "/file/" + filename);
-            PdfReader reader = new PdfReader(url);
+            byte[] pwd = System.Text.Encoding.Default.GetBytes(ConfigurationManager.AppSettings["PdfPwd"]);//密码 
+            PdfReader reader = new PdfReader(url, pwd);
             PdfStamper stamper = new PdfStamper(reader, stream);    //read pdf stream 
             var imgHeight = img.Height;
             var imgWidth = img.Width;  //调整图片大小，使之适合A4
@@ -2118,6 +2120,7 @@ namespace MvcPlatform.Controllers
         //pdf文件合并
         protected void MergePDFFiles(IList<string> fileList, string outMergeFile)
         {
+            byte[] pwd = System.Text.Encoding.Default.GetBytes(ConfigurationManager.AppSettings["PdfPwd"]);//密码 
             PdfReader reader;
             Document document = new Document();  // Define the output place, and add the document to the stream          
             PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(outMergeFile, FileMode.Create));
@@ -2128,7 +2131,7 @@ namespace MvcPlatform.Controllers
             for (int i = 0; i < fileList.Count; i++)
             {
                 Uri url = new Uri(fileList[i]);
-                reader = new PdfReader(url);
+                reader = new PdfReader(url, pwd);
                 int iPageNum = reader.NumberOfPages;
                 for (int j = 1; j <= iPageNum; j++)
                 {

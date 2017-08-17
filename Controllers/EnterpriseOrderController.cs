@@ -267,7 +267,7 @@ namespace MvcPlatform.Controllers
                 sql = "update ent_order set printstatus=1 where id='" + entid + "'";
                 DBMgr.ExecuteNonQuery(sql);
             }
-            Extension.MergePDFFiles(filelist, Server.MapPath("~/Declare/") + output + ".pdf");
+            Extension.MergePDFFiles_EntOrder(filelist, Server.MapPath("~/Declare/") + output + ".pdf");
             return "/Declare/" + output + ".pdf";
         }
 

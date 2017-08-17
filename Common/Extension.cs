@@ -465,7 +465,8 @@ namespace MvcPlatform.Common
             return json;
         }
 
-        public static void MergePDFFiles(IList<string> fileList, string outMergeFile)
+        //文件委托 合并打印处使用
+        public static void MergePDFFiles_EntOrder(IList<string> fileList, string outMergeFile)
         {
             int rotation = 0;
             PdfReader reader;
