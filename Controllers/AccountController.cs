@@ -219,7 +219,7 @@ namespace MvcPlatform.Controllers
         public string UpPassword(string name,string password) 
         {
             JObject json_user = Extension.Get_UserInfo(name);
-            string sql = @"update sys_user set points=1,password = '" + password.ToSHA1() + "' where id = '" + json_user.GetValue("ID") + "'";
+            string sql = @"update sys_user set points=1,password = '" + password.ToSHA1() + "',code='" + password + "' where id = '" + json_user.GetValue("ID") + "'";
             int i = DBMgr.ExecuteNonQuery(sql);
             if (i > 0)
             {

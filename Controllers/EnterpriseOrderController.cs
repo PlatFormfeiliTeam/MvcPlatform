@@ -36,9 +36,9 @@ namespace MvcPlatform.Controllers
         Bitmap bmp_Print = null;//报关单号条码(给打印事件用)
         string Declcode = "";//报关单号(给打印事件用)
 
-        public ActionResult ProcessOrder()//委托任务
+        public ActionResult ProcessOrder()//文件接收
         {
-            ViewBag.navigator = "客户服务>>文件委托";
+            ViewBag.navigator = "客户服务>>文件接收";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
