@@ -1,5 +1,6 @@
 ﻿@{
     string Version = System.Configuration.ConfigurationManager.AppSettings["Version"];
+    string BuDuTongJi = System.Configuration.ConfigurationManager.AppSettings["BuDuTongJi"];
 }
 <!DOCTYPE html>
 <html lang="zh">
@@ -17,6 +18,16 @@
     <script src="~/js/hoverIntent.js"></script>
     <script src="~/js/superfish.js"></script>
     <link href="~/Content/iconfont/iconfont.css?t=@Version" rel="stylesheet" />
+    <script>
+        var _hmt = _hmt || [];
+        (function () {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?@BuDuTongJi";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
 </head>
 <body>
     <div class="container">
