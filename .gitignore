@@ -10,6 +10,7 @@ MvcPlatform.v12.suo
 Declare/
 Web.Debug.config
 Web.Release.config
+ErrorLog
 <<<<<<< HEAD
 *.svn-base
 .svn/entries
