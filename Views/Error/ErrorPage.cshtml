@@ -2,6 +2,9 @@
     ViewBag.Title = "ErrorPage";
     Layout = null;
 }
+<title>关务云单证处理平台</title>
+<script src="/js/jquery-1.8.2.min.js"></script>
+
 <style type="text/css">
 
     body {
@@ -10,7 +13,13 @@
         background-position: center;
     }
 </style>
-
+<body>
+    <script type = "text/javascript" >
+        $("body").click(function (event) {
+            window.location.href = "/Home/Index";
+        });
+    </script>
+</body>
 
 @*<h2>程序出现异常状态，请联系管理员</h2>*@
 @*@Html.Raw(ViewBag.error);*@

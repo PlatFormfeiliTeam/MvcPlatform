@@ -1,9 +1,20 @@
 ﻿@{
     ViewBag.Title = "NoPower";
-    Layout = "~/Views/Shared/Empty.cshtml";
+    Layout = null;
 }
-
-<center>
-    <h3 style="color: red; font-weight: 800;">您没有访问此页面的权限，谢谢！</h3>
-    <h5 style="color: gray; font-weight: 800; ">若有疑问，请联系相关负责人，感谢您的配合.</h5>
-</center>
+<title>关务云单证处理平台</title>
+<script src="/js/jquery-1.8.2.min.js"></script>
+<style type="text/css">
+    body {
+        background-image: url(/Images/nopower.png);
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+</style>
+<body>
+    <script type="text/javascript">
+        $("body").click(function (event) {
+            window.location.href = "/Home/Index";
+        });
+    </script>
+</body>
