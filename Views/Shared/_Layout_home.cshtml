@@ -103,11 +103,11 @@
             foottip();
         });
 
-        $("[href='/Common/VerificationList']").click(function () {
+        $("[href='/RecordInfor/VerificationList']").click(function () {
             var str = "";
             $.ajax({
                 type: 'Post',
-                url: "/Common/check_ver",
+                url: "/RecordInfor/check_ver",
                 dataType: "text",
                 async: false,//此句话必须加
                 success: function (data) {

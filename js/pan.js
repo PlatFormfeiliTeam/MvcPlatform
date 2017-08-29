@@ -1917,23 +1917,32 @@ function errorwin(jsondata) {
     var store_error = Ext.create('Ext.data.JsonStore', {
         fields: ['报关单号', '申报单位代码', '征免性质', '申报日期', '贸易方式', '经营单位代码', '账册号', 'ERRORMSG'],
         data: jsondata
-    })
+    });
+    Ext.tip.QuickTipManager.init();
     var griderror = Ext.create('Ext.grid.Panel', {
         id: 'griderror',
         store: store_error,
         enableColumnHide: false,
         height: 300,
         columns: [
-         { xtype: 'rownumberer', width: 35 },
-        { header: '报关单号', dataIndex: '报关单号', width: 110 },
-        { header: '申报单位代码', dataIndex: '申报单位代码', width: 100 },
-        { header: '征免性质', dataIndex: '征免性质', width: 80 },
-        { header: '申报日期', dataIndex: '申报日期', width: 100 },
-        { header: '贸易方式', dataIndex: '贸易方式', width: 80 },
-        { header: '经营单位代码', dataIndex: '经营单位代码', width: 100 },
-        { header: '账册号', dataIndex: '账册号', width: 110 },
-        { header: '<font color="red"><b>错误信息</b></font>', dataIndex: 'ERRORMSG', width: 200 },
-        ]
+            { xtype: 'rownumberer', width: 35 },
+            { header: '报关单号', dataIndex: '报关单号', width: 120 },
+            { header: '申报单位代码', dataIndex: '申报单位代码', width: 100 },
+            { header: '征免性质', dataIndex: '征免性质', width: 80 },
+            { header: '申报日期', dataIndex: '申报日期', width: 100 },
+            { header: '贸易方式', dataIndex: '贸易方式', width: 80 },
+            { header: '经营单位代码', dataIndex: '经营单位代码', width: 100 },
+            { header: '账册号', dataIndex: '账册号', width: 110 },
+            {
+                header: '<font color="red"><b>错误信息</b></font>', dataIndex: 'ERRORMSG', width: 200, renderer: function (value, meta, record) {
+                    meta.tdAttr = 'data-qtip="<font color=blue>' + value + '</font>"';
+                    return value;
+                }
+            }
+        ],
+        viewConfig: {
+            enableTextSelection: true
+        }
     });
 
     var win_error = Ext.create("Ext.window.Window", {

@@ -315,8 +315,8 @@
 
   <!-- 核销比对-->
   <rootmenu>
-    <menu>/Common/VerificationList</menu>
-    <submenu>/Common/ImExcel_Verification</submenu>
+    <menu>/RecordInfor/VerificationList</menu>
+    <submenu>/RecordInfor/ImExcel_Verification</submenu>
   </rootmenu>
   
 </rootmenulist>

@@ -150,14 +150,6 @@ namespace MvcPlatform.Controllers
             return View();
         }
 
-        public ActionResult VerificationList()
-        {
-            ViewBag.navigator = "通关管理>>核销比对";
-            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
-            return View();
-        }
-
-
         //登录后显示顶部当前用户中文名称 by heguiqin 2016-08-25
         public string CurrentUser()
         {
@@ -3832,7 +3824,7 @@ namespace MvcPlatform.Controllers
                               lda.trademethod,lda.declkind DECLWAY,lda.declkind DECLWAYNAME,lda.REPUNITNAME,
                               ort.BUSITYPE,ort.CONTRACTNO CONTRACTNOORDER,ort.REPWAYID,ort.REPWAYID REPWAYNAME,ort.CUSNO,
                               ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.customercode,ort.CUSTOMERNAME,ort.CREATETIME, 
-                              ort.REPNO ,lv.status VERSTATUS   
+                              ort.REPNO ,lv.status VERSTATUS,lv.NOTE    
                            from list_declaration det 
                                 left join list_order ort on det.ordercode = ort.code 
 								left join list_declaration_after lda on det.code=lda.code and lda.csid=1
@@ -4057,7 +4049,7 @@ namespace MvcPlatform.Controllers
                               ort.BUSITYPE,ort.CONTRACTNO CONTRACTNOORDER,ort.REPWAYID,ort.REPWAYID REPWAYNAME,ort.CUSNO,
                               ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.customercode,ort.CUSTOMERNAME,ort.CREATETIME, 
                               ort.REPNO,c.code ordercode_ass,c.busiunitcode busiunitcode_ass,c.busiunitname busiunitname_ass,    
-                              lv.status VERSTATUS      
+                              lv.status VERSTATUS,lv.NOTE       
                            from list_declaration det 
                                 left join list_order ort on det.ordercode = ort.code 
 								left join list_declaration_after lda on det.code=lda.code and lda.csid=1
@@ -4384,299 +4376,21 @@ namespace MvcPlatform.Controllers
             }
         }
 
-        #region LIST_VERIFICATION 核销比对
-
-        public string check_ver()
-        {
-            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            return Extension.Check_Customer(json_user.Value<string>("CUSTOMERID")).ToString().ToLower();
-        }
-
-        public string QueryConditionVerification()
-        {
-            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-
-            string where = @" where lv.CUSTOMERCODE ='" + json_user.Value<string>("CUSTOMERCODE") + "' ";
-           
-            if (!string.IsNullOrEmpty(Request["DECLARATIONCODE"]))
-            {
-                where += " and lv.DECLARATIONCODE='" + Request["DECLARATIONCODE"] + "'";
-            }
-            if (!string.IsNullOrEmpty(Request["TRADEMETHOD"]))
-            {
-                where += " and lv.TRADEMETHOD='" + Request["TRADEMETHOD"] + "'";
-            }
-
-            string sql = @"select lv.* from list_verification lv " + where;
-
-            return sql;
-
-        }
-
-        public string loadverification()
-        {
-            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
-            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-            string sql = QueryConditionVerification();
-
-            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "DESC"));
-            var json = JsonConvert.SerializeObject(dt, iso);
-
-            return "{rows:" + json + ",total:" + totalProperty + "}";
-        }
+        #region  企业端报关单 核销比对 按钮功能
 
         public string dec_Verification(string declarationcode_list, string predeclcode_list)
         {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
             declarationcode_list = declarationcode_list.TrimStart('[').TrimEnd(']').Replace("\"","'");
             predeclcode_list = predeclcode_list.TrimStart('[').TrimEnd(']').Replace("\"", "'");
             DataTable dt = DBMgr.GetDataTable("select DECLARATIONCODE 报关单号,REPUNITCODE 申报单位代码,KINDOFTAX 征免性质,to_char(REPTIME,'yyyymmdd') 申报日期,TRADEMETHOD 贸易方式,BUSIUNITCODE 经营单位代码,RECORDCODE 账册号 from list_declaration_after where declarationcode in (" + declarationcode_list + ") and csid=1");
             DataTable dt_sub = DBMgr.GetDataTable(@"select a.ORDERNO 序号,a.ITEMNO 项号,a.COMMODITYNO||a.ADDITIONALNO 商品编号,a.COMMODITYNAME 商品名称,a.TAXPAID 征免,a.CADQUANTITY 成交数量,a.CADUNIT 成交单位,a.CURRENCYCODE 币制,a.TOTALPRICE 总价,b.DECLARATIONCODE 报关单号 from 
                                                     list_decllist_after a left join list_declaration_after b on a.predeclcode=b.CODE  where a.predeclcode in (" + predeclcode_list + ") and a.isinvalid=0 and a.xzlb in('报关单','报关单解析')");
-           string  result = ImExcel_Verification_Data(dt, dt_sub, "线上");
+            string result = Extension.ImExcel_Verification_Data(dt, dt_sub, "线上", json_user);
            return result;
         }
-
-        public string ImExcel_Verification()
-        {
-            HttpPostedFileBase postedFile = Request.Files["UPLOADFILE"];//获取上传信息对象  
-            string fileName = Path.GetFileName(postedFile.FileName);
-
-            string newfile = @"~/FileUpload/Verification/" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_" + fileName;
-            if (!Directory.Exists(Server.MapPath("~/FileUpload/Verification")))
-            {
-                Directory.CreateDirectory(Server.MapPath("~/FileUpload/Verification"));
-            }
-            postedFile.SaveAs(Server.MapPath(newfile));
-
-            string result = "";
-            DataTable dtExcel = Extension.GetExcelData_Table(Server.MapPath(newfile), 0);
-            DataTable dtExcel_sub = Extension.GetExcelData_Table(Server.MapPath(newfile), 1);
-
-            result = ImExcel_Verification_Data(dtExcel, dtExcel_sub, "线下");           
-
-            if (result != "{success:true,json:[]}")//上传不成功，删除源文件
-            {
-                FileInfo fi = new FileInfo(Server.MapPath(newfile));
-                if (fi.Exists)
-                {
-                    fi.Delete();
-                }
-            }
-
-            return result;
-        }
-
-        public string ImExcel_Verification_Data(DataTable dtExcel, DataTable dtExcel_sub, string datadource)
-        {
-            if (dtExcel == null || dtExcel.Rows.Count <= 0)
-            {
-                return "{success:false,error:'导入资料为空'}";
-            }
-            if (dtExcel_sub == null || dtExcel_sub.Rows.Count <= 0)
-            {
-                return "{success:false,error:'导入资料为空'}";
-            }
-            //验证列名称
-            string data = "";
-            foreach (DataColumn column in dtExcel.Columns)
-            {
-                data = data + column.ColumnName.TrimEnd() + "/";
-            }
-
-            if (data != "报关单号/申报单位代码/征免性质/申报日期/贸易方式/经营单位代码/账册号/" || dtExcel.Columns.Count != 7)
-            {
-                return "{success:false,error:'列名不正确'}";
-            }
-
-            data = "";
-            foreach (DataColumn column in dtExcel_sub.Columns)
-            {
-                data = data + column.ColumnName.TrimEnd() + "/";
-            }
-
-            if (data != "序号/项号/商品编号/商品名称/征免/成交数量/成交单位/币制/总价/报关单号/" || dtExcel_sub.Columns.Count != 10)
-            {
-                return "{success:false,error:'列名不正确'}";
-            }
-            //====================================================================================================
-            string result = "{success:true,json:[]}";
-            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-
-            string status = "待比对";
-            string createuserid = json_user.Value<string>("ID"), createusername = json_user.Value<string>("REALNAME"), customercode = json_user.Value<string>("CUSTOMERCODE");
-
-            string declarationcode = "", repunitcode = "", kindoftax = "", reptime = "", trademethod = "", busiunitcode = "", recordcode = "";
-            dtExcel.Columns.Add("ERRORMSG"); DataTable dt_error = dtExcel.Clone();
-            string sql = ""; DataTable dt_exists = new DataTable();
-            string sql_excel_insert = @"insert into list_verification(id 
-                                ,datadource, declarationcode, repunitcode, kindoftax, reptime ,trademethod
-                                , busiunitcode, recordcode, createuserid, createusername ,createtime, status
-                                , customercode
-                            ) VALUES ( list_verification_id.Nextval
-                                ,'{0}','{1}','{2}','{3}',to_date('{4}','yyyy/mm/dd'),'{5}'
-                                ,'{6}','{7}','{8}','{9}',sysdate,'{10}'
-                                ,'{11}')";
-            string sql_excel_update = @"update list_verification set datadource='{0}',repunitcode='{2}',kindoftax='{3}',reptime=to_date('{4}','yyyy/mm/dd') ,trademethod='{5}'
-                                            , busiunitcode='{6}', recordcode='{7}', createuserid='{8}', createusername='{9}' ,createtime=sysdate, status='{10}'
-                                            , customercode='{11}'
-                                        where declarationcode='{1}'";
-
-            string sql_sub = @"insert into list_verification_sub(id 
-                                ,declarationcode, orderno, itemno, commodityno, commodityname, taxpaid
-                                ,cadquantity, cadunit, currencycode, totalprice
-                           ) VALUES ( list_verification_sub_id.Nextval
-                                ,'{0}','{1}','{2}','{3}','{4}','{5}'
-                                ,'{6}','{7}','{8}','{9}')";
-
-            OracleConnection conn = null;
-            OracleTransaction ot = null;
-            conn = DBMgr.getOrclCon();
-
-            for (int i = 0; i < dtExcel.Rows.Count; i++)
-            {
-                if (dtExcel.Rows[i]["报关单号"].ToString().Trim() == "")
-                {
-                    break;
-                }
-
-                //置空，以免影响下次判断
-                declarationcode = ""; repunitcode = ""; kindoftax = ""; reptime = ""; trademethod = ""; busiunitcode = ""; recordcode = "";
-                sql = ""; dt_exists.Clear();
-
-                declarationcode = dtExcel.Rows[i]["报关单号"].ToString().Trim();
-                repunitcode = dtExcel.Rows[i]["申报单位代码"].ToString().Trim();
-                kindoftax = dtExcel.Rows[i]["征免性质"].ToString().Trim();
-                reptime = dtExcel.Rows[i]["申报日期"].ToString().Trim();
-                trademethod = dtExcel.Rows[i]["贸易方式"].ToString().Trim();
-                busiunitcode = dtExcel.Rows[i]["经营单位代码"].ToString().Trim();
-                recordcode = dtExcel.Rows[i]["账册号"].ToString().Trim();
-
-                DataRow[] dr_array = dtExcel_sub.Select("报关单号='" + declarationcode + "'");
-                if (dr_array.Length <= 0)
-                {
-                    dtExcel.Rows[i]["ERRORMSG"] = "没有表体数据，不能导入";
-                    dt_error.ImportRow(dtExcel.Rows[i]);
-                    continue;
-                }
-
-                //判断存在性
-                dt_exists = DBMgr.GetDataTable("select declarationcode,status from list_verification where declarationcode='" + declarationcode + "'");
-                if (dt_exists.Rows.Count <= 0)
-                {
-                    //insert
-                    sql = string.Format(sql_excel_insert, datadource, declarationcode, repunitcode, kindoftax, reptime, trademethod
-                                            , busiunitcode, recordcode, createuserid, createusername, status
-                                            , customercode);
-                }
-                else
-                {
-                    if (dt_exists.Rows[0]["STATUS"].ToString() == "待比对" || dt_exists.Rows[0]["STATUS"].ToString() == "比对未通过")
-                    {
-                        //update
-                        sql = string.Format(sql_excel_update, datadource, declarationcode, repunitcode, kindoftax, reptime, trademethod
-                                            , busiunitcode, recordcode, createuserid, createusername, status
-                                            , customercode);
-                    }
-                    else
-                    {
-                        dtExcel.Rows[i]["ERRORMSG"] = "状态为 " + dt_exists.Rows[0]["STATUS"].ToString() + " ，不能导入";
-                        dt_error.ImportRow(dtExcel.Rows[i]);
-                        continue;
-                        
-                    }
-                }                
-               
-                try
-                {                    
-                    conn.Open();
-                    ot = conn.BeginTransaction();
-
-                    int recount = DBMgr.ExecuteNonQuery(sql, conn);
-                    if (recount > 0)
-                    {
-                        //插入前先删除
-                        DBMgr.ExecuteNonQuery("delete list_verification_sub where declarationcode='" + declarationcode + "'", conn);
-                        foreach (DataRow item in dr_array)
-                        {
-                            sql = string.Format(sql_sub
-                                , item["报关单号"].ToString(), item["序号"].ToString(), item["项号"].ToString(), item["商品编号"].ToString(), item["商品名称"].ToString(), item["征免"].ToString()
-                                , item["成交数量"].ToString(), item["成交单位"].ToString(), item["币制"].ToString(), item["总价"].ToString());
-                            DBMgr.ExecuteNonQuery(sql, conn);
-                        }
-
-                    }
-
-                    //commit 之前先判断
-                    if (dt_exists.Rows.Count <= 0)//add
-                    {
-                        dt_exists.Clear();
-                        dt_exists = DBMgr.GetDataTable("select declarationcode,status from list_verification where declarationcode='" + declarationcode + "'");
-                        if (dt_exists.Rows.Count <= 0)
-                        {
-                            ot.Commit();
-                        }
-                        else
-                        {
-                            ot.Rollback();
-                            dtExcel.Rows[i]["ERRORMSG"] = "报关单号已经存在，不能导入";
-                            dt_error.ImportRow(dtExcel.Rows[i]);
-                        }
-                    }
-                    else//update
-                    {
-                        dt_exists.Clear();
-                        dt_exists = DBMgr.GetDataTable("select declarationcode,status from list_verification where declarationcode='" + declarationcode + "'");
-                        if (dt_exists.Rows[0]["STATUS"].ToString() == "待比对" || dt_exists.Rows[0]["STATUS"].ToString() == "比对未通过")
-                        {
-                            ot.Commit();
-                        }
-                        else
-                        {
-                            ot.Rollback();
-                            dtExcel.Rows[i]["ERRORMSG"] = "状态为 " + dt_exists.Rows[0]["STATUS"].ToString() + " ，不能导入";
-                            dt_error.ImportRow(dtExcel.Rows[i]);
-                        }
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    ot.Rollback();
-                    dtExcel.Rows[i]["ERRORMSG"] = "导入数据异常:" + ex.Message;
-                    dt_error.ImportRow(dtExcel.Rows[i]);
-
-                }
-                finally
-                {
-                    conn.Close();
-                }
-
-            }
-
-            if (dt_error.Rows.Count > 0)
-            {
-                var json = JsonConvert.SerializeObject(dt_error);
-                result = "{success:true,json:" + json + "}";
-            }
-
-            return result;
-
-        }
-
-        public string loadVerificationDetail_D()
-        {
-            string declartioncode = Request["declartioncode"];
-
-            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
-            iso.DateTimeFormat = "yyyy-MM-dd";
-
-            string sql = "select * from list_verification_sub where declarationcode='" + declartioncode + "'";
-            DataTable dt_sub = DBMgr.GetDataTable(GetPageSql(sql,"orderno","asc"));
-            var json = JsonConvert.SerializeObject(dt_sub, iso);
-            return "{rows:" + json + ",total:" + totalProperty + "}";
-        }
-
-
+     
         #endregion
 
 

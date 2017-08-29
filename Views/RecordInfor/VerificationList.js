@@ -77,7 +77,7 @@ function initSearch() {
 function gridbind() {
     Ext.regModel('VERIFICATION', {
         fields: ['ID', 'DATADOURCE', 'DECLARATIONCODE', 'REPUNITCODE', 'KINDOFTAX', 'REPTIME', 'TRADEMETHOD', 'BUSIUNITCODE'
-        , 'RECORDCODE', 'CREATETIME', 'STATUS']
+        , 'RECORDCODE', 'CREATETIME', 'STATUS', 'NOTE']
     });
 
     var store_verification = Ext.create('Ext.data.JsonStore', {
@@ -85,7 +85,7 @@ function gridbind() {
         pageSize: 20,
         proxy: {
             type: 'ajax',
-            url: '/Common/loadverification',
+            url: '/RecordInfor/loadverification',
             reader: {
                 root: 'rows',
                 type: 'json',
@@ -131,15 +131,14 @@ function gridbind() {
             }
         },
         { header: '贸易方式', dataIndex: 'TRADEMETHOD', width: 110 },
-        { header: '经营单位代码', dataIndex: 'BUSIUNITCODE', width: 110 },
-        { header: '账册号', dataIndex: 'RECORDCODE', width: 110 },        
+        //{ header: '经营单位代码', dataIndex: 'BUSIUNITCODE', width: 110 },
+        { header: '账册号', dataIndex: 'RECORDCODE', width: 110 },
         { header: '类型', dataIndex: 'DATADOURCE', width: 100 },
         { header: '创建时间', dataIndex: 'CREATETIME', width: 130 }
         ],
         listeners:
         {
             'itemdblclick': function (view, record, item, index, e) {
-                //opencenterwin("/Common/VerificationListDetail?DECLARATIONCODE=" + record.get("DECLARATIONCODE"), 1000, 500);
                 Open();
             }
         },
@@ -210,7 +209,7 @@ function importfile() {
                 if (Ext.getCmp('formpanel_upload').getForm().isValid()) {
                     
                     Ext.getCmp('formpanel_upload').getForm().submit({
-                        url: '/Common/ImExcel_Verification',
+                        url: '/RecordInfor/ImExcel_Verification',
                         waitMsg: '数据导入中...',
                         success: function (form, action) {
                             var result = Ext.decode(action.response.responseText);
@@ -309,6 +308,17 @@ function form_ini_detail(recs) {
     var field_CREATETIME = Ext.create('Ext.form.field.Text', {
         id: 'CREATETIME', name: 'CREATETIME', fieldLabel: '创建时间', readOnly: true, value: recs[0].get("CREATETIME")
     });
+    var field_NOTE = Ext.create('Ext.form.field.Text', {
+        id: 'NOTE ', name: 'NOTE ', fieldLabel: '<font color=red>未通过原因</font>', readOnly: true, value: recs[0].get("NOTE"), flex: 1
+    });
+    field_NOTE.setFieldStyle({ color: 'blue' });
+
+    var f_NOTE_container = {
+        xtype: 'fieldcontainer',
+        layout: 'hbox', margin: 0,
+        columnWidth: .5,
+        items: [field_NOTE]
+    }   
 
     var f_formpanel = Ext.create('Ext.form.Panel', {
         id: 'f_formpanel',
@@ -323,10 +333,15 @@ function form_ini_detail(recs) {
         },
         items: [
                 { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_DECLARATIONCODE, field_REPUNITCODE, field_KINDOFTAX, field_REPTIME] },
-                { layout: 'column', height: 42, border: 0, items: [field_TRADEMETHOD, field_BUSIUNITCODE, field_RECORDCODE, field_DATADOURCE] },
-                { layout: 'column', height: 42, border: 0, items: [field_STATUS, field_CREATETIME] }
+                { layout: 'column', height: 42, border: 0, items: [field_TRADEMETHOD, field_BUSIUNITCODE, field_RECORDCODE,field_CREATETIME ] },
+                { layout: 'column', height: 42, border: 0, items: [field_DATADOURCE, field_STATUS, f_NOTE_container] }
         ]
     });
+
+    if (field_STATUS.getValue() != "比对未通过") {
+        field_NOTE.hide();
+    } 
+    
 }
 
 function grid_ini_detail(data) {
@@ -340,7 +355,7 @@ function grid_ini_detail(data) {
         pageSize: 10,
         proxy: {
             type: 'ajax',
-            url: '/Common/loadVerificationDetail_D',
+            url: '/RecordInfor/loadVerificationDetail_D',
             reader: {
                 root: 'rows',
                 type: 'json',
@@ -378,8 +393,8 @@ function grid_ini_detail(data) {
         { header: '成交数量', dataIndex: 'CADQUANTITY', width: 60 },
         { header: '成交单位', dataIndex: 'CADUNIT', width: 60 },
         { header: '币制', dataIndex: 'CURRENCYCODE', width: 40 },
-        { header: '总价', dataIndex: 'TOTALPRICE', width: 100 },
-        { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 130 }
+        { header: '总价', dataIndex: 'TOTALPRICE', width: 100 }//,
+        //{ header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 130 }
         ],
         viewConfig: {
             enableTextSelection: true

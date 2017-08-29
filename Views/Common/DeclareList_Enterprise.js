@@ -405,7 +405,7 @@ function gridpanelBind() {
         fields: ['ID', 'PREDECLCODE', 'DECLARATIONCODE', 'CUSTOMSSTATUS', 'CODE', 'MODIFYFLAG', 'REPTIME', 'TRANSNAME', 'BUSIUNITCODE', 'CUSTOMERNAME', 'IETYPE',
                 'BUSIUNITNAME', 'PORTCODE', 'BLNO', 'REPWAYID', 'REPWAYNAME', 'DECLWAY', 'DECLWAYNAME', 'TRADEMETHOD', 'CONTRACTNO', 'GOODSNUM',
                 'GOODSNW', 'GOODSGW', 'SHEETNUM', 'ORDERCODE', 'CUSNO', 'ASSOCIATENO', 'CORRESPONDNO', 'BUSITYPE', 'CONTRACTNOORDER', 'REPUNITNAME',
-                'VERSTATUS'
+                'VERSTATUS', 'NOTE'
         ],
         pageSize: 22,
         proxy: {
@@ -452,6 +452,7 @@ function gridpanelBind() {
             }
         }
     });
+    Ext.tip.QuickTipManager.init();
     pgbar = Ext.create('Ext.toolbar.Paging', {
         id: 'declare_grid_pgbar',
         displayMsg: '显示 {0} - {1} 条,共计 {2} 条',
@@ -463,7 +464,14 @@ function gridpanelBind() {
         { xtype: 'rownumberer', width: 35 },
         { header: 'ID', dataIndex: 'ID', sortable: true, hidden: true },
         { header: '海关状态', dataIndex: 'CUSTOMSSTATUS', width: 90, locked: true },
-        { header: '比对状态', dataIndex: 'VERSTATUS', width: 90, locked: true},
+        {
+            header: '比对状态', dataIndex: 'VERSTATUS', width: 90, locked: true, renderer: function (value, meta, record) {
+                if (value == "比对未通过") {
+                    meta.tdAttr = 'data-qtitle="<font color=red>未通过原因</font>" data-qtip="<font color=blue>' + record.get("NOTE") + '</font>"';
+                }
+                return value;
+            }
+        },
         { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 140, locked: true, renderer: render },
         { header: '申报单位', dataIndex: 'REPUNITNAME', width: 200 },
         { header: '合同发票号', dataIndex: 'CONTRACTNOORDER', width: 140, locked: true, },

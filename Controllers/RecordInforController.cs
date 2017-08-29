@@ -91,6 +91,13 @@ namespace MvcPlatform.Controllers
             return View();
         }
 
+        public ActionResult VerificationList()//核销比对
+        {
+            ViewBag.navigator = "备案管理>>核销比对";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
+
 
         #region Recordinfo_Detail
         public string Query_RecordInfor(string type)
@@ -1470,7 +1477,8 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(4).SetCellValue("报关单号"); row1.CreateCell(5).SetCellValue("贸易方式"); row1.CreateCell(6).SetCellValue("序号"); row1.CreateCell(7).SetCellValue("项号属性");
                 row1.CreateCell(8).SetCellValue("项号"); row1.CreateCell(9).SetCellValue("品名"); row1.CreateCell(10).SetCellValue("规格型号"); row1.CreateCell(11).SetCellValue("成交数量"); 
                 row1.CreateCell(12).SetCellValue("成交单位"); row1.CreateCell(13).SetCellValue("成交金额");row1.CreateCell(14).SetCellValue("币制"); row1.CreateCell(15).SetCellValue("海关状态");
-                row1.CreateCell(16).SetCellValue("账册号"); row1.CreateCell(17).SetCellValue("删改单"); row1.CreateCell(18).SetCellValue("数据确认"); 
+                row1.CreateCell(16).SetCellValue("账册号"); row1.CreateCell(17).SetCellValue("删改单"); row1.CreateCell(18).SetCellValue("数据确认"); row1.CreateCell(19).SetCellValue("比对状态");
+                row1.CreateCell(20).SetCellValue("未通过原因"); 
                
 
                 if (dt != null)
@@ -1497,6 +1505,8 @@ namespace MvcPlatform.Controllers
                         rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["RECORDCODE"].ToString());
                         rowtemp.CreateCell(17).SetCellValue(GetName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
                         rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["DATACONFIRM"].ToString() == "2" ? "是" : "否");
+                        rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["VERSTATUS"].ToString());
+                        rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["NOTE"].ToString());
                     }
                 }
             }
@@ -1512,7 +1522,7 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(16).SetCellValue("法定数量"); row1.CreateCell(17).SetCellValue("法定单位"); row1.CreateCell(18).SetCellValue("第二法定数量"); row1.CreateCell(19).SetCellValue("第二法定单位");
                 row1.CreateCell(20).SetCellValue("原产国"); row1.CreateCell(21).SetCellValue("币制"); row1.CreateCell(22).SetCellValue("单价"); row1.CreateCell(23).SetCellValue("总价");
                 row1.CreateCell(24).SetCellValue("折合美元总价"); row1.CreateCell(25).SetCellValue("汇率"); row1.CreateCell(26).SetCellValue("备注1"); row1.CreateCell(27).SetCellValue("备注2");
-                row1.CreateCell(28).SetCellValue("备注3"); 
+                row1.CreateCell(28).SetCellValue("备注3"); row1.CreateCell(29).SetCellValue("比对状态"); row1.CreateCell(30).SetCellValue("未通过原因"); 
 
 
                 if (dt != null)
@@ -1574,6 +1584,8 @@ namespace MvcPlatform.Controllers
                         //rowtemp.CreateCell(26).SetCellValue("");
                         //rowtemp.CreateCell(27).SetCellValue("");
                         //rowtemp.CreateCell(28).SetCellValue("");
+                        rowtemp.CreateCell(29).SetCellValue(dt.Rows[i]["VERSTATUS"].ToString());
+                        rowtemp.CreateCell(30).SetCellValue(dt.Rows[i]["NOTE"].ToString());
                     }
                 }
             }
@@ -1649,6 +1661,95 @@ namespace MvcPlatform.Controllers
 
 
         }        
+        #endregion
+
+
+        #region LIST_VERIFICATION 核销比对
+
+        public string check_ver()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            return Extension.Check_Customer(json_user.Value<string>("CUSTOMERID")).ToString().ToLower();
+        }
+
+        public string ImExcel_Verification()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            HttpPostedFileBase postedFile = Request.Files["UPLOADFILE"];//获取上传信息对象  
+            string fileName = Path.GetFileName(postedFile.FileName);
+
+            string newfile = @"~/FileUpload/Verification/" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_" + fileName;
+            if (!Directory.Exists(Server.MapPath("~/FileUpload/Verification")))
+            {
+                Directory.CreateDirectory(Server.MapPath("~/FileUpload/Verification"));
+            }
+            postedFile.SaveAs(Server.MapPath(newfile));
+
+            string result = "";
+            DataTable dtExcel = Extension.GetExcelData_Table(Server.MapPath(newfile), 0);
+            DataTable dtExcel_sub = Extension.GetExcelData_Table(Server.MapPath(newfile), 1);
+
+            result = Extension.ImExcel_Verification_Data(dtExcel, dtExcel_sub, "线下", json_user);
+
+            if (result != "{success:true,json:[]}")//上传不成功，删除源文件
+            {
+                FileInfo fi = new FileInfo(Server.MapPath(newfile));
+                if (fi.Exists)
+                {
+                    fi.Delete();
+                }
+            }
+
+            return result;
+        }
+
+        public string QueryConditionVerification()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            string where = @" where lv.BUSIUNITCODE ='" + json_user.Value<string>("CUSTOMERHSCODE") + "' ";
+
+            if (!string.IsNullOrEmpty(Request["DECLARATIONCODE"]))
+            {
+                where += " and lv.DECLARATIONCODE='" + Request["DECLARATIONCODE"] + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["TRADEMETHOD"]))
+            {
+                where += " and lv.TRADEMETHOD='" + Request["TRADEMETHOD"] + "'";
+            }
+
+            string sql = @"select lv.* from list_verification lv " + where;
+
+            return sql;
+
+        }
+
+        public string loadverification()
+        {
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            string sql = QueryConditionVerification();
+
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "DESC"));
+            var json = JsonConvert.SerializeObject(dt, iso);
+
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
+        public string loadVerificationDetail_D()
+        {
+            string declartioncode = Request["declartioncode"];
+
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd";
+
+            string sql = "select * from list_verification_sub where declarationcode='" + declartioncode + "'";
+            DataTable dt_sub = DBMgr.GetDataTable(GetPageSql(sql, "orderno", "asc"));
+            var json = JsonConvert.SerializeObject(dt_sub, iso);
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
         #endregion
     }
 }
