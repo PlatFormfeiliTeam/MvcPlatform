@@ -104,7 +104,7 @@ namespace MvcPlatform.Controllers
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
 
-            string sql="",where = "";
+            string sql = "", where = "";
             if (!string.IsNullOrEmpty(Request["RECORDINFORID"]))
             {
                 where += " and a.CODE='" + Request["RECORDINFORID"] + "'";
@@ -131,57 +131,45 @@ namespace MvcPlatform.Controllers
             }
             if (type == "go")
             {
-                sql = @"select a.code,b.*
-                            from (select * from cusdoc.sys_recordinfo where enabled=1) a
-                                 inner join (  
-                                         select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
-                                                ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark
-                                                ,aa.options,aa.status,aa.customercode,aa.customername
-                                         from sys_recordinfo_detail_task aa 
-                                    ) b on a.id=b.recordinfoid ";
+                sql = @"select a.code,b.*,c.elements
+                        from (select * from cusdoc.sys_recordinfo where enabled=1) a
+                            inner join (  
+                                    select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
+                                        ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark
+                                        ,aa.options,aa.status,aa.customercode,aa.customername
+                                    from sys_recordinfo_detail_task aa 
+                                    ) b on a.id=b.recordinfoid 
+                            left join (
+                                    select hscode,extracode,elements from cusdoc.BASE_COMMODITYHS 
+                                    where enabled=1 and yearid=(select id from  cusdoc.base_year where customarea='2300' and enabled=1 and rownum=1)
+                                    ) c on b.hscode=c.hscode and b.additionalno=c.extracode";
             }
             else
             {
-                sql = @"select a.code,b.*
-                            from (select * from cusdoc.sys_recordinfo where enabled=1) a
-                                 inner join (
-                                         select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
-                                                ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark 
-                                                ,null options,null status,null customercode,null customername
-                                         from cusdoc.sys_recordinfo_detail aa
-                                    ) b on a.id=b.recordinfoid ";                
+                sql = @"select a.code,b.*,c.elements
+                        from (select * from cusdoc.sys_recordinfo where enabled=1) a
+                            inner join (
+                                    select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
+                                        ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark 
+                                        ,null options,null status,null customercode,null customername
+                                    from cusdoc.sys_recordinfo_detail aa
+                                    ) b on a.id=b.recordinfoid 
+                            left join (
+                                    select hscode,extracode,elements from cusdoc.BASE_COMMODITYHS 
+                                    where enabled=1 and yearid=(select id from  cusdoc.base_year where customarea='2300' and enabled=1 and rownum=1)
+                                    ) c on b.hscode=c.hscode and b.additionalno=c.extracode";                
             }
 
-            if (Request["ERROR"].ToString() == "1")
-            {
-                sql = sql + " left join (select hscode from cusdoc.BASE_COMMODITYHS where enabled=1) c on b.hscode=c.hscode";
-            }
             sql = sql + " where a.busiunit='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where;
 
             if (Request["ERROR"].ToString() == "1")
             {
-                sql = sql + " and c.hscode is null";
+                sql = sql + " and (c.hscode is null or c.extracode is null)";
             }
 
             return sql;
         }
 
-        /*all sql
-         * string sql = @"select a.code,b.*
-                        from (select * from cusdoc.sys_recordinfo where enabled=1) a
-                             inner join (  
-                                     select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
-                                            ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark
-                                            ,aa.options,aa.status,aa.customercode,aa.customername
-                                     from sys_recordinfo_detail_task aa where aa.status<50 
-                                     union
-                                     select aa.ID,aa.recordinfoid,aa.itemno,aa.hscode,aa.additionalno,aa.itemnoattribute 
-                                            ,aa.commodityname,aa.specificationsmodel,aa.unit,aa.remark 
-                                            ,null options,null status,null customercode,null customername
-                                     from cusdoc.sys_recordinfo_detail aa 
-                                          left join (select * from sys_recordinfo_detail_task where status<50 and OPTIONS<>'A') bb on aa.id=bb.rid
-                                     where bb.rid is null
-                                ) b on a.id=b.recordinfoid ";*/
         public string loadRecordDetail()
         {
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
@@ -278,7 +266,7 @@ namespace MvcPlatform.Controllers
             NPOI.SS.UserModel.IRow row1 = sheet_lj.CreateRow(0);
             row1.CreateCell(0).SetCellValue("账册号"); row1.CreateCell(1).SetCellValue("项号"); row1.CreateCell(2).SetCellValue("HS编码"); row1.CreateCell(3).SetCellValue("附加码");
             row1.CreateCell(4).SetCellValue("项号属性"); row1.CreateCell(5).SetCellValue("商品名称"); row1.CreateCell(6).SetCellValue("规格型号"); row1.CreateCell(7).SetCellValue("成交单位");
-            row1.CreateCell(8).SetCellValue("备注");
+            row1.CreateCell(8).SetCellValue("备注"); row1.CreateCell(9).SetCellValue("申报要素");
 
             for (int i = 0; i < dr_lj.Length; i++)
             {
@@ -292,13 +280,14 @@ namespace MvcPlatform.Controllers
                 rowtemp.CreateCell(6).SetCellValue(dr_lj[i]["SPECIFICATIONSMODEL"].ToString());
                 rowtemp.CreateCell(7).SetCellValue(GetName(dr_lj[i]["UNIT"].ToString(), e_unit));
                 rowtemp.CreateCell(8).SetCellValue(dr_lj[i]["REMARK"].ToString());
+                rowtemp.CreateCell(9).SetCellValue(dr_lj[i]["ELEMENTS"].ToString());
             }
 
             NPOI.SS.UserModel.ISheet sheet_cp = book.CreateSheet("成品");
             NPOI.SS.UserModel.IRow row2 = sheet_cp.CreateRow(0);
             row2.CreateCell(0).SetCellValue("账册号"); row2.CreateCell(1).SetCellValue("项号"); row2.CreateCell(2).SetCellValue("HS编码"); row2.CreateCell(3).SetCellValue("附加码");
             row2.CreateCell(4).SetCellValue("项号属性"); row2.CreateCell(5).SetCellValue("商品名称"); row2.CreateCell(6).SetCellValue("规格型号"); row2.CreateCell(7).SetCellValue("成交单位");
-            row2.CreateCell(8).SetCellValue("备注");
+            row2.CreateCell(8).SetCellValue("备注"); row2.CreateCell(9).SetCellValue("申报要素");
 
             for (int i = 0; i < dr_cp.Length; i++)
             {
@@ -312,6 +301,7 @@ namespace MvcPlatform.Controllers
                 rowtemp.CreateCell(6).SetCellValue(dr_cp[i]["SPECIFICATIONSMODEL"].ToString());
                 rowtemp.CreateCell(7).SetCellValue(GetName(dr_cp[i]["UNIT"].ToString(), e_unit));
                 rowtemp.CreateCell(8).SetCellValue(dr_cp[i]["REMARK"].ToString());
+                rowtemp.CreateCell(9).SetCellValue(dr_cp[i]["ELEMENTS"].ToString());
             }
 
             //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -325,7 +315,7 @@ namespace MvcPlatform.Controllers
             NPOI.SS.UserModel.IRow row3 = sheet_lj_go.CreateRow(0);
             row3.CreateCell(0).SetCellValue("变动状态"); row3.CreateCell(1).SetCellValue("申请状态"); row3.CreateCell(2).SetCellValue("账册号"); row3.CreateCell(3).SetCellValue("项号");
             row3.CreateCell(4).SetCellValue("HS编码"); row3.CreateCell(5).SetCellValue("附加码"); row3.CreateCell(6).SetCellValue("项号属性"); row3.CreateCell(7).SetCellValue("商品名称");
-            row3.CreateCell(8).SetCellValue("规格型号"); row3.CreateCell(9).SetCellValue("成交单位"); row3.CreateCell(10).SetCellValue("备注");
+            row3.CreateCell(8).SetCellValue("规格型号"); row3.CreateCell(9).SetCellValue("成交单位"); row3.CreateCell(10).SetCellValue("备注"); row3.CreateCell(11).SetCellValue("申报要素");
 
             for (int i = 0; i < dr_lj_go.Length; i++)
             {
@@ -341,13 +331,14 @@ namespace MvcPlatform.Controllers
                 rowtemp.CreateCell(8).SetCellValue(dr_lj_go[i]["SPECIFICATIONSMODEL"].ToString());
                 rowtemp.CreateCell(9).SetCellValue(GetName(dr_lj_go[i]["UNIT"].ToString(), e_unit));
                 rowtemp.CreateCell(10).SetCellValue(dr_lj_go[i]["REMARK"].ToString());
+                rowtemp.CreateCell(11).SetCellValue(dr_lj_go[i]["ELEMENTS"].ToString());
             }
 
             NPOI.SS.UserModel.ISheet sheet_cp_go = book.CreateSheet("成品_申请");
             NPOI.SS.UserModel.IRow row4 = sheet_cp_go.CreateRow(0);
             row4.CreateCell(0).SetCellValue("变动状态"); row4.CreateCell(1).SetCellValue("申请状态"); row4.CreateCell(2).SetCellValue("账册号"); row4.CreateCell(3).SetCellValue("项号");
             row4.CreateCell(4).SetCellValue("HS编码"); row4.CreateCell(5).SetCellValue("附加码"); row4.CreateCell(6).SetCellValue("项号属性"); row4.CreateCell(7).SetCellValue("商品名称");
-            row4.CreateCell(8).SetCellValue("规格型号"); row4.CreateCell(9).SetCellValue("成交单位"); row4.CreateCell(10).SetCellValue("备注");
+            row4.CreateCell(8).SetCellValue("规格型号"); row4.CreateCell(9).SetCellValue("成交单位"); row4.CreateCell(10).SetCellValue("备注"); row4.CreateCell(11).SetCellValue("申报要素");
 
             for (int i = 0; i < dr_cp_go.Length; i++)
             {
@@ -363,6 +354,7 @@ namespace MvcPlatform.Controllers
                 rowtemp.CreateCell(8).SetCellValue(dr_cp_go[i]["SPECIFICATIONSMODEL"].ToString());
                 rowtemp.CreateCell(9).SetCellValue(GetName(dr_cp_go[i]["UNIT"].ToString(), e_unit));
                 rowtemp.CreateCell(10).SetCellValue(dr_cp_go[i]["REMARK"].ToString());
+                rowtemp.CreateCell(11).SetCellValue(dr_cp_go[i]["ELEMENTS"].ToString());
             }
             //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             // 写入到客户端 

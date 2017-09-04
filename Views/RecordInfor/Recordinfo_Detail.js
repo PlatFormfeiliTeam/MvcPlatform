@@ -141,8 +141,9 @@ function initSearch() {
 function itemsbind() {
     Ext.regModel('RecrodDetail', {
         fields: ['ID', 'OPTIONS', 'STATUS', 'RECORDINFOID', 'CODE', 'ITEMNO', 'HSCODE', 'ADDITIONALNO', 'ITEMNOATTRIBUTE', 'COMMODITYNAME'
-            , 'SPECIFICATIONSMODEL', 'UNIT', 'CUSTOMERCODE', 'CUSTOMERNAME', 'REMARK']
+            , 'SPECIFICATIONSMODEL', 'UNIT', 'CUSTOMERCODE', 'CUSTOMERNAME', 'REMARK','ELEMENTS']
     });
+    Ext.tip.QuickTipManager.init();
 
     var store_RecrodDetail_lj = Ext.create('Ext.data.JsonStore', {
         model: 'RecrodDetail',
@@ -178,7 +179,7 @@ function itemsbind() {
         displayMsg: '显示 {0} - {1} 条,共计 {2} 条',
         store: store_RecrodDetail_lj,
         displayInfo: true
-    })
+    });
     gridpanel_lj = Ext.create('Ext.grid.Panel', {
         id: "gridpanel_lj",
         store: store_RecrodDetail_lj,
@@ -193,14 +194,22 @@ function itemsbind() {
         //{ header: '申请状态', dataIndex: 'STATUS', width: 110 },
         { header: '账册号', dataIndex: 'CODE', width: 130 },
         { header: '项号', dataIndex: 'ITEMNO', width: 80 },
-        { header: 'HS编码', dataIndex: 'HSCODE', width: 130 },
-        { header: '附加码', dataIndex: 'ADDITIONALNO', width: 80 },
+        { header: 'HS编码', dataIndex: 'HSCODE', width: 110 },
+        { header: '附加码', dataIndex: 'ADDITIONALNO', width: 65 },
         { header: '项号属性', dataIndex: 'ITEMNOATTRIBUTE', width: 80 },
         { header: '商品名称', dataIndex: 'COMMODITYNAME', width: 200 },
         { header: '规格型号', dataIndex: 'SPECIFICATIONSMODEL', width: 200 },
         { header: '成交单位', dataIndex: 'UNIT', width: 80, renderer: renderOrder },
         //{ header: '报关行', dataIndex: 'CUSTOMERNAME', width: 150 },
-        { header: '备注', dataIndex: 'REMARK', width: 150 }
+        { header: '备注', dataIndex: 'REMARK', width: 150 },
+        {
+            header: '申报要素', dataIndex: 'ELEMENTS', width: 200, renderer: function (value, meta, record) {
+                if (value) {
+                    meta.tdAttr = 'data-qtip="<font color=blue>' + value + '</font>"';
+                }
+                return value;
+            }
+        }
         ],
         viewConfig: {
             enableTextSelection: true
@@ -256,14 +265,15 @@ function itemsbind() {
         //{ header: '申请状态', dataIndex: 'STATUS', width: 110 },
         { header: '账册号', dataIndex: 'CODE', width: 130 },
         { header: '项号', dataIndex: 'ITEMNO', width: 80 },
-        { header: 'HS编码', dataIndex: 'HSCODE', width: 130 },
-        { header: '附加码', dataIndex: 'ADDITIONALNO', width: 80 },
+        { header: 'HS编码', dataIndex: 'HSCODE', width: 110 },
+        { header: '附加码', dataIndex: 'ADDITIONALNO', width: 65 },
         { header: '项号属性', dataIndex: 'ITEMNOATTRIBUTE', width: 80 },
         { header: '商品名称', dataIndex: 'COMMODITYNAME', width: 200 },
         { header: '规格型号', dataIndex: 'SPECIFICATIONSMODEL', width: 200 },
         { header: '成交单位', dataIndex: 'UNIT', width: 80, renderer: renderOrder },
         //{ header: '报关行', dataIndex: 'CUSTOMERNAME', width: 150 },
-        { header: '备注', dataIndex: 'REMARK', width: 150 }
+        { header: '备注', dataIndex: 'REMARK', width: 150 },
+        { header: '申报要素', dataIndex: 'ELEMENTS', width: 200 }
         ],
         viewConfig: {
             enableTextSelection: true
@@ -338,14 +348,15 @@ function itemsbind() {
         { header: '申请状态', dataIndex: 'STATUS', width: 110, renderer: renderOrder },
         { header: '账册号', dataIndex: 'CODE', width: 130 },
         { header: '项号', dataIndex: 'ITEMNO', width: 80 },
-        { header: 'HS编码', dataIndex: 'HSCODE', width: 130 },
-        { header: '附加码', dataIndex: 'ADDITIONALNO', width: 80 },
+        { header: 'HS编码', dataIndex: 'HSCODE', width: 110 },
+        { header: '附加码', dataIndex: 'ADDITIONALNO', width: 65 },
         { header: '项号属性', dataIndex: 'ITEMNOATTRIBUTE', width: 80 },
         { header: '商品名称', dataIndex: 'COMMODITYNAME', width: 150 },
         { header: '规格型号', dataIndex: 'SPECIFICATIONSMODEL', width: 200 },
         { header: '成交单位', dataIndex: 'UNIT', width: 80, renderer: renderOrder },
         { header: '报关行', dataIndex: 'CUSTOMERNAME', width: 250 },
-        { header: '备注', dataIndex: 'REMARK', width: 150 }
+        { header: '备注', dataIndex: 'REMARK', width: 150 },
+        { header: '申报要素', dataIndex: 'ELEMENTS', width: 200 }
         ],
         listeners:
         {
@@ -427,14 +438,15 @@ function itemsbind() {
         { header: '申请状态', dataIndex: 'STATUS', width: 110, renderer: renderOrder },
         { header: '账册号', dataIndex: 'CODE', width: 130 },
         { header: '项号', dataIndex: 'ITEMNO', width: 80 },
-        { header: 'HS编码', dataIndex: 'HSCODE', width: 130 },
-        { header: '附加码', dataIndex: 'ADDITIONALNO', width: 80 },
+        { header: 'HS编码', dataIndex: 'HSCODE', width: 110 },
+        { header: '附加码', dataIndex: 'ADDITIONALNO', width: 65 },
         { header: '项号属性', dataIndex: 'ITEMNOATTRIBUTE', width: 80 },
         { header: '商品名称', dataIndex: 'COMMODITYNAME', width: 150 },
         { header: '规格型号', dataIndex: 'SPECIFICATIONSMODEL', width: 200 },
         { header: '成交单位', dataIndex: 'UNIT', width: 80, renderer: renderOrder },
         { header: '报关行', dataIndex: 'CUSTOMERNAME', width: 250 },
-        { header: '备注', dataIndex: 'REMARK', width: 150 }
+        { header: '备注', dataIndex: 'REMARK', width: 150 },
+        { header: '申报要素', dataIndex: 'ELEMENTS', width: 200 }
         ],
         listeners:
         {
