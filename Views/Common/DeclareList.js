@@ -54,7 +54,9 @@ Ext.onReady(function () {
                         'DECLARATIONCODE', 'REPTIME', 'CONTRACTNO', 'GOODSNUM', 'GOODSNW', 'GOODSGW', 'BLNO', 'TRANSNAME', 'VOYAGENO',
                         'BUSIUNITCODE', 'BUSIUNITNAME', 'PORTCODE', 'TRADEMETHOD', 'DECLWAY', 'DECLWAYNAME',
                         'BUSITYPE', 'CONTRACTNOORDER', 'REPWAYID', 'REPWAYNAME', 'TOTALNO', 'DIVIDENO', 'SECONDLADINGBILLNO',
-                        'CUSNO', 'IETYPE', 'ASSOCIATENO', 'CORRESPONDNO', 'CUSTOMERNAME'],
+                        'CUSNO', 'IETYPE', 'ASSOCIATENO', 'CORRESPONDNO', 'CUSTOMERNAME',
+                        'VERSTATUS', 'NOTE'
+                ],
                 pageSize: 22,
                 proxy: {
                     type: 'ajax',
@@ -81,13 +83,14 @@ Ext.onReady(function () {
                         }
                     }
                 }
-            })
+            });
+            Ext.tip.QuickTipManager.init();
             pgbar = Ext.create('Ext.toolbar.Paging', {
                 id: 'declare_grid_pgbar',
                 displayMsg: '显示 {0} - {1} 条,共计 {2} 条',
                 store: store,
                 displayInfo: true
-            })
+            });
             var gridpanel = Ext.create('Ext.grid.Panel', {
                 id: 'declare_grid',
                 store: store,
@@ -125,7 +128,15 @@ Ext.onReady(function () {
                 { header: '多单关联号', dataIndex: 'CORRESPONDNO', width: 100, hidden: busitypeid != '40-41' },//多单关联号
                 { header: '订单编号', dataIndex: 'ORDERCODE', width: 100 },
                 { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 140, locked: role == 'customer' },
-                { header: '客户编号', dataIndex: 'CUSNO', width: 125 }
+                { header: '客户编号', dataIndex: 'CUSNO', width: 125 },
+                {
+                    header: '比对状态', dataIndex: 'VERSTATUS', width: 90, renderer: function (value, meta, record) {
+                        if (value == "比对未通过") {
+                            meta.tdAttr = 'data-qtitle="<font color=red>未通过原因</font>" data-qtip="<font color=blue>' + record.get("NOTE") + '</font>"';
+                        }
+                        return value;
+                    }
+                }
                 ],
                 viewConfig: {
                     enableTextSelection: true

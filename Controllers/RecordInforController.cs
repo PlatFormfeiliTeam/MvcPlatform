@@ -1671,7 +1671,7 @@ namespace MvcPlatform.Controllers
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             return Extension.Check_Customer(json_user.Value<string>("CUSTOMERID")).ToString().ToLower();
         }
-
+        /*
         public string ImExcel_Verification()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
@@ -1703,8 +1703,39 @@ namespace MvcPlatform.Controllers
 
             return result;
         }
+         */
 
-        public string QueryConditionVerification()
+        public string ImExcel_Verification()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            HttpPostedFileBase postedFile = Request.Files["UPLOADFILE"];//获取上传信息对象  
+            string fileName = Path.GetFileName(postedFile.FileName);
+
+            string newfile = @"~/FileUpload/Verification/" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_" + fileName;
+            if (!Directory.Exists(Server.MapPath("~/FileUpload/Verification")))
+            {
+                Directory.CreateDirectory(Server.MapPath("~/FileUpload/Verification"));
+            }
+            postedFile.SaveAs(Server.MapPath(newfile));
+
+            string result = "";
+            DataTable dtExcel = Extension.GetExcelData_Table(Server.MapPath(newfile), 0);
+            result = Extension.ImExcel_Verification_Data(dtExcel, "线下", json_user);
+
+            if (result != "{success:true,json:[]}")//上传不成功，删除源文件
+            {
+                FileInfo fi = new FileInfo(Server.MapPath(newfile));
+                if (fi.Exists)
+                {
+                    fi.Delete();
+                }
+            }
+
+            return result;
+        }
+
+        /*public string QueryConditionVerification()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
 
@@ -1718,8 +1749,85 @@ namespace MvcPlatform.Controllers
             {
                 where += " and lv.TRADEMETHOD='" + Request["TRADEMETHOD"] + "'";
             }
+            if (!string.IsNullOrEmpty(Request["CONTRACTNO"]))
+            {
+                where += " and lv.CONTRACTNO='" + Request["CONTRACTNO"] + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["BUSITYPE"]))
+            {
+                where += " and lv.BUSITYPE='" + Request["BUSITYPE"] + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["STATUS"]))
+            {
+                where += " and lv.STATUS='" + Request["STATUS"] + "'";
+            }
 
             string sql = @"select lv.* from list_verification lv " + where;
+
+            return sql;
+
+        }*/
+
+        public string QueryConditionVerification()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            string where = " 1=1";
+            if (!string.IsNullOrEmpty(Request["DECLARATIONCODE"]))
+            {
+                where += " and aaa.DECLARATIONCODE='" + Request["DECLARATIONCODE"] + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["TRADEMETHOD"]))
+            {
+                where += " and aaa.TRADEMETHOD='" + Request["TRADEMETHOD"] + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["CONTRACTNO"]))
+            {
+                where += " and aaa.CONTRACTNO='" + Request["CONTRACTNO"] + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["BUSITYPE"]))
+            {
+                where += " and aaa.BUSITYPE='" + Request["BUSITYPE"] + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["STATUS"]))
+            {
+                where += " and aaa.STATUS='" + Request["STATUS"] + "'";
+            }
+
+            string sql_ver = "", sql_decl = "", sql = "";
+
+            sql_ver = @"select lv.id,lv.datadource,lv.declarationcode,lv.repunitcode,lv.kindoftax
+                        ,to_char(lv.reptime,'yyyy-mm-dd') reptime,lv.trademethod,lv.busiunitcode,lv.recordcode,lv.createtime
+                        ,lv.status,lv.note,lv.contractno,lv.busitype
+                        ,lv.inouttype      
+                    from list_verification lv 
+                    where lv.busiunitcode='{0}'";
+            sql_ver = string.Format(sql_ver, json_user.Value<string>("CUSTOMERHSCODE"));
+
+            sql_decl = @"select aa.* 
+                    from (
+                        select null id, N'线上' datadource,lda.declarationcode,lda.repunitcode,lda.kindoftax 
+                            ,to_char(lda.reptime,'yyyy-mm-dd') reptime,lda.trademethod,lda.busiunitcode,lda.recordcode,null createtime
+                            , null status,null note,lda.contractno,sb.name busitype
+                            ,case when substr(lda.declarationcode,9,1)='1' then N'进口' when substr(lda.declarationcode,9,1)='0' then N'出口' else N'' end inouttype  
+                        from list_declaration det 
+                            left join list_order ort on det.ordercode = ort.code 
+						    left join list_declaration_after lda on det.code=lda.code and lda.csid=1
+                            left join (select ordercode from list_declaration ld where ld.isinvalid=0 and ld.STATUS!=130 and ld.STATUS!=110) a on det.ordercode=a.ordercode
+                            left join (
+                                    select ASSOCIATENO from list_order l inner join list_declaration i on l.code=i.ordercode 
+                                    where l.ASSOCIATENO is not null and l.isinvalid=0 and i.isinvalid=0 and (i.STATUS!=130 and i.STATUS!=110)    
+								    ) b on ort.ASSOCIATENO=b.ASSOCIATENO 
+                             left join cusdoc.sys_busitype sb on ort.busitype=sb.code and enabled=1           
+                        where (det.STATUS=130 or det.STATUS=110) and det.isinvalid=0 and ort.isinvalid=0 and lda.busiunitcode ='{0}'
+                            and a.ordercode is null 
+                            and b.ASSOCIATENO is null
+                        ) aa 
+                            left join (select * from list_verification where busiunitcode='{0}') bb on aa.declarationcode=bb.declarationcode
+                    where bb.declarationcode is null
+                    ";
+            sql_decl = string.Format(sql_decl, json_user.Value<string>("CUSTOMERHSCODE"));
+            sql = @"select * from (" + sql_ver + " union " + sql_decl + ") aaa where " + where;
 
             return sql;
 
@@ -1731,7 +1839,7 @@ namespace MvcPlatform.Controllers
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             string sql = QueryConditionVerification();
 
-            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "DESC"));
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "declarationcode", "desc"));
             var json = JsonConvert.SerializeObject(dt, iso);
 
             return "{rows:" + json + ",total:" + totalProperty + "}";

@@ -59,17 +59,86 @@ function initSearch() {
             maxHeight: 150
         }
     });
+    
+    //合同号
+    var field_CONTRACTNO = Ext.create('Ext.form.field.Text', {
+        id: 'field_CONTRACTNO',
+        fieldLabel: '合同号',
+        name: 'CONTRACTNO'
+    });
+
+    var store_BUSITYPE = Ext.create("Ext.data.JsonStore", {
+        fields: ["CODE", "NAME"],
+        data: common_data_busitype
+    });
+
+    //业务类型
+    var s_combo_BUSITYPE = Ext.create('Ext.form.field.ComboBox', {
+        id: 's_combo_BUSITYPE',
+        store: store_BUSITYPE,
+        fieldLabel: '业务类型',
+        displayField: 'NAME',
+        name: 'BUSITYPE',
+        valueField: 'NAME',
+        triggerAction: 'all',
+        hideTrigger: true,
+        anyMatch: true,
+        queryMode: 'local',
+        listeners: {
+            focus: function (cb) {
+                if (!cb.getValue()) {
+                    cb.clearInvalid();
+                    cb.expand();
+                    cb.store.clearFilter();
+                }
+            }
+        },
+        listConfig: {
+            maxHeight: 150
+        }
+    });
+
+    var store_STATUS = Ext.create("Ext.data.JsonStore", {
+        fields: ["NAME"],
+        data: [{ "NAME": "待比对" }, { "NAME": "比对中" }, { "NAME": "比对通过" }, { "NAME": "比对未通过" }]
+    });
+
+    //状态
+    var s_combo_STATUS = Ext.create('Ext.form.field.ComboBox', {
+        id: 's_combo_STATUS',
+        store: store_STATUS,
+        fieldLabel: '状态',
+        displayField: 'NAME',
+        name: 'BUSITYPE',
+        valueField: 'NAME',
+        triggerAction: 'all',
+        hideTrigger: true,
+        anyMatch: true,
+        queryMode: 'local',
+        listeners: {
+            focus: function (cb) {
+                if (!cb.getValue()) {
+                    cb.clearInvalid();
+                    cb.expand();
+                    cb.store.clearFilter();
+                }
+            }
+        },
+        listConfig: {
+            maxHeight: 150
+        }
+    });
 
     var formpanel = Ext.create('Ext.form.Panel', {
         id: 'formpanel',
         renderTo: 'div_form',
         fieldDefaults: {
             margin: '5',
-            columnWidth: 0.25,
+            columnWidth: 0.2,
             labelWidth: 70
         },
         items: [
-        { layout: 'column', border: 0, margin: '5 0 0 0', items: [field_DECLARATIONCODE, s_combo_myfs] }
+        { layout: 'column', border: 0, margin: '5 0 0 0', items: [field_DECLARATIONCODE, s_combo_myfs, field_CONTRACTNO, s_combo_BUSITYPE, s_combo_STATUS] }
         ]
     });
 }
@@ -77,7 +146,7 @@ function initSearch() {
 function gridbind() {
     Ext.regModel('VERIFICATION', {
         fields: ['ID', 'DATADOURCE', 'DECLARATIONCODE', 'REPUNITCODE', 'KINDOFTAX', 'REPTIME', 'TRADEMETHOD', 'BUSIUNITCODE'
-        , 'RECORDCODE', 'CREATETIME', 'STATUS', 'NOTE']
+        , 'RECORDCODE', 'CREATETIME', 'STATUS', 'NOTE', 'CONTRACTNO', 'BUSITYPE', 'INOUTTYPE']
     });
 
     var store_verification = Ext.create('Ext.data.JsonStore', {
@@ -96,12 +165,14 @@ function gridbind() {
         listeners: {
             beforeload: function () {
                 store_verification.getProxy().extraParams = {
-                    DECLARATIONCODE: Ext.getCmp('field_DECLARATIONCODE').getValue(), TRADEMETHOD: Ext.getCmp("s_combo_myfs").getValue()
+                    DECLARATIONCODE: Ext.getCmp('field_DECLARATIONCODE').getValue(), TRADEMETHOD: Ext.getCmp("s_combo_myfs").getValue(),
+                    CONTRACTNO: Ext.getCmp('field_CONTRACTNO').getValue(), BUSITYPE: Ext.getCmp("s_combo_BUSITYPE").getValue(),
+                    STATUS: Ext.getCmp("s_combo_STATUS").getValue()
                 }
             }
         }
     });
-
+    Ext.tip.QuickTipManager.init();
     pgbar = Ext.create('Ext.toolbar.Paging', {
         id: 'pgbar',
         displayMsg: '显示 {0} - {1} 条,共计 {2} 条',
@@ -120,20 +191,30 @@ function gridbind() {
         columns: [
         { xtype: 'rownumberer', width: 35 },
         { header: 'ID', dataIndex: 'ID', hidden: true },
-        { header: '状态', dataIndex: 'STATUS', width: 100 },
+        {
+            header: '状态', dataIndex: 'STATUS', width: 90, renderer: function (value, meta, record) {
+                if (value == "比对未通过") {
+                    meta.tdAttr = 'data-qtitle="<font color=red>未通过原因</font>" data-qtip="<font color=blue>' + record.get("NOTE") + '</font>"';
+                }
+                return value;
+            }
+        },
+        { header: '合同号', dataIndex: 'CONTRACTNO', width: 110 },
+        { header: '业务类型', dataIndex: 'BUSITYPE', width: 90 },
+        { header: '进出类型', dataIndex: 'INOUTTYPE', width: 80 },
         { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 130 },
         { header: '申报单位代码', dataIndex: 'REPUNITCODE', width: 110 },
-        { header: '征免性质', dataIndex: 'KINDOFTAX', width: 110 },
+        { header: '征免性质', dataIndex: 'KINDOFTAX', width: 80 },
         {
-            header: '申报日期', dataIndex: 'REPTIME', width: 110, renderer: function (value) {                
+            header: '申报日期', dataIndex: 'REPTIME', width: 100, renderer: function (value) {                
                 if (value == null) { return value;}
                 return value.substr(0, 10);
             }
         },
-        { header: '贸易方式', dataIndex: 'TRADEMETHOD', width: 110 },
+        { header: '贸易方式', dataIndex: 'TRADEMETHOD', width: 80 },
         //{ header: '经营单位代码', dataIndex: 'BUSIUNITCODE', width: 110 },
         { header: '账册号', dataIndex: 'RECORDCODE', width: 110 },
-        { header: '类型', dataIndex: 'DATADOURCE', width: 100 },
+        { header: '类型', dataIndex: 'DATADOURCE', width: 60 },
         { header: '创建时间', dataIndex: 'CREATETIME', width: 130 }
         ],
         listeners:

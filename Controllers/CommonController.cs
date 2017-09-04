@@ -1397,12 +1397,14 @@ namespace MvcPlatform.Controllers
                               ort.BUSITYPE,ort.CONTRACTNO CONTRACTNOORDER,ort.REPWAYID,ort.REPWAYID REPWAYNAME,ort.CUSNO,
                               ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.customercode,ort.CUSTOMERNAME,ort.CREATETIME, 
                               ort.busiunitcode,ort.busiunitname,ort.totalno,ort.divideno,ort.secondladingbillno, 
-                              cus.SCENEDECLAREID                                                             
+                              cus.SCENEDECLAREID,     
+                              lv.status VERSTATUS,lv.NOTE                                                          
                         from list_declaration det     
                             left join list_order ort on det.ordercode = ort.code 
                             left join cusdoc.sys_customer cus on ort.customercode = cus.code 
                             left join list_declaration_after lda on det.code=lda.code and lda.csid=1
-                            left join (select ordercode from list_declaration ld where ld.isinvalid=0 and ld.STATUS!=130 and ld.STATUS!=110) a on det.ordercode=a.ordercode";
+                            left join (select ordercode from list_declaration ld where ld.isinvalid=0 and ld.STATUS!=130 and ld.STATUS!=110) a on det.ordercode=a.ordercode
+                            left join list_verification lv on lda.declarationcode=lv.declarationcode ";
 
             if (busitypeid == "40-41")
             {
@@ -3747,7 +3749,7 @@ namespace MvcPlatform.Controllers
                         break;
                     case "HGZT"://海关状态
                         if (Request["VALUE3"] == "已结关") { where += " and det.CUSTOMSSTATUS='已结关' "; }
-                        if (Request["VALUE3"] == "未结关") { where += " and det.CUSTOMSSTATUS!='已结关' "; }
+                        if (Request["VALUE3"] == "未结关") { where += " and det.CUSTOMSSTATUS!='已结关' and det.CUSTOMSSTATUS!='删单或异常' "; }
                         break;
                     case "SGD"://删改单
                         where += " and det.modifyflag='" + Request["VALUE3"] + "' ";
@@ -3763,7 +3765,7 @@ namespace MvcPlatform.Controllers
                         break;
                     case "HGZT"://海关状态
                         if (Request["VALUE7"] == "已结关") { where += " and det.CUSTOMSSTATUS='已结关' "; }
-                        if (Request["VALUE7"] == "未结关") { where += " and det.CUSTOMSSTATUS!='已结关' "; }
+                        if (Request["VALUE7"] == "未结关") { where += " and det.CUSTOMSSTATUS!='已结关' and det.CUSTOMSSTATUS!='删单或异常' "; }
                         break;
                     case "SGD"://删改单
                         where += " and det.modifyflag='" + Request["VALUE7"] + "' ";
@@ -3971,7 +3973,7 @@ namespace MvcPlatform.Controllers
                         break;
                     case "HGZT"://海关状态
                         if (Request["VALUE3"] == "已结关") { where += " and det.CUSTOMSSTATUS='已结关' "; }
-                        if (Request["VALUE3"] == "未结关") { where += " and det.CUSTOMSSTATUS!='已结关' "; }
+                        if (Request["VALUE3"] == "未结关") { where += " and det.CUSTOMSSTATUS!='已结关' and det.CUSTOMSSTATUS!='删单或异常' "; }
                         break;
                     case "SGD"://删改单
                         where += " and det.modifyflag='" + Request["VALUE3"] + "' ";
@@ -3987,7 +3989,7 @@ namespace MvcPlatform.Controllers
                         break;
                     case "HGZT"://海关状态
                         if (Request["VALUE7"] == "已结关") { where += " and det.CUSTOMSSTATUS='已结关' "; }
-                        if (Request["VALUE7"] == "未结关") { where += " and det.CUSTOMSSTATUS!='已结关' "; }
+                        if (Request["VALUE7"] == "未结关") { where += " and det.CUSTOMSSTATUS!='已结关' and det.CUSTOMSSTATUS!='删单或异常' "; }
                         break;
                     case "SGD"://删改单
                         where += " and det.modifyflag='" + Request["VALUE7"] + "' ";
@@ -4377,18 +4379,41 @@ namespace MvcPlatform.Controllers
         }
 
         #region  企业端报关单 核销比对 按钮功能
-
+        /*
         public string dec_Verification(string declarationcode_list, string predeclcode_list)
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
 
-            declarationcode_list = declarationcode_list.TrimStart('[').TrimEnd(']').Replace("\"","'");
+            declarationcode_list = declarationcode_list.TrimStart('[').TrimEnd(']').Replace("\"", "'");
             predeclcode_list = predeclcode_list.TrimStart('[').TrimEnd(']').Replace("\"", "'");
             DataTable dt = DBMgr.GetDataTable("select DECLARATIONCODE 报关单号,REPUNITCODE 申报单位代码,KINDOFTAX 征免性质,to_char(REPTIME,'yyyymmdd') 申报日期,TRADEMETHOD 贸易方式,BUSIUNITCODE 经营单位代码,RECORDCODE 账册号 from list_declaration_after where declarationcode in (" + declarationcode_list + ") and csid=1");
             DataTable dt_sub = DBMgr.GetDataTable(@"select a.ORDERNO 序号,a.ITEMNO 项号,a.COMMODITYNO||a.ADDITIONALNO 商品编号,a.COMMODITYNAME 商品名称,a.TAXPAID 征免,a.CADQUANTITY 成交数量,a.CADUNIT 成交单位,a.CURRENCYCODE 币制,a.TOTALPRICE 总价,b.DECLARATIONCODE 报关单号 from 
                                                     list_decllist_after a left join list_declaration_after b on a.predeclcode=b.CODE  where a.predeclcode in (" + predeclcode_list + ") and a.isinvalid=0 and a.xzlb in('报关单','报关单解析')");
             string result = Extension.ImExcel_Verification_Data(dt, dt_sub, "线上", json_user);
-           return result;
+            return result;
+        }*/
+
+        public string dec_Verification(string declarationcode_list)
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            declarationcode_list = declarationcode_list.TrimStart('[').TrimEnd(']').Replace("\"", "'");
+
+            string sql = @"select a.DECLARATIONCODE 报关单号,a.REPUNITCODE 申报单位代码,a.KINDOFTAX 征免性质,to_char(a.REPTIME,'yyyymmdd') 申报日期
+                                   ,a.TRADEMETHOD 贸易方式,a.BUSIUNITCODE 经营单位代码,a.RECORDCODE 账册号 
+                                   ,a.contractno 合同号 
+                                   ,(select sb.name from list_order lo 
+                                     left join cusdoc.sys_busitype sb on lo.busitype=sb.code and enabled=1
+                                      where lo.code=(select ld.ordercode from list_declaration ld where ld.code=a.code)) 业务类型
+                                   ,case when substr(a.declarationcode,9,1)='1' then '进口' when substr(a.declarationcode,9,1)='0' then '出口' else '' end 进出类型
+                                   ,b.ORDERNO 序号,b.ITEMNO 项号,b.COMMODITYNO||b.ADDITIONALNO 商品编号,b.COMMODITYNAME 商品名称,b.TAXPAID 征免
+                                   ,b.CADQUANTITY 成交数量,b.CADUNIT 成交单位,b.CURRENCYCODE 币制,b.TOTALPRICE 总价
+                            from (select * from list_declaration_after where declarationcode in ({0}) and csid=1) a
+                                 left join (select * from list_decllist_after where isinvalid=0 and xzlb in('报关单','报关单解析'))b on a.CODE=b.predeclcode";
+            sql = string.Format(sql, declarationcode_list);
+
+            DataTable dt = DBMgr.GetDataTable(sql);
+            string result = Extension.ImExcel_Verification_Data(dt, "线上", json_user);
+            return result;
         }
      
         #endregion

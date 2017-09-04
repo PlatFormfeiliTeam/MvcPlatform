@@ -745,10 +745,10 @@ function VerificationList() {
         return;
     }
     var declarationcode_list = Ext.encode(Ext.pluck(Ext.pluck(recs, 'data'), 'DECLARATIONCODE'));
-    var predeclcode_list = Ext.encode(Ext.pluck(Ext.pluck(recs, 'data'), 'CODE'));
+    //var predeclcode_list = Ext.encode(Ext.pluck(Ext.pluck(recs, 'data'), 'CODE'));
     Ext.Ajax.request({
         url: '/Common/dec_Verification',
-        params: { declarationcode_list: declarationcode_list, predeclcode_list: predeclcode_list },
+        params: { declarationcode_list: declarationcode_list },//, predeclcode_list: predeclcode_list
         success: function (response, option) {
             var result = Ext.decode(response.responseText);
             if (result.success) {
