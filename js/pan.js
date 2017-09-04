@@ -15,7 +15,7 @@ function opencenterwin(url, width, height) {
 }
 function getQueryString(name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
-    var r = window.location.search.substr(1).match(reg);
+    var r = decodeURI(window.location.search).substr(1).match(reg);
     if (r != null) return unescape(r[2]); return null;
 }
 
@@ -26,7 +26,7 @@ function getQueryString_new(name) {
         url: "/Home/Decrypt",
         dataType: "text",
         async: false,
-        data: { para: window.location.search.substr(1) },
+        data: { para: decodeURI(window.location.search).substr(1) },
         success: function (data) {
             var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
             var r = data.match(reg);
@@ -1915,7 +1915,9 @@ function selectitemno(RECORDINFOID,combo_itemno, field_name, field_spec,field_un
 
 function errorwin(jsondata) {
     var store_error = Ext.create('Ext.data.JsonStore', {
-        fields: ['报关单号', '申报单位代码', '征免性质', '申报日期', '贸易方式', '经营单位代码', '账册号', 'ERRORMSG'],
+        fields: ['报关单号', '申报单位代码', '征免性质', '申报日期', '贸易方式', '经营单位代码', '账册号'
+            , '合同号', '业务类型', '进出类型', '序号', '项号', '商品编号', '商品名称', '征免', '成交数量'
+            , '成交单位', '币制', '总价', 'ERRORMSG'],
         data: jsondata
     });
     Ext.tip.QuickTipManager.init();
@@ -1923,16 +1925,28 @@ function errorwin(jsondata) {
         id: 'griderror',
         store: store_error,
         enableColumnHide: false,
-        height: 300,
+        height: 400,
         columns: [
             { xtype: 'rownumberer', width: 35 },
-            { header: '报关单号', dataIndex: '报关单号', width: 120 },
-            { header: '申报单位代码', dataIndex: '申报单位代码', width: 100 },
+            { header: '报关单号', dataIndex: '报关单号', width: 120, locked: true },
+            { header: '申报单位代码', dataIndex: '申报单位代码', width: 100, locked: true },
             { header: '征免性质', dataIndex: '征免性质', width: 80 },
             { header: '申报日期', dataIndex: '申报日期', width: 100 },
-            { header: '贸易方式', dataIndex: '贸易方式', width: 80 },
-            { header: '经营单位代码', dataIndex: '经营单位代码', width: 100 },
-            { header: '账册号', dataIndex: '账册号', width: 110 },
+            { header: '贸易方式', dataIndex: '贸易方式', width: 80},
+            { header: '经营单位代码', dataIndex: '经营单位代码', width: 100},
+            { header: '账册号', dataIndex: '账册号', width: 110},
+            { header: '合同号', dataIndex: '合同号', width: 80 },
+            { header: '业务类型', dataIndex: '业务类型', width: 80 },
+            { header: '进出类型', dataIndex: '进出类型', width: 80 },
+            { header: '序号', dataIndex: '序号', width: 80 },
+            { header: '项号', dataIndex: '项号', width: 80 },
+            { header: '商品编号', dataIndex: '商品编号', width: 80 },
+            { header: '商品名称', dataIndex: '商品名称', width: 80 },
+            { header: '征免', dataIndex: '征免', width: 80 },
+            { header: '成交数量', dataIndex: '成交数量', width: 80 },
+            { header: '成交单位', dataIndex: '成交单位', width: 80 },
+            { header: '币制', dataIndex: '币制', width: 80 },
+            { header: '总价', dataIndex: '总价', width: 80 },
             {
                 header: '<font color="red"><b>错误信息</b></font>', dataIndex: 'ERRORMSG', width: 200, renderer: function (value, meta, record) {
                     meta.tdAttr = 'data-qtip="<font color=blue>' + value + '</font>"';
@@ -1949,10 +1963,36 @@ function errorwin(jsondata) {
         id: "win_error",
         title: '<font style="font-size:14px;">错误信息</font>',
         width: 1000,
-        height: 350,
+        height: 450,
         modal: true,
         items: [Ext.getCmp('griderror')]
     });
     win_error.show();
 
+}
+
+function printBarcode() {//打印条码 非国内
+    var orderno = $.trim(Ext.getCmp("field_CODE").getValue());
+    if (orderno == "") {
+        Ext.MessageBox.alert("提示", "订单编号不可为空！");
+        return;
+    }
+    //window.open("/barcode/barcode_orderno.html?declcode=" + orderno);
+    window.open("/barcode/barcode_orderno.html?declcode=" + orderno, '', 'toolbar=yes,menubar=yes, location=yes,scrollbars=yes,resizable=yes');
+}
+
+function printBarcode_Domestic() {//打印条码 国内
+    var orderno = "";
+    for (var i = 1; i < 5; i++) {
+        if (Ext.getCmp('code' + i.toString())) {
+            orderno = $.trim(Ext.getCmp('code' + i.toString()).getValue());
+            if (orderno != "") { break; }
+        }
+    }
+    if (orderno == "") {
+        Ext.MessageBox.alert("提示", "订单编号不可为空！");
+        return;
+    }
+    //window.open("/barcode/barcode_orderno.html?declcode=" + orderno);
+    window.open("/barcode/barcode_orderno.html?declcode=" + orderno, '', 'toolbar=yes,menubar=yes, location=yes,scrollbars=yes,resizable=yes');
 }
