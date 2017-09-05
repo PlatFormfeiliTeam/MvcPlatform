@@ -38,75 +38,39 @@
     
 
     Ext.onReady(function () {
-        var id = getQueryString("id");
-        rowIndex = getQueryString("rowIndex");
-        currentPage = getQueryString("currentPage");
+        var id = getQueryString("id"); rowIndex = getQueryString("rowIndex"); currentPage = getQueryString("currentPage");
+
         if (opener.Ext.getCmp('declare_grid_pgbar')) {
             pageSize = parseInt(opener.Ext.getCmp('declare_grid_pgbar').store.pageSize);
             store_size = parseInt(opener.Ext.getCmp('declare_grid_pgbar').store.data.length);
         }
-
-
 
         var model_fields = ['ID', 'CODE', 'ORDERCODE', 'CUSTOMSSTATUS', 'ISPRINT', 'SHEETNUM', 'MODIFYFLAG', 'PRETRANSNAME',
                         'DECLARATIONCODE', 'REPTIME', 'CONTRACTNO', 'GOODSNUM', 'GOODSNW', 'GOODSGW', 'BLNO', 'TRANSNAME', 'VOYAGENO',
                         'BUSIUNITCODE', 'BUSIUNITNAME', 'PORTCODE', 'TRADEMETHOD', 'DECLWAY', 'DECLWAYNAME',
                         'BUSITYPE', 'CONTRACTNOORDER', 'REPWAYID', 'REPWAYNAME', 'TOTALNO', 'DIVIDENO', 'SECONDLADINGBILLNO',
                         'CUSNO', 'IETYPE', 'ASSOCIATENO', 'CORRESPONDNO', 'CUSTOMERNAME'];
-        Ext.define('DeclarationList', {
-            extend: 'Ext.data.Model',
-            fields: model_fields
-        });
-        store_Trade = Ext.create('Ext.data.JsonStore', {
-            model: 'DeclarationList',
-            pageSize: pageSize
-        });
+        Ext.define('DeclarationList', { extend: 'Ext.data.Model', fields: model_fields });
+
+        store_Trade = Ext.create('Ext.data.JsonStore', { model: 'DeclarationList', pageSize: pageSize });
         store_Trade.proxy = opener.Ext.getCmp('declare_grid_pgbar').store.getProxy();
         store_Trade.proxy.extraParams.start = pageSize * (parseInt(currentPage) - 1);;
         store_Trade.load(function (records, operation, success) {
             max_page = (store_Trade.totalCount % pageSize) == 0 ? parseInt(store_Trade.totalCount / pageSize) : parseInt(store_Trade.totalCount / pageSize) + 1;
         });
 
-
-
-
         form_ini();
         var items = [];
-        var paneltop_2 = Ext.create('Ext.panel.Panel', {
-            id: 'paneltop_2',
-            border: 0,
-            region: 'center',
-            height: 430,
-            contentEl: 'content'
-        })
-        var paneltop_1 = Ext.create('Ext.panel.Panel', {
-            border: 10,
-            height: 30,
-            region: 'north',
-            contentEl: 'menu'
-
-        })
-        var panel_top = Ext.create('Ext.panel.Panel', {
-            id: 'panel_top',
-            border: 0,
-            region: 'north',
-            items: [paneltop_1, paneltop_2]
-        })
+        var paneltop_2 = Ext.create('Ext.panel.Panel', { id: 'paneltop_2', border: 0, region: 'center', height: 430, contentEl: 'content' });
+        var paneltop_1 = Ext.create('Ext.panel.Panel', { border: 10, height: 30, region: 'north', contentEl: 'menu' });
+        var panel_top = Ext.create('Ext.panel.Panel', { id: 'panel_top', border: 0, region: 'north', items: [paneltop_1, paneltop_2] });
         items.push(panel_top);
-
-
 
         var bbar_r = '<div><a href="javascript:reload(2);">上一条</a>&nbsp;&nbsp;<a href="javascript:reload(1);">下一条</a></div>';
         var buttombar = Ext.create('Ext.toolbar.Toolbar', {
             buttonAlign: 'center',
-            items: ['->', {
-                text: "<font color='red' size='3'><b>打印报关单</b></font>",
-                handler: function () {
-                    FileConsult(param1, param2, param3)
-                }
-            }, '->', bbar_r]
+            items: ['->', { text: "<font color='red' size='3'><b>打印报关单</b></font>", handler: function () { FileConsult(param1, param2, param3) } }, '->', bbar_r]
         });
-
         var panel_bottom = Ext.create('Ext.panel.Panel', {
             id: 'panel_buttom',
             title: '<i class="fa fa-hand-o-right" aria-hidden="true"></i>&nbsp;基本信息',
@@ -117,6 +81,7 @@
             items: [Ext.getCmp('panelbottom_1_1')]
         });
         items.push(panel_bottom);
+
         var viewport = Ext.create('Ext.container.Viewport', {
             id: 'viewport',
             //layout: 'accordion',
@@ -238,51 +203,31 @@
    
     }
 
-    function form_ini()
-    {
-    
-        var field_ID = Ext.create('Ext.form.field.Hidden', {
-            name: 'ID'
-        });
-        var field_DECLARATIONCODE = Ext.create('Ext.form.field.Text', {
-            name: 'DECLARATIONCODE',
-            fieldLabel: '报关单号',
-            readOnly: true
-        });
-        var field_REPTIME = Ext.create('Ext.form.field.Text', {
-            name: 'REPTIME',
-            fieldLabel: '申报日期',
-            readOnly: true
-        });
-        var field_CUSTOMSSTATUS = Ext.create('Ext.form.field.Text', {
-            name: 'CUSTOMSSTATUS',
-            fieldLabel: '海关状态',
-            readOnly: true
-        });
-        var field_CONTRACTNOORDER = Ext.create('Ext.form.field.Text', {
-            name: 'CONTRACTNOORDER',
-            fieldLabel: '合同发票号',
-            readOnly: true
-        });
-        var field_BUSIUNITNAME = Ext.create('Ext.form.field.Text', {
-            name: 'BUSIUNITNAME',
-            fieldLabel: '经营单位',
-            readOnly: true
-        });
-        var item_top = [{ layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [field_DECLARATIONCODE, field_REPTIME, field_CUSTOMSSTATUS, field_CONTRACTNOORDER, field_BUSIUNITNAME] }];
+    function form_ini() {
+        var field_ID = Ext.create('Ext.form.field.Hidden', { name: 'ID' });
+        var field_DECLARATIONCODE = Ext.create('Ext.form.field.Text', { name: 'DECLARATIONCODE', fieldLabel: '报关单号', readOnly: true });
+        var field_REPTIME = Ext.create('Ext.form.field.Text', { name: 'REPTIME', fieldLabel: '申报日期', readOnly: true });
+        var field_CUSTOMSSTATUS = Ext.create('Ext.form.field.Text', { name: 'CUSTOMSSTATUS', fieldLabel: '海关状态', readOnly: true });
+        var field_CONTRACTNOORDER = Ext.create('Ext.form.field.Text', { name: 'CONTRACTNOORDER', fieldLabel: '合同发票号', readOnly: true });
+        var field_BUSIUNITNAME = Ext.create('Ext.form.field.Text', { name: 'BUSIUNITNAME', fieldLabel: '经营单位', readOnly: true });
+
+        var item_top = [{
+            layout: 'column', height: 30, margin: '5 0 0 0', border: 0
+            , items: [field_DECLARATIONCODE, field_REPTIME, field_CUSTOMSSTATUS, field_CONTRACTNOORDER, field_BUSIUNITNAME]
+        }];
 
         var panelbottom_1_1 = Ext.create('Ext.form.Panel', {
             id: 'panelbottom_1_1',
-           // region: 'center',
+            // region: 'center',
             border: 0,
+            margin: '0 0 25 0',
             fieldDefaults: {
                 margin: '0 5 10 0',
                 labelWidth: 80,
                 columnWidth: .20,
                 labelAlign: 'right'
             },
-            items:item_top
-
+            items: item_top
         });
 
     }
