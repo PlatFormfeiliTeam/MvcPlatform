@@ -868,12 +868,9 @@ namespace MvcPlatform.Controllers
         public string LoadList_index()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            string where = QueryCondition();
-
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-
-            string sql = @"select * from LIST_ORDER where instr('" + Request["busitypeid"] + "',BUSITYPE)>0 and BUSIUNITCODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "' " + where;
+            string sql = QueryCondition();            
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "createtime", "desc"));
             var json = JsonConvert.SerializeObject(dt, iso);
 
@@ -911,7 +908,7 @@ namespace MvcPlatform.Controllers
         public string QueryCondition()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-
+            string busitypeid = Request["busitypeid"];
             string where = "";
 
             if (!string.IsNullOrEmpty(Request["VALUE1"]))//判断查询条件1是否有值
@@ -953,19 +950,19 @@ namespace MvcPlatform.Controllers
                         {
                             where += " and INSPSTATUS=100 ";
                         }
-                        if ((Request["VALUE1"] + "") == "申报完结")  //申报完结=申报完结
+                        if ((Request["VALUE1"] + "") == "申报完成")  //申报完成=申报完成
                         {
-                            where += " and INSPSTATUS=130 ";
+                            where += " and INSPSTATUS>=120 ";
                         }
-                        if ((Request["VALUE1"] + "") == "未完结")  //未完结
+                        if ((Request["VALUE1"] + "") == "未完成")  //未完结
                         {
-                            where += " and INSPSTATUS<130 ";
+                            where += " and INSPSTATUS<120 ";
                         }
                         break;
                     case "LOGISTICSSTATUS":
                         if (!string.IsNullOrEmpty(Request["VALUE1"]))
                         {
-                            where += " and LOGISTICSSTATUS='" + Request["VALUE1"] + "'";
+                            where += " and to_number(nvl(LOGISTICSSTATUS,0))" + Request["VALUE1"];
                         }
                         break;
                 }
@@ -977,53 +974,148 @@ namespace MvcPlatform.Controllers
                     case "CONTRACTNO":
                         where += " and CONTRACTNO like '%" + Request["VALUE2"] + "%' ";
                         break;
+                    case "REPNO":
+                        where += " and REPNO like '%" + Request["VALUE2"] + "%' ";
+                        break;
+                    case "DIVIDENO":
+                        where += " and DIVIDENO like '%" + Request["VALUE2"] + "%' ";
+                        break;
+                    case "MANIFEST":
+                        where += " and MANIFEST like '%" + Request["VALUE2"] + "%' ";
+                        break;
+                    case "SECONDLADINGBILLNO":
+                        where += " and SECONDLADINGBILLNO like '%" + Request["VALUE2"] + "%' ";
+                        break;
                 }
             }
-            if (!string.IsNullOrEmpty(Request["VALUE3"]))//判断查询条件3是否有值
+
+            if (!string.IsNullOrEmpty(Request["VALUE3"]))//判断查询条件2是否有值
             {
                 switch (Request["CONDITION3"])
                 {
-                    case "REPNO":
-                        where += " and REPNO like '%" + Request["VALUE3"] + "%' ";
-                        break;
-                    case "DIVIDENO":
-                        where += " and DIVIDENO like '%" + Request["VALUE3"] + "%' ";
-                        break;
-                    case "MANIFEST":
-                        where += " and MANIFEST like '%" + Request["VALUE3"] + "%' ";
-                        break;
-                    case "SECONDLADINGBILLNO":
-                        where += " and SECONDLADINGBILLNO like '%" + Request["VALUE3"] + "%' ";
-                        break;
-                }
-            }
-
-            if (!string.IsNullOrEmpty(Request["VALUE4"]))//判断查询条件2是否有值
-            {
-                switch (Request["CONDITION4"])
-                {
                     case "CUSTOMAREACODE":
-                        where += " and CUSTOMAREACODE = '" + Request["VALUE4"] + "' ";
+                        where += " and CUSTOMAREACODE = '" + Request["VALUE3"] + "' ";
                         break;
                     case "REPWAYID":
-                        where += " and REPWAYID = '" + Request["VALUE4"] + "' ";
+                        where += " and REPWAYID = '" + Request["VALUE3"] + "' ";
                         break;
                     case "PORTCODE":
-                        where += " and PORTCODE = '" + Request["VALUE4"] + "' ";
+                        where += " and PORTCODE = '" + Request["VALUE3"] + "' ";
                         break;
                 }
             }
-            if (!string.IsNullOrEmpty(Request["STARTDATE"]))
+
+            switch (Request["CONDITION4"])
             {
-                where += " and SUBMITTIME>=to_date('" + Request["STARTDATE"] + "','yyyy-mm-dd hh24:mi:ss')";
-            }
-            if (!string.IsNullOrEmpty(Request["ENDDATE"]))
-            {
-                where += " and SUBMITTIME<=to_date('" + Request["ENDDATE"] + "','yyyy-mm-dd hh24:mi:ss')+1";
+                case "SUBMITTIME":
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))
+                    {
+                        where += " and SUBMITTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss')";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))
+                    {
+                        where += " and SUBMITTIME<=to_date('" + Request["VALUE4_2"] + "','yyyy-mm-dd hh24:mi:ss')+1";
+                    }
+                    break;
             }
 
-            where += " and ISINVALID=0 ";//?是否需要
-            return where;
+            if (!string.IsNullOrEmpty(Request["VALUE5"]))//判断查询条件1是否有值
+            {
+                switch (Request["CONDITION5"])
+                {
+                    case "DECLSTATUS":
+                        if ((Request["VALUE5"] + "") == "草稿")  //草稿=草稿
+                        {
+                            where += " and DECLSTATUS=0 ";
+                        }
+                        if ((Request["VALUE5"] + "") == "已委托")  //已委托=已委托
+                        {
+                            where += " and DECLSTATUS=10 ";
+                        }
+                        if ((Request["VALUE5"] + "") == "申报中")  //申报中=申报中
+                        {
+                            where += " and DECLSTATUS=100 ";
+                        }
+                        if ((Request["VALUE5"] + "") == "申报完结")  //申报完结=申报完结
+                        {
+                            where += " and DECLSTATUS=130 ";
+                        }
+                        if ((Request["VALUE5"] + "") == "未完结")  //未完结
+                        {
+                            where += " and DECLSTATUS<130 ";
+                        }
+                        break;
+                    case "INSPSTATUS":
+                        if ((Request["VALUE5"] + "") == "草稿")  //草稿=草稿
+                        {
+                            where += " and INSPSTATUS=0 ";
+                        }
+                        if ((Request["VALUE5"] + "") == "已委托")  //已委托=已委托
+                        {
+                            where += " and INSPSTATUS=10 ";
+                        }
+                        if ((Request["VALUE5"] + "") == "申报中")  //申报中=申报中
+                        {
+                            where += " and INSPSTATUS=100 ";
+                        }
+                        if ((Request["VALUE5"] + "") == "申报完成")  //申报完成=申报完成
+                        {
+                            where += " and INSPSTATUS>=120 ";
+                        }
+                        if ((Request["VALUE5"] + "") == "未完成")  //未完结
+                        {
+                            where += " and INSPSTATUS<120 ";
+                        }
+                        break;
+                    case "LOGISTICSSTATUS":
+                        if (!string.IsNullOrEmpty(Request["VALUE5"]))
+                        {
+                            where += " and to_number(nvl(LOGISTICSSTATUS,0))" + Request["VALUE5"];
+                        }
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(Request["VALUE6"]))//判断查询条件2是否有值
+            {
+                switch (Request["CONDITION6"])
+                {
+                    case "CONTRACTNO":
+                        where += " and CONTRACTNO like '%" + Request["VALUE6"] + "%' ";
+                        break;
+                    case "REPNO":
+                        where += " and REPNO like '%" + Request["VALUE6"] + "%' ";
+                        break;
+                    case "DIVIDENO":
+                        where += " and DIVIDENO like '%" + Request["VALUE6"] + "%' ";
+                        break;
+                    case "MANIFEST":
+                        where += " and MANIFEST like '%" + Request["VALUE2"] + "%' ";
+                        break;
+                    case "SECONDLADINGBILLNO":
+                        where += " and SECONDLADINGBILLNO like '%" + Request["VALUE6"] + "%' ";
+                        break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(Request["VALUE7"]))//判断查询条件2是否有值
+            {
+                switch (Request["CONDITION7"])
+                {
+                    case "CUSTOMAREACODE":
+                        where += " and CUSTOMAREACODE = '" + Request["VALUE7"] + "' ";
+                        break;
+                    case "REPWAYID":
+                        where += " and REPWAYID = '" + Request["VALUE7"] + "' ";
+                        break;
+                    case "PORTCODE":
+                        where += " and PORTCODE = '" + Request["VALUE7"] + "' ";
+                        break;
+                }
+            }
+
+            where += " and ISINVALID=0 ";
+            string sql = @"select * from LIST_ORDER where instr('" + busitypeid + "',BUSITYPE)>0 and BUSIUNITCODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "' " + where;
+            return sql;
         }
 
         public string getTrack()
@@ -1093,45 +1185,14 @@ namespace MvcPlatform.Controllers
 
         public string ExportList()
         {
-            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            string where = QueryCondition();
-            string dec_insp_status = Request["dec_insp_status"];
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);         
+            string dec_insp_status = Request["dec_insp_status"]; string common_data_sbfs = Request["common_data_sbfs"];
             string busitypeid = Request["busitypeid"];
-            string busitype = "";
-
-            switch (busitypeid)
-            {
-                case "11":
-                    busitype = "空运进口";
-                    break;
-                case "10":
-                    busitype = "空运出口";
-                    break;
-                case "21":
-                    busitype = "海运进口";
-                    break;
-                case "20":
-                    busitype = "海运出口";
-                    break;
-                case "31":
-                    busitype = "陆运进口";
-                    break;
-                case "30":
-                    busitype = "陆运出口";
-                    break;
-                case "40,41":
-                    busitype = "国内";
-                    break;
-                case "50,51":
-                    busitype = "特殊区域";
-                    break;
-            }
 
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-            string sql = @"select * from LIST_ORDER a  left join (select CODE,NAME||'('||CODE||')' REPWAYNAME from cusdoc.SYS_REPWAY where Enabled=1 and instr(busitype,'" + busitype + "')>0) b on a.REPWAYID=b.CODE "
-                      + "where instr('" + Request["busitypeid"] + "',BUSITYPE)>0 and BUSIUNITCODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "' " + where;
 
+            string sql = QueryCondition();
             DataTable dt_count = DBMgr.GetDataTable("select count(1) from (" + sql + ") a");
             int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
             if (Convert.ToInt32(dt_count.Rows[0][0]) > WebDownCount)
@@ -1185,7 +1246,7 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["CUSTOMAREACODE"].ToString());
                     rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
 
-                    rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());//REPWAYID
+                    rowtemp.CreateCell(12).SetCellValue(getStatusName(dt.Rows[i]["REPWAYID"].ToString(), common_data_sbfs));
                     rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["TURNPRENO"].ToString());
                     rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
                     rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SUBMITUSERNAME"].ToString());
@@ -1231,7 +1292,7 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["CUSTOMAREACODE"].ToString());
                     rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
 
-                    rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());//REPWAYID
+                    rowtemp.CreateCell(12).SetCellValue(getStatusName(dt.Rows[i]["REPWAYID"].ToString(), common_data_sbfs));
                     rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["ARRIVEDNO"].ToString());
                     rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
                     rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SUBMITUSERNAME"].ToString());
@@ -1275,7 +1336,7 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["CUSTOMAREACODE"].ToString());
                     rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
 
-                    rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());//REPWAYID
+                    rowtemp.CreateCell(12).SetCellValue(getStatusName(dt.Rows[i]["REPWAYID"].ToString(), common_data_sbfs));
                     rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["TURNPRENO"].ToString());
                     rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
                     rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SUBMITUSERNAME"].ToString());
@@ -1319,7 +1380,7 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["CUSTOMAREACODE"].ToString());
                     rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
 
-                    rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());//REPWAYID
+                    rowtemp.CreateCell(12).SetCellValue(getStatusName(dt.Rows[i]["REPWAYID"].ToString(), common_data_sbfs));
                     rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["TURNPRENO"].ToString());
                     rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
                     rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SUBMITUSERNAME"].ToString());
@@ -1360,7 +1421,7 @@ namespace MvcPlatform.Controllers
                     }
                     rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["CUSTOMAREACODE"].ToString());
                     rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
-                    rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());//REPWAYID
+                    rowtemp.CreateCell(11).SetCellValue(getStatusName(dt.Rows[i]["REPWAYID"].ToString(), common_data_sbfs));
 
                     rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
                     rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["SUBMITUSERNAME"].ToString());
@@ -1403,7 +1464,7 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["CUSTOMAREACODE"].ToString());
                     rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
 
-                    rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());//REPWAYID
+                    rowtemp.CreateCell(12).SetCellValue(getStatusName(dt.Rows[i]["REPWAYID"].ToString(), common_data_sbfs));
                     rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["ARRIVEDNO"].ToString());
                     rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["TURNPRENO"].ToString());
                     rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
@@ -1445,7 +1506,7 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["PRINTSTATUS"].ToString() == "1" ? "已打印" : "未打印");
 
                     rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["CUSTOMAREACODE"].ToString());
-                    rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());//REPWAYID
+                    rowtemp.CreateCell(9).SetCellValue(getStatusName(dt.Rows[i]["REPWAYID"].ToString(), common_data_sbfs));
                     rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
                     if (dt.Rows[i]["BUSITYPE"].ToString() == "40")
                     {
@@ -1490,7 +1551,7 @@ namespace MvcPlatform.Controllers
 
                     rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
                     rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["PRINTSTATUS"].ToString() == "1" ? "已打印" : "未打印");
-                    rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());//REPWAYID
+                    rowtemp.CreateCell(7).SetCellValue(getStatusName(dt.Rows[i]["REPWAYID"].ToString(), common_data_sbfs));
 
                     if (dt.Rows[i]["GOODSNUM"].ToString() != "")
                     {

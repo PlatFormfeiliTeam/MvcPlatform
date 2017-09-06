@@ -425,7 +425,7 @@ function form_ini_detail(recs) {
     
 }
 
-function grid_ini_detail(data) {
+function grid_ini_detail() {
     Ext.regModel('VerificationDetail', {
         fields: ['DECLARATIONCODE', 'ORDERNO', 'ITEMNO', 'COMMODITYNO', 'COMMODITYNAME', 'TAXPAID'
              , 'CADQUANTITY', 'CADUNIT', 'CURRENCYCODE', 'TOTALPRICE']
@@ -447,6 +447,7 @@ function grid_ini_detail(data) {
         listeners: {
             beforeload: function () {
                 store_d.getProxy().extraParams.declartioncode = Ext.getCmp("DECLARATIONCODE").getValue();
+                store_d.getProxy().extraParams.status = Ext.getCmp("STATUS").getValue();
             }
         }
     });

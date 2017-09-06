@@ -419,23 +419,13 @@
         id: 'REMARK',
         name: 'REMARK',
         fieldLabel: '备注',
-        flex: .50
-
-
-    });
-    //修改原因
-    var field_MODIFYREASON = Ext.create('Ext.form.field.Text', {
-        id: 'MODIFYREASON',
-        name: 'MODIFYREASON',
-        fieldLabel: '<font color=red>修改原因</font>',
-        fieldStyle: 'border-color:red;',
-        flex: .50
+        flex: 1
     });
     var textarea_container = {
-        columnWidth: 1,
+        columnWidth: .5,
         xtype: 'fieldcontainer',
         layout: 'hbox', margin: 0,
-        items: [field_REMARK, field_MODIFYREASON]
+        items: [field_REMARK]
     }
 
     //维护时间

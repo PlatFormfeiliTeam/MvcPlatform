@@ -660,14 +660,14 @@ namespace MvcPlatform.Controllers
                 id = DBMgr.GetDataTable(sql).Rows[0][0] + "";//获取ID
                 sql = @"INSERT INTO SYS_RECORDINFO_DETAIL_TASK (ID
                         ,RECORDINFOID,ITEMNO,HSCODE,ADDITIONALNO,ITEMNOATTRIBUTE
-                        ,COMMODITYNAME,SPECIFICATIONSMODEL,UNIT,REMARK,MODIFYREASON
+                        ,COMMODITYNAME,SPECIFICATIONSMODEL,UNIT,REMARK,CUSTOMAREA
                         ,CREATEID,CREATENAME,CREATEDATE,OPTIONS,STATUS,CUSTOMERCODE
-                        ,CUSTOMERNAME,SUBMITID,SUBMITNAME,SUBMITTIME,CUSTOMAREA                       
+                        ,CUSTOMERNAME,SUBMITID,SUBMITNAME,SUBMITTIME                       
                         ) VALUES ('{0}'
                             ,'{1}','{2}','{3}','{4}','{5}'
                             ,'{6}','{7}','{8}','{9}','{10}'
                             ,'{11}','{12}',sysdate,'{13}','{14}','{15}'
-                            ,'{16}','{17}','{18}',{19},'{20}'
+                            ,'{16}','{17}','{18}',{19}
                             )";
                 sql = string.Format(sql, id
                     , json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), json.Value<string>("HSCODE"), json.Value<string>("ADDITIONALNO"), json.Value<string>("ITEMNOATTRIBUTE")
@@ -680,15 +680,15 @@ namespace MvcPlatform.Controllers
             {
                 id = Request["id"];
                 sql = @"UPDATE SYS_RECORDINFO_DETAIL_TASK SET RECORDINFOID='{1}',ITEMNO='{2}',HSCODE='{3}',ADDITIONALNO='{4}',ITEMNOATTRIBUTE='{5}' 
-                            ,COMMODITYNAME='{6}',SPECIFICATIONSMODEL='{7}',UNIT='{8}',REMARK='{9}',MODIFYREASON='{10}'
+                            ,COMMODITYNAME='{6}',SPECIFICATIONSMODEL='{7}',UNIT='{8}',REMARK='{9}',CUSTOMAREA='{10}'
                             ,OPTIONS='{11}',STATUS='{12}',CUSTOMERCODE='{13}',CUSTOMERNAME='{14}',SUBMITID='{15}'
-                            ,SUBMITNAME='{16}',SUBMITTIME={17},CUSTOMAREA='{18}'
+                            ,SUBMITNAME='{16}',SUBMITTIME={17}
                         WHERE ID={0}";
                 sql = string.Format(sql, id
                     , json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), json.Value<string>("HSCODE"), json.Value<string>("ADDITIONALNO"), json.Value<string>("ITEMNOATTRIBUTE")
-                    , json.Value<string>("COMMODITYNAME"), json.Value<string>("SPECIFICATIONSMODEL"), json.Value<string>("UNIT"), json.Value<string>("REMARK"), json.Value<string>("MODIFYREASON")
+                    , json.Value<string>("COMMODITYNAME"), json.Value<string>("SPECIFICATIONSMODEL"), json.Value<string>("UNIT"), json.Value<string>("REMARK"), json.Value<string>("CUSTOMAREA")
                     , 'A', json.Value<string>("STATUS"), json.Value<string>("CUSTOMERCODE"), json.Value<string>("CUSTOMERNAME"), json.Value<string>("SUBMITID")
-                    , json.Value<string>("SUBMITNAME"), json.Value<string>("SUBMITTIME"), json.Value<string>("CUSTOMAREA")
+                    , json.Value<string>("SUBMITNAME"), json.Value<string>("SUBMITTIME")
                     );
             }
             if (sql != "")
@@ -1839,12 +1839,26 @@ namespace MvcPlatform.Controllers
 
         public string loadVerificationDetail_D()
         {
-            string declartioncode = Request["declartioncode"];
+            string declartioncode = Request["declartioncode"]; string status = Request["status"];
 
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd";
 
-            string sql = "select * from list_verification_sub where declarationcode='" + declartioncode + "'";
+            string sql = "";
+            if (status != "")
+            {
+                sql = @"select * from list_verification_sub where declarationcode='" + declartioncode + "'";
+            }
+            else
+            {
+                sql = @"select a.DECLARATIONCODE,b.ORDERNO,b.ITEMNO,b.COMMODITYNO||b.ADDITIONALNO COMMODITYNO,b.COMMODITYNAME,b.TAXPAID
+                                   ,b.CADQUANTITY,b.CADUNIT,b.CURRENCYCODE,b.TOTALPRICE
+                            from (select * from list_declaration_after where declarationcode='{0}' and csid=1) a
+                                 left join (select * from list_decllist_after where isinvalid=0 and xzlb in('报关单','报关单解析'))b on a.CODE=b.predeclcode";
+                sql = string.Format(sql, declartioncode);
+            }
+            
+
             DataTable dt_sub = DBMgr.GetDataTable(GetPageSql(sql, "orderno", "asc"));
             var json = JsonConvert.SerializeObject(dt_sub, iso);
             return "{rows:" + json + ",total:" + totalProperty + "}";

@@ -574,7 +574,9 @@
         name: 'MODIFYREASON',
         fieldLabel: '<font color=red>修改原因</font>',
         fieldStyle: 'border-color:red;',
-        flex: .50
+        flex: .50,
+        allowBlank: false,
+        blankText: '修改原因不能为空!',
     });
 
     var textarea_container = {

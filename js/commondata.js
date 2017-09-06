@@ -77,7 +77,12 @@ var menu_js_data = [{ "NAME": "I跟踪", "URL": "http://www.igenzong.com/air/tra
 
 var modifyflag_data = [{ "NAME": "正常", "CODE": "0" }, { "NAME": "删单", "CODE": "1" }, { "NAME": "改单", "CODE": "2" }, { "NAME": "改单完成", "CODE": "3" }];
 
-var logistic_status_data = [{ "NAME": "抽单完成", "CODE": ">='10'" },{ "NAME": "抽单未完成", "CODE": "<'10'" },
-                            { "NAME": "报关完成", "CODE": ">='30'" },{ "NAME": "报关未完成", "CODE": "<'30'" },
-                            { "NAME": "报检完成", "CODE": ">='40'" },{ "NAME": "报检未完成", "CODE": "<'40'" },
-                            { "NAME": "运输完成", "CODE": ">='70'" },{ "NAME": "运输未完成", "CODE": "<'70'" }];
+var logistic_status_data = [{ "NAME": "抽单完成", "CODE": ">=10" }, { "NAME": "抽单未完成", "CODE": "<10" },
+                            { "NAME": "已派车", "CODE": ">=45" }, { "NAME": "未派车", "CODE": "<45" },
+                            { "NAME": "运输完成", "CODE": ">=70" }, { "NAME": "运输未完成", "CODE": "<70" },                            
+                            { "NAME": "送货完成", "CODE": ">=90" }, { "NAME": "送货未完成", "CODE": "<90" }];
+
+//var logistic_status_data = [{ "NAME": "抽单完成", "CODE": ">='10'" },{ "NAME": "抽单未完成", "CODE": "<'10'" },
+//                            { "NAME": "报关完成", "CODE": ">='30'" },{ "NAME": "报关未完成", "CODE": "<'30'" },
+//                            { "NAME": "报检完成", "CODE": ">='40'" },{ "NAME": "报检未完成", "CODE": "<'40'" },
+//                            { "NAME": "运输完成", "CODE": ">='70'" },{ "NAME": "运输未完成", "CODE": "<'70'" }];
