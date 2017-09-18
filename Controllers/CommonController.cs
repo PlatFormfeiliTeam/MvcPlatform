@@ -3754,6 +3754,10 @@ namespace MvcPlatform.Controllers
                     case "SGD"://删改单
                         where += " and det.modifyflag='" + Request["VALUE3"] + "' ";
                         break;
+                    case "VERSTATUS"://比对状态
+                        if (Request["VALUE3"] == "未比对") { where += " and lv.status is null"; }
+                        else { where += " and lv.status='" + Request["VALUE3"] + "' "; }
+                        break;
                 }
             }
             if (!string.IsNullOrEmpty(Request["VALUE7"]))//判断查询条件1是否有值
@@ -3769,6 +3773,10 @@ namespace MvcPlatform.Controllers
                         break;
                     case "SGD"://删改单
                         where += " and det.modifyflag='" + Request["VALUE7"] + "' ";
+                        break;
+                    case "VERSTATUS"://比对状态
+                        if (Request["VALUE7"] == "未比对") { where += " and lv.status is null"; }
+                        else { where += " and lv.status='" + Request["VALUE7"] + "' "; }
                         break;
                 }
             }
@@ -3978,6 +3986,10 @@ namespace MvcPlatform.Controllers
                     case "SGD"://删改单
                         where += " and det.modifyflag='" + Request["VALUE3"] + "' ";
                         break;
+                    case "VERSTATUS"://比对状态
+                        if (Request["VALUE3"] == "未比对") { where += " and lv.status is null"; }
+                        else { where += " and lv.status='" + Request["VALUE3"] + "' "; }
+                        break;
                 }
             }
             if (!string.IsNullOrEmpty(Request["VALUE7"]))//判断查询条件1是否有值
@@ -3993,6 +4005,10 @@ namespace MvcPlatform.Controllers
                         break;
                     case "SGD"://删改单
                         where += " and det.modifyflag='" + Request["VALUE7"] + "' ";
+                        break;
+                    case "VERSTATUS"://比对状态
+                        if (Request["VALUE7"] == "未比对") { where += " and lv.status is null"; }
+                        else { where += " and lv.status='" + Request["VALUE7"] + "' "; }
                         break;
                 }
             }

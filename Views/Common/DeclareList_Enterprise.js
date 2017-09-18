@@ -121,7 +121,7 @@ function initSearch() {
 
     var store_3 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: [{ "NAME": "业务类型", "CODE": "BUSITYPE" }, { "NAME": "海关状态", "CODE": "HGZT" }, { "NAME": "删改单", "CODE": "SGD" }]
+        data: [{ "NAME": "业务类型", "CODE": "BUSITYPE" }, { "NAME": "海关状态", "CODE": "HGZT" }, { "NAME": "删改单", "CODE": "SGD" }, { "NAME": "比对状态", "CODE": "VERSTATUS" }]
     });
     var combo_3 = Ext.create('Ext.form.field.ComboBox', {
         id: 'CONDITION3',
@@ -146,6 +146,9 @@ function initSearch() {
                    }
                    if (this.getValue() == "SGD") {
                        store_3_1.loadData(modifyflag_data);
+                   }
+                   if (this.getValue() == "VERSTATUS") {
+                       store_3_1.loadData(verstatus_data_search);
                    }
                }
            }
@@ -296,7 +299,7 @@ function initSearch() {
 
     var store_7 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: [{ "NAME": "业务类型", "CODE": "BUSITYPE" }, { "NAME": "海关状态", "CODE": "HGZT" }, { "NAME": "删改单", "CODE": "SGD" }]
+        data: [{ "NAME": "业务类型", "CODE": "BUSITYPE" }, { "NAME": "海关状态", "CODE": "HGZT" }, { "NAME": "删改单", "CODE": "SGD" }, { "NAME": "比对状态", "CODE": "VERSTATUS" }]
     });
     var combo_7 = Ext.create('Ext.form.field.ComboBox', {
         id: 'CONDITION7',
@@ -321,6 +324,9 @@ function initSearch() {
                    }
                    if (this.getValue() == "SGD") {
                        store_7_1.loadData(modifyflag_data);
+                   }
+                   if (this.getValue() == "VERSTATUS") {
+                       store_7_1.loadData(verstatus_data_search);
                    }
                }
            }
@@ -742,12 +748,16 @@ function VerificationList() {
         Ext.MessageBox.alert('提示', '请选择需要比对的记录！');
         return;
     }
+    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "数据保存中，请稍等..." });
+    myMask.show();
+
     var declarationcode_list = Ext.encode(Ext.pluck(Ext.pluck(recs, 'data'),'DECLARATIONCODE'));
     //var predeclcode_list = Ext.encode(Ext.pluck(Ext.pluck(recs, 'data'),'CODE'));
     Ext.Ajax.request({
         url: '/Common/dec_Verification',
         params: { declarationcode_list: declarationcode_list},//, predeclcode_list: predeclcode_list
         success: function (response, option) {
+            myMask.hide();
             var result = Ext.decode(response.responseText);
             if (result.success) {
                 var json = result.json; var msg = "";

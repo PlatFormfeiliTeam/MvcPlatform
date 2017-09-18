@@ -1783,7 +1783,8 @@ namespace MvcPlatform.Controllers
             }
             if (!string.IsNullOrEmpty(Request["STATUS"]))
             {
-                where += " and aaa.STATUS='" + Request["STATUS"] + "'";
+                if (Request["STATUS"] == "未比对") { where += " and aaa.status is null"; }
+                else { where += " and aaa.STATUS='" + Request["STATUS"] + "'"; }
             }
 
             string sql_ver = "", sql_decl = "", sql = "";
@@ -1792,7 +1793,9 @@ namespace MvcPlatform.Controllers
                         ,to_char(lv.reptime,'yyyy-mm-dd') reptime,lv.trademethod,lv.busiunitcode,lv.recordcode,lv.createtime
                         ,lv.status,lv.note,lv.contractno,lv.busitype
                         ,lv.inouttype      
+                        ,det.CUSTOMSSTATUS 
                     from list_verification lv 
+                        left join (select * from list_declaration where isinvalid=0) det on lv.declarationcode=det.declarationcode and lv.datadource='线上'
                     where lv.busiunitcode='{0}'";
             sql_ver = string.Format(sql_ver, json_user.Value<string>("CUSTOMERHSCODE"));
 
@@ -1802,6 +1805,7 @@ namespace MvcPlatform.Controllers
                             ,to_char(lda.reptime,'yyyy-mm-dd') reptime,lda.trademethod,lda.busiunitcode,lda.recordcode,null createtime
                             , null status,null note,lda.contractno,sb.name busitype
                             ,case when substr(lda.declarationcode,9,1)='1' then N'进口' when substr(lda.declarationcode,9,1)='0' then N'出口' else N'' end inouttype  
+                            ,det.CUSTOMSSTATUS 
                         from list_declaration det 
                             left join list_order ort on det.ordercode = ort.code 
 						    left join list_declaration_after lda on det.code=lda.code and lda.csid=1
@@ -1854,7 +1858,7 @@ namespace MvcPlatform.Controllers
                 sql = @"select a.DECLARATIONCODE,b.ORDERNO,b.ITEMNO,b.COMMODITYNO||b.ADDITIONALNO COMMODITYNO,b.COMMODITYNAME,b.TAXPAID
                                    ,b.CADQUANTITY,b.CADUNIT,b.CURRENCYCODE,b.TOTALPRICE
                             from (select * from list_declaration_after where declarationcode='{0}' and csid=1) a
-                                 left join (select * from list_decllist_after where isinvalid=0 and xzlb in('报关单','报关单解析'))b on a.CODE=b.predeclcode";
+                                 left join (select * from list_decllist_after where isinvalid=0)b on a.CODE=b.predeclcode and a.xzlb=b.xzlb";
                 sql = string.Format(sql, declartioncode);
             }
             

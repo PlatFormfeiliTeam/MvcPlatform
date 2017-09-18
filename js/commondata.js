@@ -76,6 +76,7 @@ var menu_js_data = [{ "NAME": "I跟踪", "URL": "http://www.igenzong.com/air/tra
 ]
 
 var modifyflag_data = [{ "NAME": "正常", "CODE": "0" }, { "NAME": "删单", "CODE": "1" }, { "NAME": "改单", "CODE": "2" }, { "NAME": "改单完成", "CODE": "3" }];
+var verstatus_data_search = [{ "NAME": "未比对", "CODE": "未比对" }, { "NAME": "比对中", "CODE": "比对中" }, { "NAME": "比对通过", "CODE": "比对通过" }, { "NAME": "比对未通过", "CODE": "比对未通过" }];
 
 var logistic_status_data = [{ "NAME": "抽单完成", "CODE": ">=10" }, { "NAME": "抽单未完成", "CODE": "<10" },
                             { "NAME": "已派车", "CODE": ">=45" }, { "NAME": "未派车", "CODE": "<45" },

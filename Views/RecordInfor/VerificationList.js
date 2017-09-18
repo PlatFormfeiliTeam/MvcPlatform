@@ -99,8 +99,8 @@ function initSearch() {
     });
 
     var store_STATUS = Ext.create("Ext.data.JsonStore", {
-        fields: ["NAME"],
-        data: [{ "NAME": "待比对" }, { "NAME": "比对中" }, { "NAME": "比对通过" }, { "NAME": "比对未通过" }]
+        fields: ["NAME", "CODE"],
+        data: verstatus_data_search
     });
 
     //状态
@@ -109,8 +109,8 @@ function initSearch() {
         store: store_STATUS,
         fieldLabel: '状态',
         displayField: 'NAME',
-        name: 'BUSITYPE',
-        valueField: 'NAME',
+        name: 'STATUS',
+        valueField: 'CODE',
         triggerAction: 'all',
         hideTrigger: true,
         anyMatch: true,
@@ -146,7 +146,7 @@ function initSearch() {
 function gridbind() {
     Ext.regModel('VERIFICATION', {
         fields: ['ID', 'DATADOURCE', 'DECLARATIONCODE', 'REPUNITCODE', 'KINDOFTAX', 'REPTIME', 'TRADEMETHOD', 'BUSIUNITCODE'
-        , 'RECORDCODE', 'CREATETIME', 'STATUS', 'NOTE', 'CONTRACTNO', 'BUSITYPE', 'INOUTTYPE']
+        , 'RECORDCODE', 'CREATETIME', 'STATUS', 'NOTE', 'CONTRACTNO', 'BUSITYPE', 'INOUTTYPE','CUSTOMSSTATUS']
     });
 
     var store_verification = Ext.create('Ext.data.JsonStore', {
@@ -166,8 +166,8 @@ function gridbind() {
             beforeload: function () {
                 store_verification.getProxy().extraParams = {
                     DECLARATIONCODE: Ext.getCmp('field_DECLARATIONCODE').getValue(), TRADEMETHOD: Ext.getCmp("s_combo_myfs").getValue(),
-                    CONTRACTNO: Ext.getCmp('field_CONTRACTNO').getValue(), BUSITYPE: Ext.getCmp("s_combo_BUSITYPE").getValue(),
-                    STATUS: Ext.getCmp("s_combo_STATUS").getValue()
+                    CONTRACTNO: Ext.getCmp('field_CONTRACTNO').getValue(), BUSITYPE: Ext.getCmp('s_combo_BUSITYPE').getValue(),
+                    STATUS: Ext.getCmp('s_combo_STATUS').getValue()
                 }
             }
         }
@@ -199,19 +199,20 @@ function gridbind() {
                 return value;
             }
         },
+        { header: '海关状态', dataIndex: 'CUSTOMSSTATUS', width: 90 },
         { header: '合同号', dataIndex: 'CONTRACTNO', width: 110 },
         { header: '业务类型', dataIndex: 'BUSITYPE', width: 90 },
         { header: '进出类型', dataIndex: 'INOUTTYPE', width: 80 },
         { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 130 },
-        { header: '申报单位代码', dataIndex: 'REPUNITCODE', width: 110 },
-        { header: '征免性质', dataIndex: 'KINDOFTAX', width: 80 },
+        { header: '申报单位代码', dataIndex: 'REPUNITCODE', width: 100 },
+        { header: '征免性质', dataIndex: 'KINDOFTAX', width: 70 },
         {
-            header: '申报日期', dataIndex: 'REPTIME', width: 100, renderer: function (value) {                
+            header: '申报日期', dataIndex: 'REPTIME', width: 90, renderer: function (value) {                
                 if (value == null) { return value;}
                 return value.substr(0, 10);
             }
         },
-        { header: '贸易方式', dataIndex: 'TRADEMETHOD', width: 80 },
+        { header: '贸易方式', dataIndex: 'TRADEMETHOD', width: 70 },
         //{ header: '经营单位代码', dataIndex: 'BUSIUNITCODE', width: 110 },
         { header: '账册号', dataIndex: 'RECORDCODE', width: 110 },
         { header: '类型', dataIndex: 'DATADOURCE', width: 60 },

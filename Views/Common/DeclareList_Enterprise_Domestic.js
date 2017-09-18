@@ -126,7 +126,7 @@ function initSearch() {
 
     var store_3 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: [{ "NAME": "业务类型", "CODE": "BUSITYPE" }, { "NAME": "海关状态", "CODE": "HGZT" }, { "NAME": "删改单", "CODE": "SGD" }]
+        data: [{ "NAME": "业务类型", "CODE": "BUSITYPE" }, { "NAME": "海关状态", "CODE": "HGZT" }, { "NAME": "删改单", "CODE": "SGD" }, { "NAME": "比对状态", "CODE": "VERSTATUS" }]
     });
     var combo_3 = Ext.create('Ext.form.field.ComboBox', {
         id: 'CONDITION3',
@@ -151,6 +151,9 @@ function initSearch() {
                    }
                    if (this.getValue() == "SGD") {
                        store_3_1.loadData(modifyflag_data);
+                   }
+                   if (this.getValue() == "VERSTATUS") {
+                       store_3_1.loadData(verstatus_data_search);
                    }
                }
            }
@@ -305,7 +308,7 @@ function initSearch() {
 
     var store_7 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: [{ "NAME": "业务类型", "CODE": "BUSITYPE" }, { "NAME": "海关状态", "CODE": "HGZT" }, { "NAME": "删改单", "CODE": "SGD" }]
+        data: [{ "NAME": "业务类型", "CODE": "BUSITYPE" }, { "NAME": "海关状态", "CODE": "HGZT" }, { "NAME": "删改单", "CODE": "SGD" }, { "NAME": "比对状态", "CODE": "VERSTATUS" }]
     });
     var combo_7 = Ext.create('Ext.form.field.ComboBox', {
         id: 'CONDITION7',
@@ -330,6 +333,9 @@ function initSearch() {
                    }
                    if (this.getValue() == "SGD") {
                        store_7_1.loadData(modifyflag_data);
+                   }
+                   if (this.getValue() == "VERSTATUS") {
+                       store_7_1.loadData(verstatus_data_search);
                    }
                }
            }
