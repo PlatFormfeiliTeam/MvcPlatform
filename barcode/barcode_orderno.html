@@ -6,7 +6,7 @@
 
         function getQueryString(name) {
             var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-            var r = window.location.search.substr(1).match(reg);
+            var r = decodeURI(window.location.search).substr(1).match(reg);
             if (r != null) return unescape(r[2]); return null;
         }
         var declcode = getQueryString("declcode"); 
@@ -42,16 +42,16 @@ font-family: sans-serif;
 <body align="center"> 
 
 <div style="margin: 0 0 5px 8px; page-break-after: always;"> 
-    <table align="center" cellpadding="0" cellspacing="0" border="0"><!--width="300"-->
+    <table align="center" cellpadding="0" cellspacing="0" border="0" width="300">
         <tr>
             <td colspan="2" align="center" style="background: #f00;">
                 <div class="bcTarget" align="center" style="margin:0;padding:0; text-align:center;">
                 </div>
             </td>
         </tr>
-        <!--<tr>
-            <td id="declcode_td" colspan="2" align="center" style="margin: 2px; font-weight: 800; font-size: 20px; font-family: sans-serif">
-            </td>
+        <!--<tr style="margin: 2px; font-weight: 800; font-family: sans-serif">
+            <td id="td_printtime"></td>
+            <td id="td_printuser"></td>
         </tr>-->
     </table> 
 </div> 
@@ -63,16 +63,34 @@ font-family: sans-serif;
 
    
     jQuery(document).ready(function () {
-        //$('#declcode_td').text(declcode);
+        //$('#td_printtime').text(GetTime()); $('#td_printuser').text('guiqinhe');
         $(".bcTarget").each(function () {
             $(this).empty().barcode(declcode, "code128", { barWidth:2, barHeight: 50, showHRI: true, fontSize: 9, fontSize:18,output: "svg" });
         });
 
-        //$(".bcTarget object").attr("width", "360px");
-        //$(".bcTarget").css("width", "360");
+        $(".bcTarget object").attr("width", "300px");
+        $(".bcTarget").css("width", "300");
         window.print();
 
     });
+
+    //function GetTime() {
+    //    var nd = new Date();
+
+    //    var y = nd.getFullYear();
+    //    var m = nd.getMonth() + 1;
+    //    var d = nd.getDate();
+    //    var h = nd.getHours();
+    //    var mi = nd.getMinutes();
+
+    //    if (m <= 9) m = "0" + m;
+    //    if (d <= 9) d = "0" + d;
+    //    if (h <= 9) h = "0" + h;
+    //    if (mi <= 9) mi = "0" + mi;
+
+    //    var cdate = y + "/" + m + "/" + d + " " + h + ":" + mi;
+    //    return cdate;
+    //}
 
 </script> 
 </body> 

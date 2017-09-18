@@ -204,7 +204,7 @@ namespace MvcPlatform.Controllers
             DataTable dt = DBMgr.GetDataTable(sql);
             for (int i = 0; i < dt.Rows.Count; i++)
             {
-                if (Convert.ToInt32(dt.Rows[0]["STATUS"] + "") != 0)
+                if (Convert.ToInt32(dt.Rows[i]["STATUS"] + "") != 0)
                 {
                     bf = true;
                     break;

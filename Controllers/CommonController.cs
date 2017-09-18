@@ -4408,7 +4408,7 @@ namespace MvcPlatform.Controllers
                                    ,b.ORDERNO 序号,b.ITEMNO 项号,b.COMMODITYNO||b.ADDITIONALNO 商品编号,b.COMMODITYNAME 商品名称,b.TAXPAID 征免
                                    ,b.CADQUANTITY 成交数量,b.CADUNIT 成交单位,b.CURRENCYCODE 币制,b.TOTALPRICE 总价
                             from (select * from list_declaration_after where declarationcode in ({0}) and csid=1) a
-                                 left join (select * from list_decllist_after where isinvalid=0 and xzlb in('报关单','报关单解析'))b on a.CODE=b.predeclcode";
+                                 left join (select * from list_decllist_after where isinvalid=0)b on a.CODE=b.predeclcode and a.xzlb=b.xzlb";
             sql = string.Format(sql, declarationcode_list);
 
             DataTable dt = DBMgr.GetDataTable(sql);

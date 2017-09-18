@@ -110,6 +110,10 @@ namespace MvcPlatform.Filters
             {
                 return false;
             }
+            if (filterContext.HttpContext.Request.Url.AbsolutePath == "/OrderFile/UploadFile")
+            {
+                return false;
+            }
             if (filterContext.HttpContext.Request.Url.AbsolutePath == "/OrderDomestic/Upload_WebServer")
             {
                 return false;
@@ -132,7 +136,10 @@ namespace MvcPlatform.Filters
             {
                 return false;
             }
-
+            if (filterContext.HttpContext.Request.Url.AbsolutePath == "/OrderFile/DownFile")
+            {
+                return false;
+            }
             if (filterContext.HttpContext.Request.Url.AbsolutePath == "/Home/IndexNoticeDetail")//常用收藏，首页，更多
             {
                 return false;

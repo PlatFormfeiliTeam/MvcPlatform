@@ -79,7 +79,7 @@ var modifyflag_data = [{ "NAME": "正常", "CODE": "0" }, { "NAME": "删单", "C
 
 var logistic_status_data = [{ "NAME": "抽单完成", "CODE": ">=10" }, { "NAME": "抽单未完成", "CODE": "<10" },
                             { "NAME": "已派车", "CODE": ">=45" }, { "NAME": "未派车", "CODE": "<45" },
-                            { "NAME": "运输完成", "CODE": ">=70" }, { "NAME": "运输未完成", "CODE": "<70" },                            
+                            { "NAME": "运抵场站完成", "CODE": ">=70" }, { "NAME": "运抵场站未完成", "CODE": "<70" },
                             { "NAME": "送货完成", "CODE": ">=90" }, { "NAME": "送货未完成", "CODE": "<90" }];
 
 //var logistic_status_data = [{ "NAME": "抽单完成", "CODE": ">='10'" },{ "NAME": "抽单未完成", "CODE": "<'10'" },
