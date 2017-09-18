@@ -750,12 +750,16 @@ function VerificationList() {
         Ext.MessageBox.alert('提示', '请选择需要比对的记录！');
         return;
     }
+    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "数据保存中，请稍等..." });
+    myMask.show();
+
     var declarationcode_list = Ext.encode(Ext.pluck(Ext.pluck(recs, 'data'), 'DECLARATIONCODE'));
     //var predeclcode_list = Ext.encode(Ext.pluck(Ext.pluck(recs, 'data'), 'CODE'));
     Ext.Ajax.request({
         url: '/Common/dec_Verification',
         params: { declarationcode_list: declarationcode_list },//, predeclcode_list: predeclcode_list
         success: function (response, option) {
+            myMask.hide();
             var result = Ext.decode(response.responseText);
             if (result.success) {
                 var json = result.json; var msg = "";
