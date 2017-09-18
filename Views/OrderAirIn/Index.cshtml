@@ -118,7 +118,9 @@
                         },
 
                         'cellclick': function (view, td, cellindex, record, tr, rowindex, e, opt) {
-                            var dataindex = gridpanel.columns[cellindex].dataIndex;
+                            //var dataindex = gridpanel.columns[cellindex].dataIndex;//20170918注释掉，IE浏览器以外的浏览器 ，不能正确获取列名，改用下面这种方法
+                            var dataindex = view.getHeaderAtIndex(cellindex).dataIndex;
+
                             if (dataindex == 'LOGISTICSNAME') {
                                 var totalno = record.data.TOTALNO;
                                 var divdeno = record.data.DIVIDENO;
