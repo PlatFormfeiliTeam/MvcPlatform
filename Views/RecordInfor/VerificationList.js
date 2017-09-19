@@ -567,7 +567,7 @@ function ExportReport_ver() {
         DECLARATIONCODE: Ext.getCmp('field_DECLARATIONCODE').getValue(), TRADEMETHOD: Ext.getCmp("s_combo_myfs").getValue(),
         CONTRACTNO: Ext.getCmp('field_CONTRACTNO').getValue(), BUSITYPE: Ext.getCmp('s_combo_BUSITYPE').getValue(),
         STATUS: Ext.getCmp('s_combo_STATUS').getValue(),
-        DATE_START: Ext.Date.format(Ext.getCmp("s_date_start").getValue(), 'Y-m-d H:i:s'), DATE_END: Ext.Date.format(Ext.getCmp("s_date_end").getValue(), 'Y-m-d H:i:s'),
+        DATE_START: Ext.Date.format(Ext.getCmp("s_date_start").getValue(), 'Y-m-d'), DATE_END: Ext.Date.format(Ext.getCmp("s_date_end").getValue(), 'Y-m-d'),
         RBGTYPE: Ext.getCmp("field_report").getValue().rbg_report
     }
 
