@@ -1727,7 +1727,8 @@ namespace MvcPlatform.Controllers
             return result;
         }
 
-        /*public string QueryConditionVerification()
+        /*
+         public string QueryConditionVerification()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
 
@@ -1758,7 +1759,8 @@ namespace MvcPlatform.Controllers
 
             return sql;
 
-        }*/
+        }
+         */
 
         public string QueryConditionVerification()
         {
@@ -1785,6 +1787,14 @@ namespace MvcPlatform.Controllers
             {
                 if (Request["STATUS"] == "未比对") { where += " and aaa.status is null"; }
                 else { where += " and aaa.STATUS='" + Request["STATUS"] + "'"; }
+            }
+            if (!string.IsNullOrEmpty(Request["DATE_START"]))//如果开始时间有值
+            {
+                where += " and to_date(aaa.reptime,'yyyy-mm-dd hh24:mi:ss')>=to_date('" + Request["DATE_START"] + "','yyyy-mm-dd hh24:mi:ss') ";
+            }
+            if (!string.IsNullOrEmpty(Request["DATE_END"]))//如果结束时间有值
+            {
+                where += " and to_date(aaa.reptime,'yyyy-mm-dd hh24:mi:ss')<=to_date('" + Request["DATE_END"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
             }
 
             string sql_ver = "", sql_decl = "", sql = "";
@@ -1866,6 +1876,180 @@ namespace MvcPlatform.Controllers
             DataTable dt_sub = DBMgr.GetDataTable(GetPageSql(sql, "orderno", "asc"));
             var json = JsonConvert.SerializeObject(dt_sub, iso);
             return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
+        public string ExportReport_ver()
+        {
+            string UNIT = Request["UNIT"]; string modifyflag_data = Request["modifyflag_data"];
+
+            string DECLARATIONCODE = Request["DECLARATIONCODE"]; string TRADEMETHOD = Request["TRADEMETHOD"]; 
+            string CONTRACTNO = Request["CONTRACTNO"];string BUSITYPE = Request["BUSITYPE"]; 
+            string STATUS = Request["STATUS"];
+            string DATE_START = Request["DATE_START"]; string DATE_END = Request["DATE_END"];
+            string RBGTYPE = Request["RBGTYPE"];
+
+            int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            //创建Excel文件的对象
+            NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();
+            string filename = "核销比对.xls";
+
+            OracleParameter[] parms = new OracleParameter[12];
+
+            parms[0] = new OracleParameter("WebDownCount", OracleDbType.Int32, WebDownCount, ParameterDirection.Input);
+            parms[1] = new OracleParameter("busiunitcode", OracleDbType.NVarchar2, json_user.Value<string>("CUSTOMERHSCODE"), ParameterDirection.Input);
+            parms[2] = new OracleParameter("declarationcode", OracleDbType.NVarchar2, DECLARATIONCODE, ParameterDirection.Input);
+            parms[3] = new OracleParameter("trademethod", OracleDbType.NVarchar2, TRADEMETHOD, ParameterDirection.Input);
+            parms[4] = new OracleParameter("contractno", OracleDbType.NVarchar2, CONTRACTNO, ParameterDirection.Input);
+            parms[5] = new OracleParameter("busitype", OracleDbType.NVarchar2, BUSITYPE, ParameterDirection.Input);
+            parms[6] = new OracleParameter("status", OracleDbType.NVarchar2, STATUS, ParameterDirection.Input);
+            parms[7] = new OracleParameter("date_start", OracleDbType.NVarchar2, DATE_START, ParameterDirection.Input);
+            parms[8] = new OracleParameter("date_end", OracleDbType.NVarchar2, DATE_END, ParameterDirection.Input);
+            parms[9] = new OracleParameter("rbgtype", OracleDbType.NVarchar2, RBGTYPE, ParameterDirection.Input);         
+
+            parms[10] = new OracleParameter("p_flag_parms", OracleDbType.Varchar2, 20, null, ParameterDirection.Output);//输出参数，字符串类型的，一定要设定大小
+            parms[11] = new OracleParameter("rescur", OracleDbType.RefCursor, ParameterDirection.Output);
+
+            DataTable dt = DBMgr.GetDataTableParm("Pro_VerificationDetail_Report", parms);
+            string p_flag_parms = parms[10].Value.ToString();
+
+            if (p_flag_parms == "N")
+            {
+                return "{success:false,WebDownCount:" + WebDownCount + "}";
+            }
+           
+            if (RBGTYPE == "0")//昆山区内
+            {
+                NPOI.SS.UserModel.ISheet sheet = book.CreateSheet("昆山区内");
+                NPOI.SS.UserModel.IRow row1 = sheet.CreateRow(0);
+                row1.CreateCell(0).SetCellValue("合同号"); row1.CreateCell(1).SetCellValue("业务类型"); row1.CreateCell(2).SetCellValue("进出类型"); row1.CreateCell(3).SetCellValue("申报日期");
+                row1.CreateCell(4).SetCellValue("报关单号"); row1.CreateCell(5).SetCellValue("贸易方式"); row1.CreateCell(6).SetCellValue("序号"); row1.CreateCell(7).SetCellValue("项号属性");
+                row1.CreateCell(8).SetCellValue("项号"); row1.CreateCell(9).SetCellValue("品名"); row1.CreateCell(10).SetCellValue("规格型号"); row1.CreateCell(11).SetCellValue("成交数量"); 
+                row1.CreateCell(12).SetCellValue("成交单位"); row1.CreateCell(13).SetCellValue("成交金额");row1.CreateCell(14).SetCellValue("币制"); row1.CreateCell(15).SetCellValue("海关状态");
+                row1.CreateCell(16).SetCellValue("账册号"); row1.CreateCell(17).SetCellValue("删改单"); row1.CreateCell(18).SetCellValue("数据确认"); row1.CreateCell(19).SetCellValue("比对状态");
+                row1.CreateCell(20).SetCellValue("未通过原因"); 
+               
+
+                if (dt != null)
+                {
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        NPOI.SS.UserModel.IRow rowtemp = sheet.CreateRow(i + 1);
+                        rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                        rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["BUSITYPE"].ToString());
+                        rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["INTERNALTYPENAME"].ToString());
+                        rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["REPTIME"].ToString());
+                        rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["DECLARATIONCODE"].ToString());
+                        rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["TRADEMETHOD"].ToString());
+                        rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["ORDERNO"].ToString());
+                        rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["ITEMNOATTRIBUTE"].ToString());
+                        rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["ITEMNO"].ToString());
+                        rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["COMMODITYNAME"].ToString());
+                        rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["SPECIFICATIONSMODEL"].ToString());
+                        rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["CADQUANTITY"].ToString());
+                        rowtemp.CreateCell(12).SetCellValue(GetName(dt.Rows[i]["CADUNIT"].ToString(), UNIT));
+                        rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["TOTALPRICE"].ToString());
+                        rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["CURRENCY"].ToString());
+                        rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["CUSTOMSSTATUS"].ToString());
+                        rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["RECORDCODE"].ToString());
+                        rowtemp.CreateCell(17).SetCellValue(GetName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
+                        rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["DATACONFIRM"].ToString() == "2" ? "是" : "否");
+                        rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["VERSTATUS"].ToString());
+                        rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["NOTE"].ToString());
+                    }
+                }
+            }
+
+            if (RBGTYPE == "1")//昆山区外
+            {
+                NPOI.SS.UserModel.ISheet sheet = book.CreateSheet("昆山区外");
+                NPOI.SS.UserModel.IRow row1 = sheet.CreateRow(0);
+                row1.CreateCell(0).SetCellValue("备案号"); row1.CreateCell(1).SetCellValue("企业内部编号"); row1.CreateCell(2).SetCellValue("报关单号"); row1.CreateCell(3).SetCellValue("申报日期");
+                row1.CreateCell(4).SetCellValue("退单日期"); row1.CreateCell(5).SetCellValue("贸易方式"); row1.CreateCell(6).SetCellValue("成品料件标志"); row1.CreateCell(7).SetCellValue("毛重(公斤)");
+                row1.CreateCell(8).SetCellValue("净重(公斤)"); row1.CreateCell(9).SetCellValue("序号"); row1.CreateCell(10).SetCellValue("项号"); row1.CreateCell(11).SetCellValue("料号");
+                row1.CreateCell(12).SetCellValue("商品名称"); row1.CreateCell(13).SetCellValue("规格型号"); row1.CreateCell(14).SetCellValue("申报数量"); row1.CreateCell(15).SetCellValue("单位");
+                row1.CreateCell(16).SetCellValue("法定数量"); row1.CreateCell(17).SetCellValue("法定单位"); row1.CreateCell(18).SetCellValue("第二法定数量"); row1.CreateCell(19).SetCellValue("第二法定单位");
+                row1.CreateCell(20).SetCellValue("原产国"); row1.CreateCell(21).SetCellValue("币制"); row1.CreateCell(22).SetCellValue("单价"); row1.CreateCell(23).SetCellValue("总价");
+                row1.CreateCell(24).SetCellValue("折合美元总价"); row1.CreateCell(25).SetCellValue("汇率"); row1.CreateCell(26).SetCellValue("备注1"); row1.CreateCell(27).SetCellValue("备注2");
+                row1.CreateCell(28).SetCellValue("备注3"); row1.CreateCell(29).SetCellValue("比对状态"); row1.CreateCell(30).SetCellValue("未通过原因"); 
+
+
+                if (dt != null)
+                {
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        NPOI.SS.UserModel.IRow rowtemp = sheet.CreateRow(i + 1);
+                        rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["RECORDCODE"].ToString());
+                        rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                        rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["DECLARATIONCODE"].ToString());
+                        rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["REPTIME"].ToString());
+                        //rowtemp.CreateCell(4).SetCellValue("");
+                        rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["TRADEMETHOD"].ToString());
+                        if (dt.Rows[i]["ITEMNOATTRIBUTE"].ToString() == "料件")
+                        {
+                            rowtemp.CreateCell(6).SetCellValue("3");
+                        }
+                        else if (dt.Rows[i]["ITEMNOATTRIBUTE"].ToString() == "成品")
+                        {
+                            rowtemp.CreateCell(6).SetCellValue("4");
+                        }
+                        else
+                        {
+                            rowtemp.CreateCell(6).SetCellValue("");
+                        }
+                        //rowtemp.CreateCell(7).SetCellValue("");
+                        //rowtemp.CreateCell(8).SetCellValue("");
+                        rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["ORDERNO"].ToString());
+                        rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["ITEMNO"].ToString());
+                        //rowtemp.CreateCell(11).SetCellValue("");
+                        rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["COMMODITYNAME"].ToString());
+                        rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["SPECIFICATIONSMODEL"].ToString());
+                        rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["CADQUANTITY"].ToString());
+                        rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["CADUNIT"].ToString());//GetName(dt.Rows[i]["CADUNIT"].ToString(), UNIT)
+
+                        rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["LEGALQUANTITY"].ToString());
+                        rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["LEGALUNIT"].ToString());
+                        rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["SQUANTITY"].ToString());
+                        rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["SUNIT"].ToString());
+
+                        if (dt.Rows[i]["INTERNALTYPENAME"].ToString()=="进口")
+                        {
+                            rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["COUNTRYORIGINCODE"].ToString());
+                        }
+                        else if (dt.Rows[i]["INTERNALTYPENAME"].ToString() == "出口")
+                        {
+                            rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["DESTCOUNTRYCODE"].ToString());
+                        }
+                        else
+                        {
+                            rowtemp.CreateCell(20).SetCellValue("");
+                        }
+                        
+                        rowtemp.CreateCell(21).SetCellValue(dt.Rows[i]["CURRENCY"].ToString());
+                        rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["UNITPRICE"].ToString());
+                        rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["TOTALPRICE"].ToString());
+                        //rowtemp.CreateCell(24).SetCellValue("");
+                        //rowtemp.CreateCell(25).SetCellValue("");
+                        //rowtemp.CreateCell(26).SetCellValue("");
+                        //rowtemp.CreateCell(27).SetCellValue("");
+                        //rowtemp.CreateCell(28).SetCellValue("");
+                        rowtemp.CreateCell(29).SetCellValue(dt.Rows[i]["VERSTATUS"].ToString());
+                        rowtemp.CreateCell(30).SetCellValue(dt.Rows[i]["NOTE"].ToString());
+                    }
+                }
+            }
+
+            
+
+
+            // 写入到客户端 
+            //System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            //book.Write(ms);
+            //ms.Seek(0, SeekOrigin.Begin);
+            //return File(ms, "application/vnd.ms-excel", filename);
+
+            return Extension.getPathname(filename, book);
         }
 
         #endregion

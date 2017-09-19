@@ -1,4 +1,4 @@
-﻿var common_data_myfs = [];
+﻿var common_data_myfs = [], ommon_data_unit = [];
 var pgbar;
 
 Ext.onReady(function () {
@@ -9,6 +9,7 @@ Ext.onReady(function () {
         success: function (response, opts) {
             var commondata = Ext.decode(response.responseText);
             common_data_myfs = commondata.myfs;//贸易方式
+            common_data_unit = commondata.unit;//单位
 
             initSearch();
             gridbind();
@@ -107,7 +108,7 @@ function initSearch() {
     var s_combo_STATUS = Ext.create('Ext.form.field.ComboBox', {
         id: 's_combo_STATUS',
         store: store_STATUS,
-        fieldLabel: '状态',
+        fieldLabel: '比对状态',
         displayField: 'NAME',
         name: 'STATUS',
         valueField: 'CODE',
@@ -129,16 +130,38 @@ function initSearch() {
         }
     });
 
+    //申报日期
+    var s_date_start = Ext.create('Ext.form.field.Date', {
+        id: 's_date_start',
+        margin: 0,
+        emptyText: '开始日期', flex: .5,
+        format: 'Y-m-d'
+    })
+    var s_date_end = Ext.create('Ext.form.field.Date', {
+        id: 's_date_end',
+        margin: 0,
+        emptyText: '结束日期', flex: .5,
+        format: 'Y-m-d'
+    })
+    var s_date_container = {
+        xtype: 'fieldcontainer',
+        layout: 'hbox',
+        fieldLabel: '申报日期',
+        columnWidth: .25,
+        items: [s_date_start, s_date_end]
+    }
+
     var formpanel = Ext.create('Ext.form.Panel', {
         id: 'formpanel',
         renderTo: 'div_form',
         fieldDefaults: {
             margin: '5',
-            columnWidth: 0.2,
+            columnWidth: 0.25,
             labelWidth: 70
         },
         items: [
-        { layout: 'column', border: 0, margin: '5 0 0 0', items: [field_DECLARATIONCODE, s_combo_myfs, field_CONTRACTNO, s_combo_BUSITYPE, s_combo_STATUS] }
+        { layout: 'column', border: 0, margin: '5 0 0 0', items: [field_DECLARATIONCODE, s_combo_myfs, field_CONTRACTNO, s_combo_BUSITYPE] },
+        { layout: 'column', border: 0, margin: '5 0 0 0', items: [s_combo_STATUS, s_date_container] }
         ]
     });
 }
@@ -167,7 +190,8 @@ function gridbind() {
                 store_verification.getProxy().extraParams = {
                     DECLARATIONCODE: Ext.getCmp('field_DECLARATIONCODE').getValue(), TRADEMETHOD: Ext.getCmp("s_combo_myfs").getValue(),
                     CONTRACTNO: Ext.getCmp('field_CONTRACTNO').getValue(), BUSITYPE: Ext.getCmp('s_combo_BUSITYPE').getValue(),
-                    STATUS: Ext.getCmp('s_combo_STATUS').getValue()
+                    STATUS: Ext.getCmp('s_combo_STATUS').getValue(),
+                    DATE_START: Ext.Date.format(Ext.getCmp("s_date_start").getValue(), 'Y-m-d H:i:s'), DATE_END: Ext.Date.format(Ext.getCmp("s_date_end").getValue(), 'Y-m-d H:i:s')
                 }
             }
         }
@@ -192,7 +216,7 @@ function gridbind() {
         { xtype: 'rownumberer', width: 35 },
         { header: 'ID', dataIndex: 'ID', hidden: true },
         {
-            header: '状态', dataIndex: 'STATUS', width: 90, renderer: function (value, meta, record) {
+            header: '比对状态', dataIndex: 'STATUS', width: 90, renderer: function (value, meta, record) {
                 if (value == "比对未通过") {
                     meta.tdAttr = 'data-qtitle="<font color=red>未通过原因</font>" data-qtip="<font color=blue>' + record.get("NOTE") + '</font>"';
                 }
@@ -483,5 +507,88 @@ function grid_ini_detail() {
             enableTextSelection: true
         },
         forceFit: true
+    });
+}
+
+
+//----------------------------------------------------------------------export win----------------------------------------------------------------------------------
+function ExportWin() {
+    var bbar_r = '<div class="btn-group" role="group">'
+                       + '<form id="exportform_type" name="form" enctype="multipart/form-data" method="post" style="display:inline-block">'
+                       + '<button onclick="ExportReport_ver()" type="button" id="btn_Export" class="btn btn-primary btn-sm"><i class="fa fa-level-down"></i>&nbsp;导出</button></form>'
+                  + '</div>';
+
+    var bbar = Ext.create('Ext.toolbar.Toolbar', {
+        items: ['->', bbar_r]
+    });
+
+    //导出格式
+    var field_report = Ext.create('Ext.form.RadioGroup', {
+        id: 'field_report',
+        labelAlign: "right",
+        fieldLabel: '导出格式',
+        columns: 2,
+        vertical: true,
+        items: [{ boxLabel: "昆山区内", name: 'rbg_report', inputValue: "0", checked: true }, { boxLabel: "昆山区外", name: 'rbg_report', inputValue: "1" }]
+    });
+
+    var formpanel_d = Ext.create('Ext.form.Panel', {
+        id: 'formpanel_report',
+        border: 0,
+        bbar: bbar,
+        fieldDefaults: {
+            margin: '0 5 10 0',
+            labelWidth: 80,
+            columnWidth: 1,
+            labelAlign: 'right',
+            labelSeparator: ''
+        },
+        items: [{ layout: 'column', height: 42, border: 0, margin: '5 0 0 0', items: [field_report] }]
+    });
+
+    var win = Ext.create("Ext.window.Window", {
+        id: "win_report",
+        //title: '下载报表',
+        width: 500,
+        height: 120,
+        modal: true,
+        items: [Ext.getCmp('formpanel_report')]
+    });
+    win.show();
+}
+
+
+function ExportReport_ver() {
+    var myMask = new Ext.LoadMask(Ext.getCmp("win_report"), { msg: "数据导出中，请稍等..." });
+    myMask.show();
+
+    var data = {
+        UNIT: JSON.stringify(common_data_unit), modifyflag_data: JSON.stringify(modifyflag_data),
+        DECLARATIONCODE: Ext.getCmp('field_DECLARATIONCODE').getValue(), TRADEMETHOD: Ext.getCmp("s_combo_myfs").getValue(),
+        CONTRACTNO: Ext.getCmp('field_CONTRACTNO').getValue(), BUSITYPE: Ext.getCmp('s_combo_BUSITYPE').getValue(),
+        STATUS: Ext.getCmp('s_combo_STATUS').getValue(),
+        DATE_START: Ext.Date.format(Ext.getCmp("s_date_start").getValue(), 'Y-m-d H:i:s'), DATE_END: Ext.Date.format(Ext.getCmp("s_date_end").getValue(), 'Y-m-d H:i:s'),
+        RBGTYPE: Ext.getCmp("field_report").getValue().rbg_report
+    }
+
+    Ext.Ajax.request({
+        url: '/RecordInfor/ExportReport_ver',
+        params: data,
+        success: function (response, option) {
+            var json = Ext.decode(response.responseText);
+            if (json.success == false) {
+                Ext.MessageBox.alert('提示', '综合需求及性能，导出记录限制' + json.WebDownCount + '！');
+            } else {
+                Ext.Ajax.request({
+                    url: '/Common/DownloadFile',
+                    method: 'POST',
+                    params: Ext.decode(response.responseText),
+                    form: 'exportform_type',
+                    success: function (response, option) {
+                    }
+                });
+            }
+            myMask.hide();
+        }
     });
 }

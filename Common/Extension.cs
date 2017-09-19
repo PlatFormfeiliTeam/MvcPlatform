@@ -926,7 +926,7 @@ namespace MvcPlatform.Common
 
             if (ParaType == "verification")//VerificationList.cshtml 导入用的
             {
-                return "{myfs:" + json_myfs + "}";
+                return "{myfs:" + json_myfs + ",unit:" + json_unit + "}";
             }
 
             return "{jydw:" + json_jydw + ",sbfs_all:" + json_sbfs_all + ",sbfs:" + json_sbfs + ",sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",bzzl:" + json_bzzl

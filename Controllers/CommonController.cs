@@ -4121,7 +4121,7 @@ namespace MvcPlatform.Controllers
             row1.CreateCell(8).SetCellValue("提运单号"); row1.CreateCell(9).SetCellValue("申报方式"); row1.CreateCell(10).SetCellValue("报关方式"); row1.CreateCell(11).SetCellValue("贸易方式");
             row1.CreateCell(12).SetCellValue("合同协议号"); row1.CreateCell(13).SetCellValue("件数"); row1.CreateCell(14).SetCellValue("重量"); row1.CreateCell(15).SetCellValue("张数");
             row1.CreateCell(16).SetCellValue("订单编号"); row1.CreateCell(17).SetCellValue("客户编号"); row1.CreateCell(18).SetCellValue("进/出"); row1.CreateCell(19).SetCellValue("两单关联号");
-            row1.CreateCell(20).SetCellValue("多单关联号"); row1.CreateCell(21).SetCellValue("删改单"); 
+            row1.CreateCell(20).SetCellValue("多单关联号"); row1.CreateCell(21).SetCellValue("删改单"); row1.CreateCell(22).SetCellValue("比对状态"); row1.CreateCell(23).SetCellValue("未通过原因"); 
 
 
 
@@ -4170,6 +4170,8 @@ namespace MvcPlatform.Controllers
                 rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["ASSOCIATENO"].ToString());
                 rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["CORRESPONDNO"].ToString());
                 rowtemp.CreateCell(21).SetCellValue(getStatusName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
+                rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["VERSTATUS"].ToString());
+                rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["NOTE"].ToString());
             }
 
 
@@ -4213,7 +4215,8 @@ namespace MvcPlatform.Controllers
             row1.CreateCell(8).SetCellValue("提运单号"); row1.CreateCell(9).SetCellValue("申报方式"); row1.CreateCell(10).SetCellValue("报关方式"); row1.CreateCell(11).SetCellValue("贸易方式");
             row1.CreateCell(12).SetCellValue("合同协议号"); row1.CreateCell(13).SetCellValue("件数"); row1.CreateCell(14).SetCellValue("重量"); row1.CreateCell(15).SetCellValue("张数");
             row1.CreateCell(16).SetCellValue("订单编号"); row1.CreateCell(17).SetCellValue("客户编号"); row1.CreateCell(18).SetCellValue("进/出"); row1.CreateCell(19).SetCellValue("两单关联号");
-            row1.CreateCell(20).SetCellValue("多单关联号"); row1.CreateCell(21).SetCellValue("删改单"); row1.CreateCell(22).SetCellValue("关联企业");
+            row1.CreateCell(20).SetCellValue("多单关联号"); row1.CreateCell(21).SetCellValue("删改单"); row1.CreateCell(22).SetCellValue("关联企业"); row1.CreateCell(23).SetCellValue("比对状态"); 
+            row1.CreateCell(24).SetCellValue("未通过原因"); 
 
 
 
@@ -4263,6 +4266,8 @@ namespace MvcPlatform.Controllers
                 rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["CORRESPONDNO"].ToString());
                 rowtemp.CreateCell(21).SetCellValue(getStatusName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
                 rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["BUSIUNITNAME_ASS"].ToString());
+                rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["VERSTATUS"].ToString());
+                rowtemp.CreateCell(24).SetCellValue(dt.Rows[i]["NOTE"].ToString());
             }
 
 
