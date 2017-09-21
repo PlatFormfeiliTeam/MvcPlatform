@@ -250,11 +250,11 @@ function del() {
     }
     var ids = ""; var bf = false;
     Ext.each(recs, function (rec) {
-        if (rec.get("STATUS") == "已关联") { bf = true; }
+        if (rec.get("STATUS") == "已关联" || rec.get("STATUS") == "关联中") { bf = true; }
         ids += rec.get("ID") + ",";
     });
     if (bf) {
-        Ext.Msg.alert("提示", "不能删除已关联的文件!");
+        Ext.Msg.alert("提示", "已关联或关联中的文件不能删除!");
         return;
     }
     ids = ids.substr(0, ids.length - 1);

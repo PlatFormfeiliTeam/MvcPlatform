@@ -161,7 +161,7 @@ namespace MvcPlatform.Controllers
             DataTable dt = DBMgr.GetDataTable(sql);
             for (int i = 0; i < dt.Rows.Count; i++)
             {
-                if (dt.Rows[i]["STATUS"].ToString() == "已关联")
+                if (dt.Rows[i]["STATUS"].ToString() == "已关联" || dt.Rows[i]["STATUS"].ToString() == "关联中")
                 {
                     bf = true;
                     break;
