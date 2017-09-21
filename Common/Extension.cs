@@ -928,6 +928,10 @@ namespace MvcPlatform.Common
             {
                 return "{myfs:" + json_myfs + ",unit:" + json_unit + "}";
             }
+            if (ParaType == "filerecoginze")//List_FileRecoginze.cshtml 导入用的
+            {
+                return "{jydw:" + json_jydw + "}";
+            }
 
             return "{jydw:" + json_jydw + ",sbfs_all:" + json_sbfs_all + ",sbfs:" + json_sbfs + ",sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",bzzl:" + json_bzzl
                 + ",myfs:" + json_myfs + ",containertype:" + json_containertype + ",containersize:" + json_containersize + ",truckno:" + json_truckno

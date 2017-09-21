@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
+using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -182,15 +183,169 @@ namespace MvcPlatform.Controllers
             return result;
         }
 
-        /* //订单随附文件
-                sql = @"select * from LIST_ATTACHMENT where instr(ordercode,'{0}') >0 
+        public string SaveRecoginze()
+        {
+            string id = Request["id"]; string cusno = Request["cusno"]; string ordercode = Request["ordercode"];
+            string result = "{success:false}"; string sql = "";
+
+            sql = "select * from list_filerecoginze where id =" + id;
+            DataTable dt = DBMgr.GetDataTable(sql);
+            if (dt == null)
+            {
+                return result;
+            }
+            if (dt.Rows.Count != 1)
+            {
+                return result;
+            }
+
+            if (dt.Rows[0]["STATUS"].ToString() == "已关联")//已经关联
+            {
+                return "{success:true,flag:'Y'}";
+            }
+            //----------------------------------------------------------------------------------------------------------------------
+            //--list_filerecoginze
+            string filepath = dt.Rows[0]["FILEPATH"].ToString();
+            string originalname = dt.Rows[0]["FILENAME"].ToString(); string filesuffix = originalname.Substring(originalname.LastIndexOf(".") + 1).ToUpper();
+            string direc_pdf = Request.PhysicalApplicationPath;
+            FileInfo fi = new FileInfo(direc_pdf + filepath);
+
+            DataTable dt_order = new DataTable();
+
+            //根据识别出的订单号，查询是否存在此订单
+            sql = "select * from list_order a where a.ISINVALID=0";
+            if (ordercode != "") { sql += " and a.code='" + ordercode + "'"; }
+            if (cusno != "") { sql += " and a.cusno='" + cusno + "'"; }
+            dt_order = DBMgr.GetDataTable(sql);
+            if (dt_order == null) { return "{success:true,flag:'E'}"; }
+            if (dt_order.Rows.Count <= 0) { return "{success:true,flag:'E'}"; }
+
+            //如果为空的话，再次赋值
+            if (ordercode == "") { ordercode = dt_order.Rows[0]["CODE"].ToString(); }
+            if (cusno == "") { cusno = dt_order.Rows[0]["CUSNO"].ToString(); }
+            string associateno = dt_order.Rows[0]["ASSOCIATENO"].ToString();
+            OracleConnection conn = null;
+            OracleTransaction ot = null;
+            conn = DBMgr.getOrclCon();
+            try
+            {
+                conn.Open();
+                ot = conn.BeginTransaction();
+                string sql_insert = "";
+
+                if (associateno != "")//两单关联
+                {
+                    sql_insert = @"insert into LIST_ATTACHMENT (id
+                                                ,filename,originalname,filetype,uploadtime,ordercode,sizes,filetypename
+                                                ,filesuffix,IETYPE) 
+                                            values(List_Attachment_Id.Nextval
+                                                ,'{0}','{1}','{2}',sysdate,'{3}','{4}','{5}'
+                                                ,'{6}','{7}')";
+                    sql_insert = string.Format(sql_insert
+                            , "/44/" + ordercode + "/" + filepath.Substring(filepath.LastIndexOf(@"/") + 1), originalname, "44", ordercode, fi.Length, "订单文件"
+                            , filesuffix, dt_order.Rows[0]["BUSITYPE"].ToString() == "40" ? "仅出口" : "仅进口");
+                    DBMgr.ExecuteNonQuery(sql_insert, conn);
+
+                    DataTable dt_asOrder = new DataTable();
+                    if (associateno != "")//两单关联
+                    {
+                        dt_asOrder = DBMgr.GetDataTable("select * from list_order a where a.ISINVALID=0 and ASSOCIATENO='" + associateno + "' and code!='" + ordercode + "'");
+                    }
+
+                    if (dt_asOrder == null)
+                    {
+
+                    }
+
+                    else if (dt_asOrder.Rows.Count < 0)
+                    {
+
+                    }
+                    else
+                    {
+                        sql_insert = @"insert into LIST_ATTACHMENT (id
+                                                ,filename,originalname,filetype,uploadtime,ordercode,sizes,filetypename
+                                                ,filesuffix,IETYPE) 
+                                            values(List_Attachment_Id.Nextval
+                                                ,'{0}','{1}','{2}',sysdate,'{3}','{4}','{5}'
+                                                ,'{6}','{7}')";
+                        sql_insert = string.Format(sql_insert
+                                , "/44/" + dt_asOrder.Rows[0]["code"].ToString() + "/" + filepath.Substring(filepath.LastIndexOf(@"/") + 1), originalname, "44", dt_asOrder.Rows[0]["code"].ToString(), fi.Length, "订单文件"
+                                , filesuffix, dt_asOrder.Rows[0]["BUSITYPE"].ToString() == "40" ? "仅出口" : "仅进口");
+                        DBMgr.ExecuteNonQuery(sql_insert, conn);
+                    }
+
+                }
+                else
+                {
+                    sql_insert = @"insert into LIST_ATTACHMENT (id
+                                                ,filename,originalname,filetype,uploadtime,ordercode,sizes,filetypename
+                                                ,filesuffix) 
+                                            values(List_Attachment_Id.Nextval
+                                                ,'{0}','{1}','{2}',sysdate,'{3}','{4}','{5}'
+                                                ,'{6}')";
+                    sql_insert = string.Format(sql_insert
+                            , "/44/" + ordercode + "/" + filepath.Substring(filepath.LastIndexOf(@"/") + 1), originalname, "44", ordercode, fi.Length, "订单文件"
+                            , filesuffix);
+                    DBMgr.ExecuteNonQuery(sql_insert, conn);
+                }
+
+                //关联成功 ，文件挪到自动上传到文件服务器的目录，并删除原始目录的文件、修改原始路径为服务器新路径
+                DBMgr.ExecuteNonQuery("update list_filerecoginze set status='已关联',ordercode='" + ordercode + "',cusno='" + cusno
+                    + "',filepath='/44/" + ordercode + "/" + filepath.Substring(filepath.LastIndexOf(@"/") + 1) + "' where id=" + id, conn);
+                ot.Commit();
+
+                fi.CopyTo(direc_pdf + @"/FileUpload/file/" + filepath.Substring(filepath.LastIndexOf(@"/") + 1));
+                fi.Delete();
+
+                result = "{success:true}";
+            }
+            catch (Exception ex)
+            {
+                ot.Rollback();
+            }
+            finally
+            {
+                conn.Close();
+            }
+            return result;
+        }
+
+        public string selectorder()
+        {
+            string where = "";
+            if (!string.IsNullOrEmpty(Request["BUSIUNIT"]))
+            {
+                where += " and (busiunitcode like '%" + Request["BUSIUNIT"] + "%' or busiunitname like '%" + Request["BUSIUNIT"] + "%')";
+            }
+            if (!string.IsNullOrEmpty(Request["BUSITYPE"]))
+            {
+                where += " and busitype='" + Request["BUSITYPE"] + "'";
+            }
+            string sql = "select id,code,cusno,associateno,busitype,busiunitcode,busiunitname from list_order where isinvalid=0 " + where;
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "createtime", "desc"));
+            string json = JsonConvert.SerializeObject(dt); ;
+            return "{total:" + totalProperty + ",rows:" + json + "}";
+        }
+
+        public string filedetail()
+        {
+            string ordercode = Request["ordercode"]; 
+            //订单随附文件
+            string sql = @"select * from LIST_ATTACHMENT where instr(ordercode,'{0}') >0 
                       and ((filetype=44 or filetype=58) or ( filetype=57 AND confirmstatus = 1 )) and (abolishstatus is null or abolishstatus=0)";
-                sql = string.Format(sql, ordercode);
-                dt = DBMgr.GetDataTable(sql);
-                string filedata = JsonConvert.SerializeObject(dt, iso);
+            sql = string.Format(sql, ordercode);
+            DataTable dt = DBMgr.GetDataTable(sql);
+
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            string filedata = JsonConvert.SerializeObject(dt, iso);
 
 
-                result = "{formdata:" + formdata + ",filedata:" + filedata + "}";*/
+            string result = "{filedata:" + filedata + "}";
+            return result;
+        }
+        
 
         #endregion
 
