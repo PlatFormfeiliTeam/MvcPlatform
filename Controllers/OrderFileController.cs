@@ -207,8 +207,19 @@ namespace MvcPlatform.Controllers
             //--list_filerecoginze
             string filepath = dt.Rows[0]["FILEPATH"].ToString();
             string originalname = dt.Rows[0]["FILENAME"].ToString(); string filesuffix = originalname.Substring(originalname.LastIndexOf(".") + 1).ToUpper();
-            string direc_pdf = Request.PhysicalApplicationPath;
+            string direc_pdf = Request.PhysicalApplicationPath; 
+            string bakpath = direc_pdf + @"/FileUpload/filereconginze/bak/";//备份原始文件目录
+            if (!Directory.Exists(bakpath))
+            {
+                Directory.CreateDirectory(bakpath);
+            }
             FileInfo fi = new FileInfo(direc_pdf + filepath);
+
+            System.Uri Uri = new Uri("ftp://" + ConfigurationManager.AppSettings["FTPServer"] + ":" + ConfigurationManager.AppSettings["FTPPortNO"]);
+            string UserName = ConfigurationManager.AppSettings["FTPUserName"];
+            string Password = ConfigurationManager.AppSettings["FTPPassword"];
+            FtpHelper ftp = new FtpHelper(Uri, UserName, Password);
+
 
             DataTable dt_order = new DataTable();
 
@@ -224,6 +235,8 @@ namespace MvcPlatform.Controllers
             if (ordercode == "") { ordercode = dt_order.Rows[0]["CODE"].ToString(); }
             if (cusno == "") { cusno = dt_order.Rows[0]["CUSNO"].ToString(); }
             string associateno = dt_order.Rows[0]["ASSOCIATENO"].ToString();
+            string newfilepath = "/44/" + ordercode + "/" + filepath.Substring(filepath.LastIndexOf(@"/") + 1);
+
             OracleConnection conn = null;
             OracleTransaction ot = null;
             conn = DBMgr.getOrclCon();
@@ -295,8 +308,12 @@ namespace MvcPlatform.Controllers
                     + "',filepath='/44/" + ordercode + "/" + filepath.Substring(filepath.LastIndexOf(@"/") + 1) + "' where id=" + id, conn);
                 ot.Commit();
 
-                fi.CopyTo(direc_pdf + @"/FileUpload/file/" + filepath.Substring(filepath.LastIndexOf(@"/") + 1));
-                fi.Delete();
+                bool res = ftp.UploadFile(direc_pdf + filepath, newfilepath, true);
+                if (res)
+                {
+                    fi.CopyTo(bakpath + filepath.Substring(filepath.LastIndexOf(@"/") + 1));
+                    fi.Delete();
+                }
 
                 result = "{success:true}";
             }

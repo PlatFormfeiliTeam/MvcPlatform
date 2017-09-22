@@ -183,21 +183,21 @@ namespace MvcPlatform.Common
         {
             try
             {
+                if (!File.Exists(localFilePath))
+                {
+                    return false;//本地文件不存在
+                }
+
                 //自动递归创建目录
                 if (autoCreateDirectory)
                 {
-                    if (!CreateDirectory(Path.GetDirectoryName(remoteFilePath)))
+                    if (!CreateDirectory(Path.GetDirectoryName(remoteFilePath), true))
                     {
-                        //递归创建目录失败，返回false
-                        return false;
+                        return false;// //递归创建目录失败，返回false
                     }
                 }
-                FileInfo fileInf = new FileInfo(localFilePath);
-                if (!fileInf.Exists)
-                {
-                    throw new FileNotFoundException(string.Format("本地文件不存在:{0}!", localFilePath));
-                }
 
+                FileInfo fileInf = new FileInfo(localFilePath);
                 FtpWebRequest request = CreateRequest(new Uri(this.Uri + remoteFilePath), WebRequestMethods.Ftp.UploadFile);
 
                 request.ContentLength = fileInf.Length;
