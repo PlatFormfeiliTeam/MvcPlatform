@@ -1663,40 +1663,7 @@ namespace MvcPlatform.Controllers
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             return Extension.Check_Customer(json_user.Value<string>("CUSTOMERID")).ToString().ToLower();
         }
-        /*
-        public string ImExcel_Verification()
-        {
-            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-
-            HttpPostedFileBase postedFile = Request.Files["UPLOADFILE"];//获取上传信息对象  
-            string fileName = Path.GetFileName(postedFile.FileName);
-
-            string newfile = @"~/FileUpload/Verification/" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_" + fileName;
-            if (!Directory.Exists(Server.MapPath("~/FileUpload/Verification")))
-            {
-                Directory.CreateDirectory(Server.MapPath("~/FileUpload/Verification"));
-            }
-            postedFile.SaveAs(Server.MapPath(newfile));
-
-            string result = "";
-            DataTable dtExcel = Extension.GetExcelData_Table(Server.MapPath(newfile), 0);
-            DataTable dtExcel_sub = Extension.GetExcelData_Table(Server.MapPath(newfile), 1);
-
-            result = Extension.ImExcel_Verification_Data(dtExcel, dtExcel_sub, "线下", json_user);
-
-            if (result != "{success:true,json:[]}")//上传不成功，删除源文件
-            {
-                FileInfo fi = new FileInfo(Server.MapPath(newfile));
-                if (fi.Exists)
-                {
-                    fi.Delete();
-                }
-            }
-
-            return result;
-        }
-         */
-
+        
         public string ImExcel_Verification()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
@@ -1726,42 +1693,7 @@ namespace MvcPlatform.Controllers
 
             return result;
         }
-
-        /*
-         public string QueryConditionVerification()
-        {
-            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-
-            string where = @" where lv.BUSIUNITCODE ='" + json_user.Value<string>("CUSTOMERHSCODE") + "' ";
-
-            if (!string.IsNullOrEmpty(Request["DECLARATIONCODE"]))
-            {
-                where += " and lv.DECLARATIONCODE='" + Request["DECLARATIONCODE"] + "'";
-            }
-            if (!string.IsNullOrEmpty(Request["TRADEMETHOD"]))
-            {
-                where += " and lv.TRADEMETHOD='" + Request["TRADEMETHOD"] + "'";
-            }
-            if (!string.IsNullOrEmpty(Request["CONTRACTNO"]))
-            {
-                where += " and lv.CONTRACTNO='" + Request["CONTRACTNO"] + "'";
-            }
-            if (!string.IsNullOrEmpty(Request["BUSITYPE"]))
-            {
-                where += " and lv.BUSITYPE='" + Request["BUSITYPE"] + "'";
-            }
-            if (!string.IsNullOrEmpty(Request["STATUS"]))
-            {
-                where += " and lv.STATUS='" + Request["STATUS"] + "'";
-            }
-
-            string sql = @"select lv.* from list_verification lv " + where;
-
-            return sql;
-
-        }
-         */
-
+        
         public string QueryConditionVerification()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
@@ -1876,6 +1808,36 @@ namespace MvcPlatform.Controllers
             DataTable dt_sub = DBMgr.GetDataTable(GetPageSql(sql, "orderno", "asc"));
             var json = JsonConvert.SerializeObject(dt_sub, iso);
             return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
+        public string DeleteVeri()
+        {
+            string declcodes = Request["declcodes"];
+            string result = "{success:false}"; string sql = "";
+
+            bool bf = false;
+            sql = "select * from list_verification where id in(" + declcodes + ")";
+            DataTable dt = DBMgr.GetDataTable(sql);
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                if (dt.Rows[i]["STATUS"].ToString() == "比对中")
+                {
+                    bf = true;
+                    break;
+                }
+            }
+
+            if (bf) { return result; }
+
+            sql = "delete from list_verification where declarationcode in(" + declcodes + ")";
+            DBMgr.ExecuteNonQuery(sql);
+
+            sql = "delete from list_verification_sub where declarationcode in(" + declcodes + ")";
+            DBMgr.ExecuteNonQuery(sql);
+
+            result = "{success:true}";
+
+            return result;
         }
 
         public string ExportReport_ver()
@@ -2055,3 +2017,71 @@ namespace MvcPlatform.Controllers
         #endregion
     }
 }
+/*
+public string ImExcel_Verification()
+{
+    JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+    HttpPostedFileBase postedFile = Request.Files["UPLOADFILE"];//获取上传信息对象  
+    string fileName = Path.GetFileName(postedFile.FileName);
+
+    string newfile = @"~/FileUpload/Verification/" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_" + fileName;
+    if (!Directory.Exists(Server.MapPath("~/FileUpload/Verification")))
+    {
+        Directory.CreateDirectory(Server.MapPath("~/FileUpload/Verification"));
+    }
+    postedFile.SaveAs(Server.MapPath(newfile));
+
+    string result = "";
+    DataTable dtExcel = Extension.GetExcelData_Table(Server.MapPath(newfile), 0);
+    DataTable dtExcel_sub = Extension.GetExcelData_Table(Server.MapPath(newfile), 1);
+
+    result = Extension.ImExcel_Verification_Data(dtExcel, dtExcel_sub, "线下", json_user);
+
+    if (result != "{success:true,json:[]}")//上传不成功，删除源文件
+    {
+        FileInfo fi = new FileInfo(Server.MapPath(newfile));
+        if (fi.Exists)
+        {
+            fi.Delete();
+        }
+    }
+
+    return result;
+}
+ */
+
+/*
+ public string QueryConditionVerification()
+{
+    JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+    string where = @" where lv.BUSIUNITCODE ='" + json_user.Value<string>("CUSTOMERHSCODE") + "' ";
+
+    if (!string.IsNullOrEmpty(Request["DECLARATIONCODE"]))
+    {
+        where += " and lv.DECLARATIONCODE='" + Request["DECLARATIONCODE"] + "'";
+    }
+    if (!string.IsNullOrEmpty(Request["TRADEMETHOD"]))
+    {
+        where += " and lv.TRADEMETHOD='" + Request["TRADEMETHOD"] + "'";
+    }
+    if (!string.IsNullOrEmpty(Request["CONTRACTNO"]))
+    {
+        where += " and lv.CONTRACTNO='" + Request["CONTRACTNO"] + "'";
+    }
+    if (!string.IsNullOrEmpty(Request["BUSITYPE"]))
+    {
+        where += " and lv.BUSITYPE='" + Request["BUSITYPE"] + "'";
+    }
+    if (!string.IsNullOrEmpty(Request["STATUS"]))
+    {
+        where += " and lv.STATUS='" + Request["STATUS"] + "'";
+    }
+
+    string sql = @"select lv.* from list_verification lv " + where;
+
+    return sql;
+
+}
+ */

@@ -1,5 +1,4 @@
 ﻿var common_data_myfs = [], ommon_data_unit = [];
-var pgbar;
 
 Ext.onReady(function () {
 
@@ -255,7 +254,6 @@ function gridbind() {
     });
 }
 
-
 function renderver(value, cellmeta, record, rowIndex, columnIndex, store) {
     //var rtn = "";
     //var dataindex = cellmeta.column.dataIndex;
@@ -282,7 +280,7 @@ function Reset() {
 
 //查询
 function Select() {
-    pgbar.moveFirst();
+    Ext.getCmp("pgbar").moveFirst();
 }
 
 function importfile() {
@@ -327,7 +325,7 @@ function importfile() {
                             }
 
                             Ext.Msg.alert('提示', msg, function () {
-                                pgbar.moveFirst();
+                                Ext.getCmp("pgbar").moveFirst();
                                 //Ext.getCmp('win_upload').close();
                                 if (json.length > 0) {
                                     errorwin(json);
@@ -339,7 +337,7 @@ function importfile() {
                             var errormsg = result.error;
 
                             Ext.MessageBox.alert("提示", errormsg, function () {
-                                pgbar.moveFirst();
+                                Ext.getCmp("pgbar").moveFirst();
                             });
                         }
                     });
@@ -358,6 +356,99 @@ function importfile() {
         items: [Ext.getCmp('formpanel_upload')]
     });
     win_upload.show();
+}
+
+function VeriList() {
+    var recs = Ext.getCmp('gridpanel').getSelectionModel().getSelection();
+    if (recs.length == 0) {
+        Ext.MessageBox.alert('提示', '请选择需要比对的记录！');
+        return;
+    }
+
+    var bf = false;
+    Ext.each(recs, function (rec) {
+        if (rec.get("STATUS") == "比对中") { bf = true; }
+    });
+    if (bf) {
+        Ext.Msg.alert("提示", "比对中的记录 不能 发送核销比对!");
+        return;
+    }
+
+    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "数据保存中，请稍等..." });
+    myMask.show();
+
+    var declarationcode_list = Ext.encode(Ext.pluck(Ext.pluck(recs, 'data'), 'DECLARATIONCODE'));
+    //var predeclcode_list = Ext.encode(Ext.pluck(Ext.pluck(recs, 'data'),'CODE'));
+    Ext.Ajax.request({
+        url: '/Common/dec_Verification',
+        params: { declarationcode_list: declarationcode_list },//, predeclcode_list: predeclcode_list
+        success: function (response, option) {
+            myMask.hide();
+            var result = Ext.decode(response.responseText);
+            if (result.success) {
+                var json = result.json; var msg = "";
+                if (json.length > 0) {
+                    msg = "操作完成";
+                } else {
+                    msg = "保存成功";
+                }
+
+                Ext.Msg.alert('提示', msg, function () {
+                    Ext.getCmp("pgbar").moveFirst();
+                    if (json.length > 0) {
+                        errorwin(json);
+                    }
+                });
+            }
+            else {
+                var result = Ext.decode(response.responseText);
+                var errormsg = result.error;
+                Ext.MessageBox.alert("提示", errormsg, function () {
+                    Ext.getCmp("pgbar").moveFirst();
+                });
+            }
+
+
+        }
+    });
+
+}
+
+function DeleteVeri() {
+    var recs = Ext.getCmp("gridpanel").getSelectionModel().getSelection();
+    if (recs.length == 0) {
+        Ext.Msg.alert("提示", "请选择删除记录!");
+        return;
+    }
+    var declcodes = ""; var bf = false;
+    Ext.each(recs, function (rec) {
+        if (rec.get("STATUS") == null || rec.get("STATUS") == "比对中") { bf = true; }
+        declcodes += "'" + rec.get("DECLARATIONCODE") + "',";
+    });
+    if (bf) {
+        Ext.Msg.alert("提示", "未必对或比对中的记录不能删除!");
+        return;
+    }
+    declcodes = declcodes.substr(0, declcodes.length - 1);
+
+    Ext.MessageBox.confirm("提示", "确定要删除所选择的记录吗？", function (btn) {
+        if (btn == 'yes') {
+            Ext.Ajax.request({
+                url: '/RecordInfor/DeleteVeri',
+                params: { declcodes: declcodes },
+                success: function (response, success, option) {
+                    var res = Ext.decode(response.responseText);
+                    var msgs = "";
+                    if (res.success) { msgs = "删除成功！"; }
+                    else { msgs = "删除失败！"; }
+
+                    Ext.MessageBox.alert('提示', msgs, function (btn) {
+                        Ext.getCmp("pgbar").moveFirst();
+                    });
+                }
+            });
+        }
+    });
 }
 
 //-----------------------------------------------------------------------win show-------------------------------------------------------------------------------
