@@ -1439,5 +1439,43 @@ namespace MvcPlatform.Common
 
         }
 
+
+        public static string Verification(string declarationcode_list, string DATADOURCE, JObject json_user)
+        {
+            string sql = "";
+            if (DATADOURCE == "线上")
+            {
+                sql = @"select a.DECLARATIONCODE 报关单号,a.REPUNITCODE 申报单位代码,a.KINDOFTAX 征免性质,to_char(a.REPTIME,'yyyymmdd') 申报日期
+                                   ,a.TRADEMETHOD 贸易方式,a.BUSIUNITCODE 经营单位代码,a.RECORDCODE 账册号 
+                                   ,a.contractno 合同号 
+                                   ,(select sb.name from list_order lo 
+                                     left join cusdoc.sys_busitype sb on lo.busitype=sb.code and enabled=1
+                                      where lo.code=(select ld.ordercode from list_declaration ld where ld.code=a.code)) 业务类型
+                                   ,case when substr(a.declarationcode,9,1)='1' then '进口' when substr(a.declarationcode,9,1)='0' then '出口' else '' end 进出类型
+                                   ,b.ORDERNO 序号,b.ITEMNO 项号,b.COMMODITYNO||b.ADDITIONALNO 商品编号,b.COMMODITYNAME 商品名称,b.TAXPAID 征免
+                                   ,b.CADQUANTITY 成交数量,b.CADUNIT 成交单位,b.CURRENCYCODE 币制,b.TOTALPRICE 总价
+                            from (select * from list_declaration_after where declarationcode in ({0}) and csid=1) a
+                                 left join (select * from list_decllist_after where isinvalid=0)b on a.CODE=b.predeclcode and a.xzlb=b.xzlb";
+            }
+
+            if (DATADOURCE == "线下")
+            {
+                sql = @"select a.DECLARATIONCODE 报关单号,a.REPUNITCODE 申报单位代码,a.KINDOFTAX 征免性质,to_char(a.REPTIME,'yyyymmdd') 申报日期
+                                   ,a.TRADEMETHOD 贸易方式,a.BUSIUNITCODE 经营单位代码,a.RECORDCODE 账册号 
+                                   ,a.CONTRACTNO 合同号 
+                                   ,a.BUSITYPE 业务类型
+                                   ,a.INOUTTYPE 进出类型
+                                   ,b.ORDERNO 序号,b.ITEMNO 项号,b.COMMODITYNO 商品编号,b.COMMODITYNAME 商品名称,b.TAXPAID 征免
+                                   ,b.CADQUANTITY 成交数量,b.CADUNIT 成交单位,b.CURRENCYCODE 币制,b.TOTALPRICE 总价
+                            from (select * from list_verification where declarationcode in ({0})) a
+                                 left join list_verification_sub b on a.declarationcode=b.declarationcode";
+            }
+            sql = string.Format(sql, declarationcode_list);
+
+            DataTable dt = DBMgr.GetDataTable(sql);
+            string result = Extension.ImExcel_Verification_Data(dt, "线上", json_user);
+            return result;
+        }
+
     }
 }

@@ -1783,6 +1783,36 @@ namespace MvcPlatform.Controllers
             return "{rows:" + json + ",total:" + totalProperty + "}";
         }
 
+        public string VeriList(string declarationcode_list, string datadource)
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            declarationcode_list = declarationcode_list.TrimStart('[').TrimEnd(']').Replace("\"", "'");
+            string result = Extension.Verification(declarationcode_list, datadource, json_user);
+            return result;
+           
+            /*JArray ja = (JArray)JsonConvert.DeserializeObject(Request["jsondata_str"]);
+            string declcode_up = "", declcode_down = "";
+            for (int i = 0; i < ja.Count; i++)
+            {
+                if (ja[i].Value<string>("DATADOURCE") == "线上") { declcode_up = declcode_up + ",'" + ja[i].Value<string>("DECLARATIONCODE") + "'"; }
+                if (ja[i].Value<string>("DATADOURCE") == "线下") { declcode_up = declcode_up + ",'" + ja[i].Value<string>("DECLARATIONCODE") + "'"; }
+            }
+
+            string result_up = "", result_down = "";
+            if (declcode_up != "")
+            {
+                declcode_up = declcode_up.Substring(1);
+                result_up = Extension.Verification(declcode_up, "线上", json_user);
+            }
+            if (declcode_down != "")
+            {
+                declcode_down = declcode_down.Substring(1);
+                result_down = Extension.Verification(declcode_up, "线下", json_user);
+            }
+            return "";*/
+             
+        }
+
         public string loadVerificationDetail_D()
         {
             string declartioncode = Request["declartioncode"]; string status = Request["status"];
@@ -1850,22 +1880,8 @@ namespace MvcPlatform.Controllers
                 dt.Rows.Add(dr);
             }
 
-            string result = Extension.ImExcel_Verification_Data(dt, json.Value<string>("DATADOURCE"), json_user);
+            string result = Extension.ImExcel_Verification_Data(dt, "线下", json_user);
             return result;
-
-            //json.Value<string>("RECORDINFOID")
-            /*for (int j = 0; j < ja.Count; j++)
-            {
-                sql = @"insert into SYS_PRODUCTCONSUME(ID,RECORDINFOID,ITEMNO,ITEMNO_CONSUME,ITEMNO_COMMODITYNAME,ITEMNO_SPECIFICATIONSMODEL,ITEMNO_UNIT,
-                                        ITEMNO_UNITNAME,CONSUME,ATTRITIONRATE,CREATEMAN,CREATEDATE,RID) 
-                                    values(SYS_PRODUCTCONSUME_id.Nextval,'{0}','{1}','{2}','{3}','{4}','{5}'
-                                    ,'{6}','{7}','{8}','{9}',sysdate,'{10}')";
-                sql = string.Format(sql, json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), ja[j].Value<string>("ITEMNO_CONSUME"), ja[j].Value<string>("ITEMNO_COMMODITYNAME"), ja[j].Value<string>("ITEMNO_SPECIFICATIONSMODEL"), ja[j].Value<string>("ITEMNO_UNIT")
-                    , ja[j].Value<string>("ITEMNO_UNITNAME"), ja[j].Value<string>("CONSUME"), ja[j].Value<string>("ATTRITIONRATE"), json_user.Value<string>("ID"), id
-                    );
-                DBMgr.ExecuteNonQuery(sql);
-            }*/
-
         }
 
         public string DeleteVeri()

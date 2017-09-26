@@ -225,21 +225,28 @@ function gridbind() {
         { header: '海关状态', dataIndex: 'CUSTOMSSTATUS', width: 90 },
         { header: '合同号', dataIndex: 'CONTRACTNO', width: 110 },
         { header: '业务类型', dataIndex: 'BUSITYPE', width: 90 },
-        { header: '进出类型', dataIndex: 'INOUTTYPE', width: 80 },
-        { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 130 },
+        { header: '进出类型', dataIndex: 'INOUTTYPE', width: 65 },
+        { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 150 },
         { header: '申报单位代码', dataIndex: 'REPUNITCODE', width: 100 },
-        { header: '征免性质', dataIndex: 'KINDOFTAX', width: 70 },
+        { header: '征免性质', dataIndex: 'KINDOFTAX', width: 65 },
         {
             header: '申报日期', dataIndex: 'REPTIME', width: 90, renderer: function (value) {                
                 if (value == null) { return value;}
                 return value.substr(0, 10);
             }
         },
-        { header: '贸易方式', dataIndex: 'TRADEMETHOD', width: 70 },
+        { header: '贸易方式', dataIndex: 'TRADEMETHOD', width: 65 },
         //{ header: '经营单位代码', dataIndex: 'BUSIUNITCODE', width: 110 },
         { header: '账册号', dataIndex: 'RECORDCODE', width: 110 },
-        { header: '类型', dataIndex: 'DATADOURCE', width: 60 },
-        { header: '创建时间', dataIndex: 'CREATETIME', width: 130 }
+        {
+            header: '类型', dataIndex: 'DATADOURCE', width: 60, renderer: function (value, meta, record) {
+                if (value == "线下") {
+                    return '<font color=blue>' + value + '</font>';
+                }
+                return value;
+            }
+        },
+        { header: '创建时间', dataIndex: 'CREATETIME', width: 140 }
         ],
         listeners:
         {
@@ -345,24 +352,31 @@ function VeriList() {
         Ext.MessageBox.alert('提示', '请选择需要比对的记录！');
         return;
     }
-
-    var bf = false;
+    var datadource = recs[0].get("DATADOURCE");
+    var bf = false; var bf_type = false;//var jsondata="[]";
     Ext.each(recs, function (rec) {
         if (rec.get("STATUS") == "比对中") { bf = true; }
+        if (rec.get("DATADOURCE") != datadource) { bf_type = true; }
+        //jsondata.push({ "DECLARATIONCODE": rec.get("DECLARATIONCODE"), "DATADOURCE": rec.get("DATADOURCE") });
     });
     if (bf) {
         Ext.Msg.alert("提示", "比对中的记录 不能 发送核销比对!");
+        return;
+    }
+    if (bf_type) {
+        Ext.Msg.alert("提示", "线上、线下的数据需要分开发送核销比对!");
         return;
     }
 
     var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "数据保存中，请稍等..." });
     myMask.show();
 
+    //var jsondata_str = Ext.encode(jsondata);
     var declarationcode_list = Ext.encode(Ext.pluck(Ext.pluck(recs, 'data'), 'DECLARATIONCODE'));
-    //var predeclcode_list = Ext.encode(Ext.pluck(Ext.pluck(recs, 'data'),'CODE'));
+
     Ext.Ajax.request({
-        url: '/Common/dec_Verification',
-        params: { declarationcode_list: declarationcode_list },//, predeclcode_list: predeclcode_list
+        url: '/RecordInfor/VeriList',        
+        params: { declarationcode_list: declarationcode_list, datadource: datadource },//params: { jsondata_str: jsondata_str },
         success: function (response, option) {
             myMask.hide();
             var result = Ext.decode(response.responseText);
@@ -481,13 +495,17 @@ function Open() {
                         item.setReadOnly(false);
                     }
                 });
-                //document.getElementById("btn_VeriList_D").disabled = false;
+                document.getElementById("btn_VeriList_D").style.visibility = "visible";
+                Ext.getCmp("btn_gird_add").show();
+                Ext.getCmp("btn_gird_del").show();
             } else {
                 Ext.Array.each(Ext.getCmp("f_formpanel").getForm().getFields().items, function (item) {
                     item.setFieldStyle('background-color: #CECECE; background-image: none;');
                     item.setReadOnly(true);
                 });
-                //document.getElementById("btn_VeriList_D").disabled = true;
+                document.getElementById("btn_VeriList_D").style.visibility = "hidden";
+                Ext.getCmp("btn_gird_add").hide();
+                Ext.getCmp("btn_gird_del").hide();
             }
 
         }
@@ -571,11 +589,36 @@ function grid_ini_detail() {
         data: data_verisub
     });
 
+    var g_tbar = Ext.create('Ext.toolbar.Toolbar', {
+        items: [
+            '->',
+            {
+                text: '<span class="icon iconfont" style="font-size:10px">&#xe622;</span>&nbsp;添 加', id: 'btn_gird_add',
+                handler: function () {
+                    var p = {
+                        DECLARATIONCODE: '', ORDERNO: '', ITEMNO: '', COMMODITYNO: '', COMMODITYNAME: '', TAXPAID: '', CADQUANTITY: '', CADUNIT: '', CURRENCYCODE: '', TOTALPRICE: ''
+                    };
+                    store_d.insert(store_d.data.length, p);
+                }
+            },
+            {
+                text: '<span class="icon iconfont" style="font-size:10px">&#xe6d3;</span>&nbsp;删 除', id: 'btn_gird_del',
+                handler: function () {
+                    var recs = grid.getSelectionModel().getSelection();
+                    if (recs.length > 0) {
+                        store_d.remove(recs);
+                    }
+                }
+            }
+        ]
+    });
+
     var grid = Ext.create('Ext.grid.Panel', {
         id: 'gridpanel_d',
         store: store_d,
         height: 300,
-        //selModel: { selType: 'checkboxmodel' },
+        tbar: g_tbar,
+        selModel: { selType: 'checkboxmodel' },
         enableColumnHide: false,
         columns: [
             { xtype: 'rownumberer', width: 35 },
