@@ -481,13 +481,13 @@ function Open() {
                         item.setReadOnly(false);
                     }
                 });
-                document.getElementById("btn_VeriList_D").disabled = false;
+                //document.getElementById("btn_VeriList_D").disabled = false;
             } else {
                 Ext.Array.each(Ext.getCmp("f_formpanel").getForm().getFields().items, function (item) {
                     item.setFieldStyle('background-color: #CECECE; background-image: none;');
                     item.setReadOnly(true);
                 });
-                document.getElementById("btn_VeriList_D").disabled = true;
+                //document.getElementById("btn_VeriList_D").disabled = true;
             }
 
         }
