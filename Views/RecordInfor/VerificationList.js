@@ -254,31 +254,12 @@ function gridbind() {
     });
 }
 
-function renderver(value, cellmeta, record, rowIndex, columnIndex, store) {
-    //var rtn = "";
-    //var dataindex = cellmeta.column.dataIndex;
-    //switch (dataindex) {
-    //    case "FLAG":
-    //        var rec = store_flag.findRecord('CODE', value);
-    //        if (rec) {
-    //            rtn = rec.get("NAME");
-    //        }
-    //        break;
-    //    case "OLDFILENAME":
-    //        rtn = "<a href='" + record.get("FILEPATH") + "' target='_blank'>" + record.get("OLDFILENAME") + "</a>";
-    //        break;
-    //}
-    //return rtn;
-}
-
-//重置
 function Reset() {
     Ext.each(Ext.getCmp('formpanel').getForm().getFields().items, function (field) {
         field.reset();
     });
 }
 
-//查询
 function Select() {
     Ext.getCmp("pgbar").moveFirst();
 }
@@ -459,6 +440,233 @@ function Open() {
         Ext.Msg.alert("提示", "请选择一笔记录!");
         return;
     }
+
+    form_ini_detail();
+    grid_ini_detail();
+
+    var bbar = '<div class="btn-group" role="group">'
+                    + '<button type="button" onclick="VeriList_D()" id="btn_VeriList_D" class="btn btn-primary btn-sm"><i class="fa fa-send"></i>&nbsp;核销比对</button>'
+                + '</div>';
+    var bbar = Ext.create('Ext.toolbar.Toolbar', {
+        items: ['->', bbar, '->']
+    });
+
+    var win = Ext.create("Ext.window.Window", {
+        id: "win_d",
+        title: '<font style="font-size:14px;">核销比对信息</font>',
+        width: 1000,
+        height: 550,
+        modal: true,
+        bbar: bbar,
+        items: [Ext.getCmp('f_formpanel'), Ext.getCmp('gridpanel_d')]
+    });
+    win.show();
+
+    Ext.Ajax.request({
+        url: "/RecordInfor/loadVerificationDetail_D",
+        params: { declartioncode: recs[0].get("DECLARATIONCODE"), status: recs[0].get("STATUS") },
+        success: function (response, opts) {
+            var data = Ext.decode(response.responseText);
+
+            Ext.getCmp("f_formpanel").getForm().setValues(recs[0].data);
+            Ext.getCmp('gridpanel_d').store.loadData(data.verisubdata);
+
+            if (recs[0].get("STATUS") != "比对未通过") {
+                Ext.getCmp("NOTE").hide();
+            }
+
+            if (recs[0].get("DATADOURCE") == "线下") {
+                Ext.Array.each(Ext.getCmp("f_formpanel").getForm().getFields().items, function (item) {
+                    if (item.id != "DATADOURCE" && item.id != "CUSTOMSSTATUS" && item.id != "CREATETIME" && item.id != "STATUS" && item.id != "NOTE") {
+                        item.setReadOnly(false);
+                    }
+                });
+                document.getElementById("btn_VeriList_D").disabled = false;
+            } else {
+                Ext.Array.each(Ext.getCmp("f_formpanel").getForm().getFields().items, function (item) {
+                    item.setFieldStyle('background-color: #CECECE; background-image: none;');
+                    item.setReadOnly(true);
+                });
+                document.getElementById("btn_VeriList_D").disabled = true;
+            }
+
+        }
+    });
+}
+
+function form_ini_detail() {
+
+    var field_DECLARATIONCODE = Ext.create('Ext.form.field.Text', { id: 'DECLARATIONCODE', name: 'DECLARATIONCODE', fieldLabel: '报关单号', allowBlank: false, blankText: '报关单号不能为空!' });
+
+    var field_REPUNITCODE = Ext.create('Ext.form.field.Text', { id: 'REPUNITCODE', name: 'REPUNITCODE', fieldLabel: '申报单位代码' });
+
+    var field_KINDOFTAX = Ext.create('Ext.form.field.Text', { id: 'KINDOFTAX', name: 'KINDOFTAX', fieldLabel: '征免性质' });
+
+    var field_REPTIME = Ext.create('Ext.form.field.Text', { id: 'REPTIME', name: 'REPTIME', fieldLabel: '申报日期' });
+
+    var field_TRADEMETHOD = Ext.create('Ext.form.field.Text', { id: 'TRADEMETHOD', name: 'TRADEMETHOD', fieldLabel: '贸易方式' });
+
+    var field_BUSIUNITCODE = Ext.create('Ext.form.field.Text', { id: 'BUSIUNITCODE', name: 'BUSIUNITCODE', fieldLabel: '经营单位代码', allowBlank: false, blankText: '报关单号不能为空!' });
+
+    var field_RECORDCODE = Ext.create('Ext.form.field.Text', { id: 'RECORDCODE', name: 'RECORDCODE', fieldLabel: '账册号' });
+    
+    var field_DATADOURCE = Ext.create('Ext.form.field.Text', {
+        id: 'DATADOURCE', name: 'DATADOURCE', fieldLabel: '类型',
+        readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none; color: blue;'
+    });
+
+    var field_CUSTOMSSTATUS = Ext.create('Ext.form.field.Text', {
+        id: 'CUSTOMSSTATUS', name: 'CUSTOMSSTATUS', fieldLabel: '海关状态',
+        readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;'
+    });
+
+    var field_CONTRACTNO = Ext.create('Ext.form.field.Text', { id: 'CONTRACTNO', name: 'CONTRACTNO', fieldLabel: '合同号' });
+
+    var field_BUSITYPE = Ext.create('Ext.form.field.Text', { id: 'BUSITYPE', name: 'BUSITYPE', fieldLabel: '业务类型' });
+
+    var field_INOUTTYPE = Ext.create('Ext.form.field.Text', { id: 'INOUTTYPE', name: 'INOUTTYPE', fieldLabel: '进出类型' });
+    
+    var field_CREATETIME = Ext.create('Ext.form.field.Text', {
+        id: 'CREATETIME', name: 'CREATETIME', fieldLabel: '创建时间',
+        readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;'
+    });
+
+    var field_STATUS = Ext.create('Ext.form.field.Text', {
+        id: 'STATUS', name: 'STATUS', fieldLabel: '状态', 
+        readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;'
+    });
+
+    var field_NOTE = Ext.create('Ext.form.field.Text', {
+        id: 'NOTE', name: 'NOTE', fieldLabel: '<font color=red>未通过原因</font>', flex: 1, 
+        readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none; color: blue;'
+    });
+
+    var f_NOTE_container = { xtype: 'fieldcontainer', layout: 'hbox', margin: 0, columnWidth: .5, items: [field_NOTE] };
+
+    var f_formpanel = Ext.create('Ext.form.Panel', {
+        id: 'f_formpanel',
+        minHeight: 180,
+        border: 0,
+        fieldDefaults: {
+            margin: '0 5 10 0',
+            labelWidth: 80,
+            columnWidth: .25,
+            labelAlign: 'right',
+            labelSeparator: ''
+        },
+        items: [
+                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_DECLARATIONCODE, field_REPUNITCODE, field_KINDOFTAX, field_REPTIME] },
+                { layout: 'column', height: 42, border: 0, items: [field_TRADEMETHOD, field_BUSIUNITCODE, field_RECORDCODE, field_CONTRACTNO] },
+                { layout: 'column', height: 42, border: 0, items: [field_BUSITYPE, field_INOUTTYPE, field_CUSTOMSSTATUS, field_DATADOURCE] },
+                { layout: 'column', height: 42, border: 0, items: [field_CREATETIME, field_STATUS, f_NOTE_container] }
+        ]
+    });
+}
+
+function grid_ini_detail() {
+    var data_verisub = [];
+    var store_d = Ext.create('Ext.data.JsonStore', {
+        storeId: 'store_d',
+        fields: ['DECLARATIONCODE', 'ORDERNO', 'ITEMNO', 'COMMODITYNO', 'COMMODITYNAME', 'TAXPAID', 'CADQUANTITY', 'CADUNIT', 'CURRENCYCODE', 'TOTALPRICE'],
+        data: data_verisub
+    });
+
+    var grid = Ext.create('Ext.grid.Panel', {
+        id: 'gridpanel_d',
+        store: store_d,
+        height: 300,
+        //selModel: { selType: 'checkboxmodel' },
+        enableColumnHide: false,
+        columns: [
+            { xtype: 'rownumberer', width: 35 },
+            { header: '序号', dataIndex: 'ORDERNO', width: 40, editor: { xtype: "numberfield", decimalPrecision: 0, selectOnFocus: true } },
+            { header: '项号', dataIndex: 'ITEMNO', width: 40, editor: { xtype: "numberfield", decimalPrecision: 0, selectOnFocus: true } },
+            { header: '商品编号', dataIndex: 'COMMODITYNO', width: 110, editor: { xtype: "numberfield", decimalPrecision: 0, selectOnFocus: true } },
+            { header: '商品名称', dataIndex: 'COMMODITYNAME', width: 200, editor: { xtype: "textfield", selectOnFocus: true } },
+            { header: '征免', dataIndex: 'TAXPAID', width: 100, editor: { xtype: "textfield", selectOnFocus: true } },
+            { header: '成交数量', dataIndex: 'CADQUANTITY', width: 60, editor: { xtype: "textfield", selectOnFocus: true } },
+            { header: '成交单位', dataIndex: 'CADUNIT', width: 60, editor: { xtype: "textfield", selectOnFocus: true } },
+            { header: '币制', dataIndex: 'CURRENCYCODE', width: 40, editor: { xtype: "textfield", selectOnFocus: true } },
+            { header: '总价', dataIndex: 'TOTALPRICE', width: 100, editor: { xtype: "textfield", selectOnFocus: true } }
+        ],
+        listeners:{
+            beforeedit: {//控制是否可以编辑
+                fn: function (editor, e, eOpts) {
+                    if (Ext.getCmp("DATADOURCE").getValue() == "线上") {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+        },
+        viewConfig: {
+            enableTextSelection: true
+        },
+        plugins: [
+            Ext.create('Ext.grid.plugin.CellEditing', {//Ext.create('Ext.grid.plugin.RowEditing', {
+                clicksToEdit: 1
+            })
+        ],
+        forceFit: true
+    });
+}
+
+function VeriList_D() {
+    if (!Ext.getCmp('f_formpanel').getForm().isValid()) {
+        return;
+    }
+    var formdata = Ext.encode(Ext.getCmp('f_formpanel').getForm().getValues());
+    var verisubdata = Ext.encode(Ext.pluck(Ext.data.StoreManager.lookup('store_d').data.items, 'data'));
+
+    var mask = new Ext.LoadMask(Ext.get(Ext.getBody()), { msg: "数据保存中，请稍等..." });
+
+    mask.show();
+    Ext.Ajax.request({
+        url: "/RecordInfor/VeriList_D_Verification",
+        params: { formdata: formdata, verisubdata: verisubdata },
+        success: function (response, option) {
+            if (response.responseText) {
+                mask.hide();
+                var result = Ext.decode(response.responseText);
+                if (result.success) {
+                    var json = result.json; var msg = "";
+                    if (json.length > 0) {
+                        msg = "操作完成";
+                    } else {
+                        msg = "保存成功";
+                    }
+
+                    Ext.Msg.alert('提示', msg, function () {
+                        Ext.getCmp("pgbar").moveFirst();
+                        if (json.length > 0) {
+                            errorwin(json);
+                        } else {
+                            Ext.getCmp("STATUS").setValue("待比对");
+                        }
+                    });
+                }
+                else {
+                    var result = Ext.decode(response.responseText);
+                    var errormsg = result.error;
+                    Ext.MessageBox.alert("提示", errormsg, function () {
+                        Ext.getCmp("pgbar").moveFirst();
+                    });
+                }
+            }
+        }
+    });
+
+}
+
+
+
+/*
+function Open() {
+    var recs = Ext.getCmp('gridpanel').getSelectionModel().getSelection();
+    if (recs.length != 1) {
+        Ext.Msg.alert("提示", "请选择一笔记录!");
+        return;
+    }
     form_ini_detail(recs);
     grid_ini_detail();
 
@@ -506,7 +714,7 @@ function form_ini_detail(recs) {
         id: 'CREATETIME', name: 'CREATETIME', fieldLabel: '创建时间', readOnly: true, value: recs[0].get("CREATETIME")
     });
     var field_NOTE = Ext.create('Ext.form.field.Text', {
-        id: 'NOTE ', name: 'NOTE ', fieldLabel: '<font color=red>未通过原因</font>', readOnly: true, value: recs[0].get("NOTE"), flex: 1
+        id: 'NOTE ', name: 'NOTE ', fieldLabel: '<font color=red>未通过原因</font>', flex: 1, readOnly: true, value: recs[0].get("NOTE")
     });
     field_NOTE.setFieldStyle({ color: 'blue' });
 
@@ -519,7 +727,7 @@ function form_ini_detail(recs) {
 
     var f_formpanel = Ext.create('Ext.form.Panel', {
         id: 'f_formpanel',
-        minHeight: 170,
+        minHeight: 140,
         border: 0,
         fieldDefaults: {
             margin: '0 5 10 0',
@@ -537,8 +745,7 @@ function form_ini_detail(recs) {
 
     if (field_STATUS.getValue() != "比对未通过") {
         field_NOTE.hide();
-    } 
-    
+    }     
 }
 
 function grid_ini_detail() {
@@ -600,7 +807,7 @@ function grid_ini_detail() {
         forceFit: true
     });
 }
-
+*/
 
 //----------------------------------------------------------------------export win----------------------------------------------------------------------------------
 function ExportWin() {

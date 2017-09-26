@@ -1786,7 +1786,8 @@ namespace MvcPlatform.Controllers
         public string loadVerificationDetail_D()
         {
             string declartioncode = Request["declartioncode"]; string status = Request["status"];
-
+            string verisubdata = "[]";    
+            
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd";
 
@@ -1803,11 +1804,68 @@ namespace MvcPlatform.Controllers
                                  left join (select * from list_decllist_after where isinvalid=0)b on a.CODE=b.predeclcode and a.xzlb=b.xzlb";
                 sql = string.Format(sql, declartioncode);
             }
-            
 
-            DataTable dt_sub = DBMgr.GetDataTable(GetPageSql(sql, "orderno", "asc"));
-            var json = JsonConvert.SerializeObject(dt_sub, iso);
-            return "{rows:" + json + ",total:" + totalProperty + "}";
+            sql = sql + " order by orderno";
+            verisubdata = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso);
+            return "{verisubdata:" + verisubdata + "}";       
+
+        }
+
+        public string VeriList_D_Verification()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            JObject json = (JObject)JsonConvert.DeserializeObject(Request["formdata"]);
+            JArray ja = (JArray)JsonConvert.DeserializeObject(Request["verisubdata"]);
+
+            DataTable dt = new DataTable();
+            dt.Columns.Add("报关单号", typeof(string)); dt.Columns.Add("申报单位代码", typeof(string)); dt.Columns.Add("征免性质", typeof(string)); dt.Columns.Add("申报日期", typeof(string));
+            dt.Columns.Add("贸易方式", typeof(string)); dt.Columns.Add("经营单位代码", typeof(string)); dt.Columns.Add("账册号", typeof(string)); dt.Columns.Add("合同号", typeof(string));
+            dt.Columns.Add("业务类型", typeof(string)); dt.Columns.Add("进出类型", typeof(string)); dt.Columns.Add("序号", typeof(string)); dt.Columns.Add("项号", typeof(string));
+            dt.Columns.Add("商品编号", typeof(string)); dt.Columns.Add("商品名称", typeof(string)); dt.Columns.Add("征免", typeof(string)); dt.Columns.Add("成交数量", typeof(string));
+            dt.Columns.Add("成交单位", typeof(string)); dt.Columns.Add("币制", typeof(string)); dt.Columns.Add("总价", typeof(string));
+
+            for (int i = 0; i < ja.Count; i++)
+            {
+                DataRow dr = dt.NewRow();
+                dr["报关单号"] = json.Value<string>("DECLARATIONCODE"); 
+                dr["申报单位代码"] = json.Value<string>("REPUNITCODE"); 
+                dr["征免性质"] = json.Value<string>("KINDOFTAX");
+                dr["申报日期"] = json.Value<string>("REPTIME"); 
+                dr["贸易方式"] = json.Value<string>("TRADEMETHOD"); 
+                dr["经营单位代码"] = json.Value<string>("BUSIUNITCODE");
+                dr["账册号"] = json.Value<string>("RECORDCODE"); 
+                dr["合同号"] = json.Value<string>("CONTRACTNO"); 
+                dr["业务类型"] = json.Value<string>("BUSITYPE");
+                dr["进出类型"] = json.Value<string>("INOUTTYPE");
+
+                dr["序号"] = ja[i].Value<string>("ORDERNO"); 
+                dr["项号"] = ja[i].Value<string>("ITEMNO");
+                dr["商品编号"] = ja[i].Value<string>("COMMODITYNO"); 
+                dr["商品名称"] = ja[i].Value<string>("COMMODITYNAME");
+                dr["征免"] = ja[i].Value<string>("TAXPAID");
+                dr["成交数量"] = ja[i].Value<string>("CADQUANTITY");
+                dr["成交单位"] = ja[i].Value<string>("CADUNIT");
+                dr["币制"] = ja[i].Value<string>("CURRENCYCODE");
+                dr["总价"] = ja[i].Value<string>("TOTALPRICE");
+                dt.Rows.Add(dr);
+            }
+
+            string result = Extension.ImExcel_Verification_Data(dt, "线下", json_user);
+            return result;
+
+            //json.Value<string>("RECORDINFOID")
+            /*for (int j = 0; j < ja.Count; j++)
+            {
+                sql = @"insert into SYS_PRODUCTCONSUME(ID,RECORDINFOID,ITEMNO,ITEMNO_CONSUME,ITEMNO_COMMODITYNAME,ITEMNO_SPECIFICATIONSMODEL,ITEMNO_UNIT,
+                                        ITEMNO_UNITNAME,CONSUME,ATTRITIONRATE,CREATEMAN,CREATEDATE,RID) 
+                                    values(SYS_PRODUCTCONSUME_id.Nextval,'{0}','{1}','{2}','{3}','{4}','{5}'
+                                    ,'{6}','{7}','{8}','{9}',sysdate,'{10}')";
+                sql = string.Format(sql, json.Value<string>("RECORDINFOID"), json.Value<string>("ITEMNO"), ja[j].Value<string>("ITEMNO_CONSUME"), ja[j].Value<string>("ITEMNO_COMMODITYNAME"), ja[j].Value<string>("ITEMNO_SPECIFICATIONSMODEL"), ja[j].Value<string>("ITEMNO_UNIT")
+                    , ja[j].Value<string>("ITEMNO_UNITNAME"), ja[j].Value<string>("CONSUME"), ja[j].Value<string>("ATTRITIONRATE"), json_user.Value<string>("ID"), id
+                    );
+                DBMgr.ExecuteNonQuery(sql);
+            }*/
+
         }
 
         public string DeleteVeri()
@@ -2017,6 +2075,36 @@ namespace MvcPlatform.Controllers
         #endregion
     }
 }
+
+
+/*
+public string loadVerificationDetail_D()
+{
+    string declartioncode = Request["declartioncode"]; string status = Request["status"];
+
+    IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+    iso.DateTimeFormat = "yyyy-MM-dd";
+
+    string sql = "";
+    if (status != "")
+    {
+        sql = @"select * from list_verification_sub where declarationcode='" + declartioncode + "'";
+    }
+    else
+    {
+        sql = @"select a.DECLARATIONCODE,b.ORDERNO,b.ITEMNO,b.COMMODITYNO||b.ADDITIONALNO COMMODITYNO,b.COMMODITYNAME,b.TAXPAID
+                           ,b.CADQUANTITY,b.CADUNIT,b.CURRENCYCODE,b.TOTALPRICE
+                    from (select * from list_declaration_after where declarationcode='{0}' and csid=1) a
+                         left join (select * from list_decllist_after where isinvalid=0)b on a.CODE=b.predeclcode and a.xzlb=b.xzlb";
+        sql = string.Format(sql, declartioncode);
+    }
+
+    DataTable dt_sub = DBMgr.GetDataTable(GetPageSql(sql, "orderno", "asc"));
+    var json = JsonConvert.SerializeObject(dt_sub, iso);
+    return "{rows:" + json + ",total:" + totalProperty + "}";
+}
+*/
+
 /*
 public string ImExcel_Verification()
 {
