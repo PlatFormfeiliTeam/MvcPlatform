@@ -1850,7 +1850,7 @@ namespace MvcPlatform.Controllers
                 dt.Rows.Add(dr);
             }
 
-            string result = Extension.ImExcel_Verification_Data(dt, "线下", json_user);
+            string result = Extension.ImExcel_Verification_Data(dt, json.Value<string>("DATADOURCE"), json_user);
             return result;
 
             //json.Value<string>("RECORDINFOID")
