@@ -2725,19 +2725,23 @@ namespace MvcPlatform.Controllers
 
         public string LoadOrderTrack()
         {
-            string ordercode = Request["ordercode"];
-            string dec_insp_status = Request["dec_insp_status"];
+            string ordercode = Request["ordercode"]; string dec_insp_status = Request["dec_insp_status"];
+
             //根据订单号获取当前状态信息和所有状态变更的时间
-            string sql = @"select * from list_order t where t.code='" + ordercode + "'";
+            string sql = @"select STATUS,ENTRUSTTYPE from list_order t where t.code='" + ordercode + "'";
             DataTable dt = DBMgr.GetDataTable(sql);
             string status_cur = dt.Rows[0]["STATUS"] + "";
             string entrusttypeid = dt.Rows[0]["ENTRUSTTYPE"] + "";//委托类型 01 报关单  02报检单  03报关报检
+
+            /*
             //类型（1订单、2报关草单、3报检草单、4预制报关单、5预制报检单）
             //查询订单已经走过的节点lt.ID, lt.CODE, lt.TIMES, lt.STATUS, lt.ISPAUSE, lt.REASON, tb2.VALUE AS STATUS_NAMEAND (lt.STATUS <= 45 OR lt.STATUS >= 110) 
             sql = @"SELECT lt.TIMES,lt.STATUS FROM list_times lt WHERE lt.CODE = '" + ordercode + "' AND lt.TYPE = 1 ORDER BY lt.STATUS asc, lt.TIMES asc";
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-            dt = DBMgr.GetDataTable(sql);
+            string rowstimes = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso);
+            */
+
             string decltrack = "[]";
             if (entrusttypeid == "01" || entrusttypeid == "03")
             {
@@ -2748,19 +2752,17 @@ namespace MvcPlatform.Controllers
             {
                 insptrack = Declare_Inspect_Track(ordercode, "inspection", dec_insp_status);
             }
-            return "{entrusttypeid:'" + entrusttypeid + "',status:'" + status_cur + "',rows:" + JsonConvert.SerializeObject(dt, iso) + ",declare:" + decltrack + ",insptrack:" + insptrack + "}";
+            return "{entrusttypeid:'" + entrusttypeid + "',status:'" + status_cur + "',declare:" + decltrack + ",insptrack:" + insptrack + "}";
+            //"{entrusttypeid:'" + entrusttypeid + "',status:'" + status_cur + "',rows:" + rowstimes + ",declare:" + decltrack + ",insptrack:" + insptrack + "}";
         }
         public string Declare_Inspect_Track(string ordercode, string source, string dec_insp_status)
         {
-            string sql = "";
-            int total = 0;
-            int status = 0;
-            DataTable dt = null;
-            DataTable dt_times = null;
+            string sql = ""; int total = 0; int status = 0; DataTable dt = null; DataTable dt_times = null; DataRow[] drtmp = null;
             string declnos = "";//保存所有的预制报关_预制报检单号
+
             if (source == "declare")
             {
-                sql = @"select * from list_declaration ld where ordercode='" + ordercode + "'";
+                sql = @"select CODE,STATUS,ISPAUSE from list_declaration ld where ordercode='" + ordercode + "'";
                 dt = DBMgr.GetDataTable(sql);
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
@@ -2770,7 +2772,7 @@ namespace MvcPlatform.Controllers
             }
             else
             {
-                sql = @"select * from list_inspection ld where ordercode='" + ordercode + "'";
+                sql = @"select CODE,STATUS,0 ISPAUSE from list_inspection ld where ordercode='" + ordercode + "'";//ISPAUSE 字段不存在，暂时都认为是0，代表正常
                 dt = DBMgr.GetDataTable(sql);
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
@@ -2778,21 +2780,17 @@ namespace MvcPlatform.Controllers
                 }
                 total = dt.Rows.Count;
             }
+
+            sql = @"select * from(select row_number() over (partition by status order by times desc) numid,lt.times,lt.status 
+                                    from list_times lt where instr('" + declnos + "',lt.CODE)>0) ltt where numid=1";
+            dt_times = DBMgr.GetDataTable(sql);
+
             DataTable dt_cus = new DataTable();
-            DataColumn dc = new DataColumn("total");
-            dt_cus.Columns.Add(dc);
-            dc = new DataColumn("finished");
-            dt_cus.Columns.Add(dc);
-            dc = new DataColumn("exception");
-            dt_cus.Columns.Add(dc);
-            dc = new DataColumn("times");
-            dt_cus.Columns.Add(dc);
-            dc = new DataColumn("status");
-            dt_cus.Columns.Add(dc);
-            dc = new DataColumn("name");
-            dt_cus.Columns.Add(dc);
+            dt_cus.Columns.Add("total"); dt_cus.Columns.Add("finished"); dt_cus.Columns.Add("exception");
+            dt_cus.Columns.Add("times"); dt_cus.Columns.Add("status"); dt_cus.Columns.Add("name");
+
             //string dec_insp_status = "[{CODE: 25,NAME:'预审中'}, {CODE: 40,NAME: '预审完成'},{CODE: 45,NAME:'制单已受理'},{CODE: 50,NAME:'制单中'},{CODE: 55,NAME:'制单完成'},{CODE: 60,NAME:'待审核'},{CODE: 65,NAME:'审核已受理'},{CODE:70,NAME:'审核中'},{CODE:75,NAME:'审核完成'},{CODE:78,NAME:'待预录'},{CODE:80,NAME:'预录已受理'},{CODE:85,NAME:'预录中'},{CODE:90,NAME:'预录完成'},{CODE:95,NAME:'预录校验完成'},{CODE:100,NAME:'申报中'},{CODE:105,NAME:'申报完成'},{CODE:110,NAME:'申报完结'}]";
-            JArray jarray = JArray.Parse(dec_insp_status);
+            JArray jarray = JArray.Parse(dec_insp_status); 
             foreach (JObject json in jarray)
             {
                 DataRow dr_cus = dt_cus.NewRow();
@@ -2812,17 +2810,22 @@ namespace MvcPlatform.Controllers
                     }
                 }
                 dr_cus["total"] = total; dr_cus["finished"] = finished; dr_cus["exception"] = exception;
-                sql = @"SELECT lt.TIMES,lt.STATUS FROM list_times lt WHERE instr('" + declnos + "',lt.CODE)>0 and lt.STATUS='" + status + "' order by lt.TIMES desc";
-                dt_times = DBMgr.GetDataTable(sql);
+
+                //sql = @"SELECT lt.TIMES,lt.STATUS FROM list_times lt WHERE instr('" + declnos + "',lt.CODE)>0 and lt.STATUS='" + status + "' order by lt.TIMES desc";
+                //dt_times = DBMgr.GetDataTable(sql);
+                //if (dt_times.Rows.Count > 0) { dr_cus["times"] = dt_times.Rows[0]["TIMES"]; }
                 if (dt_times.Rows.Count > 0)
                 {
-                    dr_cus["times"] = dt_times.Rows[0]["TIMES"];
+                    drtmp = dt_times.Select("status=" + status);
+                    if (drtmp.Length == 1) { dr_cus["times"] = drtmp[0]["times"]; }
                 }
-
                 dr_cus["status"] = json.Value<string>("CODE");
                 dr_cus["name"] = json.Value<string>("NAME");
                 dt_cus.Rows.Add(dr_cus);
             }
+           
+
+
             return JsonConvert.SerializeObject(dt_cus);
         }
 

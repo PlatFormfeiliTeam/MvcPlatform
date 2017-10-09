@@ -91,12 +91,16 @@
             color: 'rgba(135,202,37,1)'
         }
     };
+    var mask = new Ext.LoadMask(Ext.get(Ext.getBody()), { msg: "数据加载中，请稍等..." });
+
+    mask.show();
 
     Ext.onReady(function () {
         Ext.Ajax.request({
             url: "/Common/LoadOrderTrack?",
             params: { ordercode: ordercode, dec_insp_status: JSON.stringify(orderstatus_js_data) },
             success: function (response, opts) {
+                mask.hide();
                 var data = Ext.decode(response.responseText);
                 //var html = "";
                 //Ext.each(orderstatus_js_data, function (item) {
@@ -136,6 +140,8 @@
                 //    border: 0,
                 //    items: [panel1_1, grid_orderstatus]
                 //})
+                //var items = [panel1];
+
                 var items = [];
                 //报关单跟踪
                 if (data.entrusttypeid == '01' || data.entrusttypeid == '03')//委托类型 01 报关单  02报检单  03报关报检
