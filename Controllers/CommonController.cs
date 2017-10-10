@@ -2099,16 +2099,22 @@ namespace MvcPlatform.Controllers
 
         public void UpdatePrintInfo(string tablename, string code, string role)
         {
-            if(role=="enterprise")
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            if (role == "enterprise")
             {
-           
+
             }
             else
             {
-             string sql = @"update " + tablename + " set PRINTNUM = PRINTNUM+1,ISPRINT = 1,PRINTTIME=sysdate where CODE='" + code + "'";
-            DBMgr.ExecuteNonQuery(sql);
+                string sql = @"update " + tablename + " set PRINTNUM = PRINTNUM+1,ISPRINT = 1,PRINTTIME=sysdate where CODE='" + code + "'";
+                DBMgr.ExecuteNonQuery(sql);
+
+                string sql_insert = @"insert into list_times(id,code,userid,realname,status,times,type,ispause) 
+                                    values(list_times_id.nextval,'{0}','{1}','{2}','{3}',sysdate,'11','0')";
+                sql = string.Format(sql_insert, code, json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"), 130);
+                DBMgr.ExecuteNonQuery(sql);
             }
-            
         }
 
         //pdf文件合并
