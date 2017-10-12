@@ -1520,6 +1520,444 @@ namespace MvcPlatform.Controllers
             //44 订单文件  58 配仓单文件  57  转关单文件  这三种类型都属于订单业务下
             if (id == "order")
             {
+                sql = @"select f.FILETYPEID,case f.FILETYPEID when 44 then '报关订单文件' when 66 then '报检订单文件' else f.FILETYPENAME end FILETYPENAME 
+                        from sys_filetype f 
+                        where (f.FILETYPEID='44' or f.FILETYPEID='58' or f.FILETYPEID='57' or f.FILETYPEID='66') 
+                            and f.FILETYPEID IN (select t.FILETYPE from List_Attachment t where t.ordercode='" + ordercode + "') order by f.FILETYPEID asc ";
+                dt = DBMgr.GetDataTable(sql);
+                int i = 0;
+                result += "[";
+                foreach (DataRow dr in dt.Rows)
+                {
+                    if (i != dt.Rows.Count - 1)
+                    {
+                        result += "{id:'" + dr["FILETYPEID"] + "',typename:'" + dr["FILETYPENAME"] + "'},";
+                    }
+                    else
+                    {
+                        result += "{id:'" + dr["FILETYPEID"] + "',typename:'" + dr["FILETYPENAME"] + "'}";
+                    }
+                    i++;
+                }
+                result += "]";
+                return result;
+            }
+            if (id == "44")
+            {
+                int i = 0;
+                sql = @"select t.* from list_attachment t where t.filetype='44' and t.splitstatus=1 and t.ordercode='" + ordercode + "'";
+                dt = DBMgr.GetDataTable(sql);
+                result += "[";
+                foreach (DataRow dr in dt.Rows)
+                {
+                    if (role == "enterprise")
+                    {
+                       if (i != dt.Rows.Count - 1)
+                        {
+                            result += "{id:'44_" + (i + 1) + "',typename:'订单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'},";
+                        }
+                        else
+                        {
+                            result += "{id:'44_" + (i + 1) + "',typename:'订单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'}";
+                        }
+                    }
+                    else
+                    {
+                        if (i != dt.Rows.Count - 1)
+                        {
+                            result += "{id:'44_" + (i + 1) + "',typename:'订单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'},";
+                        }
+                        else
+                        {
+                            result += "{id:'44_" + (i + 1) + "',typename:'订单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'}";
+                        }
+                    
+                    }
+                   
+                    i++;
+                }
+                result += "]";
+                return result;
+            }
+            if (id.LastIndexOf("44_") >= 0 && role != "enterprise")
+            {
+                int i = 0;
+                sql = @"select t.*,f.FILETYPENAME,t.rowid from list_attachmentdetail t left join  sys_filetype f on t.filetypeid=f.filetypeid
+                                where t.ordercode='" + ordercode + "' order by f.filetypeid asc";
+                dt = DBMgr.GetDataTable(sql);
+                result += "[";
+                foreach (DataRow dr in dt.Rows)
+                {
+                    if (i != dt.Rows.Count - 1)
+                    {
+                        result += "{id:'" + dr["FILETYPEID"] + "',typename:'" + dr["FILETYPENAME"] + "',filename:'" + dr["FILENAME"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["SOURCEFILENAME"] + "'},";
+                    }
+                    else
+                    {
+                        result += "{id:'" + dr["FILETYPEID"] + "',typename:'" + dr["FILETYPENAME"] + "',filename:'" + dr["FILENAME"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["SOURCEFILENAME"] + "'}";
+                    }
+                    i++;
+                }
+                result += "]";
+                return result;
+            }
+
+
+            if (id == "66")
+            {
+                int i = 0;
+                sql = @"select t.* from list_attachment t where t.filetype='66' and t.ordercode='" + ordercode + "'";
+                dt = DBMgr.GetDataTable(sql);
+                result += "[";
+                foreach (DataRow dr in dt.Rows)
+                {
+                    //暂时没有拆分，所以报关行跟企业不区分，都是叶子
+
+                    //if (role == "enterprise")
+                    //{
+                        if (i != dt.Rows.Count - 1)
+                        {
+                            result += "{id:'66_" + (i + 1) + "',typename:'订单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'},";
+                        }
+                        else
+                        {
+                            result += "{id:'66_" + (i + 1) + "',typename:'订单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'}";
+                        }
+                    //}
+                    //else
+                    //{
+                    //    if (i != dt.Rows.Count - 1)
+                    //    {
+                    //        result += "{id:'44_" + (i + 1) + "',typename:'订单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'},";
+                    //    }
+                    //    else
+                    //    {
+                    //        result += "{id:'44_" + (i + 1) + "',typename:'订单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'}";
+                    //    }
+
+                    //}
+
+                    i++;
+                }
+                result += "]";
+                return result;
+            }
+
+            if (id == "declare")//报关下面涉及的文件类型有 63  报关单(提前)  61  报关单
+            {
+                sql = @"select f.FILETYPEID,f.FILETYPENAME  from sys_filetype f where
+                       f.FILETYPEID IN (select t.FILETYPE from List_Attachment t where  (t.FILETYPE='63' or t.FILETYPE='61') and t.ordercode='" + ordercode + "') order by f.FILETYPEID asc ";
+                dt = DBMgr.GetDataTable(sql);
+                int i = 0;
+                result += "[";
+                foreach (DataRow dr in dt.Rows)
+                {
+                    if (i != dt.Rows.Count - 1)
+                    {
+                        result += "{id:'" + dr["FILETYPEID"] + "',typename:'" + dr["FILETYPENAME"] + "'},";
+                    }
+                    else
+                    {
+                        result += "{id:'" + dr["FILETYPEID"] + "',typename:'" + dr["FILETYPENAME"] + "'}";
+                    }
+                    i++;
+                }
+                result += "]";
+                return result;
+            }
+            if (id == "61")//报关单下面显示所有的报关单号 每个报关单号下可能会有一个或者多个报关单文件 236920161696176849
+            {
+                int i = 0;
+                sql = @"select CODE,DECLARATIONCODE from list_declaration t where t.ordercode='" + ordercode + "' order by COSTARTTIME";
+                dt = DBMgr.GetDataTable(sql);
+                result += "[";
+                foreach (DataRow dr in dt.Rows)
+                {
+                    if (i != dt.Rows.Count - 1)
+                    {
+                        result += "{id:'" + dr["CODE"] + "',typename:'" + dr["DECLARATIONCODE"] + "'},";
+                    }
+                    else
+                    {
+                        result += "{id:'" + dr["CODE"] + "',typename:'" + dr["DECLARATIONCODE"] + "'}";
+                    }
+                    i++;
+                }
+                result += "]";
+                return result;
+
+            }
+            if (id == "63")//报关单提前 16063955942这个订单有报关单提前数据  2016-6-7暂定取出所有的该订单下所有的报关单提前文件
+            {
+                int i = 0;
+                sql = @"select t.* from list_attachment t where t.filetype='63' and t.ordercode='" + ordercode + "' order by  uploadtime asc";
+                dt = DBMgr.GetDataTable(sql);//G16055233755001  这个预支报关单号下面有两个报关单文件
+                result += "[";
+                foreach (DataRow dr in dt.Rows)
+                {
+                    if (i != dt.Rows.Count - 1)
+                    {
+                        result += "{id:'" + id + "_" + (i + 1) + "',typename:'报关单提前文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'},";
+                    }
+                    else
+                    {
+                        result += "{id:'" + id + "_" + (i + 1) + "',typename:'报关单提前文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'}";
+                    }
+                    i++;
+                }
+                result += "]";
+                return result;
+
+            }
+            if (id.Length == 15 && id.Substring(0, 1) == "G")//如果节点是预制报关单号 则加载其下所有的文件
+            {
+                int i = 0;
+                sql = @"select t.* from list_attachment t where t.filetype='61' and t.declcode='" + id + "' order by pgindex asc,uploadtime asc";
+                dt = DBMgr.GetDataTable(sql);//G16055233755001  这个预支报关单号下面有两个报关单文件
+                result += "[";
+                foreach (DataRow dr in dt.Rows)
+                {
+                    if (i != dt.Rows.Count - 1)
+                    {
+                        result += "{id:'" + id + "_" + (i + 1) + "',typename:'报关单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'},";
+                    }
+                    else
+                    {
+                        result += "{id:'" + id + "_" + (i + 1) + "',typename:'报关单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'}";
+                    }
+                    i++;
+                }
+                result += "]";
+                return result;
+            }
+            //报检入口  涉及的文件类型有 62 报检单 121  报检核准单
+            if (id == "inspect")
+            {
+                sql = @"select f.FILETYPEID,f.FILETYPENAME  from sys_filetype f where
+                       f.FILETYPEID IN (select t.FILETYPE from List_Attachment t where  (t.FILETYPE='62' or t.FILETYPE='121') and t.ordercode='" + ordercode + "') order by f.FILETYPEID asc ";
+                dt = DBMgr.GetDataTable(sql);
+                int i = 0;
+                result += "[";
+                foreach (DataRow dr in dt.Rows)
+                {
+                    if (i != dt.Rows.Count - 1)
+                    {
+                        result += "{id:'" + dr["FILETYPEID"] + "',typename:'" + dr["FILETYPENAME"] + "'},";
+                    }
+                    else
+                    {
+                        result += "{id:'" + dr["FILETYPEID"] + "',typename:'" + dr["FILETYPENAME"] + "'}";
+                    }
+                    i++;
+                }
+                result += "]";
+                return result;
+            }
+            //显示报检业务的下的所有报检单 一个订单可能会有多个报检单，一个报检单号会对应多个报检单文件
+            //报检单和报检核准单都是挂在预制报检单list_inspection 这个表下面
+            if (id == "62")
+            {
+                int i = 0;
+                sql = @"select CODE,INSPECTIONCODE from list_inspection t where t.ordercode='" + ordercode + "' and t.INSPECTIONCODE is not null order by COSTARTTIME"; //starttime
+                dt = DBMgr.GetDataTable(sql);
+                result += "[";
+                foreach (DataRow dr in dt.Rows)
+                {
+                    if (i != dt.Rows.Count - 1)
+                    {
+                        result += "{id:'" + id + "_" + dr["CODE"] + "',typename:'" + dr["INSPECTIONCODE"] + "'},";
+                    }
+                    else
+                    {
+                        result += "{id:'" + id + "_" + dr["CODE"] + "',typename:'" + dr["INSPECTIONCODE"] + "'}";
+                    }
+                    i++;
+                }
+                result += "]";
+                return result;
+            }
+            if (id == "121")
+            {
+                int i = 0;
+                sql = @"select CODE,APPROVALCODE from list_inspection t where t.ordercode='" + ordercode + "' and t.APPROVALCODE is not null order by COSTARTTIME";//starttime
+                dt = DBMgr.GetDataTable(sql);
+                result += "[";
+                foreach (DataRow dr in dt.Rows)
+                {
+                    if (i != dt.Rows.Count - 1)
+                    {
+                        result += "{id:'" + id + "_" + dr["CODE"] + "',typename:'" + dr["APPROVALCODE"] + "'},";
+                    }
+                    else
+                    {
+                        result += "{id:'" + id + "_" + dr["CODE"] + "',typename:'" + dr["APPROVALCODE"] + "'}";
+                    }
+                    i++;
+                }
+                result += "]";
+                return result;
+            }
+            if (id.LastIndexOf("62_J") >= 0)//显示报检核准单
+            {
+                int i = 0;
+                sql = @"select t.* from list_attachment t where t.filetype='62' and t.ORDERCODE='" + ordercode + "' and t.INSPCODE='" + id.Replace("62_", "") + "' order by pgindex asc,uploadtime asc";
+                dt = DBMgr.GetDataTable(sql);
+                result += "[";
+                foreach (DataRow dr in dt.Rows)
+                {
+                    if (i != dt.Rows.Count - 1)
+                    {
+                        result += "{id:'" + id + "_" + (i + 1) + "',typename:'报检单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'},";
+                    }
+                    else
+                    {
+                        result += "{id:'" + id + "_" + (i + 1) + "',typename:'报检单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'}";
+                    }
+                    i++;
+                }
+                result += "]";
+                return result;
+            }
+            if (id.LastIndexOf("121_J") >= 0)//显示报检核准单
+            {
+                int i = 0;
+                sql = @"select t.* from list_attachment t where t.filetype='121' and t.ORDERCODE='" + ordercode + "' and t.INSPCODE='" + id.Replace("121_", "") + "' order by pgindex asc,uploadtime asc";
+                dt = DBMgr.GetDataTable(sql);
+                result += "[";
+                foreach (DataRow dr in dt.Rows)
+                {
+                    if (i != dt.Rows.Count - 1)
+                    {
+                        result += "{id:'" + id + "_" + (i + 1) + "',typename:'报检核准单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'},";
+                    }
+                    else
+                    {
+                        result += "{id:'" + id + "_" + (i + 1) + "',typename:'报检核准单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'}";
+                    }
+                    i++;
+                }
+                result += "]";
+                return result;
+            }
+            
+             //校验单  涉及的文件类型有 60 
+            if (id == "checkout")
+            {
+                
+               sql = @"select f.FILETYPEID,f.FILETYPENAME  from sys_filetype f where
+                       f.FILETYPEID IN (select t.FILETYPE from List_Attachment t where t.FILETYPE='60' and t.ordercode='" + ordercode + "') order by f.FILETYPEID asc ";
+                dt = DBMgr.GetDataTable(sql);
+                int i = 0;
+                result += "[";
+                foreach (DataRow dr in dt.Rows)
+                {
+                    if (i != dt.Rows.Count - 1)
+                    {
+                        result += "{id:'" + dr["FILETYPEID"] + "',typename:'" + dr["FILETYPENAME"] + "'},";
+                    }
+                    else
+                    {
+                        result += "{id:'" + dr["FILETYPEID"] + "',typename:'" + dr["FILETYPENAME"] + "'}";
+                    }
+                    i++;
+                }
+                result += "]";
+                return result;
+            }
+            if (id == "60")
+            {
+                int i = 0;
+                sql = @"select t.* from list_attachment t where t.filetype='60' and t.ordercode='" + ordercode + "' order by uploadtime asc";
+                dt = DBMgr.GetDataTable(sql);
+                result += "[";
+                foreach (DataRow dr in dt.Rows)
+                {
+                    if (i != dt.Rows.Count - 1)
+                    {
+                        result += "{id:'" + id + "_" + (i + 1) + "',typename:'校验单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'},";
+                    }
+                    else
+                    {
+                        result += "{id:'" + id + "_" + (i + 1) + "',typename:'校验单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'}";
+                    }
+                    i++;
+                }
+                result += "]";
+                return result;
+            }
+            return "";
+        }
+
+        /*
+          public string ConsultInfo()
+        {
+
+            string ordercode = Request["ordercode"];string role = Request["role"];
+            string id = Request["id"];
+            string sql = "";
+            DataTable dt;
+            string result = "";
+            if (id == "-1")  //1 根据委托类型加载业务单据   01 报关单  02  报检单  03  报关报检
+            {
+                sql = "select * from list_order where code='" + ordercode + "'";
+                dt = DBMgr.GetDataTable(sql);
+                if (dt.Rows.Count > 0)
+                {
+                    string entrusttypeid = dt.Rows[0]["ENTRUSTTYPE"] + "";
+                    if (role == "enterprise")
+                    {
+                        switch (entrusttypeid)
+                        {
+                            //case "01":
+                            //    result += "[{id:'declare',typename:'报关'}]";
+                            //    break;
+                            //case "02":
+                            //    result += "[{id:'declare',typename:'报检'}]";
+                            //    break;
+                            //case "03":
+                            //    result += "[{id:'declare',typename:'报关'},{id:'inspect',typename:'报检'}]";
+                            //    break;
+                            case "01":
+                                result += "[{id:'order',typename:'委托',leaf:false},{id:'declare',typename:'报关'}]";
+                                break;
+                            case "02":
+                                result += "[{id:'order',typename:'委托',leaf:false}]";
+                                break;
+                            case "03":
+                                result += "[{id:'order',typename:'委托',leaf:false},{id:'declare',typename:'报关'}]";
+                                break;
+                        }
+                    }
+                    else if (role == "declare")
+                    {
+                        result += "[{id:'declare',typename:'报关'}]";
+                    }
+                    else if (role == "declare_pre")
+                    {
+                        result += "[{id:'declare',typename:'报关'},{id:'checkout',typename:'校验'}]";
+                    }
+                    else
+                    {
+                        switch (entrusttypeid)
+                        {
+                            case "01":
+                                result += "[{id:'order',typename:'委托',leaf:false},{id:'declare',typename:'报关'}]";
+                                break;
+                            case "02":
+                                result += "[{id:'order',typename:'委托',leaf:false},{id:'declare',typename:'报检'}]";
+                                break;
+                            case "03":
+                                result += "[{id:'order',typename:'委托',leaf:false},{id:'declare',typename:'报关'},{id:'inspect',typename:'报检'}]";
+                                break;
+                        }
+                    }
+                }
+
+                return result;
+            }
+            //44 订单文件  58 配仓单文件  57  转关单文件  这三种类型都属于订单业务下
+            if (id == "order")
+            {
                 sql = @"select f.FILETYPEID,f.FILETYPENAME  from sys_filetype f 
                       where (f.FILETYPEID='44' or f.FILETYPEID='58' or f.FILETYPEID='57') 
                       and f.FILETYPEID IN (select t.FILETYPE from List_Attachment t where t.ordercode='" + ordercode + "') order by f.FILETYPEID asc ";
@@ -1844,6 +2282,7 @@ namespace MvcPlatform.Controllers
             }
             return "";
         }
+         */
 
         public string SinglePrint()//单个文件打印
         {
