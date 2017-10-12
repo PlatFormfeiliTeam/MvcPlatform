@@ -219,16 +219,13 @@ namespace MvcPlatform.Controllers
             string where = "";
             if (!string.IsNullOrEmpty(Request["ENTERPRISENAME"]))//判断查询条件是否有值
             {
-                where += " and b.BUSIUNITCODE='" + GetCode(Request["ENTERPRISENAME"]) + "'";
+                //where += " and b.BUSIUNITCODE='" + GetCode(Request["ENTERPRISENAME"]) + "'";
+                where += " and b.BUSIUNITCODE='" + Request["ENTERPRISENAME"] + "'";
             }
             if (!string.IsNullOrEmpty(Request["CODE"]))//判断查询条件是否有值
             {
                 where += " and instr(b.CUSNO,'" + Request["CODE"].ToString().Trim() + "')>0 ";
             }
-            //if (!string.IsNullOrEmpty(Request["PRINTSTATUS"]))//判断查询条件是否有值
-            //{
-            //    where += " and  t.PRINTSTATUS='" + Request["PRINTSTATUS"] + "'";
-            //}
             if (!string.IsNullOrEmpty(Request["STARTDATE"]))//如果开始时间有值
             {
                 where += " and b.CREATETIME>=to_date('" + Request["STARTDATE"] + "','yyyy-mm-dd hh24:mi:ss') ";
@@ -239,9 +236,7 @@ namespace MvcPlatform.Controllers
             }
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-
-            //string sql = @"select t.*,(select count(1) from list_attachment l where l.entid=t.ID ) FILENUM from ENT_ORDER t where t.FILEDECLAREUNITCODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where;
-            //2016/10/9 为了提升load效能 FILENUM获取修改为：
+            
             string sql = @"select *  from LIST_CUSDATA_FL b  where b.cusno is not null and b.REPUNITCODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "'" + where;
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "b.CREATETIME", "desc"));
             var json = JsonConvert.SerializeObject(dt, iso);
