@@ -215,11 +215,28 @@
     });
 
     //贸易方式
-    var field_TRADEWAYCODES = Ext.create('Ext.form.field.Text', {
-        name: 'TRADEWAYCODES',
+    //var field_TRADEWAYCODES = Ext.create('Ext.form.field.Text', {
+    //    name: 'TRADEWAYCODES',
+    //    fieldLabel: '贸易方式',
+    //    readOnly: true
+    //});
+
+    //贸易方式combostore
+    var store_myfs = Ext.create('Ext.data.JsonStore', {
+        fields: ['CODE', 'NAME'],
+        data: common_data_myfs
+    })
+    var field_TRADEWAYCODES = Ext.create('Ext.form.field.ComboBox', {//贸易方式
         fieldLabel: '贸易方式',
-        readOnly: true
-    });
+        id: 'combo_myfs1',
+        store: store_myfs,
+        name: 'TRADEWAYCODES',
+        displayField: 'NAME',
+        readOnly: true,
+        valueField: 'CODE',
+        tabIndex: 14,
+        hideTrigger: true
+    })
 
     //转关预录号
     var field_TURNPRENO = Ext.create('Ext.form.field.Text', {

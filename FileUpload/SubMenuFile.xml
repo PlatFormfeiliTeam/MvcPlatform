@@ -263,7 +263,7 @@
   </rootmenu>
   <rootmenu>
     <menu>/EnterpriseOrder/ListOrder_Index?busitypeid=40-41</menu>
-    <submenu>/OrderDomestic/OrderView?menuxml=ent_domestic</submenu>
+    <submenu>/OrderDomestic/OrderView_E?menuxml=ent_domestic</submenu>
     <submenu>/Common/FileConsult_E?menuxml=domestic</submenu>
     <submenu>/EnterpriseOrder/GoodsTrack?menuxml=ent_domestic</submenu>
   </rootmenu>

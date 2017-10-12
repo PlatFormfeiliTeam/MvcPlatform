@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "OrderView";
+    ViewBag.Title = "OrderView_E";
     Layout = "~/Views/Shared/Empty.cshtml";
     string Version = System.Configuration.ConfigurationManager.AppSettings["Version"];
 }
@@ -13,6 +13,7 @@
 <script src="~/Views/OrderDomestic/form_head.js?t=@Version"></script>
 <script src="~/Views/OrderDomestic/form_import_view.js?t=@Version"></script>
 <script src="~/Views/OrderDomestic/form_export_view.js?t=@Version"></script>
+
 <script type="text/javascript">
     var formpanelhead, formpanelin, formpanelout, formpanelhead2, formpanelin2, formpanelout2;
     var ordercode = getQueryString("ORDERCODE");
@@ -20,8 +21,11 @@
     var common_data_jydw = [], common_data_sbfs = [], common_data_sbgq = [], common_data_bgfs = [], common_data_bzzl = [], common_data_myfs = [];
     var cur_usr;//当前用户
     var busitypeid = getQueryString("busitypeid");
+    var store_busitype;
     // Ext.Loader.setConfig({ enabled: true });
     Ext.onReady(function () {
+        store_busitype = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_busitype });
+
         //1 调取基础数据
         Ext.Ajax.request({
             url: "/Common/Ini_Base_Data?",
@@ -35,80 +39,31 @@
                 common_data_bzzl = commondata.bzzl;//包装种类
                 common_data_myfs = commondata.myfs;//贸易方式
                 common_data_dzfwdw = commondata.dzfwdw;//单证服务单位
+
                 form_head_ini();
-                form_import_ini();
-                form_export_ini();
+                if (busitypeid == "41") { form_import_ini(); }
+                if (busitypeid == "40") { form_export_ini(); }
+
                 //2 加载表单数据
                 Ext.Ajax.request({
-                    url: "/OrderDomestic/loadform",
+                    url: "/Common/loadOrderView",
                     params: { ordercode: ordercode },
                     success: function (response, opts) {
                         var data = Ext.decode(response.responseText);
-                        formpanelhead.getForm().setValues(data.data1.IETYPE ? data.data1 : data.data2);
-                        repunitcode = data.data1.REPUNITCODE ? data.data1.REPUNITCODE : data.data2.REPUNITCODE;//初始化报关报检单位
-                        inspunitcode = data.data1.INSPUNITCODE ? data.data1.INSPUNITCODE : data.data2.INSPUNITCODE;
-                        formpanelin.getForm().setValues(data.data1);
-                        form_control(data.data1, 1);
-                        readonly_init(formpanelin, formpanelhead, 1);//设置控件只读
-                        formpanelout.getForm().setValues(data.data2);
-                        form_control(data.data2, 2);
-                        readonly_init(formpanelout, formpanelhead, 2);//设置控件只读
-                        var radioitems = [];
-                        var bbar_html = '<div class="btn-group">';
-                        if (data.data1.CODE) {
-                            radioitems.push({
-                                boxLabel: '原始订单进口', name: 'ordergroup', checked: data.data1.CODE == ordercode,
-                                width: 140, inputValue: data.data1.CODE
-                            });
+                       
+                        formpanelhead.getForm().setValues(data.data);
+                        repunitcode = data.data.REPUNITCODE;
+                        inspunitcode = data.data.INSPUNITCODE;
+                        if (busitypeid == "41") {
+                            formpanelin.getForm().setValues(data.data);
+                            form_control(data.data, 1);
+                            readonly_init(formpanelin, formpanelhead, 1);//设置控件只读
+                        }                        
+                        if (busitypeid == "40") {
+                            formpanelout.getForm().setValues(data.data);
+                            form_control(data.data, 2);
+                            readonly_init(formpanelout, formpanelhead, 2);//设置控件只读
                         }
-                        if (data.data2.CODE) {
-                            radioitems.push({
-                                boxLabel: '原始订单出口', name: 'ordergroup', checked: data.data2.CODE == ordercode,
-                                width: 140, inputValue: data.data2.CODE
-                            });
-                        }
-                        if (data.data3.CODE) {
-                            radioitems.push({
-                                boxLabel: '关联订单进口', name: 'ordergroup', checked: data.data3.CODE == ordercode,
-                                width: 140, inputValue: data.data3.CODE
-                            });
-                        }
-                        if (data.data4.CODE) {
-                            radioitems.push({
-                                boxLabel: '关联订单出口', name: 'ordergroup', checked: data.data4.CODE == ordercode,
-                                width: 140, inputValue: data.data4.CODE
-                            });
-                        }
-                        var rg_ordercodes = Ext.create('Ext.form.RadioGroup', {
-                            columns: 4,
-                            items: radioitems,
-                            listeners: {
-                                change: function (rg, newValue, oldValue, eOpts) {
-                                    if (rg.getChecked()[0].boxLabel == "原始订单进口" || rg.getChecked()[0].boxLabel == "关联订单进口") {
-                                        document.getElementById("icon_in").style.backgroundColor = '#157fcc';
-                                        document.getElementById("icon_out").style.backgroundColor = '#777';
-                                        //如果是四单的情形还要进行表单数据切换
-                                        busitypeid = 41;
-                                    }
-                                    else {
-                                        busitypeid = 40;
-                                        document.getElementById("icon_out").style.backgroundColor = '#157fcc';
-                                        document.getElementById("icon_in").style.backgroundColor = '#777';
-                                    }
-                                    var actab = tabpanel.getActiveTab();
-                                    if (actab.title == '订单跟踪') {
-                                        Ext.getDom("trackIframe").src = "/Common/OrderTrack?menuxml=domestic&ORDERCODE=" + newValue.ordergroup;
-                                    }
-                                    if (actab.title == '随附文件') {
-                                        Ext.getDom("fileIframe").src = "/Common/FileConsult?menuxml=domestic&ORDERCODE=" + newValue.ordergroup + "&BUSITYPE=" + busitypeid;
-                                    }
-
-                                    //保证载入跟踪信息及随附文件时传入的ordercode随订单类型改变的
-                                    ordercode = newValue.ordergroup;
-                                    store_declaration.load();//再次加载
-                                }
-                            }
-                        })
                         //3 绘制报关单列表
                         var store_declaration = Ext.create('Ext.data.JsonStore', {
                             fields: ['ID', 'DECLARATIONCODE', 'GOODSNUM', 'GOODSNW', 'GOODSGW', 'SHEETNUM', 'BUSITYPE', 'TRADECODE', 'CUSTOMSSTATUS', 'COMMODITYNUM'],
@@ -152,28 +107,30 @@
                                 //{ header: '删改单', dataIndex: 'shangaidan', flex: 1 }
                             ]
                         });
+
+                        var panel1_items = [];
+                        if (busitypeid == "41") {
+                            panel1_items = [formpanelhead, formpanelin, panel_declaration];
+                        }
+                        if (busitypeid == "40") {
+                            panel1_items = [formpanelhead, formpanelout, panel_declaration];
+                        }
                         var panel1 = Ext.create('Ext.panel.Panel', {
                             border: 0,
                             margin: '20 20',
-                            items: [formpanelhead, formpanelin, formpanelout, panel_declaration]
+                            items: panel1_items
                         })
 
-                        var tab_items = [{ title: '委托信息', border: 0, items: [panel1] },
-                                        { title: '订单跟踪', contentEl: 'trackIframe' },
-                                        { title: '随附文件', contentEl: 'fileIframe' }];
-                        
-                        var toolbar = Ext.create('Ext.toolbar.Toolbar', {
-                            items: [rg_ordercodes]
-                        })
+                        var tab_items = [{ title: '委托信息', border: 0, items: [panel1] }, { title: '随附文件', contentEl: 'fileIframe' }];
+
                         var tabpanel = Ext.create('Ext.tab.Panel', {
                             border: 0,
                             items: tab_items,
                             region: 'center',
-                            tbar: toolbar,
                             listeners: {
                                 tabchange: function (tabPanel, newCard, oldCard, eOpts) {
                                     if (newCard.title == "随附文件") {
-                                        Ext.getDom("fileIframe").src = "/Common/FileConsult?menuxml=domestic&ORDERCODE=" + ordercode + "&BUSITYPE=" + busitypeid;
+                                        Ext.getDom("fileIframe").src = "/Common/FileConsult_E?menuxml=domestic&ORDERCODE=" + ordercode + "&BUSITYPE=" + busitypeid;
                                     }
                                     if (newCard.title == "订单跟踪") {
                                         Ext.getDom("trackIframe").src = "/Common/OrderTrack?menuxml=domestic&ORDERCODE=" + ordercode;
@@ -184,21 +141,13 @@
                         var viewport = Ext.create('Ext.container.Viewport', {
                             layout: 'border',
                             items: [tabpanel]
-                        })
-                        if (rg_ordercodes.getChecked()[0].boxLabel == "原始订单进口" || rg_ordercodes.getChecked()[0].boxLabel == "关联订单进口") {
-                            document.getElementById("icon_in").style.backgroundColor = '#157fcc';
-                        }
-                        else {
-                            document.getElementById("icon_out").style.backgroundColor = '#157fcc';
-                        }
+                        });
+
                     }
                 });
             }
         })
-    })
-
-
-
+    });
 </script>
 <iframe id="trackIframe" width="100%" height="100%" name="mainContent" frameborder="no" border="0" marginwidth="0" marginheight="0"></iframe>
 <iframe id="fileIframe" width="100%" height="100%" name="mainContent" frameborder="no" border="0" marginwidth="0" marginheight="0"></iframe>

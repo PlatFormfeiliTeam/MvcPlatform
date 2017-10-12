@@ -683,7 +683,7 @@ function ViewsEnterprise() {
     }
 
     if (busitypeid == "40-41") {
-        opencenterwin("/OrderDomestic/OrderView?menuxml=" + menuxml + "&Role=enterprise&OrderId=" + recs[0].get("ID") + "&OrderCode=" + recs[0].get("CODE") + "&busitypeid=" + recs[0].get("BUSITYPE"), 1500, 800);
+        opencenterwin("/OrderDomestic/OrderView_E?menuxml=" + menuxml + "&Role=enterprise&OrderId=" + recs[0].get("ID") + "&OrderCode=" + recs[0].get("CODE") + "&busitypeid=" + recs[0].get("BUSITYPE"), 1500, 800);
     }
     else {
         opencenterwin("/Common/OrderView?menuxml=" + menuxml + "&Role=enterprise&OrderId=" + recs[0].get("ID") + "&ordercode=" + recs[0].get("CODE") + "&busitypeid=" + recs[0].get("BUSITYPE"), 1200, 800);

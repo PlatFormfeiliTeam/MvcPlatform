@@ -100,7 +100,11 @@
                                         Ext.getDom("trackIframe").src = "/Common/OrderTrack?menuxml=domestic&ORDERCODE=" + newValue.ordergroup;
                                     }
                                     if (actab.title == '随附文件') {
-                                        Ext.getDom("fileIframe").src = "/Common/FileConsult?menuxml=domestic&ORDERCODE=" + newValue.ordergroup + "&BUSITYPE=" + busitypeid;
+                                        if (role == "enterprise") {
+                                            Ext.getDom("fileIframe").src = "/Common/FileConsult_E?menuxml=domestic&ORDERCODE=" + newValue.ordergroup + "&BUSITYPE=" + busitypeid;
+                                        } else {
+                                            Ext.getDom("fileIframe").src = "/Common/FileConsult?menuxml=domestic&ORDERCODE=" + newValue.ordergroup + "&BUSITYPE=" + busitypeid;
+                                        }
                                     }
 
                                     //保证载入跟踪信息及随附文件时传入的ordercode随订单类型改变的
@@ -158,10 +162,15 @@
                             items: [formpanelhead, formpanelin, formpanelout, panel_declaration]
                         })
 
-                        var tab_items = [{ title: '委托信息', border: 0, items: [panel1] },
+                        var tab_items = []
+                        if (role == "enterprise") {
+                            tab_items = [{ title: '委托信息', border: 0, items: [panel1] },
+                                        { title: '随附文件', contentEl: 'fileIframe' }];
+                        } else {
+                            tab_items = [{ title: '委托信息', border: 0, items: [panel1] },
                                         { title: '订单跟踪', contentEl: 'trackIframe' },
                                         { title: '随附文件', contentEl: 'fileIframe' }];
-                        
+                        }
                         var toolbar = Ext.create('Ext.toolbar.Toolbar', {
                             items: [rg_ordercodes]
                         })
@@ -173,7 +182,11 @@
                             listeners: {
                                 tabchange: function (tabPanel, newCard, oldCard, eOpts) {
                                     if (newCard.title == "随附文件") {
-                                        Ext.getDom("fileIframe").src = "/Common/FileConsult?menuxml=domestic&ORDERCODE=" + ordercode + "&BUSITYPE=" + busitypeid;
+                                        if (role == "enterprise") {
+                                            Ext.getDom("fileIframe").src = "/Common/FileConsult_E?menuxml=domestic&ORDERCODE=" + ordercode + "&BUSITYPE=" + busitypeid;
+                                        } else {
+                                            Ext.getDom("fileIframe").src = "/Common/FileConsult?menuxml=domestic&ORDERCODE=" + ordercode + "&BUSITYPE=" + busitypeid;
+                                        }
                                     }
                                     if (newCard.title == "订单跟踪") {
                                         Ext.getDom("trackIframe").src = "/Common/OrderTrack?menuxml=domestic&ORDERCODE=" + ordercode;
