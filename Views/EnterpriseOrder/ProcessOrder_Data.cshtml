@@ -185,9 +185,13 @@
     }
 
     function Reset() {
-        Ext.each(Ext.getCmp('formpanel').getForm().getFields().items, function (field) {
-            field.reset();
-        });
+        //Ext.each(Ext.getCmp('formpanel').getForm().getFields().items, function (field) {
+        //    field.reset();
+        //});
+        Ext.getCmp("s_field_ENTERPRISENAME").setValue("");
+        Ext.getCmp("field_CODE").setValue("");
+        Ext.getCmp("start_date").setValue("");
+        Ext.getCmp("end_date").setValue("");
     }
    
     function entorder_detail() {
