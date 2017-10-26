@@ -97,7 +97,8 @@ function form_ini() {
             select: function (records) {
                 field_FILERECEVIEUNITNAME_h.setValue(records.rawValue.substr(0, records.rawValue.lastIndexOf('(')));
             }
-        }
+        },
+        tabIndex: 1
     })
     var cont_wjjsdw = Ext.create('Ext.form.FieldContainer', {
         fieldLabel: '文件接收单位',
@@ -135,7 +136,8 @@ function form_ini() {
             select: function (records) {
                 field_FILEDECLAREUNITNAME_h.setValue(records.rawValue.substr(0, records.rawValue.lastIndexOf('(')));
             }
-        }
+        },
+        tabIndex: 2
     });
     var field_ID = Ext.create('Ext.form.field.Hidden', {
         name: 'ID'
@@ -215,7 +217,8 @@ function form_ini() {
                     combo_BUSITYPE.reset();;
                 }
             }
-        }
+        },
+        tabIndex:3
     });
 
     //申报关区
@@ -252,7 +255,8 @@ function form_ini() {
             getInnerTpl: function () {
                 return '<div>{NAME}</div>';
             }
-        }
+        },
+        tabIndex:5
     })
     var field_CUSTOMDISTRICTNAME = Ext.create('Ext.form.field.Hidden', {
         name: 'CUSTOMDISTRICTNAME'
@@ -280,13 +284,15 @@ function form_ini() {
                     cb.expand()
                 };
             }
-        }
+        },
+        tabIndex: 4
     })
     //备注
     var field_REMARK = Ext.create('Ext.form.field.Text', {
         id: 'field_REMARK1',
         fieldLabel: '备注',
-        name: 'REMARK'
+        name: 'REMARK',
+        tabIndex: 7
     });
 
     //企业编号
@@ -313,6 +319,7 @@ function form_ini() {
         triggerAction: 'all',
         queryMode: 'local',
         anyMatch: true,
+        tabIndex: 6
         //listeners: {
         //    focus: function (cb) {
         //        if (!cb.getValue()) {

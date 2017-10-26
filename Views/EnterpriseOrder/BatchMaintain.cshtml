@@ -229,7 +229,8 @@
                 select: function (records) {
                     field_FILERECEVIEUNITNAME_h.setValue(records.rawValue.substr(0, records.rawValue.lastIndexOf('(')));
                 }
-            }
+            },
+            tabIndex: 3
         })
         var cont_wjjsdw = Ext.create('Ext.form.FieldContainer', {
             fieldLabel: '文件接收单位',
@@ -269,13 +270,14 @@
             hideTrigger: true,
             anyMatch: true,
             listeners: {
-            focus: function (cb) {
-            cb.clearInvalid();
-        },
-            select: function (records) {
-             field_FILEDECLAREUNITNAME_h.setValue(records.rawValue.substr(0, records.rawValue.lastIndexOf('(')));
-        }
-    }
+                focus: function (cb) {
+                    cb.clearInvalid();
+                },
+                select: function (records) {
+                    field_FILEDECLAREUNITNAME_h.setValue(records.rawValue.substr(0, records.rawValue.lastIndexOf('(')));
+                }
+            },
+            tabIndex: 4
         });
         var field_ID = Ext.create('Ext.form.field.Hidden', {
             name: 'ID'
@@ -355,7 +357,8 @@
                         combo_BUSITYPE.reset();;
                     }
                 }
-            }
+            },
+            tabIndex: 5
         });
 
         //申报关区
@@ -393,7 +396,8 @@
                 getInnerTpl: function () {
                     return '<div>{NAME}</div>';
                 }
-            }
+            },
+            tabIndex: 2
         })
         var field_CUSTOMDISTRICTNAME = Ext.create('Ext.form.field.Hidden', {
             name: 'CUSTOMDISTRICTNAME'
@@ -420,14 +424,16 @@
                         cb.expand()
                     };
                 }
-            }
+            },
+            tabIndex: 6
         })
         //备注
         var field_REMARK = Ext.create('Ext.form.field.Text', {
             id: 'field_REMARK1',
             //fieldLabel: '备注',
             flex: 1,margin:0,
-            name: 'REMARK'
+            name: 'REMARK',
+            tabIndex: 8
         });
         var REMARK_container = {
             columnWidth: 1,
@@ -442,7 +448,8 @@
             fieldLabel: '企业编号',
             name: 'CODE',
             allowBlank: false,
-            blankText: '企业编号不能为空!'
+            blankText: '企业编号不能为空!',
+            tabIndex: 1
         });
         //模板名称
         var store_TEMPLATENAME = Ext.create('Ext.data.JsonStore', {
@@ -456,7 +463,8 @@
             valueField: 'ID',
             triggerAction: 'all',
             queryMode: 'local', flex: 1, margin: 0,
-            anyMatch: true
+            anyMatch: true,
+            tabIndex: 7
         });
         var TEMPLATENAME_container = {
             columnWidth: 1,
