@@ -304,7 +304,8 @@ function form_ini() {
         blankText: '企业编号不能为空!',
         validateOnBlur: false,
         readOnly: true,
-        validateOnChange: false
+        validateOnChange: false,
+        tabIndex: 8
     });
     //模板名称
     var store_TEMPLATENAME = Ext.create('Ext.data.JsonStore', {
