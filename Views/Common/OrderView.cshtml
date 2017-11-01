@@ -17,7 +17,7 @@
     var role = getQueryString("role");
     var busitypename = "";
     var store_busitype;
-    var common_data_jydw = [], common_data_sbfs = [], common_data_sbgq = [], common_data_bgfs = [], common_data_bzzl = [], common_data_myfs = [], common_data_mzbz = [];
+    var common_data_jydw = [], common_data_sbfs = [], common_data_sbgq = [], common_data_bgfs = [], common_data_bzzl = [], common_data_myfs = [], common_data_mzbz = [], common_data_dzfwdw = [];
     Ext.onReady(function () {
         store_busitype = Ext.create('Ext.data.JsonStore', {
             fields: ['CODE', 'NAME'],
@@ -39,6 +39,7 @@
                 common_data_bzzl = commondata.bzzl;//包装种类
                 common_data_myfs = commondata.myfs;//贸易方式
                 common_data_mzbz = commondata.mzbz;//木质包装
+                common_data_dzfwdw = commondata.dzfwdw;//单证服务单位
 
                 formpanel_ini();
                 //2 加载表单数据

@@ -336,13 +336,41 @@
     var store_status2 = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
         data: orderstatus_js_data
-    })
-    var field_STATUS2 = Ext.create('Ext.form.field.ComboBox', {//业务状态
-        id: 'field_status2',
-        name: 'STATUS',
+    });
+    //var field_STATUS2 = Ext.create('Ext.form.field.ComboBox', {//业务状态
+    //    id: 'field_status2',
+    //    name: 'STATUS',
+    //    valueField: 'CODE',
+    //    displayField: 'NAME',
+    //    fieldLabel: '业务状态',
+    //    queryMode: 'local',
+    //    editable: false,
+    //    hiddenTrigger: true,
+    //    readOnly: true,
+    //    labelWidth: 80,
+    //    value: 1,
+    //    store: store_status2
+    //});
+    var field_DECLSTATUS2 = Ext.create('Ext.form.field.ComboBox', {//报关状态
+        id: 'field_declstatus2',
+        name: 'DECLSTATUS',
         valueField: 'CODE',
         displayField: 'NAME',
-        fieldLabel: '业务状态',
+        fieldLabel: '报关状态',
+        queryMode: 'local',
+        editable: false,
+        hiddenTrigger: true,
+        readOnly: true,
+        labelWidth: 80,
+        value: 1,
+        store: store_status2
+    });
+    var field_INSPSTATUS2 = Ext.create('Ext.form.field.ComboBox', {//报检状态
+        id: 'field_inspstatus2',
+        name: 'INSPSTATUS',
+        valueField: 'CODE',
+        displayField: 'NAME',
+        fieldLabel: '报检状态',
         queryMode: 'local',
         editable: false,
         hiddenTrigger: true,
@@ -367,7 +395,7 @@
         { layout: 'column', height: 42, border: 0, items: [field_CODE2, combo_ENTRUSTTYPENAME2, field_CUSNO2, combo_jydw2, combo_DECLWAY2] },
         { layout: 'column', height: 42, border: 0, items: [field_quanpackage2, field_weight2, field_contractno2, combo_myfs2, field_FILINGNUMBER2] },
         { layout: 'column', height: 42, border: 0, items: [chk_CHKLAWCONDITION2, field_CLEARANCENO2, field_ASSOCIATEPEDECLNO2, tf_bgsbdw2, tf_bjsbdw2] },
-        { layout: 'column', height: 42, border: 0, items: [field_ENTRUSTREQUEST2, field_STATUS2] },
+        { layout: 'column', height: 42, border: 0, items: [field_ENTRUSTREQUEST2, field_DECLSTATUS2, field_INSPSTATUS2] },//field_STATUS2
          field_BUSIUNITNAME2, field_BUSISHORTNAME2]
     })
 }

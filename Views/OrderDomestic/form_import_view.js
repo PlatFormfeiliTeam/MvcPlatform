@@ -316,12 +316,40 @@
         fields: ['CODE', 'NAME'],
         data: orderstatus_js_data
     })
-    var field_STATUS = Ext.create('Ext.form.field.ComboBox', {//业务状态
-        id: 'field_status1',
-        name: 'STATUS',
+    //var field_STATUS = Ext.create('Ext.form.field.ComboBox', {//业务状态
+    //    id: 'field_status1',
+    //    name: 'STATUS',
+    //    valueField: 'CODE',
+    //    displayField: 'NAME',
+    //    fieldLabel: '业务状态',
+    //    queryMode: 'local',
+    //    editable: false,
+    //    hiddenTrigger: true,
+    //    readOnly: true,
+    //    labelWidth: 80,
+    //    value: 1,
+    //    store: store_status
+    //});
+    var field_DECLSTATUS = Ext.create('Ext.form.field.ComboBox', {//报关状态
+        id: 'field_declstatus1',
+        name: 'DECLSTATUS',
         valueField: 'CODE',
         displayField: 'NAME',
-        fieldLabel: '业务状态',
+        fieldLabel: '报关状态',
+        queryMode: 'local',
+        editable: false,
+        hiddenTrigger: true,
+        readOnly: true,
+        labelWidth: 80,
+        value: 1,
+        store: store_status
+    });
+    var field_INSPSTATUS = Ext.create('Ext.form.field.ComboBox', {//报检状态
+        id: 'field_inspstatus1',
+        name: 'INSPSTATUS',
+        valueField: 'CODE',
+        displayField: 'NAME',
+        fieldLabel: '报检状态',
         queryMode: 'local',
         editable: false,
         hiddenTrigger: true,
@@ -347,7 +375,7 @@
                 { layout: 'column', height: 42, border: 0, items: [field_CODE, combo_ENTRUSTTYPENAME, field_CUSNO, combo_jydw, combo_DECLWAY] },
                 { layout: 'column', height: 42, border: 0, items: [field_quanpackage, field_weight, field_contractno, combo_myfs, field_FILINGNUMBER] },
                 { layout: 'column', height: 42, border: 0, items: [chk_CHKLAWCONDITION, field_CLEARANCENO, field_ASSOCIATEPEDECLNO, tf_bgsbdw1, tf_bjsbdw1] },
-                { layout: 'column', height: 42, border: 0, items: [field_ENTRUSTREQUEST, field_STATUS] },
+                { layout: 'column', height: 42, border: 0, items: [field_ENTRUSTREQUEST, field_DECLSTATUS, field_INSPSTATUS] },//field_STATUS
                 field_BUSIUNITNAME, field_BUSISHORTNAME
         ]
     })

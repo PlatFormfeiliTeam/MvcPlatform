@@ -115,20 +115,59 @@
         readOnly: true
     });
 
+    //单证服务单位
+    var store_dzfwdw = Ext.create('Ext.data.JsonStore', {
+        fields: ['CODE', 'NAME'],
+        data: common_data_dzfwdw
+    })
+    var combo_dzfwdw = Ext.create('Ext.form.field.ComboBox', {
+        name: 'DOCSERVICECODE',
+        store: store_dzfwdw,
+        hideTrigger: true,
+        fieldLabel: '单证服务单位',
+        displayField: 'NAME',
+        valueField: 'CODE',
+        triggerAction: 'all',
+        editable: false,
+        value: 'GWYKS',
+        queryMode: 'local',
+        labelWidth: 80
+    })
+
     //业务状态 
     var store_status = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
         data: orderstatus_js_data
     })
-    var field_STATUS = Ext.create('Ext.form.field.ComboBox', {//业务状态
-        id: 'field_status1',
-        name: 'STATUS',
+    //var field_STATUS = Ext.create('Ext.form.field.ComboBox', {//业务状态
+    //    id: 'field_status1',
+    //    name: 'STATUS',
+    //    valueField: 'CODE',
+    //    displayField: 'NAME',
+    //    fieldLabel: '业务状态',
+    //    store: store_status,
+    //    hiddenTrigger: true,
+    //    readOnly: true        
+    //});
+    var field_DECLSTATUS = Ext.create('Ext.form.field.ComboBox', {//报关状态
+        id: 'field_declstatus1',
+        name: 'DECLSTATUS',
         valueField: 'CODE',
         displayField: 'NAME',
-        fieldLabel: '业务状态',
+        fieldLabel: '报关状态',
         store: store_status,
         hiddenTrigger: true,
-        readOnly: true        
+        readOnly: true
+    });
+    var field_INSPSTATUS = Ext.create('Ext.form.field.ComboBox', {//报检状态
+        id: 'field_inspstatus1',
+        name: 'INSPSTATUS',
+        valueField: 'CODE',
+        displayField: 'NAME',
+        fieldLabel: '报检状态',
+        store: store_status,
+        hiddenTrigger: true,
+        readOnly: true
     });
     //客户编号
     var field_CUSNO = Ext.create('Ext.form.field.Text', {
@@ -300,8 +339,8 @@
         items: [
               { layout: 'column', border: 42, border: 0, items: [label_baseinfo] },
               { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_CODE, field_ENTRUSTTYPE, field_REPWAY, field_CUSTOMDISTRICT, field_REPUNIT] },
-              { layout: 'column', height: 42, border: 0, items: [field_DECLWAY, field_SUBMITUSERNAME, field_SUBMITTIME, field_INSPUNITNAME, field_STATUS] },
-              { layout: 'column', height: 42, border: 0, items: [field_CREATEUSERNAME, field_CREATETIME] },
+              { layout: 'column', height: 42, border: 0, items: [field_DECLWAY, field_SUBMITUSERNAME, field_SUBMITTIME, combo_dzfwdw, field_INSPUNITNAME] },//field_STATUS
+              { layout: 'column', height: 42, border: 0, items: [field_CREATEUSERNAME, field_CREATETIME, field_DECLSTATUS, field_INSPSTATUS] },
               { layout: 'column', border: 42, border: 0, items: [label_busiinfo] },
               { layout: 'column', height: 42, border: 0, items: [field_CUSNO, field_PORTCODE, field_BUSIUNIT, field_TOTALNO, field_DIVIDENO] },
               { layout: 'column', height: 42, border: 0, items: [field_quanpackage, field_weight, field_contractno, field_TRADEWAYCODES, field_TURNPRENO] },
