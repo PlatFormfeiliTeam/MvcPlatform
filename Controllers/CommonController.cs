@@ -3226,8 +3226,10 @@ namespace MvcPlatform.Controllers
                 total = dt.Rows.Count;
             }
 
+//            sql = @"select * from(select row_number() over (partition by status order by times desc) numid,lt.times,lt.status 
+//                                    from list_times lt where instr('" + declnos + "',lt.CODE)>0) ltt where numid=1";
             sql = @"select * from(select row_number() over (partition by status order by times desc) numid,lt.times,lt.status 
-                                    from list_times lt where instr('" + declnos + "',lt.CODE)>0) ltt where numid=1";
+                                    from list_times lt where lt.CODE='" + declnos + "') ltt where numid=1";
             dt_times = DBMgr.GetDataTable(sql);
 
             DataTable dt_cus = new DataTable();
