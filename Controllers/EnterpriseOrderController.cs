@@ -894,7 +894,7 @@ namespace MvcPlatform.Controllers
             }
             string item_combo_value = Request["item_combo_value"] + "";
             string cx_value = Request["cx_value"] + "";
-            string sql = @"select * from LIST_ORDER where instr('" + Request["busitypeid"] + "',BUSITYPE)>0 and (BUSIUNITCODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "' or CUSTOMERCODE='" + json_user.Value<string>("CUSTOMERCODE") + "') " + where;
+            string sql = @"select * from LIST_ORDER where instr('" + Request["busitypeid"] + "',BUSITYPE)>0 and (BUSIUNITCODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "' or receiverunitcode='" + json_user.Value<string>("CUSTOMERCODE") + "') " + where;
             DataTable dt = DBMgr.GetDataTable(sql);
             var json = JsonConvert.SerializeObject(dt, iso);
 

@@ -120,7 +120,7 @@ namespace MvcPlatform.Controllers
                             ,TRADEWAYCODES,GOODSGW,GOODSNW,PACKKIND,BUSIKIND
                             ,ORDERWAY,CLEARUNIT,CLEARUNITNAME,CREATETIME,SUBMITTIME,SPECIALRELATIONSHIP
                             ,PRICEIMPACT,PAYPOYALTIES,WEIGHTCHECK,ISWEIGHTCHECK,DECLSTATUS
-                            ,INSPSTATUS,DOCSERVICECODE
+                            ,INSPSTATUS,DOCSERVICECODE,CLEARREMARK,RECEIVERUNITCODE,RECEIVERUNITNAME   
                             ) 
                       VALUES (LIST_ORDER_id.Nextval
                             , '{0}','{1}','{2}','{3}','{4}','{5}'
@@ -132,18 +132,18 @@ namespace MvcPlatform.Controllers
                             ,'{31}','{32}','{33}','{34}','{35}'
                             ,'{36}','{37}','{38}', sysdate,{39},'{40}'
                             ,'{41}','{42}','{43}','{44}','{45}'
-                            ,'{46}','{47}')";
+                            ,'{46}','{47}','{48}','{49}','{50}')";
                 sql = string.Format(sql
                             , "10", ordercode, json.Value<string>("CUSNO"), json.Value<string>("BUSIUNITCODE"), json.Value<string>("BUSIUNITNAME"), json.Value<string>("CONTRACTNO")
                             , json.Value<string>("TOTALNO"), json.Value<string>("DIVIDENO"), json.Value<string>("TURNPRENO"), json.Value<string>("GOODSNUM"), json.Value<string>("ARRIVEDNO")
                             , json.Value<string>("CLEARANCENO"), GetChk(json.Value<string>("LAWFLAG")), json.Value<string>("ENTRUSTTYPE"), json.Value<string>("REPWAYID"), json.Value<string>("CUSTOMAREACODE")
                             , GetCode(json.Value<string>("REPUNITCODE")), GetName(json.Value<string>("REPUNITCODE")), json.Value<string>("DECLWAY"), json.Value<string>("PORTCODE"), GetCode(json.Value<string>("INSPUNITCODE"))
                             , GetName(json.Value<string>("INSPUNITCODE")), json.Value<string>("ORDERREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"), json.Value<string>("STATUS")
-                            , json.Value<string>("SUBMITUSERID"), json.Value<string>("SUBMITUSERNAME"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLCARNO")
+                            , json.Value<string>("SUBMITUSERID"), json.Value<string>("SUBMITUSERNAME"), json.Value<string>("CUSTOMERCODE"), json.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLCARNO")
                             , json.Value<string>("TRADEWAYCODES"), json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW"), json.Value<string>("PACKKIND"), "001"
-                            , "1", json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("SUBMITTIME"), GetChk(json.Value<string>("SPECIALRELATIONSHIP"))
+                            , "1", json.Value<string>("CLEARUNIT"), json.Value<string>("CLEARUNITNAME"), json.Value<string>("SUBMITTIME"), GetChk(json.Value<string>("SPECIALRELATIONSHIP"))
                             , GetChk(json.Value<string>("PRICEIMPACT")), GetChk(json.Value<string>("PAYPOYALTIES")), GetChk(json.Value<string>("WEIGHTCHECK")), GetChk(json.Value<string>("ISWEIGHTCHECK")), json.Value<string>("DECLSTATUS")
-                            , json.Value<string>("INSPSTATUS"), json.Value<string>("DOCSERVICECODE")
+                            , json.Value<string>("INSPSTATUS"), json.Value<string>("DOCSERVICECODE"), json.Value<string>("CLEARREMARK"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
                         );
             }
             else//修改
@@ -177,6 +177,7 @@ namespace MvcPlatform.Controllers
                             ,GOODSGW,GOODSNW,PACKKIND,BUSIKIND,ORDERWAY
                             ,CLEARUNIT,CLEARUNITNAME,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES
                             ,WEIGHTCHECK,ISWEIGHTCHECK,DOCSERVICECODE,DECLSTATUS,INSPSTATUS
+                            ,CLEARREMARK,RECEIVERUNITCODE,RECEIVERUNITNAME   
                             ";
                 sql = Extension.getUpdateSql(allcol, ordercode, IsSubmitAfterSave);
                 if (sql != "")
@@ -187,13 +188,13 @@ namespace MvcPlatform.Controllers
                                , json.Value<string>("CLEARANCENO"), GetChk(json.Value<string>("LAWFLAG")), json.Value<string>("ENTRUSTTYPE"), json.Value<string>("REPWAYID"), json.Value<string>("CUSTOMAREACODE")
                                , GetCode(json.Value<string>("REPUNITCODE")), GetName(json.Value<string>("REPUNITCODE")), json.Value<string>("DECLWAY"), json.Value<string>("PORTCODE"), GetCode(json.Value<string>("INSPUNITCODE"))
                                , GetName(json.Value<string>("INSPUNITCODE")), json.Value<string>("ORDERREQUEST"), json.Value<string>("STATUS"), json.Value<string>("SUBMITUSERID"), json.Value<string>("SUBMITUSERNAME")
-                               , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLCARNO"), json.Value<string>("TRADEWAYCODES"), json.Value<string>("SUBMITTIME")
+                               , json.Value<string>("CUSTOMERCODE"), json.Value<string>("CUSTOMERNAME"), json.Value<string>("DECLCARNO"), json.Value<string>("TRADEWAYCODES"), json.Value<string>("SUBMITTIME")
                                , json.Value<string>("GOODSGW"), json.Value<string>("GOODSNW"), json.Value<string>("PACKKIND"), "001", "1"
-                               , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT")), GetChk(json.Value<string>("PAYPOYALTIES"))
-                               , GetChk(json.Value<string>("WEIGHTCHECK")), GetChk(json.Value<string>("ISWEIGHTCHECK"))
-                               , json.Value<string>("DOCSERVICECODE"), json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS")
-                         );
-                }               
+                               , json.Value<string>("CLEARUNIT"), json.Value<string>("CLEARUNITNAME"), GetChk(json.Value<string>("SPECIALRELATIONSHIP")), GetChk(json.Value<string>("PRICEIMPACT")), GetChk(json.Value<string>("PAYPOYALTIES"))
+                               , GetChk(json.Value<string>("WEIGHTCHECK")), GetChk(json.Value<string>("ISWEIGHTCHECK")), json.Value<string>("DOCSERVICECODE"), json.Value<string>("DECLSTATUS"), json.Value<string>("INSPSTATUS")
+                               , json.Value<string>("CLEARREMARK"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
+                            );
+                }              
             }
             if (sql != "")
             {
