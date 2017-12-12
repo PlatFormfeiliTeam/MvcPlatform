@@ -19,7 +19,8 @@
     var cur_usr;
     var common_data_jydw = [], common_data_sbfs = [], common_data_sbgq = [],
         common_data_bgfs = [], common_data_bzzl = [], common_data_myfs = [],
-        common_data_containertype = [], common_data_containersize = [], common_data_truckno = [], common_data_relacontainer = [], common_data_adminurl = "",common_data_dzfwdw = [];
+        common_data_containertype = [], common_data_containersize = [], common_data_truckno = [], common_data_relacontainer = []
+        , common_data_adminurl = "", common_data_dzfwdw = [], common_data_wtdw = [];
     var formpanel, store_jydw, file_store, win_container_truck, uploader;//集装箱和报关车号选择列表页
     var repunitcode, inspunitcode;//报关申报单位 报检申报单位 这两个变量公共化,是因为这两个对应的字段会依赖委托类型进行清值和赋值
     Ext.onReady(function () {
@@ -43,6 +44,8 @@
                 common_data_relacontainer = commondata.relacontainer;//关联集装箱
                 common_data_adminurl = commondata.adminurl;//文件服务器URL
                 common_data_dzfwdw = commondata.dzfwdw;//单证服务单位
+                common_data_wtdw = commondata.wtdw;//委托单位
+
                 repunitcode = commondata.curuser.REPUNITNAME + "(" + commondata.curuser.CUSTOMERHSCODE + ")";//报关申报单位
                 inspunitcode = commondata.curuser.INSPUNITNAME + "(" + commondata.curuser.CUSTOMERCIQCODE + ")";//报检申报单位 
                 cur_usr = commondata.curuser;

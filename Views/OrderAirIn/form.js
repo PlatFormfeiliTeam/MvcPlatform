@@ -647,7 +647,7 @@
         valueField: 'CODE',
         triggerAction: 'all',
         editable: false,
-        value: 'GWYKS',
+        value: 'KSJSBGYXGS',
         queryMode: 'local'
     });
 
