@@ -164,10 +164,9 @@
         valueField: 'CODE',
         triggerAction: 'all',
         editable: false,
-        value: 'GWYKS',
-        queryMode: 'local',
-        labelWidth: 80
-    })
+        value: 'KSJSBGYXGS',
+        queryMode: 'local'
+    });
     var label_baseinfo = {
         xtype: 'label',
         margin: '5',

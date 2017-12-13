@@ -156,10 +156,9 @@ function form_head2_ini() {
         valueField: 'CODE',
         triggerAction: 'all',
         editable: false,
-        value: 'GWYKS',
-        queryMode: 'local',
-        labelWidth: 80
-    })
+        value: 'KSJSBGYXGS',
+        queryMode: 'local'
+    });
     formpanelhead2 = Ext.create('Ext.form.Panel', {
         border: 0,
         fieldDefaults: {

@@ -496,8 +496,9 @@ namespace MvcPlatform.Controllers
                                 ,CORRESPONDNO,PACKKIND,GOODSGW,GOODSNW,RECORDCODE
                                 ,IETYPE,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES,SUBMITUSERNAME
                                 ,SUBMITUSERID,ASSOCIATETRADEWAY,BUSIKIND,ORDERWAY,CLEARUNIT
-                                ,CLEARUNITNAME,CREATETIME,SUBMITTIME,PORTCODE,DECLSTATUS
-                                ,INSPSTATUS,DOCSERVICECODE) 
+                                ,CLEARUNITNAME,CREATETIME,SUBMITTIME,PORTCODE,DECLSTATUS,INSPSTATUS
+                                ,DOCSERVICECODE,CLEARREMARK,RECEIVERUNITCODE,RECEIVERUNITNAME
+                            ) 
                             VALUES (LIST_ORDER_id.Nextval
                                 ,'{0}','{1}','{2}','{3}','{4}','{5}'
                                 ,'{6}','{7}','{8}','{9}','{10}'
@@ -507,8 +508,8 @@ namespace MvcPlatform.Controllers
                                 ,'{26}','{27}','{28}','{29}','{30}'
                                 ,'{31}','{32}','{33}','{34}','{35}'
                                 ,'{36}','{37}','{38}','{39}','{40}'
-                                ,'{41}',sysdate,{42},'{43}','{44}'
-                                ,'{45}','{46}'
+                                ,'{41}',sysdate,{42},'{43}','{44}','{45}'
+                                ,'{46}','{47}','{48}','{49}'
                                 )";
 
             /*update_sql = @"update LIST_ORDER  SET ASSOCIATEPEDECLNO='{1}',CUSNO='{2}',BUSIUNITCODE='{3}',BUSIUNITNAME='{4}',CONTRACTNO='{5}'
@@ -535,7 +536,9 @@ namespace MvcPlatform.Controllers
                             ,PACKKIND,GOODSGW,GOODSNW,RECORDCODE,IETYPE
                             ,SPECIALRELATIONSHIP,PRICEIMPACT,PAYPOYALTIES,STATUS,SUBMITTIME
                             ,SUBMITUSERNAME,SUBMITUSERID,ASSOCIATETRADEWAY,BUSIKIND,ORDERWAY
-                            ,PORTCODE,DOCSERVICECODE,DECLSTATUS,INSPSTATUS
+                            ,PORTCODE,DOCSERVICECODE,DECLSTATUS,INSPSTATUS,CLEARREMARK
+                            ,RECEIVERUNITCODE,RECEIVERUNITNAME,CUSTOMERCODE,CUSTOMERNAME,CLEARUNIT
+                            ,CLEARUNITNAME
                             ";
             //update_sql在里面赋值，因为需要传code
 
@@ -564,12 +567,12 @@ namespace MvcPlatform.Controllers
                             , json1.Value<string>("CONTRACTNO"), json1.Value<string>("GOODSNUM"), json1.Value<string>("CLEARANCENO"), GetChk(json1.Value<string>("LAWFLAG")), json1.Value<string>("ENTRUSTTYPE")
                             , json_head1.Value<string>("REPWAYID"), json_head1.Value<string>("CUSTOMAREACODE"), GetCode(json1.Value<string>("REPUNITCODE")), GetName(json1.Value<string>("REPUNITCODE")), json1.Value<string>("DECLWAY")
                             , GetCode(json1.Value<string>("INSPUNITCODE")), GetName(json1.Value<string>("INSPUNITCODE")), json1.Value<string>("ORDERREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
-                            , json1.Value<string>("STATUS"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json1.Value<string>("TRADEWAYCODES"), AssociateNo
+                            , json1.Value<string>("STATUS"), json1.Value<string>("CUSTOMERCODE"), json1.Value<string>("CUSTOMERNAME"), json1.Value<string>("TRADEWAYCODES"), AssociateNo
                             , CorrespondNo, json1.Value<string>("PACKKIND"), json1.Value<string>("GOODSGW"), json1.Value<string>("GOODSNW"), json1.Value<string>("RECORDCODE")
                             , json_head1.Value<string>("IETYPE"), GetChk(json1.Value<string>("SPECIALRELATIONSHIP")), GetChk(json1.Value<string>("PRICEIMPACT")), GetChk(json1.Value<string>("PAYPOYALTIES")), json_head1.Value<string>("SUBMITUSERNAME")
-                            , json_head1.Value<string>("SUBMITUSERID"), json1.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_user.Value<string>("CUSTOMERCODE")
-                            , json_user.Value<string>("CUSTOMERNAME"), json_head1.Value<string>("SUBMITTIME"), json_head1.Value<string>("CUSTOMAREACODE"), json1.Value<string>("DECLSTATUS")
-                            , json1.Value<string>("INSPSTATUS"),json_head1.Value<string>("DOCSERVICECODE")
+                            , json_head1.Value<string>("SUBMITUSERID"), json1.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json1.Value<string>("CLEARUNIT")
+                            , json1.Value<string>("CLEARUNITNAME"), json_head1.Value<string>("SUBMITTIME"), json_head1.Value<string>("CUSTOMAREACODE"), json1.Value<string>("DECLSTATUS"), json1.Value<string>("INSPSTATUS")
+                            , json_head1.Value<string>("DOCSERVICECODE"), json1.Value<string>("CLEARREMARK"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code1;
@@ -588,7 +591,9 @@ namespace MvcPlatform.Controllers
                                 , json1.Value<string>("PACKKIND"), json1.Value<string>("GOODSGW"), json1.Value<string>("GOODSNW"), json1.Value<string>("RECORDCODE"), json_head1.Value<string>("IETYPE")
                                 , GetChk(json1.Value<string>("SPECIALRELATIONSHIP")), GetChk(json1.Value<string>("PRICEIMPACT")), GetChk(json1.Value<string>("PAYPOYALTIES")), json1.Value<string>("STATUS"), json_head1.Value<string>("SUBMITTIME")
                                 , json_head1.Value<string>("SUBMITUSERNAME"), json_head1.Value<string>("SUBMITUSERID"), json1.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
-                                , json_head1.Value<string>("CUSTOMAREACODE"), json_head1.Value<string>("DOCSERVICECODE"), json1.Value<string>("DECLSTATUS"), json1.Value<string>("INSPSTATUS")
+                                , json_head1.Value<string>("CUSTOMAREACODE"), json_head1.Value<string>("DOCSERVICECODE"), json1.Value<string>("DECLSTATUS"), json1.Value<string>("INSPSTATUS"), json1.Value<string>("CLEARREMARK")
+                                , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json1.Value<string>("CUSTOMERCODE"), json1.Value<string>("CUSTOMERNAME"), json1.Value<string>("CLEARUNIT")
+                                , json1.Value<string>("CLEARUNITNAME")
                                  );
                     }
                     if (json1.Value<Int32>("STATUS") >= 15)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
@@ -631,12 +636,12 @@ namespace MvcPlatform.Controllers
                             , json2.Value<string>("CONTRACTNO"), json2.Value<string>("GOODSNUM"), json2.Value<string>("CLEARANCENO"), GetChk(json2.Value<string>("LAWFLAG")), json2.Value<string>("ENTRUSTTYPE")
                             , json_head1.Value<string>("REPWAYID"), json_head1.Value<string>("CUSTOMAREACODE"), GetCode(json2.Value<string>("REPUNITCODE")), GetName(json2.Value<string>("REPUNITCODE")), json2.Value<string>("DECLWAY")
                             , GetCode(json2.Value<string>("INSPUNITCODE")), GetName(json2.Value<string>("INSPUNITCODE")), json2.Value<string>("ORDERREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
-                            , json2.Value<string>("STATUS"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json2.Value<string>("TRADEWAYCODES"), AssociateNo
+                            , json2.Value<string>("STATUS"), json2.Value<string>("CUSTOMERCODE"), json2.Value<string>("CUSTOMERNAME"), json2.Value<string>("TRADEWAYCODES"), AssociateNo
                             , CorrespondNo, json2.Value<string>("PACKKIND"), json2.Value<string>("GOODSGW"), json2.Value<string>("GOODSNW"), json2.Value<string>("RECORDCODE")
                             , json_head1.Value<string>("IETYPE"), GetChk(json2.Value<string>("SPECIALRELATIONSHIP")), GetChk(json2.Value<string>("PRICEIMPACT")), GetChk(json2.Value<string>("PAYPOYALTIES")), json_head1.Value<string>("SUBMITUSERNAME")
-                            , json_head1.Value<string>("SUBMITUSERID"), json2.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_user.Value<string>("CUSTOMERCODE")
-                            , json_user.Value<string>("CUSTOMERNAME"), json_head1.Value<string>("SUBMITTIME"), json_head1.Value<string>("CUSTOMAREACODE"), json2.Value<string>("DECLSTATUS")
-                            , json2.Value<string>("INSPSTATUS"),json_head1.Value<string>("DOCSERVICECODE")
+                            , json_head1.Value<string>("SUBMITUSERID"), json2.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json2.Value<string>("CLEARUNIT")
+                            , json2.Value<string>("CLEARUNITNAME"), json_head1.Value<string>("SUBMITTIME"), json_head1.Value<string>("CUSTOMAREACODE"), json2.Value<string>("DECLSTATUS"), json2.Value<string>("INSPSTATUS")
+                            , json_head1.Value<string>("DOCSERVICECODE"), json2.Value<string>("CLEARREMARK"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code2;
@@ -655,7 +660,9 @@ namespace MvcPlatform.Controllers
                                 , json2.Value<string>("PACKKIND"), json2.Value<string>("GOODSGW"), json2.Value<string>("GOODSNW"), json2.Value<string>("RECORDCODE"), json_head1.Value<string>("IETYPE")
                                 , GetChk(json2.Value<string>("SPECIALRELATIONSHIP")), GetChk(json2.Value<string>("PRICEIMPACT")), GetChk(json2.Value<string>("PAYPOYALTIES")), json2.Value<string>("STATUS"), json_head1.Value<string>("SUBMITTIME")
                                 , json_head1.Value<string>("SUBMITUSERNAME"), json_head1.Value<string>("SUBMITUSERID"), json2.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
-                                , json_head1.Value<string>("CUSTOMAREACODE"), json_head1.Value<string>("DOCSERVICECODE"), json2.Value<string>("DECLSTATUS"), json2.Value<string>("INSPSTATUS")
+                                , json_head1.Value<string>("CUSTOMAREACODE"), json_head1.Value<string>("DOCSERVICECODE"), json2.Value<string>("DECLSTATUS"), json2.Value<string>("INSPSTATUS"), json2.Value<string>("CLEARREMARK")
+                                , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json2.Value<string>("CUSTOMERCODE"), json2.Value<string>("CUSTOMERNAME"), json2.Value<string>("CLEARUNIT")
+                                , json2.Value<string>("CLEARUNITNAME")
                              );
                     }
                     if (json2.Value<Int32>("STATUS") >= 15)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
@@ -698,12 +705,12 @@ namespace MvcPlatform.Controllers
                             , json3.Value<string>("CONTRACTNO"), json3.Value<string>("GOODSNUM"), json3.Value<string>("CLEARANCENO"), GetChk(json3.Value<string>("LAWFLAG")), json3.Value<string>("ENTRUSTTYPE")
                             , json_head1.Value<string>("REPWAYID"), json_head2.Value<string>("CUSTOMAREACODE"), GetCode(json3.Value<string>("REPUNITCODE")), GetName(json3.Value<string>("REPUNITCODE")), json3.Value<string>("DECLWAY")
                             , GetCode(json3.Value<string>("INSPUNITCODE")), GetName(json3.Value<string>("INSPUNITCODE")), json3.Value<string>("ORDERREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
-                            , json3.Value<string>("STATUS"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json3.Value<string>("TRADEWAYCODES"), AssociateNo2
+                            , json3.Value<string>("STATUS"), json3.Value<string>("CUSTOMERCODE"), json3.Value<string>("CUSTOMERNAME"), json3.Value<string>("TRADEWAYCODES"), AssociateNo2
                             , CorrespondNo, json3.Value<string>("PACKKIND"), json3.Value<string>("GOODSGW"), json3.Value<string>("GOODSNW"), json3.Value<string>("RECORDCODE")
                             , json_head2.Value<string>("IETYPE"), GetChk(json3.Value<string>("SPECIALRELATIONSHIP")), GetChk(json3.Value<string>("PRICEIMPACT")), GetChk(json3.Value<string>("PAYPOYALTIES")), json_head2.Value<string>("SUBMITUSERNAME")
-                            , json_head2.Value<string>("SUBMITUSERID"), json3.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_user.Value<string>("CUSTOMERCODE")
-                            , json_user.Value<string>("CUSTOMERNAME"), json_head2.Value<string>("SUBMITTIME"), json_head2.Value<string>("CUSTOMAREACODE"), json3.Value<string>("DECLSTATUS")
-                            , json3.Value<string>("INSPSTATUS"), json_head1.Value<string>("DOCSERVICECODE")
+                            , json_head2.Value<string>("SUBMITUSERID"), json3.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json3.Value<string>("CLEARUNIT")
+                            , json3.Value<string>("CLEARUNITNAME"), json_head2.Value<string>("SUBMITTIME"), json_head2.Value<string>("CUSTOMAREACODE"), json3.Value<string>("DECLSTATUS"), json3.Value<string>("INSPSTATUS")
+                            , json_head1.Value<string>("DOCSERVICECODE"), json3.Value<string>("CLEARREMARK"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code3;
@@ -722,7 +729,9 @@ namespace MvcPlatform.Controllers
                                 , json3.Value<string>("PACKKIND"), json3.Value<string>("GOODSGW"), json3.Value<string>("GOODSNW"), json3.Value<string>("RECORDCODE"), json_head2.Value<string>("IETYPE")
                                 , GetChk(json3.Value<string>("SPECIALRELATIONSHIP")), GetChk(json3.Value<string>("PRICEIMPACT")), GetChk(json3.Value<string>("PAYPOYALTIES")), json3.Value<string>("STATUS"), json_head2.Value<string>("SUBMITTIME")
                                 , json_head2.Value<string>("SUBMITUSERNAME"), json_head2.Value<string>("SUBMITUSERID"), json3.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
-                                , json_head2.Value<string>("CUSTOMAREACODE"), json_head1.Value<string>("DOCSERVICECODE"), json3.Value<string>("DECLSTATUS"), json3.Value<string>("INSPSTATUS")
+                                , json_head2.Value<string>("CUSTOMAREACODE"), json_head1.Value<string>("DOCSERVICECODE"), json3.Value<string>("DECLSTATUS"), json3.Value<string>("INSPSTATUS"), json3.Value<string>("CLEARREMARK")
+                                , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json3.Value<string>("CUSTOMERCODE"), json3.Value<string>("CUSTOMERNAME"), json3.Value<string>("CLEARUNIT")
+                                , json3.Value<string>("CLEARUNITNAME")
                                 );
                     }
                     if (json3.Value<Int32>("STATUS") >= 15)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表
@@ -764,12 +773,12 @@ namespace MvcPlatform.Controllers
                             , json4.Value<string>("CONTRACTNO"), json4.Value<string>("GOODSNUM"), json4.Value<string>("CLEARANCENO"), GetChk(json4.Value<string>("LAWFLAG")), json4.Value<string>("ENTRUSTTYPE")
                             , json_head2.Value<string>("REPWAYID"), json_head2.Value<string>("CUSTOMAREACODE"), GetCode(json4.Value<string>("REPUNITCODE")), GetName(json4.Value<string>("REPUNITCODE")), json4.Value<string>("DECLWAY")
                             , GetCode(json4.Value<string>("INSPUNITCODE")), GetName(json4.Value<string>("INSPUNITCODE")), json4.Value<string>("ORDERREQUEST"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
-                            , json4.Value<string>("STATUS"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json4.Value<string>("TRADEWAYCODES"), AssociateNo2
+                            , json4.Value<string>("STATUS"), json4.Value<string>("CUSTOMERCODE"), json4.Value<string>("CUSTOMERNAME"), json4.Value<string>("TRADEWAYCODES"), AssociateNo2
                             , CorrespondNo, json4.Value<string>("PACKKIND"), json4.Value<string>("GOODSGW"), json4.Value<string>("GOODSNW"), json4.Value<string>("RECORDCODE")
                             , json_head2.Value<string>("IETYPE"), GetChk(json4.Value<string>("SPECIALRELATIONSHIP")), GetChk(json4.Value<string>("PRICEIMPACT")), GetChk(json4.Value<string>("PAYPOYALTIES")), json_head2.Value<string>("SUBMITUSERNAME")
-                            , json_head2.Value<string>("SUBMITUSERID"), json4.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json_user.Value<string>("CUSTOMERCODE")
-                            , json_user.Value<string>("CUSTOMERNAME"), json_head2.Value<string>("SUBMITTIME"), json_head2.Value<string>("CUSTOMAREACODE"), json4.Value<string>("DECLSTATUS")
-                            , json4.Value<string>("INSPSTATUS"),json_head1.Value<string>("DOCSERVICECODE")
+                            , json_head2.Value<string>("SUBMITUSERID"), json4.Value<string>("ASSOCIATETRADEWAY"), "002", "1", json4.Value<string>("CLEARUNIT")
+                            , json4.Value<string>("CLEARUNITNAME"), json_head2.Value<string>("SUBMITTIME"), json_head2.Value<string>("CUSTOMAREACODE"), json4.Value<string>("DECLSTATUS"), json4.Value<string>("INSPSTATUS")
+                            , json_head1.Value<string>("DOCSERVICECODE"), json4.Value<string>("CLEARREMARK"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
                          );
                     order_res = DBMgr.ExecuteNonQuery(sql);
                     ordercode = code4;
@@ -788,7 +797,9 @@ namespace MvcPlatform.Controllers
                                 , json4.Value<string>("PACKKIND"), json4.Value<string>("GOODSGW"), json4.Value<string>("GOODSNW"), json4.Value<string>("RECORDCODE"), json_head2.Value<string>("IETYPE")
                                 , GetChk(json4.Value<string>("SPECIALRELATIONSHIP")), GetChk(json4.Value<string>("PRICEIMPACT")), GetChk(json4.Value<string>("PAYPOYALTIES")), json4.Value<string>("STATUS"), json_head2.Value<string>("SUBMITTIME")
                                 , json_head2.Value<string>("SUBMITUSERNAME"), json_head2.Value<string>("SUBMITUSERID"), json4.Value<string>("ASSOCIATETRADEWAY"), "002", "1"
-                                , json_head2.Value<string>("CUSTOMAREACODE"), json_head1.Value<string>("DOCSERVICECODE"), json4.Value<string>("DECLSTATUS"), json4.Value<string>("INSPSTATUS")
+                                , json_head2.Value<string>("CUSTOMAREACODE"), json_head1.Value<string>("DOCSERVICECODE"), json4.Value<string>("DECLSTATUS"), json4.Value<string>("INSPSTATUS"), json4.Value<string>("CLEARREMARK")
+                                , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json4.Value<string>("CUSTOMERCODE"), json4.Value<string>("CUSTOMERNAME"), json4.Value<string>("CLEARUNIT")
+                                , json4.Value<string>("CLEARUNITNAME")
                              );
                     }
                     if (json4.Value<Int32>("STATUS") >= 15)  //当业务状态为订单已受理对空白字段的修改需要记录到字段修改记录表

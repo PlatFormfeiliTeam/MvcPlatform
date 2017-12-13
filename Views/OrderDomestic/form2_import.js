@@ -414,6 +414,86 @@
         value: 0,
         store: store_status3
     });
+
+    var field_CUSTOMERNAME3 = Ext.create('Ext.form.field.Hidden', { name: 'CUSTOMERNAME' });
+    var field_CLEARUNITNAME3 = Ext.create('Ext.form.field.Hidden', { name: 'CLEARUNITNAME' });
+
+    //委托单位
+    var store_wtdw3 = Ext.create('Ext.data.JsonStore', {
+        fields: ['CODE', 'NAME'],
+        data: common_data_wtdw
+    })
+    var combo_wtdw3 = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_wtdw3',
+        name: 'CUSTOMERCODE',
+        store: store_wtdw3,
+        hideTrigger: true,
+        fieldLabel: '委托单位',
+        displayField: 'NAME',
+        valueField: 'CODE',
+        triggerAction: 'all',
+        queryMode: 'local',
+        anyMatch: true,
+        listeners: {
+            focus: function (cb) {
+                if (!cb.getValue()) {
+                    cb.clearInvalid();
+                    cb.store.clearFilter();
+                    cb.expand();
+                }
+            },
+            change: function (combo, newValue, oldValue, eOpts) {
+                if (Ext.getCmp('combo_jsdw3').getValue() == "") {
+                    Ext.getCmp('combo_jsdw3').setValue(newValue);
+                }
+                field_CUSTOMERNAME3.setValue(combo.rawValue);
+            }
+        },
+        allowBlank: false,
+        blankText: '委托单位不能为空!'
+    });
+
+    //结算单位
+    var store_jsdw3 = Ext.create('Ext.data.JsonStore', {
+        fields: ['CODE', 'NAME'],
+        data: common_data_wtdw
+    })
+    var combo_jsdw3 = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_jsdw3',
+        name: 'CLEARUNIT',
+        store: store_jsdw3,
+        hideTrigger: true,
+        fieldLabel: '结算单位',
+        displayField: 'NAME',
+        valueField: 'CODE',
+        triggerAction: 'all',
+        queryMode: 'local',
+        anyMatch: true,
+        listeners: {
+            focus: function (cb) {
+                if (!cb.getValue()) {
+                    cb.clearInvalid();
+                    cb.store.clearFilter();
+                    cb.expand();
+                }
+            },
+            change: function (combo, newValue, oldValue, eOpts) {
+                field_CLEARUNITNAME3.setValue(combo.rawValue);
+            }
+        },
+        allowBlank: false,
+        blankText: '结算单位不能为空!'
+    });
+
+    //结算备注
+    var field_CLEARREMARK3 = Ext.create('Ext.form.field.Text', {
+        id: 'field_CLEARREMARK3',
+        tabIndex: 23,
+        fieldLabel: '结算备注',
+        name: 'CLEARREMARK'
+    });
+
+
     formpanelin2 = Ext.create('Ext.form.Panel', {
         border: 0,
         fieldDefaults: {
@@ -431,8 +511,8 @@
                 { layout: 'column', height: 42, border: 0, items: [field_CODE3, combo_ENTRUSTTYPENAME3, field_CUSNO3, field_jydw3, combo_DECLWAY3] },
                 { layout: 'column', height: 42, border: 0, items: [field_quanpackage3, field_weight3, field_contractno3, field_myfs3, zcbah_container3] },
                 { layout: 'column', height: 42, border: 0, items: [chk_CHKLAWCONDITION3, field_CLEARANCENO3, field_ASSOCIATEPEDECLNO3, cont_bgsbdw3, cont_bjsbdw3] },
-                { layout: 'column', height: 42, border: 0, items: [field_ORDERREQUEST3, field_STATUS3] },
-                field_BUSIUNITNAME3
+                { layout: 'column', height: 42, border: 0, items: [field_ORDERREQUEST3, field_STATUS3, combo_wtdw3, combo_jsdw3, field_CLEARREMARK3] },
+                field_BUSIUNITNAME3, field_CUSTOMERNAME3, field_CLEARUNITNAME3
         ]
     })
 }
