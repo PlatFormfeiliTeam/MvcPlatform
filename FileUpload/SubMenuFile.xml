@@ -318,5 +318,73 @@
     <menu>/RecordInfor/VerificationList</menu>
     <submenu>/RecordInfor/ImExcel_Verification</submenu>
   </rootmenu>
-  
+
+  <!-- 业务中心 -->
+  <rootmenu>
+    <menu>/CustomerOrder/ListOrder_Index_Cus?busitypeid=11</menu>
+    <submenu>/Common/OrderView?menuxml=cus_airin</submenu>
+    <submenu>/Common/FileConsult_C?menuxml=airin</submenu>
+    <submenu>/EnterpriseOrder/GoodsTrack?menuxml=cus_airin</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/CustomerOrder/ListOrder_Index_Cus?busitypeid=10</menu>
+    <submenu>/Common/OrderView?menuxml=cus_airout</submenu>
+    <submenu>/Common/FileConsult_C?menuxml=airout</submenu>
+    <submenu>/EnterpriseOrder/GoodsTrack?menuxml=cus_airout</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/CustomerOrder/ListOrder_Index_Cus?busitypeid=31</menu>
+    <submenu>/Common/OrderView?menuxml=cus_landin</submenu>
+    <submenu>/Common/FileConsult_C?menuxml=landin</submenu>
+    <submenu>/EnterpriseOrder/GoodsTrack?menuxml=cus_landin</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/CustomerOrder/ListOrder_Index_Cus?busitypeid=30</menu>
+    <submenu>/Common/OrderView?menuxml=cus_landout</submenu>
+    <submenu>/Common/FileConsult_C?menuxml=landout</submenu>
+    <submenu>/EnterpriseOrder/GoodsTrack?menuxml=cus_landout</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/CustomerOrder/ListOrder_Index_Cus?busitypeid=21</menu>
+    <submenu>/Common/OrderView?menuxml=cus_seain</submenu>
+    <submenu>/Common/FileConsult_C?menuxml=seain</submenu>
+    <submenu>/EnterpriseOrder/GoodsTrack?menuxml=cus_seain</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/CustomerOrder/ListOrder_Index_Cus?busitypeid=20</menu>
+    <submenu>/Common/OrderView?menuxml=cus_seaout</submenu>
+    <submenu>/Common/FileConsult_E?menuxml=seaout</submenu>
+    <submenu>/EnterpriseOrder/GoodsTrack?menuxml=cus_seaout</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/CustomerOrder/ListOrder_Index_Cus?busitypeid=40-41</menu>
+    <submenu>/OrderDomestic/OrderView_C?menuxml=cus_domestic</submenu>
+    <submenu>/Common/FileConsult_C?menuxml=domestic</submenu>
+    <submenu>/EnterpriseOrder/GoodsTrack?menuxml=cus_domestic</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/CustomerOrder/ListOrder_Index_Cus?busitypeid=50-51</menu>
+    <submenu>/Common/OrderView?menuxml=cus_special</submenu>
+    <submenu>/Common/FileConsult_C?menuxml=special</submenu>
+    <submenu>/EnterpriseOrder/GoodsTrack?menuxml=cus_special</submenu>
+  </rootmenu>
+
+  <!-- 通关中心>进出境业务-->
+  <rootmenu>
+    <menu>/Common/DeclareList_Customer</menu>
+    <submenu>/Common/FileConsult_C?menuxml=dec_no_domestic</submenu>
+    <submenu>/Common/ClearanceStatus?menuxml=cus_dec_cle_no_domestic</submenu>
+    <submenu>/Common/FileConsult_Declare?menuxml=cus_dec_cle_no_domestic</submenu>
+    <!-- ClearanceStatus里的报关单打印-->
+  </rootmenu>
+
+  <!-- 通关中心>国内业务-->
+  <rootmenu>
+    <menu>/Common/DeclareList_Customer_Domestic</menu>
+    <submenu>/Common/FileConsult_C?menuxml=dec_domestic</submenu>
+    <submenu>/Common/ClearanceStatus?menuxml=cus_dec_cle_domestic</submenu>
+    <submenu>/Common/FileConsult_Declare?menuxml=cus_dec_cle_domestic</submenu>
+    <!-- ClearanceStatus里的报关单打印-->
+  </rootmenu>
+
 </rootmenulist>

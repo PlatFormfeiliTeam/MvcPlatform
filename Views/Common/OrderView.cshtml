@@ -124,13 +124,20 @@
                         if (role == "enterprise") {
                             tab_items = [
                                         { title: '委托信息', border: 0, items: [formpanel, panel_declaration, panel_inspect] },
-                                        { title: '随附文件', contentEl: 'fileIframe' } ];
+                                        { title: '随附文件', contentEl: 'fileIframe' }
+                                        ];
+                        } else if (role == "customer") {
+                            tab_items = [
+                                        { title: '委托信息', border: 0, items: [formpanel, panel_declaration, panel_inspect] },
+                                        { title: '随附文件', contentEl: 'fileIframe' }
+                                        ];
+
                         } else {
                             tab_items = [
                                         { title: '委托信息', border: 0, items: [formpanel, panel_declaration, panel_inspect] },
                                         { title: '订单跟踪', contentEl: 'trackIframe' },
-                                        { title: '随附文件', contentEl: 'fileIframe' }];
-
+                                        { title: '随附文件', contentEl: 'fileIframe' }
+                                        ];
                         }
                         
 
@@ -169,6 +176,8 @@
                                     if (newCard.title == "随附文件") {
                                         if (role == "enterprise") {
                                             Ext.getDom("fileIframe").src = "/Common/FileConsult_E?menuxml=" + menuxml + "&ORDERCODE=" + ordercode + "&BUSITYPE=" + busitypeid;
+                                        } else if (role == "customer") {
+                                            Ext.getDom("fileIframe").src = "/Common/FileConsult_C?menuxml=" + menuxml + "&ORDERCODE=" + ordercode + "&BUSITYPE=" + busitypeid;
                                         } else {
                                             Ext.getDom("fileIframe").src = "/Common/FileConsult?menuxml=" + menuxml + "&ORDERCODE=" + ordercode + "&BUSITYPE=" + busitypeid;
                                         }

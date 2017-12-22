@@ -72,6 +72,10 @@ namespace MvcPlatform.Controllers
         {
             return View();
         }
+        public ActionResult FileConsult_C()//文件调阅
+        {
+            return View();
+        }
         public ActionResult FileConsult_Declare()//文件调阅
         {
             return View();
@@ -147,6 +151,19 @@ namespace MvcPlatform.Controllers
         }
         public ActionResult ClearanceStatus()//通关管理>>通关状态查询
         {
+            return View();
+        }
+
+        public ActionResult DeclareList_Customer()
+        {
+            ViewBag.navigator = "通关中心>>进出境业务";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
+        public ActionResult DeclareList_Customer_Domestic()
+        {
+            ViewBag.navigator = "通关中心>>国内业务";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
 
@@ -1108,15 +1125,21 @@ namespace MvcPlatform.Controllers
                     {
                         switch (entrusttypeid)
                         {
-                            //case "01":
-                            //    result += "[{id:'declare',typename:'报关'}]";
-                            //    break;
-                            //case "02":
-                            //    result += "[{id:'declare',typename:'报检'}]";
-                            //    break;
-                            //case "03":
-                            //    result += "[{id:'declare',typename:'报关'},{id:'inspect',typename:'报检'}]";
-                            //    break;
+                            case "01":
+                                result += "[{id:'order',typename:'委托',leaf:false},{id:'declare',typename:'报关'}]";
+                                break;
+                            case "02":
+                                result += "[{id:'order',typename:'委托',leaf:false}]";
+                                break;
+                            case "03":
+                                result += "[{id:'order',typename:'委托',leaf:false},{id:'declare',typename:'报关'}]";
+                                break;
+                        }
+                    }
+                    else if (role == "customer")
+                    {
+                        switch (entrusttypeid)
+                        {
                             case "01":
                                 result += "[{id:'order',typename:'委托',leaf:false},{id:'declare',typename:'报关'}]";
                                 break;
@@ -1191,6 +1214,17 @@ namespace MvcPlatform.Controllers
                     if (role == "enterprise")
                     {
                        if (i != dt.Rows.Count - 1)
+                        {
+                            result += "{id:'44_" + (i + 1) + "',typename:'订单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'},";
+                        }
+                        else
+                        {
+                            result += "{id:'44_" + (i + 1) + "',typename:'订单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'}";
+                        }
+                    }
+                    else if (role == "customer")
+                    {
+                        if (i != dt.Rows.Count - 1)
                         {
                             result += "{id:'44_" + (i + 1) + "',typename:'订单文件_" + (i + 1) + "',fileid:'" + dr["ID"] + "',leaf:true,url:'" + AdminUrl + "/file/" + dr["FILENAME"] + "'},";
                         }
@@ -2179,6 +2213,10 @@ namespace MvcPlatform.Controllers
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
 
             if (role == "enterprise")
+            {
+
+            }
+            else if (role == "customer")
             {
 
             }
@@ -4512,6 +4550,670 @@ namespace MvcPlatform.Controllers
      
         #endregion
 
+        #region 委托单位 通关中心
+        public string LoadDeclarationList_C()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            bool socialcreditno = Extension.Check_Customer(json_user.Value<string>("CUSTOMERID"));
+            string sql = QueryConditionDecl_C();
 
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            var json = JsonConvert.SerializeObject(dt, iso);
+            return "{rows:" + json + ",total:" + totalProperty + ",socialcreditno:\"" + socialcreditno.ToString().ToLower() + "\"}";
+        }
+       
+        public string QueryConditionDecl_C()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            string where = "";
+            if (!string.IsNullOrEmpty(Request["VALUE1"]))//判断查询条件1是否有值
+            {
+                switch (Request["CONDITION1"])
+                {
+                    case "REPUNITCODE"://申报单位
+                        where += " and lda.REPUNITCODE='" + Request["VALUE1"] + "' ";
+                        break;
+                    case "PORTCODE"://进出口岸
+                        where += " and lda.PORTCODE='" + Request["VALUE1"] + "' ";
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(Request["VALUE5"]))//判断查询条件1是否有值
+            {
+                switch (Request["CONDITION5"])
+                {
+                    case "REPUNITCODE"://申报单位
+                        where += " and lda.REPUNITCODE='" + Request["VALUE5"] + "' ";
+                        break;
+                    case "PORTCODE"://进出口岸
+                        where += " and lda.PORTCODE='" + Request["VALUE5"] + "' ";
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(Request["VALUE2"]))//判断查询条件2是否有值
+            {
+                switch (Request["CONDITION2"])
+                {
+                    case "REPNO"://对应号
+                        where += " and instr(ort.REPNO,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "BLNO"://提运单号
+                        where += " and instr(lda.BLNO,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "ORDERCODE"://订单编号
+                        where += " and instr(det.ORDERCODE,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "TRANSNAME"://运输工具名称
+                        where += " and (instr(lda.transname,'" + Request["VALUE2"] + "')>0 or instr(lda.voyageno,'" + Request["VALUE2"] + "')>0) ";
+                        break;
+                    case "DECLNO"://报关单号
+                        where += " and instr(lda.DECLARATIONCODE,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "CONTRACTNO"://合同协议号
+                        where += " and instr(lda.CONTRACTNO,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "CONTRACTNOORDER"://合同发票号
+                        where += " and instr(ort.CONTRACTNO,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(Request["VALUE6"]))//判断查询条件2是否有值
+            {
+                switch (Request["CONDITION6"])
+                {
+                    case "REPNO"://对应号
+                        where += " and instr(ort.REPNO,'" + Request["VALUE6"] + "')>0 ";
+                        break;
+                    case "BLNO"://提运单号
+                        where += " and instr(lda.BLNO,'" + Request["VALUE6"] + "')>0 ";
+                        break;
+                    case "ORDERCODE"://订单编号
+                        where += " and instr(det.ORDERCODE,'" + Request["VALUE6"] + "')>0 ";
+                        break;
+                    case "TRANSNAME"://运输工具名称
+                        where += " and (instr(lda.transname,'" + Request["VALUE6"] + "')>0 or instr(lda.voyageno,'" + Request["VALUE6"] + "')>0) ";
+                        break;
+                    case "DECLNO"://报关单号
+                        where += " and instr(lda.DECLARATIONCODE,'" + Request["VALUE6"] + "')>0 ";
+                        break;
+                    case "CONTRACTNO"://合同协议号
+                        where += " and instr(lda.CONTRACTNO,'" + Request["VALUE6"] + "')>0 ";
+                        break;
+                    case "CONTRACTNOORDER"://合同发票号
+                        where += " and instr(ort.CONTRACTNO,'" + Request["VALUE6"] + "')>0 ";
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(Request["VALUE3"]))//判断查询条件1是否有值
+            {
+                switch (Request["CONDITION3"])
+                {
+                    case "BUSITYPE"://业务类型
+                        where += " and ort.BUSITYPE='" + Request["VALUE3"] + "' ";
+                        break;
+                    case "HGZT"://海关状态
+                        if (Request["VALUE3"] == "已结关") { where += " and det.CUSTOMSSTATUS='已结关' "; }
+                        if (Request["VALUE3"] == "未结关") { where += " and det.CUSTOMSSTATUS!='已结关' and det.CUSTOMSSTATUS!='删单或异常' "; }
+                        break;
+                    case "SGD"://删改单
+                        where += " and det.modifyflag='" + Request["VALUE3"] + "' ";
+                        break;
+                    case "VERSTATUS"://比对状态
+                        if (Request["VALUE3"] == "未比对") { where += " and lv.status is null"; }
+                        else { where += " and lv.status='" + Request["VALUE3"] + "' "; }
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(Request["VALUE7"]))//判断查询条件1是否有值
+            {
+                switch (Request["CONDITION7"])
+                {
+                    case "BUSITYPE"://业务类型
+                        where += " and ort.BUSITYPE='" + Request["VALUE7"] + "' ";
+                        break;
+                    case "HGZT"://海关状态
+                        if (Request["VALUE7"] == "已结关") { where += " and det.CUSTOMSSTATUS='已结关' "; }
+                        if (Request["VALUE7"] == "未结关") { where += " and det.CUSTOMSSTATUS!='已结关' and det.CUSTOMSSTATUS!='删单或异常' "; }
+                        break;
+                    case "SGD"://删改单
+                        where += " and det.modifyflag='" + Request["VALUE7"] + "' ";
+                        break;
+                    case "VERSTATUS"://比对状态
+                        if (Request["VALUE7"] == "未比对") { where += " and lv.status is null"; }
+                        else { where += " and lv.status='" + Request["VALUE7"] + "' "; }
+                        break;
+                }
+            }
+            switch (Request["CONDITION4"])
+            {
+                case "SUBMITTIME"://订单委托日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and ort.SUBMITTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and ort.SUBMITTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "REPTIME"://申报日期
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and lda.REPTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and lda.REPTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
+                    }
+                    break;
+            }
+            switch (Request["CONDITION8"])
+            {
+                case "SUBMITTIME"://订单委托日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE8_1"]))//如果开始时间有值
+                    {
+                        where += " and ort.SUBMITTIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE8_2"]))//如果结束时间有值
+                    {
+                        where += " and ort.SUBMITTIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "REPTIME"://申报日期
+                    if (!string.IsNullOrEmpty(Request["VALUE8_1"]))//如果开始时间有值
+                    {
+                        where += " and lda.REPTIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE8_2"]))//如果结束时间有值
+                    {
+                        where += " and lda.REPTIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
+                    }
+                    break;
+            }
+            where += @" and ort.customercode ='" + json_user.Value<string>("CUSTOMERCODE") + "' and ort.BUSITYPE not in('40','41')";
+
+            string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.SHEETNUM,det.modifyflag,
+                              lda.declarationcode,to_char(lda.reptime,'yyyy-mm-dd') reptime,lda.contractno,lda.goodsnum,lda.goodsnw,lda.goodsgw,lda.blno,
+                              lda.transname,lda.voyageno,lda.busiunitcode,lda.busiunitname,lda.portcode,
+                              lda.trademethod,lda.declkind DECLWAY,lda.declkind DECLWAYNAME,lda.REPUNITNAME,
+                              ort.BUSITYPE,ort.CONTRACTNO CONTRACTNOORDER,ort.REPWAYID,ort.REPWAYID REPWAYNAME,ort.CUSNO,
+                              ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.customercode,ort.CUSTOMERNAME,ort.CREATETIME, 
+                              ort.REPNO ,lv.status VERSTATUS,lv.NOTE    
+                           from list_declaration det 
+                                left join list_order ort on det.ordercode = ort.code 
+								left join list_declaration_after lda on det.code=lda.code and lda.csid=1
+                                left join (select ordercode from list_declaration ld where ld.isinvalid=0 and ld.STATUS!=130 and ld.STATUS!=110) a on det.ordercode=a.ordercode
+                                /* left join (
+                                      select ASSOCIATENO from list_order l inner join list_declaration i on l.code=i.ordercode 
+                                      where l.ASSOCIATENO is not null and l.isinvalid=0 and i.isinvalid=0 and (i.STATUS!=130 and i.STATUS!=110)    
+									   ) b on ort.ASSOCIATENO=b.ASSOCIATENO */ 
+                                left join list_verification lv on lda.declarationcode=lv.declarationcode 
+                           where (det.STATUS=130 or det.STATUS=110) and det.isinvalid=0 and ort.isinvalid=0 " + where +
+                        @"  and a.ordercode is null 
+                            /*and b.ASSOCIATENO is null*/ ";
+
+            return sql;
+
+        }
+
+        public string LoadDeclarationList_C_Domestic()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            bool socialcreditno = Extension.Check_Customer(json_user.Value<string>("CUSTOMERID"));
+            string sql = QueryConditionDecl_C_Domestic();
+
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "CREATETIME", "desc"));
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            var json = JsonConvert.SerializeObject(dt, iso);
+            return "{rows:" + json + ",total:" + totalProperty + ",socialcreditno:\"" + socialcreditno.ToString().ToLower() + "\"}";
+        }        
+
+        public string QueryConditionDecl_C_Domestic()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            string where = "";
+            if (!string.IsNullOrEmpty(Request["VALUE1"]))//判断查询条件1是否有值
+            {
+                switch (Request["CONDITION1"])
+                {
+                    case "REPUNITCODE"://申报单位
+                        where += " and lda.REPUNITCODE='" + Request["VALUE1"] + "' ";
+                        break;
+                    case "PORTCODE"://进出口岸
+                        where += " and lda.PORTCODE='" + Request["VALUE1"] + "' ";
+                        break;
+                    case "BUSIUNITCODE_ASS"://关联企业
+                        where += " and c.busiunitcode='" + Request["VALUE1"] + "' ";
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(Request["VALUE5"]))//判断查询条件1是否有值
+            {
+                switch (Request["CONDITION5"])
+                {
+                    case "REPUNITCODE"://申报单位
+                        where += " and lda.REPUNITCODE='" + Request["VALUE5"] + "' ";
+                        break;
+                    case "PORTCODE"://进出口岸
+                        where += " and lda.PORTCODE='" + Request["VALUE5"] + "' ";
+                        break;
+                    case "BUSIUNITCODE_ASS"://关联企业
+                        where += " and c.busiunitcode='" + Request["VALUE5"] + "' ";
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(Request["VALUE2"]))//判断查询条件2是否有值
+            {
+                switch (Request["CONDITION2"])
+                {
+                    case "REPNO"://对应号
+                        where += " and instr(ort.REPNO,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "BLNO"://提运单号
+                        where += " and instr(lda.BLNO,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "ORDERCODE"://订单编号
+                        where += " and instr(det.ORDERCODE,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "DECLCARNO"://报关车号
+                        where += " and instr(ort.DECLCARNO,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "TRANSNAME"://运输工具名称
+                        where += " and (instr(lda.transname,'" + Request["VALUE2"] + "')>0 or instr(lda.voyageno,'" + Request["VALUE2"] + "')>0) ";
+                        break;
+                    case "DECLNO"://报关单号
+                        where += " and instr(lda.DECLARATIONCODE,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "CONTRACTNO"://合同协议号
+                        where += " and instr(lda.CONTRACTNO,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "CONTRACTNOORDER"://合同发票号
+                        where += " and instr(ort.CONTRACTNO,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(Request["VALUE6"]))//判断查询条件2是否有值
+            {
+                switch (Request["CONDITION6"])
+                {
+                    case "REPNO"://对应号
+                        where += " and instr(ort.REPNO,'" + Request["VALUE6"] + "')>0 ";
+                        break;
+                    case "BLNO"://提运单号
+                        where += " and instr(lda.BLNO,'" + Request["VALUE6"] + "')>0 ";
+                        break;
+                    case "ORDERCODE"://订单编号
+                        where += " and instr(det.ORDERCODE,'" + Request["VALUE6"] + "')>0 ";
+                        break;
+                    case "DECLCARNO"://报关车号
+                        where += " and instr(ort.DECLCARNO,'" + Request["VALUE6"] + "')>0 ";
+                        break;
+                    case "TRANSNAME"://运输工具名称
+                        where += " and (instr(lda.transname,'" + Request["VALUE6"] + "')>0 or instr(lda.voyageno,'" + Request["VALUE6"] + "')>0) ";
+                        break;
+                    case "DECLNO"://报关单号
+                        where += " and instr(lda.DECLARATIONCODE,'" + Request["VALUE6"] + "')>0 ";
+                        break;
+                    case "CONTRACTNO"://合同协议号
+                        where += " and instr(lda.CONTRACTNO,'" + Request["VALUE6"] + "')>0 ";
+                        break;
+                    case "CONTRACTNOORDER"://合同发票号
+                        where += " and instr(ort.CONTRACTNO,'" + Request["VALUE6"] + "')>0 ";
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(Request["VALUE3"]))//判断查询条件1是否有值
+            {
+                switch (Request["CONDITION3"])
+                {
+                    case "BUSITYPE"://业务类型
+                        where += " and ort.BUSITYPE='" + Request["VALUE3"] + "' ";
+                        break;
+                    case "HGZT"://海关状态
+                        if (Request["VALUE3"] == "已结关") { where += " and det.CUSTOMSSTATUS='已结关' "; }
+                        if (Request["VALUE3"] == "未结关") { where += " and det.CUSTOMSSTATUS!='已结关' and det.CUSTOMSSTATUS!='删单或异常' "; }
+                        break;
+                    case "SGD"://删改单
+                        where += " and det.modifyflag='" + Request["VALUE3"] + "' ";
+                        break;
+                    case "VERSTATUS"://比对状态
+                        if (Request["VALUE3"] == "未比对") { where += " and lv.status is null"; }
+                        else { where += " and lv.status='" + Request["VALUE3"] + "' "; }
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(Request["VALUE7"]))//判断查询条件1是否有值
+            {
+                switch (Request["CONDITION7"])
+                {
+                    case "BUSITYPE"://业务类型
+                        where += " and ort.BUSITYPE='" + Request["VALUE7"] + "' ";
+                        break;
+                    case "HGZT"://海关状态
+                        if (Request["VALUE7"] == "已结关") { where += " and det.CUSTOMSSTATUS='已结关' "; }
+                        if (Request["VALUE7"] == "未结关") { where += " and det.CUSTOMSSTATUS!='已结关' and det.CUSTOMSSTATUS!='删单或异常' "; }
+                        break;
+                    case "SGD"://删改单
+                        where += " and det.modifyflag='" + Request["VALUE7"] + "' ";
+                        break;
+                    case "VERSTATUS"://比对状态
+                        if (Request["VALUE7"] == "未比对") { where += " and lv.status is null"; }
+                        else { where += " and lv.status='" + Request["VALUE7"] + "' "; }
+                        break;
+                }
+            }
+            switch (Request["CONDITION4"])
+            {
+                case "SUBMITTIME"://订单委托日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and ort.SUBMITTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and ort.SUBMITTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "REPTIME"://申报日期
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and lda.REPTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and lda.REPTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
+                    }
+                    break;
+            }
+            switch (Request["CONDITION8"])
+            {
+                case "SUBMITTIME"://订单委托日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE8_1"]))//如果开始时间有值
+                    {
+                        where += " and ort.SUBMITTIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE8_2"]))//如果结束时间有值
+                    {
+                        where += " and ort.SUBMITTIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "REPTIME"://申报日期
+                    if (!string.IsNullOrEmpty(Request["VALUE8_1"]))//如果开始时间有值
+                    {
+                        where += " and lda.REPTIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE8_2"]))//如果结束时间有值
+                    {
+                        where += " and lda.REPTIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
+                    }
+                    break;
+            }
+            where += @" and ort.customercode ='" + json_user.Value<string>("CUSTOMERCODE") + "' and ort.BUSITYPE in('40','41')";
+
+            string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.SHEETNUM,det.modifyflag,
+                              lda.declarationcode,to_char(lda.reptime,'yyyy-mm-dd') reptime,lda.contractno,lda.goodsnum,lda.goodsnw,lda.goodsgw,lda.blno,
+                              lda.transname,lda.voyageno,lda.busiunitcode,lda.busiunitname,lda.portcode,
+                              lda.trademethod,lda.declkind DECLWAY,lda.declkind DECLWAYNAME,lda.REPUNITNAME,
+                              ort.BUSITYPE,ort.CONTRACTNO CONTRACTNOORDER,ort.REPWAYID,ort.REPWAYID REPWAYNAME,ort.CUSNO,
+                              ort.IETYPE,ort.ASSOCIATENO,ort.CORRESPONDNO,ort.customercode,ort.CUSTOMERNAME,ort.CREATETIME, 
+                              ort.REPNO,c.code ordercode_ass,c.busiunitcode busiunitcode_ass,c.busiunitname busiunitname_ass,    
+                              lv.status VERSTATUS,lv.NOTE       
+                           from list_declaration det 
+                                left join list_order ort on det.ordercode = ort.code 
+								left join list_declaration_after lda on det.code=lda.code and lda.csid=1
+                                left join (select ordercode from list_declaration ld where ld.isinvalid=0 and ld.STATUS!=130 and ld.STATUS!=110) a on det.ordercode=a.ordercode
+                                left join (
+                                      select ASSOCIATENO from list_order l inner join list_declaration i on l.code=i.ordercode 
+                                      where l.ASSOCIATENO is not null and l.isinvalid=0 and i.isinvalid=0 and (i.STATUS!=130 and i.STATUS!=110)    
+									   ) b on ort.ASSOCIATENO=b.ASSOCIATENO 
+                                left join (select ort2.ASSOCIATENO,ort2.code,ldaf.busiunitcode,ldaf.busiunitname
+                                            from list_order ort2 
+                                                    left join list_declaration ldc on ort2.code=ldc.ordercode
+                                                    left join list_declaration_after ldaf on ldc.code=ldaf.code and ldaf.csid=1
+                                            where ort2.isinvalid=0 and ldc.isinvalid=0
+                                            )c on ort.ASSOCIATENO = c.ASSOCIATENO and ort.code<>c.code 
+                                left join list_verification lv on lda.declarationcode=lv.declarationcode 
+                           where (det.STATUS=130 or det.STATUS=110) and det.isinvalid=0 and ort.isinvalid=0 " + where +
+                        @"  and a.ordercode is null 
+                            and b.ASSOCIATENO is null ";
+            return sql;
+
+        }
+
+        public string ExportDeclList_C()
+        {
+            string common_data_busitype_Not_Domestic = Request["common_data_busitype_Not_Domestic"]; string modifyflag_data = Request["modifyflag_data"];
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+            string sql = QueryConditionDecl_C();
+            sql = sql + " order by CREATETIME desc";
+
+            DataTable dt_count = DBMgr.GetDataTable("select count(1) from (" + sql + ") a");
+            int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
+            if (Convert.ToInt32(dt_count.Rows[0][0]) > WebDownCount)
+            {
+                return "{success:false,WebDownCount:" + WebDownCount + "}";
+            }
+
+            DataTable dt = DBMgr.GetDataTable(sql);
+
+            //创建Excel文件的对象
+            NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();
+
+            //添加一个导出成功sheet
+            NPOI.SS.UserModel.ISheet sheet_S = book.CreateSheet("报关单信息");
+
+            //给sheet1添加第一行的头部标题
+            NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
+            row1.CreateCell(0).SetCellValue("海关状态"); row1.CreateCell(1).SetCellValue("报关单号"); row1.CreateCell(2).SetCellValue("合同发票号"); row1.CreateCell(3).SetCellValue("申报单位");
+            row1.CreateCell(4).SetCellValue("申报日期"); row1.CreateCell(5).SetCellValue("运输工具名称"); row1.CreateCell(6).SetCellValue("业务类型"); row1.CreateCell(7).SetCellValue("出口口岸");
+            row1.CreateCell(8).SetCellValue("提运单号"); row1.CreateCell(9).SetCellValue("申报方式"); row1.CreateCell(10).SetCellValue("报关方式"); row1.CreateCell(11).SetCellValue("贸易方式");
+            row1.CreateCell(12).SetCellValue("合同协议号"); row1.CreateCell(13).SetCellValue("件数"); row1.CreateCell(14).SetCellValue("重量"); row1.CreateCell(15).SetCellValue("张数");
+            row1.CreateCell(16).SetCellValue("订单编号"); row1.CreateCell(17).SetCellValue("客户编号"); row1.CreateCell(18).SetCellValue("进/出"); row1.CreateCell(19).SetCellValue("两单关联号");
+            row1.CreateCell(20).SetCellValue("多单关联号"); row1.CreateCell(21).SetCellValue("删改单"); row1.CreateCell(22).SetCellValue("比对状态"); row1.CreateCell(23).SetCellValue("未通过原因");
+
+
+
+            //将数据逐步写入sheet_S各个行
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["CUSTOMSSTATUS"].ToString());
+                rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["DECLARATIONCODE"].ToString());
+                rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["CONTRACTNOORDER"].ToString());
+                rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["REPUNITNAME"].ToString());
+                rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["REPTIME"].ToString());
+                if (dt.Rows[i]["TRANSNAME"].ToString() == "" && dt.Rows[i]["VOYAGENO"].ToString() == "")
+                {
+                    rowtemp.CreateCell(5).SetCellValue("");
+
+                }
+                if (dt.Rows[i]["TRANSNAME"].ToString() == "" && dt.Rows[i]["VOYAGENO"].ToString() != "")
+                {
+                    rowtemp.CreateCell(5).SetCellValue("/" + dt.Rows[i]["VOYAGENO"].ToString());
+
+                }
+                if (dt.Rows[i]["TRANSNAME"].ToString() != "" && dt.Rows[i]["VOYAGENO"].ToString() == "")
+                {
+                    rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["TRANSNAME"].ToString());
+
+                }
+                if (dt.Rows[i]["TRANSNAME"].ToString() != "" && dt.Rows[i]["VOYAGENO"].ToString() != "")
+                {
+                    rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["TRANSNAME"].ToString() + "/" + dt.Rows[i]["VOYAGENO"].ToString());
+
+                }
+                rowtemp.CreateCell(6).SetCellValue(getStatusName(dt.Rows[i]["BUSITYPE"].ToString(), common_data_busitype_Not_Domestic));
+                rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
+                rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["BLNO"].ToString());
+                rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());
+                rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["DECLWAYNAME"].ToString());//REPWAYID
+                rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["TRADEMETHOD"].ToString());
+                rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
+                rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["GOODSGW"].ToString());
+                rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
+                rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
+                rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+                rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["IETYPE"].ToString());
+                rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["ASSOCIATENO"].ToString());
+                rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["CORRESPONDNO"].ToString());
+                rowtemp.CreateCell(21).SetCellValue(getStatusName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
+                rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["VERSTATUS"].ToString());
+                rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["NOTE"].ToString());
+            }
+
+
+            // 写入到客户端 
+            //System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            //book.Write(ms);
+            //ms.Seek(0, SeekOrigin.Begin);
+            //return File(ms, "application/vnd.ms-excel", "报关单文件.xls");
+
+            return Extension.getPathname("报关单文件.xls", book);
+        }
+
+        public string ExportDeclList_C_Domestic()
+        {
+            string common_data_busitype_Domestic = Request["common_data_busitype_Domestic"]; string modifyflag_data = Request["modifyflag_data"];
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+            string sql = QueryConditionDecl_C_Domestic();
+            sql = sql + " order by CREATETIME desc";
+
+            DataTable dt_count = DBMgr.GetDataTable("select count(1) from (" + sql + ") a");
+            int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
+            if (Convert.ToInt32(dt_count.Rows[0][0]) > WebDownCount)
+            {
+                return "{success:false,WebDownCount:" + WebDownCount + "}";
+            }
+
+            DataTable dt = DBMgr.GetDataTable(sql);
+
+            //创建Excel文件的对象
+            NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();
+
+            //添加一个导出成功sheet
+            NPOI.SS.UserModel.ISheet sheet_S = book.CreateSheet("报关单信息");
+
+            //给sheet1添加第一行的头部标题
+            NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
+            row1.CreateCell(0).SetCellValue("海关状态"); row1.CreateCell(1).SetCellValue("报关单号"); row1.CreateCell(2).SetCellValue("合同发票号"); row1.CreateCell(3).SetCellValue("申报单位");
+            row1.CreateCell(4).SetCellValue("申报日期"); row1.CreateCell(5).SetCellValue("运输工具名称"); row1.CreateCell(6).SetCellValue("业务类型"); row1.CreateCell(7).SetCellValue("出口口岸");
+            row1.CreateCell(8).SetCellValue("提运单号"); row1.CreateCell(9).SetCellValue("申报方式"); row1.CreateCell(10).SetCellValue("报关方式"); row1.CreateCell(11).SetCellValue("贸易方式");
+            row1.CreateCell(12).SetCellValue("合同协议号"); row1.CreateCell(13).SetCellValue("件数"); row1.CreateCell(14).SetCellValue("重量"); row1.CreateCell(15).SetCellValue("张数");
+            row1.CreateCell(16).SetCellValue("订单编号"); row1.CreateCell(17).SetCellValue("客户编号"); row1.CreateCell(18).SetCellValue("进/出"); row1.CreateCell(19).SetCellValue("两单关联号");
+            row1.CreateCell(20).SetCellValue("多单关联号"); row1.CreateCell(21).SetCellValue("删改单"); row1.CreateCell(22).SetCellValue("关联企业"); row1.CreateCell(23).SetCellValue("比对状态");
+            row1.CreateCell(24).SetCellValue("未通过原因");
+
+
+
+            //将数据逐步写入sheet_S各个行
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["CUSTOMSSTATUS"].ToString());
+                rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["DECLARATIONCODE"].ToString());
+                rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["CONTRACTNOORDER"].ToString());
+                rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["REPUNITNAME"].ToString());
+                rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["REPTIME"].ToString());
+                if (dt.Rows[i]["TRANSNAME"].ToString() == "" && dt.Rows[i]["VOYAGENO"].ToString() == "")
+                {
+                    rowtemp.CreateCell(5).SetCellValue("");
+
+                }
+                if (dt.Rows[i]["TRANSNAME"].ToString() == "" && dt.Rows[i]["VOYAGENO"].ToString() != "")
+                {
+                    rowtemp.CreateCell(5).SetCellValue("/" + dt.Rows[i]["VOYAGENO"].ToString());
+
+                }
+                if (dt.Rows[i]["TRANSNAME"].ToString() != "" && dt.Rows[i]["VOYAGENO"].ToString() == "")
+                {
+                    rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["TRANSNAME"].ToString());
+
+                }
+                if (dt.Rows[i]["TRANSNAME"].ToString() != "" && dt.Rows[i]["VOYAGENO"].ToString() != "")
+                {
+                    rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["TRANSNAME"].ToString() + "/" + dt.Rows[i]["VOYAGENO"].ToString());
+
+                }
+                rowtemp.CreateCell(6).SetCellValue(getStatusName(dt.Rows[i]["BUSITYPE"].ToString(), common_data_busitype_Domestic));
+                rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
+                rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["BLNO"].ToString());
+                rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["REPWAYNAME"].ToString());
+                rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["DECLWAYNAME"].ToString());//REPWAYID
+                rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["TRADEMETHOD"].ToString());
+                rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
+                rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["GOODSNUM"].ToString());
+                rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["GOODSGW"].ToString());
+                rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SHEETNUM"].ToString());
+                rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
+                rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+                rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["IETYPE"].ToString());
+                rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["ASSOCIATENO"].ToString());
+                rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["CORRESPONDNO"].ToString());
+                rowtemp.CreateCell(21).SetCellValue(getStatusName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
+                rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["BUSIUNITNAME_ASS"].ToString());
+                rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["VERSTATUS"].ToString());
+                rowtemp.CreateCell(24).SetCellValue(dt.Rows[i]["NOTE"].ToString());
+            }
+
+
+            // 写入到客户端 
+            //System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            //book.Write(ms);
+            //ms.Seek(0, SeekOrigin.Begin);
+            //return File(ms, "application/vnd.ms-excel", "报关单文件.xls");
+
+            return Extension.getPathname("报关单文件.xls", book);
+        }
+
+        public string ExportDeclFile_C(string codelist)
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string customer = json_user.Value<string>("CUSTOMERID");
+            WsZip.WsZip wz = new WsZip.WsZip();
+            string url = wz.getZipFile(codelist, customer);
+            if (url == "error")
+            {
+                return "{success:false}";
+            }
+            else
+            {
+                return "{success:true,url:\"" + url + "\"}";
+
+            }
+        }
+
+        public string ExpDeclarationList_C_all()
+        {
+            string sql = QueryConditionDecl_C();
+
+            DataTable dt = DBMgr.GetDataTable(sql);
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            var json = JsonConvert.SerializeObject(dt, iso);
+            return ExportDeclFile_C(json);
+        }
+
+        public string ExpDeclarationList_C_Domestic_all()
+        {
+            string sql = QueryConditionDecl_C_Domestic();
+
+            DataTable dt = DBMgr.GetDataTable(sql);
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            var json = JsonConvert.SerializeObject(dt, iso);
+            return ExportDeclFile_C(json);
+        }
+
+        #endregion
     }
 }

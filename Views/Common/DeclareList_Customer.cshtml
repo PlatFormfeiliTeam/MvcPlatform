@@ -1,0 +1,38 @@
+﻿@{
+    ViewBag.Title = "DeclareList_Customer";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string AdminUrl = System.Configuration.ConfigurationManager.AppSettings["AdminUrl"];
+    string Version = System.Configuration.ConfigurationManager.AppSettings["Version"];
+}
+
+<link href="/js/Extjs42/resources/css/ext-all-gray.css" rel="stylesheet" type="text/css" />
+<script src="/js/Extjs42/bootstrap.js" type="text/javascript"></script>
+<link href="/css/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+
+<script type="text/javascript">var url = "@AdminUrl";</script>
+<script src="/js/pan.js?t=@Version" type="text/javascript"></script>
+<script src="/js/commondata.js?t=@Version"></script>
+<script src="~/Views/Common/DeclareList_Customer.js?t=@Version"></script>
+
+
+<div class="container">
+    <div id="div_form" style="width:100%;"></div>
+    <div>
+        <div class="btn-group" role="group">
+            <form id="exportfileform" name="fileform" enctype="multipart/form-data" method="post" style="display:inline-block">
+                <button type="button" id="btn_Export" class="btn btn-primary btn-sm" onclick="ExportDeclFile('select')"><i class="fa fa-level-down"></i>&nbsp;导出所选报关单文件</button>
+                <button type="button" id="btn_Export" class="btn btn-primary btn-sm" onclick="ExportDeclFile('all')"><i class="fa fa-level-down"></i>&nbsp;导出全部报关单文件</button>
+                <button type="button" onclick="Searchstatus()" class="btn btn-primary btn-sm"><i class="fa fa-search"></i>&nbsp;通关状态查询</button>
+                <button type="button" id="btn_VerificationList" onclick="VerificationList()" class="btn btn-primary btn-sm"><i class="fa fa-send"></i>&nbsp;核销比对</button>
+            </form>
+        </div>
+        <div class="btn-group fr" role="group">
+            <button onclick="Select()" class="btn btn-primary btn-sm"><i class="fa fa-search"></i>&nbsp;查询</button>
+            <button onclick="Reset()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-refresh"></i>&nbsp;重置</button>
+            <form id="exportform" name="form" enctype="multipart/form-data" method="post" style="display:inline-block">
+                <button type="button" id="btn_Export" class="btn btn-primary btn-sm" onclick="ExportDecl()"><i class="fa fa-level-down"></i>&nbsp;导出</button>
+            </form>
+        </div>
+    </div>
+    <div id="appConId" style="width:100%;float:right"></div>
+</div>
