@@ -93,7 +93,7 @@ namespace MvcPlatform.Controllers
                         }
                         if ((Request["VALUE1"] + "") == "申报完结")  //申报完结=申报完结
                         {
-                            where += " and DECLSTATUS=130 ";
+                            where += " and DECLSTATUS>=130 ";
                         }
                         if ((Request["VALUE1"] + "") == "未完结")  //未完结
                         {
@@ -201,7 +201,7 @@ namespace MvcPlatform.Controllers
                         }
                         if ((Request["VALUE5"] + "") == "申报完结")  //申报完结=申报完结
                         {
-                            where += " and DECLSTATUS=130 ";
+                            where += " and DECLSTATUS>=130 ";
                         }
                         if ((Request["VALUE5"] + "") == "未完结")  //未完结
                         {

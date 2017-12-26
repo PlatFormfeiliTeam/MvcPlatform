@@ -294,7 +294,7 @@ namespace MvcPlatform.Controllers
                         }
                         if ((Request["VALUE3"] + "") == "申报完结")  //申报完结=申报完结
                         {
-                            where += " and DECLSTATUS=130 ";
+                            where += " and DECLSTATUS>=130 ";
                         }
                         if ((Request["VALUE3"] + "") == "未完结")  //未完结
                         {
@@ -316,7 +316,7 @@ namespace MvcPlatform.Controllers
                         }
                         if ((Request["VALUE3"] + "") == "申报完结")  //申报完结=申报完结
                         {
-                            where += " and INSPSTATUS=130 ";
+                            where += " and INSPSTATUS>=130 ";
                         }
                         if ((Request["VALUE3"] + "") == "未完结")  //未完结
                         {
@@ -430,7 +430,7 @@ namespace MvcPlatform.Controllers
                         }
                         if ((Request["VALUE7"] + "") == "申报完结")  //申报完结=申报完结
                         {
-                            where += " and DECLSTATUS=130 ";
+                            where += " and DECLSTATUS>=130 ";
                         }
                         if ((Request["VALUE7"] + "") == "未完结")  //未完结
                         {
@@ -452,7 +452,7 @@ namespace MvcPlatform.Controllers
                         }
                         if ((Request["VALUE7"] + "") == "申报完结")  //申报完结=申报完结
                         {
-                            where += " and INSPSTATUS=130 ";
+                            where += " and INSPSTATUS>=130 ";
                         }
                         if ((Request["VALUE7"] + "") == "未完结")  //未完结
                         {
