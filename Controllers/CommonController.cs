@@ -739,7 +739,7 @@ namespace MvcPlatform.Controllers
                         WEIGHTCHECK = dt.Rows[0]["WEIGHTCHECK"].ToString();
                     }
                     //end
-                    string formdata = "{STATUS:0,WEIGHTCHECK:'" + WEIGHTCHECK + "'}";
+                    string formdata = "{STATUS:0,WEIGHTCHECK:'" + WEIGHTCHECK + "',CUSTOMERCODE:'" + json_user.Value<string>("CUSTOMERCODE") + "',CLEARUNIT:'" + json_user.Value<string>("CUSTOMERCODE") + "'}";
                     result = "{formdata:" + formdata + ",filedata:[]}";
                 }
                 else//如果是复制新增

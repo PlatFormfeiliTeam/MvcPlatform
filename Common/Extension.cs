@@ -921,16 +921,16 @@ namespace MvcPlatform.Common
 
             //委托单位or结算单位
             string json_wtdw = "[]";
-            if (db.KeyExists("common_data:wtdw"))
-            {
-                json_wtdw = db.StringGet("common_data:wtdw");
-            }
-            else
-            {
+            //if (db.KeyExists("common_data:wtdw"))
+            //{
+            //    json_wtdw = db.StringGet("common_data:wtdw");
+            //}
+            //else
+            //{
                 sql = @"select * from sys_customer where (ISCUSTOMER=1 or ISCOMPANY=1)";
                 json_wtdw = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
-                db.StringSet("common_data:wtdw", json_wtdw);
-            }
+                //db.StringSet("common_data:wtdw", json_wtdw);
+            //}
 
             if (ParaType == "predata")//ListPreData.cshtml 导入用的
             {

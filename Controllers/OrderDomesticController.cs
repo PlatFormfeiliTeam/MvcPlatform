@@ -134,7 +134,8 @@ namespace MvcPlatform.Controllers
             string ordercodes = "";//存储所有的订单号 
             if (string.IsNullOrEmpty(ordercode))//如果订单号为空、即新增的时候
             {
-                string result = "{STATUS:0}";
+                //string result = "{STATUS:0}";
+                string result = "{STATUS:0,IETYPE:'进/出口业务',CUSTOMERCODE:'" + json_user.Value<string>("CUSTOMERCODE") + "',CLEARUNIT:'" + json_user.Value<string>("CUSTOMERCODE") + "'}";
                 return "{data1:" + result + ",data2:" + result + ",data3:" + result + ",data4:" + result + ",filedata1:" + filedata1 + ",filedata2:" + filedata2 + "}";
             }
             else
