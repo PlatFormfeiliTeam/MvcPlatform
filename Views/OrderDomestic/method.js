@@ -185,17 +185,17 @@ function loadform() {
             if (ordercode != null && ordercode != "") {
 
                 var bf = 0;
-                if (data.data1.DOCSERVICECODE) {
-                    if (data.data1.DOCSERVICECODE != data.curuser.CUSTOMERCODE) { bf++; }
+                if (data.data1.RECEIVERUNITCODE) {
+                    if (data.data1.RECEIVERUNITCODE != data.curuser.CUSTOMERCODE) { bf++; }
                 }
-                if (data.data2.DOCSERVICECODE) {
-                    if (data.data2.DOCSERVICECODE != data.curuser.CUSTOMERCODE) { bf++; }
+                if (data.data2.RECEIVERUNITCODE) {
+                    if (data.data2.RECEIVERUNITCODE != data.curuser.CUSTOMERCODE) { bf++; }
                 }
-                if (data.data3.DOCSERVICECODE) {
-                    if (data.data3.DOCSERVICECODE != data.curuser.CUSTOMERCODE) { bf++; }
+                if (data.data3.RECEIVERUNITCODE) {
+                    if (data.data3.RECEIVERUNITCODE != data.curuser.CUSTOMERCODE) { bf++; }
                 }
-                if (data.data4.DOCSERVICECODE) {
-                    if (data.data4.DOCSERVICECODE != data.curuser.CUSTOMERCODE) { bf++; }
+                if (data.data4.RECEIVERUNITCODE) {
+                    if (data.data4.RECEIVERUNITCODE != data.curuser.CUSTOMERCODE) { bf++; }
                 }
 
                 if (bf > 0) {

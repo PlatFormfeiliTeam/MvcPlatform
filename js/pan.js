@@ -1011,7 +1011,7 @@ function loadform() {
             }
 
             if (ordercode != null && ordercode != "") {
-                if (data.formdata.DOCSERVICECODE != data.curuser.CUSTOMERCODE) {
+                if (data.formdata.RECEIVERUNITCODE != data.curuser.CUSTOMERCODE) {
                     $("#pickfiles").hide(); $("#deletefile").hide();
                     $("#btn_cancelsubmit").hide(); $("#btn_copyadd_create").hide(); $("#btn_saveorder").hide(); $("#btn_submitorder").hide();
                 }
