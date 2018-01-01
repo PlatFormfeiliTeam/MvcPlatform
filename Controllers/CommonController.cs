@@ -522,8 +522,38 @@ namespace MvcPlatform.Controllers
                                     GROUP BY ordercode) c on a.code = c.ordercode ";
             }
 
-            sql += " where instr('" + Request["busitypeid"] + "',a.BUSITYPE)>0 and a.receiverunitcode='" + json_user.Value<string>("CUSTOMERCODE") + "' " + where;
+            sql += " where instr('" + Request["busitypeid"] + "',a.BUSITYPE)>0 ";
+
+            //sql += " where instr('" + Request["busitypeid"] + "',a.BUSITYPE)>0 and a.receiverunitcode='" + json_user.Value<string>("CUSTOMERCODE") + "' " + where;
             // sql += " where instr('" + Request["busitypeid"] + "',a.BUSITYPE)>0 and a.customercode='" + json_user.Value<string>("CUSTOMERCODE") + "' " + where;
+
+            string rolestr = "";
+
+            if (json_user.Value<string>("ISRECEIVER") == "1")//接单单位
+            {
+                string rec = " a.receiverunitcode='" + json_user.Value<string>("CUSTOMERCODE") + "'";
+
+                if (rolestr == "") { rolestr = rec; }
+                else { rolestr = rolestr + " or " + rec; }
+            }
+
+            if (json_user.Value<string>("ISCUSTOMER") == "1")//委托单位
+            {
+                string cus = " a.customercode='" + json_user.Value<string>("CUSTOMERCODE") + "'";
+
+                if (rolestr == "") { rolestr = cus; }
+                else { rolestr = rolestr + " or " + cus; }
+            }
+
+            if (json_user.Value<string>("DOCSERVICECOMPANY") == "1")//单证服务单位
+            {
+                string doc = " a.docservicecode='" + json_user.Value<string>("CUSTOMERCODE") + "'";
+
+                if (rolestr == "") { rolestr = doc; }
+                else { rolestr = rolestr + " or " + doc; }
+            }
+
+            sql += " and (" + rolestr + ") " + where;
 
             return sql;
         }
@@ -609,9 +639,16 @@ namespace MvcPlatform.Controllers
         //删除报关单及其对应文件信息 by heguiqin 2016-08-26
         public string Delete()
         {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
             string result = "{success:false}";
             string sql = "select * from LIST_ORDER where code='" + Request["ordercode"] + "'";
             DataTable dt = DBMgr.GetDataTable(sql);
+
+            if (dt.Rows[0]["DOCSERVICECODE"].ToString() != json_user.Value<string>("CUSTOMERCODE"))
+            {
+                return "{success:false,flag:'E'}";
+            }
 
             bool bf = false;
             string status = dt.Rows[0]["STATUS"] + "" == "" ? "0" : dt.Rows[0]["STATUS"] + "";
@@ -623,7 +660,7 @@ namespace MvcPlatform.Controllers
                 bf = true;
             }
 
-            if (bf) { return result; }
+            if (bf) { return "{success:false,flag:'Y'}"; }
 
             result = Extension.deleteorder(Request["ordercode"] + "");
             return result;
@@ -725,7 +762,7 @@ namespace MvcPlatform.Controllers
             string copyordercode = Request["copyordercode"];
             DataTable dt;
             string sql = "";
-            string result = "{}";
+            string result = "{}"; string curuser = "{CUSTOMERCODE:'" + json_user.Value<string>("CUSTOMERCODE") + "'}";
             if (string.IsNullOrEmpty(ordercode))//如果订单号为空、即新增的时候
             {
                 if (string.IsNullOrEmpty(copyordercode))//如果不是复制新增
@@ -740,7 +777,7 @@ namespace MvcPlatform.Controllers
                     }
                     //end
                     string formdata = "{STATUS:0,WEIGHTCHECK:'" + WEIGHTCHECK + "',CUSTOMERCODE:'" + json_user.Value<string>("CUSTOMERCODE") + "',CLEARUNIT:'" + json_user.Value<string>("CUSTOMERCODE") + "'}";
-                    result = "{formdata:" + formdata + ",filedata:[]}";
+                    result = "{formdata:" + formdata + ",filedata:[],curuser:" + curuser + "}";
                 }
                 else//如果是复制新增
                 {
@@ -750,7 +787,7 @@ namespace MvcPlatform.Controllers
                     if (dt.Rows.Count > 0)
                     {
                         string formdata = JsonConvert.SerializeObject(dt).TrimStart('[').TrimEnd(']');
-                        result = "{formdata:" + formdata + ",filedata:[]}";
+                        result = "{formdata:" + formdata + ",filedata:[],curuser:" + curuser + "}";
                     }
                 }
             }
@@ -782,7 +819,7 @@ namespace MvcPlatform.Controllers
                 string filedata = JsonConvert.SerializeObject(dt, iso);
 
 
-                result = "{formdata:" + formdata + ",filedata:" + filedata + "}";
+                result = "{formdata:" + formdata + ",filedata:" + filedata + ",curuser:" + curuser + "}";
             }
             return result;
         }
@@ -1040,9 +1077,39 @@ namespace MvcPlatform.Controllers
             {
                 where += @" and cus.SCENEDECLAREID ='" + json_user.Value<string>("CUSTOMERID") + "' ";
             }
-            if (role == "customer")//如果角色是客户
+            if (role == "customer")
             {
-                where += @" and ort.receiverunitcode ='" + json_user.Value<string>("CUSTOMERCODE") + "' ";//@" and ort.customercode ='" + json_user.Value<string>("CUSTOMERCODE") + "' ";
+                //where += @" and ort.receiverunitcode ='" + json_user.Value<string>("CUSTOMERCODE") + "' ";
+                // where += @" and ort.customercode ='" + json_user.Value<string>("CUSTOMERCODE") + "' ";
+
+                string rolestr = "";
+
+                if (json_user.Value<string>("ISRECEIVER") == "1")//接单单位
+                {
+                    string rec = " ort.receiverunitcode='" + json_user.Value<string>("CUSTOMERCODE") + "'";
+
+                    if (rolestr == "") { rolestr = rec; }
+                    else { rolestr = rolestr + " or " + rec; }
+                }
+
+                if (json_user.Value<string>("ISCUSTOMER") == "1")//委托单位
+                {
+                    string cus = " ort.customercode='" + json_user.Value<string>("CUSTOMERCODE") + "'";
+
+                    if (rolestr == "") { rolestr = cus; }
+                    else { rolestr = rolestr + " or " + cus; }
+                }
+
+                if (json_user.Value<string>("DOCSERVICECOMPANY") == "1")//单证服务单位
+                {
+                    string doc = " ort.docservicecode='" + json_user.Value<string>("CUSTOMERCODE") + "'";
+
+                    if (rolestr == "") { rolestr = doc; }
+                    else { rolestr = rolestr + " or " + doc; }
+                }
+
+                where += " and (" + rolestr + ") ";
+
             }
 
             string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.ISPRINT,det.SHEETNUM,det.modifyflag,det.transname as pretransname,

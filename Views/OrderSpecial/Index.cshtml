@@ -18,13 +18,17 @@
             url: "/Common/Ini_Base_Data",
             params: { busitype: '特殊区域' },
             success: function (response, option) {
-                var commondata = Ext.decode(response.responseText)
+                var commondata = Ext.decode(response.responseText);
                 common_data_jydw = commondata.jydw;//经营单位
                 common_data_sbfs = commondata.sbfs;//申报方式
                 common_data_sbgq = commondata.sbgq;//申报关区 进口口岸
                 common_data_bgfs = commondata.bgfs;//报关方式
                 common_data_bzzl = commondata.bzzl;//包装种类
                 common_data_myfs = commondata.myfs;//贸易方式
+
+                //按钮显示与隐藏
+                if (commondata.isreceiver != "1") { $("#btn_add_index").hide(); }
+
                 //查询区域
                 initSearch('50,51');
                 //列表
@@ -141,7 +145,7 @@
     <div id="div_form" style="width:100%;height:70px"></div>
     <div>
         <div class="btn-group" role="group">
-            <button onclick="Open()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;添加</button>
+            <button id="btn_add_index" onclick="Open()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;添加</button>
             <button onclick="DeleteNotGuoNei()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-trash-o"></i>&nbsp;删除</button>            
             <button type="button" class="btn btn-primary btn-sm dropdown-toggle" onclick="openwin('TSQY','special')"><i class="fa fa-pencil-square-o fa-fw"></i>&nbsp;批量维护</button>            
             <button type="button" onclick="Views('special')" class="btn btn-primary btn-sm"><i class="fa fa-file-text-o"></i>&nbsp;详细</button>

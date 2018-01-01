@@ -46,11 +46,14 @@ namespace MvcPlatform.Common
             //{
                 //2016-08-02增加字段报关服务单位SCENEDECLAREID 报检服务单位SCENEINSPECTID 因为订单里面创建时取当前用户的默认值 故提前放到缓存
                 //CUSTOMERID 这个字段在sysuser表中有
-                string sql = @"select c.NAME as CUSTOMERNAME,c.HSCODE as CUSTOMERHSCODE,c.CIQCODE as CUSTOMERCIQCODE,c.CODE CUSTOMERCODE,
-                             c.SCENEDECLAREID,c.SCENEINSPECTID,d.NAME as REPUNITNAME,e.NAME as INSPUNITNAME,u.* from SYS_USER u 
-                             left join cusdoc.sys_customer c on u.customerid = c.id 
-                             left join cusdoc.base_company d on c.hscode=d.code
-                             left join cusdoc.base_company e on c.ciqcode=e.INSPCODE where u.name ='" + account + "'";
+                string sql = @"select c.NAME as CUSTOMERNAME,c.HSCODE as CUSTOMERHSCODE,c.CIQCODE as CUSTOMERCIQCODE,c.CODE CUSTOMERCODE
+                                    ,c.SCENEDECLAREID,c.SCENEINSPECTID,d.NAME as REPUNITNAME,e.NAME as INSPUNITNAME,c.ISRECEIVER,c.ISCUSTOMER
+                                    ,c.DOCSERVICECOMPANY
+                                    ,u.* 
+                            from SYS_USER u 
+                                 left join cusdoc.sys_customer c on u.customerid = c.id 
+                                 left join cusdoc.base_company d on c.hscode=d.code
+                                 left join cusdoc.base_company e on c.ciqcode=e.INSPCODE where u.name ='" + account + "'";
                 DataTable dt = DBMgr.GetDataTable(sql);
                 IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
                 iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
@@ -621,6 +624,8 @@ namespace MvcPlatform.Common
         public static string Ini_Base_Data(JObject json_user, string ParaType, string busitype)
         {
             string AdminUrl = ConfigurationManager.AppSettings["AdminUrl"];
+            string ISRECEIVER = json_user.Value<string>("ISRECEIVER");//add 20180101
+
             IDatabase db = SeRedis.redis.GetDatabase();
             string sql = ""; 
 
@@ -979,7 +984,7 @@ namespace MvcPlatform.Common
                 + ",myfs:" + json_myfs + ",containertype:" + json_containertype + ",containersize:" + json_containersize + ",truckno:" + json_truckno
                 + ",relacontainer:" + json_relacontainer + ",mzbz:" + json_mzbz + ",jylb:" + json_jylb + ",json_sbkb:" + json_sbkb
                 + ",inspbzzl:" + json_inspbzzl + ",adminurl:'" + AdminUrl + "',curuser:" + json_user
-                + ",dzfwdw:" + json_dzfwdw + ",inspmyfs:" + json_inspmyfs + ",wtdw:" + json_wtdw + "}";
+                + ",dzfwdw:" + json_dzfwdw + ",inspmyfs:" + json_inspmyfs + ",wtdw:" + json_wtdw + ",isreceiver:'" + ISRECEIVER + "'}";
         }
 
 

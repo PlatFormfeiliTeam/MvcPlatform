@@ -176,6 +176,36 @@ function loadform() {
                     task.delay(1000); //因为经营单位选项数据加载 需延时1秒
                 }
             }
+
+            //add 20180101
+            if (common_data_isreceiver != "1") {//新增跟首页的条件一样，只要不是接单单位，就隐藏
+                $("#btn_createorder").hide();
+            }
+            
+            if (ordercode != null && ordercode != "") {
+
+                var bf = 0;
+                if (data.data1.DOCSERVICECODE) {
+                    if (data.data1.DOCSERVICECODE != data.curuser.CUSTOMERCODE) { bf++; }
+                }
+                if (data.data2.DOCSERVICECODE) {
+                    if (data.data2.DOCSERVICECODE != data.curuser.CUSTOMERCODE) { bf++; }
+                }
+                if (data.data3.DOCSERVICECODE) {
+                    if (data.data3.DOCSERVICECODE != data.curuser.CUSTOMERCODE) { bf++; }
+                }
+                if (data.data4.DOCSERVICECODE) {
+                    if (data.data4.DOCSERVICECODE != data.curuser.CUSTOMERCODE) { bf++; }
+                }
+
+                if (bf > 0) {
+                    $("#pickfiles").hide(); $("#deletefile").hide();
+                    $("#btn_cancelsubmit").hide(); $("#btn_addlinkorder").hide(); $("#btn_saveorder").hide(); $("#btn_submitorder").hide();
+                }
+            }
+
+
+
         }
     });
 }

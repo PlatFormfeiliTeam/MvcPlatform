@@ -26,7 +26,7 @@
     var ordercode = getQueryString("ordercode");
     var OrderId = getQueryString("OrderId");
     var common_data_jydw = [], common_data_sbfs = [], common_data_sbgq = [], common_data_bgfs = [], common_data_bzzl = [], common_data_myfs = [],
-        common_data_adminurl = "", common_data_dzfwdw = [], common_data_wtdw = [];
+        common_data_adminurl = "", common_data_dzfwdw = [], common_data_wtdw = [], common_data_isreceiver = "";
 
     var ID, CODEIN, CODEOUT, field_btn1, field_btn2, field_ID, field_TRADEWAYCODES;
     var tabindex = 1;
@@ -49,6 +49,7 @@
                 common_data_adminurl = commondata.adminurl;//文件服务器URL
                 common_data_dzfwdw = commondata.dzfwdw;//单证服务单位
                 common_data_wtdw = commondata.wtdw;//委托单位
+                common_data_isreceiver = commondata.isreceiver;//接收单位
 
                 repunitcode1 = commondata.curuser.REPUNITNAME + "(" + commondata.curuser.CUSTOMERHSCODE + ")";//报关申报单位
                 inspunitcode1 = commondata.curuser.INSPUNITNAME + "(" + commondata.curuser.CUSTOMERCIQCODE + ")";//报检申报单位

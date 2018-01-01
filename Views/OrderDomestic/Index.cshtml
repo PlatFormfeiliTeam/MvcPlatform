@@ -28,6 +28,10 @@
                 common_data_bgfs = commondata.bgfs;//报关方式
                 common_data_bzzl = commondata.bzzl;//包装种类
                 common_data_myfs = commondata.myfs;//贸易方式
+
+                //按钮显示与隐藏
+                if (commondata.isreceiver != "1") { $("#btn_add_index").hide(); }
+
                 //查询区域
                 initSearch('40,41');
                 //列表
@@ -149,7 +153,11 @@
                             store_Trade.load();
                         }
                         else {
-                            Ext.MessageBox.alert('提示', '删除失败！');
+                            if (res.flag == "E") { Ext.MessageBox.alert('提示', '此单您不是接单单位，不能删除！'); }
+                            else if (res.flag == "Y") { Ext.MessageBox.alert('提示', '已委托的订单不能删除！'); }
+                            else {
+                                Ext.MessageBox.alert('提示', '删除失败！');
+                            }
                         }
                     }
                 });
@@ -202,7 +210,7 @@
     <div id="div_form" style="width:100%;height:70px"></div>
     <div>
         <div class="btn-group" role="group">
-            <button onclick="Open()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;添加</button>
+            <button id="btn_add_index" onclick="Open()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;添加</button>
             <button onclick="Delete()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-trash-o"></i>&nbsp;删除</button>
             <button type="button" class="btn btn-primary btn-sm dropdown-toggle" onclick="openwin('GNJZ','domestic')"><i class="fa fa-pencil-square-o fa-fw"></i>&nbsp;批量维护</button>
             <button type="button" onclick="View()" class="btn btn-primary btn-sm"><i class="fa fa-file-text-o"></i>&nbsp;详细</button>

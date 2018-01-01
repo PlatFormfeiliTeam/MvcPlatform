@@ -989,6 +989,7 @@ function loadform() {
                 Ext.getCmp('w_grid').store.loadData(Ext.decode(Ext.getCmp('field_CONTAINERTRUCK').getValue()));
             }
             formcontrol();//表单字段控制
+
             //add 2016/10/9 add
             if (ordercode == "" && copyordercode == "") {//编辑或复制新增时，直接以上面的formdata赋值为准，新增则需要抓取值
                 if (Ext.getCmp('WEIGHTCHECK')) {
@@ -1001,6 +1002,18 @@ function loadform() {
                         Ext.getCmp('ISWEIGHTCHECK').setValue(false);
                         Ext.getCmp('ISWEIGHTCHECK').setReadOnly(true);
                     }
+                }
+            }
+
+            //add 20180101
+            if (common_data_isreceiver != "1") {//新增跟首页的条件一样，只要不是接单单位，就隐藏
+                $("#btn_add_create").hide();
+            }
+
+            if (ordercode != null && ordercode != "") {
+                if (data.formdata.DOCSERVICECODE != data.curuser.CUSTOMERCODE) {
+                    $("#pickfiles").hide(); $("#deletefile").hide();
+                    $("#btn_cancelsubmit").hide(); $("#btn_copyadd_create").hide(); $("#btn_saveorder").hide(); $("#btn_submitorder").hide();
                 }
             }
         }
@@ -1635,7 +1648,11 @@ function DeleteNotGuoNei() {
                         store_Trade.load();
                     }
                     else {
-                        Ext.MessageBox.alert('提示', '删除失败！');
+                        if (res.flag == "E") { Ext.MessageBox.alert('提示', '此单您不是接单单位，不能删除！'); }
+                        else if (res.flag == "Y") { Ext.MessageBox.alert('提示', '已委托的订单不能删除！'); }                        
+                        else {
+                            Ext.MessageBox.alert('提示', '删除失败！');
+                        }
                     }
                 }
             });

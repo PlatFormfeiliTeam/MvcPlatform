@@ -79,10 +79,17 @@ namespace MvcPlatform.Controllers
         //删除订单
         public string Delete()
         {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
             //删除订单
             string result = "{success:false}";
             string sql = "select * from LIST_ORDER where code='" + Request["ordercode"] + "'";
             DataTable dt = DBMgr.GetDataTable(sql);
+
+            if (dt.Rows[0]["DOCSERVICECODE"].ToString() != json_user.Value<string>("CUSTOMERCODE"))
+            {
+                return "{success:false,flag:'E'}";
+            }
 
             bool bf = false;
             string status = dt.Rows[0]["STATUS"] + "" == "" ? "0" : dt.Rows[0]["STATUS"] + "";
@@ -93,7 +100,7 @@ namespace MvcPlatform.Controllers
             {
                 bf = true;
             }
-            if (bf) { return result; }
+            if (bf) { return "{success:false,flag:'Y'}"; }
 
             if (!string.IsNullOrEmpty(dt.Rows[0]["CORRESPONDNO"] + ""))//如果四单
             {
@@ -125,7 +132,8 @@ namespace MvcPlatform.Controllers
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string ordercode = Request["ordercode"];
-            DataTable dt;
+            DataTable dt; string curuser = "{CUSTOMERCODE:'" + json_user.Value<string>("CUSTOMERCODE") + "'}";
+
             string data1 = "{}", data2 = "{}", data3 = "{}", data4 = "{}", ASSOCIATENO = "", filedata1 = "[]", filedata2 = "[]";
             string code1 = "", code2 = "", code3 = "", code4 = "";
             string[] str_arr;
@@ -136,7 +144,7 @@ namespace MvcPlatform.Controllers
             {
                 //string result = "{STATUS:0}";
                 string result = "{STATUS:0,IETYPE:'进/出口业务',CUSTOMERCODE:'" + json_user.Value<string>("CUSTOMERCODE") + "',CLEARUNIT:'" + json_user.Value<string>("CUSTOMERCODE") + "'}";
-                return "{data1:" + result + ",data2:" + result + ",data3:" + result + ",data4:" + result + ",filedata1:" + filedata1 + ",filedata2:" + filedata2 + "}";
+                return "{data1:" + result + ",data2:" + result + ",data3:" + result + ",data4:" + result + ",filedata1:" + filedata1 + ",filedata2:" + filedata2 + ",curuser:" + curuser + "}";
             }
             else
             {
@@ -234,7 +242,7 @@ namespace MvcPlatform.Controllers
                     where += " and instr('" + code3 + code4 + "',ordercode)>0";
                 }
                 filedata2 = !string.IsNullOrEmpty(where) ? JsonConvert.SerializeObject(DBMgr.GetDataTable(sql + where), iso) : "[]";
-                return "{ORDERCODES:'" + ordercodes + "',data1:" + data1 + ",data2:" + data2 + ",filedata1:" + filedata1 + ",data3:" + data3 + ",data4:" + data4 + ",filedata2:" + filedata2 + "}";
+                return "{ORDERCODES:'" + ordercodes + "',data1:" + data1 + ",data2:" + data2 + ",filedata1:" + filedata1 + ",data3:" + data3 + ",data4:" + data4 + ",filedata2:" + filedata2 + ",curuser:" + curuser + "}";
             }
         }
 
