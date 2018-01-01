@@ -195,7 +195,7 @@
         id: 'NUMBER'
     });
     topbar = Ext.create('Ext.toolbar.Toolbar', {
-        items: [label_baseinfo, '->', combo_notype, field_noinput, tbar_r]
+        items: [label_baseinfo]//, '->', combo_notype, field_noinput, tbar_r
     })
     formpanelhead = Ext.create('Ext.form.Panel', {
         border: 0,

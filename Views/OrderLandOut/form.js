@@ -30,7 +30,7 @@
         tabIndex: 1
     })
     var tbar = Ext.create('Ext.toolbar.Toolbar', {
-        items: [label_baseinfo, '->', combo_notype, field_noinput, tbar_r]
+        items: [label_baseinfo]//, '->', combo_notype, field_noinput, tbar_r
     })
 
     var field_CODE = Ext.create('Ext.form.field.Text', {//订单编号

@@ -29,7 +29,7 @@
         tabIndex: 1
     });
     var tbar = Ext.create('Ext.toolbar.Toolbar', {
-        items: [label_baseinfo, '->', combo_notype, field_noinput, tbar_r]
+        items: [label_baseinfo]//, '->', combo_notype, field_noinput, tbar_r
     })
     //订单编号
     var field_CODE = Ext.create('Ext.form.field.Text', {

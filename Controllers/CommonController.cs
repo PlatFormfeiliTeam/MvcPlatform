@@ -584,10 +584,9 @@ namespace MvcPlatform.Controllers
             }
             else
             {
-                sql = @"insert into CONFIG_QUERYSETTING(ID,USERNAME,USERID,CONDITION1,CONDITION2,CONDITION3,CONDITION4,CONDITION5,CONDITION6,CONDITION7,CONDITION8,updatetime)
-                        values (CONFIG_QUERYSETTING_ID.Nextval,'{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}',sysdate)";
-                sql = string.Format(sql
-                        , json_user.Value<string>("NAME"), json_user.Value<string>("ID"), json.Value<string>("CONDITION1"), json.Value<string>("CONDITION2"), json.Value<string>("CONDITION3")
+                sql = @"insert into CONFIG_QUERYSETTING(ID,USERID,CONDITION1,CONDITION2,CONDITION3,CONDITION4,CONDITION5,CONDITION6,CONDITION7,CONDITION8,updatetime)
+                        values (CONFIG_QUERYSETTING_ID.Nextval,'{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}',sysdate)";
+                sql = string.Format(sql, json_user.Value<string>("ID"), json.Value<string>("CONDITION1"), json.Value<string>("CONDITION2"), json.Value<string>("CONDITION3")
                         , json.Value<string>("CONDITION4"), json.Value<string>("CONDITION5"), json.Value<string>("CONDITION6"), json.Value<string>("CONDITION7"), json.Value<string>("CONDITION8"));
             }
             int i = DBMgr.ExecuteNonQuery(sql);

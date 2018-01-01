@@ -27,7 +27,7 @@
                 common_data_myfs = commondata.myfs;//贸易方式
 
                 //按钮显示与隐藏
-                if (commondata.isreceiver != "1") { $("#btn_add_index").hide(); }
+                if (commondata.isreceiver != "1") { $("#btn_add_index").hide(); $("#btn_mutiedit").hide(); }
 
                 //查询区域
                 initSearch('50,51');
@@ -147,7 +147,7 @@
         <div class="btn-group" role="group">
             <button id="btn_add_index" onclick="Open()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus fa-fw"></i>&nbsp;添加</button>
             <button onclick="DeleteNotGuoNei()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-trash-o"></i>&nbsp;删除</button>            
-            <button type="button" class="btn btn-primary btn-sm dropdown-toggle" onclick="openwin('TSQY','special')"><i class="fa fa-pencil-square-o fa-fw"></i>&nbsp;批量维护</button>            
+            <button id="btn_mutiedit" type="button" class="btn btn-primary btn-sm dropdown-toggle" onclick="openwin('TSQY','special')"><i class="fa fa-pencil-square-o fa-fw"></i>&nbsp;批量维护</button>            
             <button type="button" onclick="Views('special')" class="btn btn-primary btn-sm"><i class="fa fa-file-text-o"></i>&nbsp;详细</button>
         </div>
         <div class="btn-group fr" role="group">
