@@ -71,11 +71,6 @@ namespace MvcPlatform.Controllers
             return View();
         }
 
-        public ActionResult OrderView_C()
-        {
-            return View();
-        }
-
         //删除订单
         public string Delete()
         {
