@@ -476,7 +476,7 @@ namespace MvcPlatform.Controllers
                 case "CSSTARTTIME"://订单开始时间
                     if (!string.IsNullOrEmpty(Request["VALUE8_1"]))//如果开始时间有值
                     {
-                        where += " and CREATETIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss')' ";
+                        where += " and CREATETIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
                     }
                     if (!string.IsNullOrEmpty(Request["VALUE8_2"]))//如果结束时间有值
                     {
