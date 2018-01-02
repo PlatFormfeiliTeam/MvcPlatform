@@ -185,6 +185,8 @@ namespace MvcPlatform.Controllers
 
         public string SaveRecoginze()
         {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
             string id = Request["id"]; string cusno = Request["cusno"]; string ordercode = Request["ordercode"];
             string result = "{success:false}"; string sql = "";
 
@@ -250,13 +252,13 @@ namespace MvcPlatform.Controllers
                 {
                     sql_insert = @"insert into LIST_ATTACHMENT (id
                                                 ,filename,originalname,filetype,uploadtime,ordercode,sizes,filetypename
-                                                ,filesuffix,IETYPE) 
+                                                ,filesuffix,IETYPE,uploaduserid,uploadusername) 
                                             values(List_Attachment_Id.Nextval
                                                 ,'{0}','{1}','{2}',sysdate,'{3}','{4}','{5}'
-                                                ,'{6}','{7}')";
+                                                ,'{6}','{7}','{8}','{9}')";
                     sql_insert = string.Format(sql_insert
                             , "/44/" + ordercode + "/" + filepath.Substring(filepath.LastIndexOf(@"/") + 1), originalname, "44", ordercode, fi.Length, "订单文件"
-                            , filesuffix, dt_order.Rows[0]["BUSITYPE"].ToString() == "40" ? "仅出口" : "仅进口");
+                            , filesuffix, dt_order.Rows[0]["BUSITYPE"].ToString() == "40" ? "仅出口" : "仅进口", json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"));
                     DBMgr.ExecuteNonQuery(sql_insert, conn);
 
                     DataTable dt_asOrder = new DataTable();
@@ -278,13 +280,13 @@ namespace MvcPlatform.Controllers
                     {
                         sql_insert = @"insert into LIST_ATTACHMENT (id
                                                 ,filename,originalname,filetype,uploadtime,ordercode,sizes,filetypename
-                                                ,filesuffix,IETYPE) 
+                                                ,filesuffix,IETYPE,uploaduserid,uploadusername)  
                                             values(List_Attachment_Id.Nextval
                                                 ,'{0}','{1}','{2}',sysdate,'{3}','{4}','{5}'
-                                                ,'{6}','{7}')";
+                                                ,'{6}','{7}','{8}','{9}')";
                         sql_insert = string.Format(sql_insert
                                 , "/44/" + dt_asOrder.Rows[0]["code"].ToString() + "/" + filepath.Substring(filepath.LastIndexOf(@"/") + 1), originalname, "44", dt_asOrder.Rows[0]["code"].ToString(), fi.Length, "订单文件"
-                                , filesuffix, dt_asOrder.Rows[0]["BUSITYPE"].ToString() == "40" ? "仅出口" : "仅进口");
+                                , filesuffix, dt_asOrder.Rows[0]["BUSITYPE"].ToString() == "40" ? "仅出口" : "仅进口", json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"));
                         DBMgr.ExecuteNonQuery(sql_insert, conn);
                     }
 
@@ -293,13 +295,13 @@ namespace MvcPlatform.Controllers
                 {
                     sql_insert = @"insert into LIST_ATTACHMENT (id
                                                 ,filename,originalname,filetype,uploadtime,ordercode,sizes,filetypename
-                                                ,filesuffix) 
+                                                ,filesuffix,uploaduserid,uploadusername)  
                                             values(List_Attachment_Id.Nextval
                                                 ,'{0}','{1}','{2}',sysdate,'{3}','{4}','{5}'
-                                                ,'{6}')";
+                                                ,'{6}','{7}','{8}')";
                     sql_insert = string.Format(sql_insert
                             , "/44/" + ordercode + "/" + filepath.Substring(filepath.LastIndexOf(@"/") + 1), originalname, "44", ordercode, fi.Length, "订单文件"
-                            , filesuffix);
+                            , filesuffix, json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"));
                     DBMgr.ExecuteNonQuery(sql_insert, conn);
                 }
 
@@ -314,6 +316,8 @@ namespace MvcPlatform.Controllers
                     fi.CopyTo(bakpath + filepath.Substring(filepath.LastIndexOf(@"/") + 1));
                     fi.Delete();
                 }
+
+                //Submit(ordercode, json_user);//add 提交委托
 
                 result = "{success:true}";
             }
@@ -376,6 +380,76 @@ namespace MvcPlatform.Controllers
             pageSql = string.Format(pageSql, tempsql, order, asc, start + 1, limit + start);
             return pageSql;
         }
+
+
+//        public static string Submit(string ordercode, JObject json_user)
+//        {
+//            string rtnstr = "{success:true}";
+//            DataTable dt_order = DBMgr.GetDataTable("select * from list_order a where a.code='" + ordercode + "' and a.ISINVALID=0");
+
+//            string busitype = dt_order.Rows[0]["BUSITYPE"].ToString();
+//            string entrusttype = dt_order.Rows[0]["ENTRUSTTYPE"].ToString();
+
+
+//            if (busitype == "30" || busitype == "31")//陆运业务
+//            {
+//                string status = "10", declstatus = "", inspstatus = "";
+//                if (entrusttype == "01") {
+//                    if (dt_order.Rows[0]["DECLSTATUS"].ToString() != "")
+//                    {
+//                        if (Convert.ToInt32(dt_order.Rows[0]["DECLSTATUS"].ToString()) >= 10)
+//                        {
+//                            return rtnstr;
+//                        }
+//                    }
+//                    declstatus = status; 
+//                }
+//                if (entrusttype == "02") {
+//                    if (dt_order.Rows[0]["INSPSTATUS"].ToString() != "")
+//                    {
+//                        if (Convert.ToInt32(dt_order.Rows[0]["INSPSTATUS"].ToString()) >= 10)
+//                        {
+//                            return rtnstr;
+//                        }
+//                    }
+//                    inspstatus = status; 
+//                }
+//                if (entrusttype == "03") {
+//                    if (dt_order.Rows[0]["DECLSTATUS"].ToString() != "")
+//                    {
+//                        if (Convert.ToInt32(dt_order.Rows[0]["DECLSTATUS"].ToString()) >= 10)
+//                        {
+//                            return rtnstr;
+//                        }
+//                    }
+//                    if (dt_order.Rows[0]["INSPSTATUS"].ToString() != "")
+//                    {
+//                        if (Convert.ToInt32(dt_order.Rows[0]["INSPSTATUS"].ToString()) >= 10)
+//                        {
+//                            return rtnstr;
+//                        }
+//                    }
+//                    declstatus = status; inspstatus = status; 
+//                }
+
+//                string sql = @"UPDATE LIST_ORDER SET STATUS='{1}',DECLSTATUS='{2}',INSPSTATUS='{3}',SUBMITUSERID='{4}',SUBMITUSERNAME='{5}'  
+//                                    ,SUBMITTIME=sysdate,BUSIKIND='001',ORDERWAY='1'                                    
+//                            WHERE CODE = '{0}' ";
+//                sql = string.Format(sql, ordercode, status, declstatus, inspstatus, json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"));
+
+//                int result = DBMgr.ExecuteNonQuery(sql);
+//                if (result == 1)
+//                {
+//                    Extension.add_list_time(10, ordercode, json_user);//插入订单状态变更日志
+//                }
+//                else
+//                {
+//                    rtnstr = "{success:false}";
+//                }
+//            }
+//            return rtnstr;
+
+//        }
 
     }
 }
