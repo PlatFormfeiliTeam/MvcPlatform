@@ -141,10 +141,20 @@ namespace MvcPlatform.Controllers
         }
         public string loaduserInfo()
         {
+            string strWhere = string.Empty;
+            if (!string.IsNullOrEmpty(Request["Login_ID"]))
+            {
+                strWhere = strWhere + " and name = '" + Request["Login_ID"] + "' ";
+            }
+
+            if (!string.IsNullOrEmpty(Request["Login_Name"]))
+            {
+                strWhere = strWhere + " and realname = '" + Request["Login_Name"] + "' ";
+            }
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-            string sql = @"select * from sys_user where parentid ='" + json_user.GetValue("ID") + "'";
+            string sql = @"select * from sys_user where parentid ='" + json_user.GetValue("ID") + "'" + strWhere;
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql));
             var json = JsonConvert.SerializeObject(dt, iso);
             return "{rows:" + json + ",total:" + totalProperty + "}";

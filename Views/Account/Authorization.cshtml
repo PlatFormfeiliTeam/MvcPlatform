@@ -5,7 +5,50 @@
     var gridUser, store_user, treeModel, treeModelstore;
     var userid = '';
     Ext.onReady(function () {
-        Ext.regModel('User', { fields: ['ID', 'NAME', 'REALNAME'] })
+
+        //yangyang.zhao
+        var loginId = new Ext.form.TextField({
+            width: 300,
+            maxLength: 10,
+            name: 'Login_ID',
+            id:'Login_ID',
+            fieldLabel: '登录名',
+            maxLengthText: '登录名不能超过10个字符',
+            columnWidth: .28,
+            labelWidth: 45
+            
+        });
+
+        var loginName = new Ext.form.TextField({
+            width: 300,
+            maxLength: 10,
+            name: 'Login_Name',
+            id: 'Login_Name',
+            fieldLabel: '姓名',
+            maxLengthText: '姓名不能超过10个字符',
+            columnWidth: .28,
+            labelWidth: 30
+            
+        });
+
+        var formpanel_search = Ext.create('Ext.form.Panel', {
+            id: 'formpanel_search',
+            renderTo: 'loginId',
+            border: 0,
+            fieldDefaults: {
+                margin: '5',
+                columnWidth: 0.24               
+            },
+            items: [
+                { layout: 'column', border: 0, items: [loginId,loginName] }
+                
+            ]
+        });
+
+
+
+
+        Ext.regModel('User', { fields: ['ID', 'NAME', 'REALNAME'] });
         store_user = Ext.create('Ext.data.JsonStore', {
             model: 'User',
             proxy: {
@@ -13,46 +56,63 @@
                 url: '/Account/loaduserInfo',
                 reader: {
                     root: 'rows',
-                    type: 'json'
+                    type: 'json',
+                    totalProperty: 'total'
                 }
             },
-            autoLoad: true
-        });
-
-        var pgbar = Ext.create('Ext.toolbar.Paging', {
-            displayMsg: '显示 {0} - {1} 条,共计 {2} 条',
-            store: store_user,
-            displayInfo: true
-        })
-
-        gridUser = Ext.create('Ext.grid.Panel', {
-            renderTo: "div_west",
-            width: 400,
-            height: 500, bbar: pgbar,
-            store: store_user,
-            columns: [
-                { xtype: 'rownumberer', width: 35 },
-                { header: 'ID', dataIndex: 'ID', hidden: true },
-                { header: '登录名', dataIndex: 'NAME', width: 100 },
-                { header: '姓名', dataIndex: 'REALNAME', flex: 1 }
-            ],
+            autoLoad: true,
             listeners: {
-                itemclick: function (value, record, item, index, e, eOpts) {
-                    treeModelstore.setProxy({
-                        type: 'ajax',
-                        url: '/Account/selectModel',
-                        reader: 'json'
-                    });
-                    userid = record.get("ID");
-                    var proxys = treeModelstore.proxy;
-                    proxys.extraParams.userid = userid;
-                    treeModelstore.load();
+                beforeload: function (store, options) {
+                    store_user.getProxy().extraParams =
+                        Ext.getCmp('formpanel_search').getForm().getValues();
                 }
             }
-        })
+        });
 
+        //去掉var不会报错
+        pgbar = Ext.create('Ext.toolbar.Paging',
+            {
+                displayMsg: '显示 {0} - {1} 条,共计 {2} 条',
+                store: store_user,
+                displayInfo: true
+            });
+
+        gridUser = Ext.create('Ext.grid.Panel',
+            {
+                renderTo: "div_west",
+                width: 400,
+                height: 500,
+                
+                bbar: pgbar,
+                store: store_user,
+                columns: [
+                    { xtype: 'rownumberer', width: 35 },
+                    { header: 'ID', dataIndex: 'ID', hidden: true },
+                    { header: '登录名', dataIndex: 'NAME', width: 100 },
+                    { header: '姓名', dataIndex: 'REALNAME', flex: 1 }
+                ],
+                listeners: {
+                    itemclick: function (value, record, item, index, e, eOpts) {
+                        
+                        
+                        
+                        treeModelstore.setProxy({
+                            type: 'ajax',
+                            url: '/Account/selectModel',
+                            reader: 'json'
+                        });
+                        userid = record.get("ID");
+                        var proxys = treeModelstore.proxy;
+                        proxys.extraParams.userid = userid;
+                        treeModelstore.load();
+                     }
+                    }
+                    
+                
+            });
+        
         var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "数据加载中，请稍等..." });
-
+        
         //系统模块
         Ext.regModel("SysModelAuth", { fields: ["MODULEID", "NAME", "leaf", "URL", "PARENTID", "checked"] });
         treeModelstore = new Ext.data.TreeStore({
@@ -86,10 +146,10 @@
             width: 800,
             store: treeModelstore,
             columns: [
-            { dataIndex: 'MODULEID', width: 500, hidden: true },
-            { dataIndex: 'leaf', width: 100, hidden: true },
-            { header: '模块名称', xtype: 'treecolumn', dataIndex: 'NAME', flex: 1 },
-            { text: 'ParentID', dataIndex: 'PARENTID', hidden: true }
+                { dataIndex: 'MODULEID', width: 500, hidden: true },
+                { dataIndex: 'leaf', width: 100, hidden: true },
+                { header: '模块名称', xtype: 'treecolumn', dataIndex: 'NAME', flex: 1 },
+                { text: 'ParentID', dataIndex: 'PARENTID', hidden: true }
             ],
             listeners: {
                 checkchange: function (node, checked) {
@@ -98,6 +158,7 @@
                 }
             }
         });
+
         //======================联动选择==========================
         /*向上遍历父结点*/
         var nodep = function (node) {
@@ -163,7 +224,18 @@
             }
         }
     }
+    //查询
+    function Select() {
+        
+        pgbar.moveFirst();
+    }
 
+    //重置
+    function Reset() {
+        Ext.getCmp('Login_ID').setValue('');
+        Ext.getCmp('Login_Name').setValue('');
+    }
+    //保存
     function SaveAuthorization() { 
         if (userid) {
             var moduleids = "";
@@ -176,7 +248,7 @@
             Ext.Ajax.request({
                 url: '/Account/AuthorizationSave',
                 params: { moduleids: moduleids, userid: userid },
-                success: function (option, success, response) {
+                success: function(option, success, response) {
                     if (option.responseText == '{success:true}') {
                         Ext.MessageBox.alert('提示', '保存成功！');
                     } else {
@@ -184,18 +256,25 @@
                     }
                     mask.hide();
                 }
-            })
+            });
         }
         else {
             Ext.MessageBox.alert('提示', '请先选择需要授权的账号！');
         }
     }
+
+    
 </script>
 
 <div class="container">
     <div id="appConId" style="width:100%"></div>
+    <div id="loginId"></div>
     <div class="btn-group" role="group">
-        <button type="button" onclick="SaveAuthorization()" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;保存</button>
+        <button type="button" onclick="SaveAuthorization()" class="btn btn-primary btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;保存</button>        
+    </div>
+    <div class="btn-group fr" role="group">
+        <button onclick="Select()" class="btn btn-primary btn-sm"><i class="fa fa-search"></i>&nbsp;查询</button>
+        <button onclick="Reset()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-refresh"></i>&nbsp;重置</button>
     </div>
     <div>
         <div id="div_west" class="fl">
