@@ -307,14 +307,21 @@ namespace MvcPlatform.Controllers
 
                 //关联成功 ，文件挪到自动上传到文件服务器的目录，并删除原始目录的文件、修改原始路径为服务器新路径
                 DBMgr.ExecuteNonQuery("update list_filerecoginze set status='已关联',ordercode='" + ordercode + "',cusno='" + cusno
-                    + "',filepath='/44/" + ordercode + "/" + filepath.Substring(filepath.LastIndexOf(@"/") + 1) + "' where id=" + id, conn);
-                ot.Commit();
+                    + "',filepath='/44/" + ordercode + "/" + filepath.Substring(filepath.LastIndexOf(@"/") + 1) + "' where id=" + id, conn);                
 
                 bool res = ftp.UploadFile(direc_pdf + filepath, newfilepath, true);
                 if (res)
                 {
+                    ot.Commit();
+
                     fi.CopyTo(bakpath + filepath.Substring(filepath.LastIndexOf(@"/") + 1));
                     fi.Delete();
+                }
+                else
+                {
+                    ot.Rollback();
+
+                    DBMgr.ExecuteNonQuery("update list_filerecoginze set status='关联失败',ordercode='" + ordercode + "',cusno='" + cusno + "' where id=" + id);
                 }
 
                 //Submit(ordercode, json_user);//add 提交委托

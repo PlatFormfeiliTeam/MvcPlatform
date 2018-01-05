@@ -84,6 +84,19 @@ namespace MvcPlatform.Filters
                     filterContext.Result = new RedirectResult("/Account/NoPower");
                 }
 
+                //----------------------------------------------------
+                //20180103临时加上权限：因 委托单位 跟 接单单位 共用一个界面，只是控制新增按钮而已，接单单位可以新增，委托单位不可以
+                if (queryString == "" && (xmlstr.ToLower() == "/orderairout/create" || xmlstr.ToLower() == "/orderairin/create" || xmlstr.ToLower() == "/orderlandout/create"
+                    || xmlstr.ToLower() == "/orderlandin/create" || xmlstr.ToLower() == "/orderseaout/create" || xmlstr.ToLower() == "/orderseain/create"
+                    || xmlstr.ToLower() == "/orderdomestic/create" || xmlstr.ToLower() == "/orderspecial/create"))//代表的是新增界面
+                {
+                    JObject jsonu = Extension.Get_UserInfo(filterContext.HttpContext.User.Identity.Name);
+                    if (json_user.Value<string>("ISRECEIVER") != "1")
+                    {
+                        filterContext.Result = new RedirectResult("/Account/NoPower");
+                    }
+                }
+                //----------------------------------------------------
             }
         }
 
