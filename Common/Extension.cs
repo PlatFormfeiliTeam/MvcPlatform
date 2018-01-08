@@ -942,16 +942,16 @@ namespace MvcPlatform.Common
             }
             //单证服务单位
             string json_dzfwdw = "[]";
-            if (db.KeyExists("common_data:dzfwdw"))
-            {
-                json_dzfwdw = db.StringGet("common_data:dzfwdw");
-            }
-            else
-            {
+            //if (db.KeyExists("common_data:dzfwdw"))
+            //{
+            //    json_dzfwdw = db.StringGet("common_data:dzfwdw");
+            //}
+            //else
+            //{
                 sql = @"select * from sys_customer where DOCSERVICECOMPANY=1";
                 json_dzfwdw = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
-                db.StringSet("common_data:dzfwdw", json_dzfwdw);
-            }
+                //db.StringSet("common_data:dzfwdw", json_dzfwdw);
+            //}
 
             //委托单位or结算单位
             string json_wtdw = "[]";

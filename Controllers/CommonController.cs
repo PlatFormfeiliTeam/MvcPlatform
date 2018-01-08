@@ -627,7 +627,7 @@ namespace MvcPlatform.Controllers
             string sql = "select * from LIST_ORDER where code='" + Request["ordercode"] + "'";
             DataTable dt = DBMgr.GetDataTable(sql);
 
-            if (dt.Rows[0]["DOCSERVICECODE"].ToString() != json_user.Value<string>("CUSTOMERCODE"))
+            if (dt.Rows[0]["RECEIVERUNITCODE"].ToString() != json_user.Value<string>("CUSTOMERCODE"))
             {
                 return "{success:false,flag:'E'}";
             }
