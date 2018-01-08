@@ -369,6 +369,41 @@ function browsefile_fd() {
     document.getElementById('fileViewDiv').innerHTML = '<embed id="pdf" width="100%" height="100%" src="' + url + '/file/' + records[0].get("FILENAME") + '"></embed>';
 }
 
+function Export() {
+    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "数据导出中，请稍等..." });
+    myMask.show();
+
+    var data = {
+        OnlySelf: Ext.get('OnlySelfi').el.dom.className,
+        CUSNO: Ext.getCmp('field_CUSNO').getValue(), ORDERCODE: Ext.getCmp('field_ORDERCODE').getValue(),
+        STATUS: Ext.getCmp("s_combo_status").getValue(),
+        STARTDATE: Ext.Date.format(Ext.getCmp("start_date").getValue(), 'Y-m-d H:i:s'),
+        ENDDATE: Ext.Date.format(Ext.getCmp("end_date").getValue(), 'Y-m-d H:i:s')
+    }
+
+    Ext.Ajax.request({
+        url: '/OrderFile/ExportFileRecoginze',
+        method: 'POST',
+        params: data,
+        success: function (response, option) {
+            var json = Ext.decode(response.responseText);
+            if (json.success == false) {
+                Ext.MessageBox.alert('提示', '综合需求及性能，导出记录限制' + json.WebDownCount + '！');
+            } else {
+                Ext.Ajax.request({
+                    url: '/Common/DownloadFile',
+                    method: 'POST',
+                    params: Ext.decode(response.responseText),
+                    form: 'exportform',
+                    success: function (response, option) {
+                    }
+                });
+            }
+            myMask.hide();
+        }
+    });
+}
+
 //----------------------------------------------------------------------------------------关联文件------------------------------------------------------------------------------------
 function openwin() {
     var recs = Ext.getCmp("gridpanel").getSelectionModel().getSelection();

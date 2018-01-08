@@ -164,7 +164,7 @@ namespace MvcPlatform.Controllers
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             string sql = QueryCondition();
 
-            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "createtime", "desc"));
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "a.createtime", "desc"));
             var json = JsonConvert.SerializeObject(dt, iso);
 
             var json_senior = "[]";
@@ -3058,6 +3058,7 @@ namespace MvcPlatform.Controllers
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string sql = QueryCondition();
+            sql += " order by a.createtime desc";
             string dec_insp_status = Request["dec_insp_status"]; string busitypeid = Request["busitypeid"]; string common_data_sbfs = Request["common_data_sbfs"];
 
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 

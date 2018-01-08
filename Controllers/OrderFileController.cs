@@ -373,21 +373,57 @@ namespace MvcPlatform.Controllers
             string result = "{filedata:" + filedata + "}";
             return result;
         }
-        
 
-        #endregion
-
-        private string GetPageSql(string tempsql, string order, string asc)
+        public string ExportFileRecoginze()
         {
-            int start = Convert.ToInt32(Request["start"]);
-            int limit = Convert.ToInt32(Request["limit"]);
-            string sql = "select count(1) from ( " + tempsql + " )";
-            totalProperty = Convert.ToInt32(DBMgr.GetDataTable(sql).Rows[0][0]);
-            string pageSql = @"SELECT * FROM ( SELECT tt.*, ROWNUM AS rowno FROM ({0} ORDER BY {1} {2}) tt WHERE ROWNUM <= {4}) table_alias WHERE table_alias.rowno >= {3}";
-            pageSql = string.Format(pageSql, tempsql, order, asc, start + 1, limit + start);
-            return pageSql;
-        }
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string sql = QueryConditionFileRecoginze();
+            sql = sql + " order by lf.TIMES desc";
 
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+            DataTable dt_count = DBMgr.GetDataTable("select count(1) from (" + sql + ") a");
+            int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
+            if (Convert.ToInt32(dt_count.Rows[0][0]) > WebDownCount)
+            {
+                return "{success:false,WebDownCount:" + WebDownCount + "}";
+            }
+
+            DataTable dt = DBMgr.GetDataTable(sql);
+
+            //创建Excel文件的对象
+            NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();
+
+            //添加一个导出成功sheet
+            NPOI.SS.UserModel.ISheet sheet_S;
+            string filename = "文件关联.xls";
+
+            sheet_S = book.CreateSheet("文件关联");
+
+            NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
+            row1.CreateCell(0).SetCellValue("关联状态"); row1.CreateCell(1).SetCellValue("订单编号"); row1.CreateCell(2).SetCellValue("客户编号"); 
+            row1.CreateCell(3).SetCellValue("创建时间"); row1.CreateCell(4).SetCellValue("创建人"); 
+
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["STATUS"].ToString());
+                rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
+                rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+
+                rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["TIMES"].ToString());
+                rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["USERNAME"].ToString());
+            }
+
+            // 写入到客户端 
+            //System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            //book.Write(ms);
+            //ms.Seek(0, SeekOrigin.Begin);
+            //return File(ms, "application/vnd.ms-excel", filename);
+
+            return Extension.getPathname(filename, book);
+        }
 
 //        public static string Submit(string ordercode, JObject json_user)
 //        {
@@ -401,7 +437,8 @@ namespace MvcPlatform.Controllers
 //            if (busitype == "30" || busitype == "31")//陆运业务
 //            {
 //                string status = "10", declstatus = "", inspstatus = "";
-//                if (entrusttype == "01") {
+//                if (entrusttype == "01")
+//                {
 //                    if (dt_order.Rows[0]["DECLSTATUS"].ToString() != "")
 //                    {
 //                        if (Convert.ToInt32(dt_order.Rows[0]["DECLSTATUS"].ToString()) >= 10)
@@ -409,9 +446,10 @@ namespace MvcPlatform.Controllers
 //                            return rtnstr;
 //                        }
 //                    }
-//                    declstatus = status; 
+//                    declstatus = status;
 //                }
-//                if (entrusttype == "02") {
+//                if (entrusttype == "02")
+//                {
 //                    if (dt_order.Rows[0]["INSPSTATUS"].ToString() != "")
 //                    {
 //                        if (Convert.ToInt32(dt_order.Rows[0]["INSPSTATUS"].ToString()) >= 10)
@@ -419,9 +457,10 @@ namespace MvcPlatform.Controllers
 //                            return rtnstr;
 //                        }
 //                    }
-//                    inspstatus = status; 
+//                    inspstatus = status;
 //                }
-//                if (entrusttype == "03") {
+//                if (entrusttype == "03")
+//                {
 //                    if (dt_order.Rows[0]["DECLSTATUS"].ToString() != "")
 //                    {
 //                        if (Convert.ToInt32(dt_order.Rows[0]["DECLSTATUS"].ToString()) >= 10)
@@ -436,7 +475,7 @@ namespace MvcPlatform.Controllers
 //                            return rtnstr;
 //                        }
 //                    }
-//                    declstatus = status; inspstatus = status; 
+//                    declstatus = status; inspstatus = status;
 //                }
 
 //                string sql = @"UPDATE LIST_ORDER SET STATUS='{1}',DECLSTATUS='{2}',INSPSTATUS='{3}',SUBMITUSERID='{4}',SUBMITUSERNAME='{5}'  
@@ -457,6 +496,23 @@ namespace MvcPlatform.Controllers
 //            return rtnstr;
 
 //        }
+
+
+        #endregion
+
+        private string GetPageSql(string tempsql, string order, string asc)
+        {
+            int start = Convert.ToInt32(Request["start"]);
+            int limit = Convert.ToInt32(Request["limit"]);
+            string sql = "select count(1) from ( " + tempsql + " )";
+            totalProperty = Convert.ToInt32(DBMgr.GetDataTable(sql).Rows[0][0]);
+            string pageSql = @"SELECT * FROM ( SELECT tt.*, ROWNUM AS rowno FROM ({0} ORDER BY {1} {2}) tt WHERE ROWNUM <= {4}) table_alias WHERE table_alias.rowno >= {3}";
+            pageSql = string.Format(pageSql, tempsql, order, asc, start + 1, limit + start);
+            return pageSql;
+        }
+
+
+
 
     }
 }

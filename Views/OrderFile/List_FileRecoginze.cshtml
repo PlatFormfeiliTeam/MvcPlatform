@@ -25,6 +25,9 @@
             <button onclick="changeOnlySelfStyle()" class="btn btn-primary btn-sm"><i id="OnlySelfi" class="fa fa-check-square-o"></i>&nbsp;仅本人</button>
             <button onclick="Select()" class="btn btn-primary btn-sm"><i class="fa fa-search"></i>&nbsp;查询</button>
             <button onclick="Reset()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-refresh"></i>&nbsp;重置</button>
+            <form id="exportform" name="form" enctype="multipart/form-data" method="post" style="display:inline-block">
+                <button type="button" id="btn_Export" class="btn btn-primary btn-sm" onclick="Export()"><i class="fa fa-level-down"></i>&nbsp;导出</button>
+            </form>
         </div>
     </div>
     <div id="appConId" style="width:100%;"></div>
