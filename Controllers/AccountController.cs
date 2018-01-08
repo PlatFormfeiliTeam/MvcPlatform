@@ -144,12 +144,12 @@ namespace MvcPlatform.Controllers
             string strWhere = string.Empty;
             if (!string.IsNullOrEmpty(Request["Login_ID"]))
             {
-                strWhere = strWhere + " and name = '" + Request["Login_ID"] + "' ";
+                strWhere += " and name like '%" + Request["Login_ID"] + "%' ";
             }
 
             if (!string.IsNullOrEmpty(Request["Login_Name"]))
             {
-                strWhere = strWhere + " and realname = '" + Request["Login_Name"] + "' ";
+                strWhere += " and realname like '%" + Request["Login_Name"] + "%' ";
             }
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
