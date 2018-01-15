@@ -414,12 +414,23 @@ function form_ini_con() {
                    text: '<span class="icon iconfont" style="font-size:10px">&#xe6d3;</span>&nbsp;删 除', id: 'btn_pro_del',
                    handler: function () {
                        var recs = gridpanel_costdata.getSelectionModel().getSelection();
-                       if (recs.length > 0) {
-                           if (recs[0].data.STATUS <= 10) { store_COSTDATA.remove(recs); }
-                           else { Ext.MessageBox.alert("提示", "只能删除费用状态为<span style='color:blue'>生成费用</span>的记录！"); }
+                       if (recs.length == 0) {
+                           Ext.MessageBox.alert('提示', '请选择需要删除的记录！');
+                           return;
                        }
-                       Ext.getCmp('btn_mode').setText('<span style="color:blue">新增模式</span>');
-                       rownum = -1;
+
+                       Ext.MessageBox.confirm("提示", "确定要删除所选择的记录吗？", function (btn) {
+                           if (btn == 'yes') {
+                               if (recs[0].data.STATUS > 10) {
+                                   Ext.MessageBox.alert("提示", "只能删除费用状态为<span style='color:blue'>生成费用</span>的记录！");
+                                   return;
+                               }
+
+                               store_COSTDATA.remove(recs);
+                               Ext.getCmp('btn_mode').setText('<span style="color:blue">新增模式</span>');
+                               rownum = -1;
+                           }
+                       });
                    }
                }]
     });
