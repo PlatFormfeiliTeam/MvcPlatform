@@ -303,6 +303,9 @@ function form_ini_con() {
                     cb.expand();
                 }
             },
+            select: function (records) {
+                field_FEENAME.setValue(records.rawValue);
+            },
             change: function (combo, newValue, oldValue, eOpts) {
                 field_FEENAME.setValue(combo.rawValue);
             }
