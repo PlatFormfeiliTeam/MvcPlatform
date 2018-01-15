@@ -31,7 +31,7 @@
         valueField: 'CODE',
         triggerAction: 'all',
         forceSelection: true,
-        tabIndex: 2,
+        tabIndex: 1,
         queryMode: 'local',
         anyMatch: true,
         listeners: {
@@ -68,7 +68,7 @@
         displayField: 'NAME',
         valueField: 'CODE',
         triggerAction: 'all',
-        queryMode: 'local',
+        queryMode: 'local', tabIndex: 2,
         anyMatch: true,
         listeners: {
             focus: function (cb) {
@@ -103,7 +103,7 @@
         margin: 0,
         minChars: 4,
         forceSelection: true,
-        tabIndex: 10,
+        tabIndex: 3,
         anyMatch: true,
         hideTrigger: true,
         listeners: {
@@ -154,7 +154,7 @@
         fieldLabel: '结算单位', forceSelection: true,
         displayField: 'NAME',
         valueField: 'CODE',
-        triggerAction: 'all',
+        triggerAction: 'all', tabIndex: 4,
         queryMode: 'local',
         anyMatch: true,
         listeners: {
@@ -177,44 +177,44 @@
     var field_CUSNO = Ext.create('Ext.form.field.Text', {
         id: 'CUSNO',
         name: 'CUSNO',
-        tabIndex: 8,
+        tabIndex: 5,
         fieldLabel: '企业编号'
     });
-    //维护人员
+    //创建人员
     var field_CREATEUSERNAME = Ext.create('Ext.form.field.Text', {
         name: 'CREATEUSERNAME',
-        fieldLabel: '维护人员',
-        readOnly: true
+        fieldLabel: '创建人员',
+        readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
-    //维护时间
+    //创建时间
     var field_CREATETIME = Ext.create('Ext.form.field.Text', {
         id: 'field_CREATETIME',
         name: 'CREATETIME',
-        fieldLabel: '维护时间',
-        readOnly: true
+        fieldLabel: '创建时间',
+        readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
 
-    //提交人员
+    //维护人员
     var field_SUBMITUSERNAME = Ext.create('Ext.form.field.Text', {
         name: 'SUBMITUSERNAME',
-        fieldLabel: '委托人员',
-        readOnly: true
+        fieldLabel: '维护人员',
+        readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
-    //提交时间
+    //维护时间
     var field_SUBMITTIME = Ext.create('Ext.form.field.Text', {
         name: 'SUBMITTIME',
-        fieldLabel: '委托时间',
-        readOnly: true
+        fieldLabel: '维护时间',
+        readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
 
     //操作需求
     var field_DOREQUEST = Ext.create('Ext.form.field.Text', {
         id: 'field_DOREQUEST',
-        tabIndex: 23, flex: 1, margin: 0,
+        tabIndex: 23, flex: 1, margin: 0, tabIndex: 6,
         name: 'DOREQUEST'
     });
     var container_DOREQUEST = {
-        columnWidth: .40,
+        columnWidth: 1,
         xtype: 'fieldcontainer',
         layout: 'hbox',
         fieldLabel: '操作需求',
@@ -224,11 +224,11 @@
     //结算备注
     var field_CLEARREMARK = Ext.create('Ext.form.field.Text', {
         id: 'field_CLEARREMARK',
-        tabIndex: 23, flex: 1, margin: 0,
+        tabIndex: 23, flex: 1, margin: 0, tabIndex: 7,
         name: 'CLEARREMARK'
     });
     var container_CLEARREMARK = {
-        columnWidth: .60,
+        columnWidth: 1,
         xtype: 'fieldcontainer',
         layout: 'hbox',
         fieldLabel: '结算备注',
@@ -258,7 +258,8 @@
         items: [
         { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_CODE, combo_ENTRUSTTYPENAME, combo_wtdw, field_jydw, combo_jsdw] },
         { layout: 'column', height: 42, border: 0, items: [field_CUSNO, field_CREATEUSERNAME, field_CREATETIME, field_SUBMITUSERNAME, field_SUBMITTIME] },
-        { layout: 'column', height: 42, border: 0, items: [container_DOREQUEST, container_CLEARREMARK, ] },        
+        { layout: 'column', height: 42, border: 0, items: [container_DOREQUEST] },
+        { layout: 'column', height: 42, border: 0, items: [container_CLEARREMARK] },
         field_BUSIUNITNAME, field_CUSTOMERNAME, field_CLEARUNITNAME, field_ORIGINALCOSTIDS
         ]
     });
@@ -318,7 +319,32 @@ function form_ini_con() {
         name: 'COST',
         fieldLabel: '金额', hideTrigger: true, //decimalPrecision: 2,
         allowBlank: false,
-        blankText: '金额不能为空!'
+        blankText: '金额不能为空!',
+        listeners: {
+            "specialkey": function (field, e) {
+                if (e.keyCode == 13) {
+                    if (!formpanel_con.getForm().isValid()) {
+                        return;
+                    }
+                    if (Number(field_COST.getValue()) <= 0) {
+                        Ext.MessageBox.alert("提示", "金额必须大于0！");
+                        return;
+                    }
+                    var formdata = formpanel_con.getForm().getValues();
+                    if (rownum < 0) {//添加模式
+                        store_COSTDATA.insert(store_COSTDATA.data.length, formdata);
+                    }
+                    else {//修改模式
+                        var rec = store_COSTDATA.getAt(rownum);
+                        store_COSTDATA.remove(rec);
+                        store_COSTDATA.insert(rownum, formdata);
+                    }
+                    formpanel_con.getForm().reset();
+                    rownum = -1;
+                    Ext.getCmp('btn_mode').setText('<span style="color:blue">新增模式</span>');
+                }
+            }
+        }
     });
 
     //费用状态
@@ -386,7 +412,7 @@ function form_ini_con() {
                     }
                 },
                '->',
-               {
+               /*{
                    text: '<span class="icon iconfont" style="font-size:10px">&#xe622;</span>&nbsp;保 存', id: 'btn_pro_save',
                    handler: function () {
                        if (!formpanel_con.getForm().isValid()) {
@@ -409,20 +435,20 @@ function form_ini_con() {
                        rownum = -1;
                        Ext.getCmp('btn_mode').setText('<span style="color:blue">新增模式</span>');
                    }
-               },
+               },*/
                {
-                   text: '<span class="icon iconfont" style="font-size:10px">&#xe6d3;</span>&nbsp;删 除', id: 'btn_pro_del',
+                   text: '<span class="icon iconfont" style="font-size:10px">&#xe6d3;</span>&nbsp;移 除', id: 'btn_pro_del',
                    handler: function () {
                        var recs = gridpanel_costdata.getSelectionModel().getSelection();
                        if (recs.length == 0) {
-                           Ext.MessageBox.alert('提示', '请选择需要删除的记录！');
+                           Ext.MessageBox.alert('提示', '请选择需要移除的记录！');
                            return;
                        }
 
-                       Ext.MessageBox.confirm("提示", "确定要删除所选择的记录吗？", function (btn) {
+                       Ext.MessageBox.confirm("提示", "确定要移除所选择的记录吗？", function (btn) {
                            if (btn == 'yes') {
                                if (recs[0].data.STATUS > 10) {
-                                   Ext.MessageBox.alert("提示", "只能删除费用状态为<span style='color:blue'>生成费用</span>的记录！");
+                                   Ext.MessageBox.alert("提示", "只能移除费用状态为<span style='color:blue'>生成费用</span>的记录！");
                                    return;
                                }
 

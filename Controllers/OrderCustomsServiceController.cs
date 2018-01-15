@@ -157,7 +157,7 @@ namespace MvcPlatform.Controllers
                 formdata = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso).TrimStart('[').TrimEnd(']');
 
                 //费用明细
-                sql = @"select a.*,(select name from finance_feelist where code=a.feecode and ISENABLED=0) FEENAME
+                sql = @"select a.*,(select name||'('||code||')' from finance_feelist where code=a.feecode and ISENABLED=0) FEENAME
                             ,(select name from finance_status where code=a.status) STATUSNAME
                         from finance_costdata a where a.ordercode='" + ordercode + "' order by a.id";
                 costdata = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso);

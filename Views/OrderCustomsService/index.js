@@ -45,7 +45,7 @@ function initSearch_CusService() {
 
     var start_date = Ext.create('Ext.form.field.Date', { id: 'start_date', name: 'start_date', format: 'Y-m-d', emptyText: '开始日期', flex: .5, margin: 0 });
     var end_date = Ext.create('Ext.form.field.Date', { id: 'end_date', name: 'end_date', format: 'Y-m-d', emptyText: '结束日期', flex: .5, margin: 0 });    
-    var condate = Ext.create('Ext.form.FieldContainer', { fieldLabel: '委托日期', layout: 'hbox', columnWidth: .33, items: [start_date, end_date] });
+    var condate = Ext.create('Ext.form.FieldContainer', { fieldLabel: '创建日期', layout: 'hbox', columnWidth: .33, items: [start_date, end_date] });
 
     //委托单位
     var store_wtdw = Ext.create('Ext.data.JsonStore', {
@@ -74,7 +74,7 @@ function initSearch_CusService() {
 
     var start_date2 = Ext.create('Ext.form.field.Date', { id: 'start_date2', name: 'start_date2', format: 'Y-m-d', emptyText: '开始日期', flex: .5, margin: 0 });
     var end_date2 = Ext.create('Ext.form.field.Date', { id: 'end_date2', name: 'end_date2', format: 'Y-m-d', emptyText: '结束日期', flex: .5, margin: 0 });
-    var condate2 = Ext.create('Ext.form.FieldContainer', { fieldLabel: '提交日期', layout: 'hbox', columnWidth: .33, items: [start_date2, end_date2] });
+    var condate2 = Ext.create('Ext.form.FieldContainer', { fieldLabel: '维护日期', layout: 'hbox', columnWidth: .33, items: [start_date2, end_date2] });
 
 
     var formpanel = Ext.create('Ext.form.Panel', {
@@ -142,8 +142,8 @@ function bindgrid() {
         columns: [
         { xtype: 'rownumberer', width: 35 },
         { header: 'ID', dataIndex: 'ID', hidden: true, locked: true },
-        { header: '提交时间', dataIndex: 'SUBMITTIME', width: 120, locked: true },
-        { header: '委托时间', dataIndex: 'CREATETIME', width: 120, locked: true },
+        { header: '维护时间', dataIndex: 'SUBMITTIME', width: 120, locked: true },
+        { header: '创建时间', dataIndex: 'CREATETIME', width: 120, locked: true },
         { header: '委托类型', dataIndex: 'ENTRUSTTYPE', width: 100, locked: true },
         { header: '委托单位', dataIndex: 'CUSTOMERNAME', width: 130, locked: true },
         { header: '结算单位', dataIndex: 'CLEARUNITNAME', width: 130, locked: true },

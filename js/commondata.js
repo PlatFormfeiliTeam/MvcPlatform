@@ -5,7 +5,7 @@ var wtlx_js_data = [{ "CODE": "01", "NAME": "报关单(01)" }, { "CODE": "02", "
 var wtlx_js_data_CustomsService = [{ "CODE": "企业备案（手册）", "NAME": "企业备案（手册）" }, { "CODE": "减免税备案", "NAME": "减免税备案" }, { "CODE": "代理预录入", "NAME": "代理预录入" },
     { "CODE": "账册备案", "NAME": "账册备案" }, { "CODE": "其他", "NAME": "其他" }];
 //费用类别-关务服务
-var fylb_js_data = [{ "CODE": "DLF", "NAME": "代理费" }, { "CODE": "SJF", "NAME": "输机费" }, { "CODE": "QTF", "NAME": "其他费" }];
+var fylb_js_data = [{ "CODE": "DLF", "NAME": "代理费(DLF)" }, { "CODE": "SJF", "NAME": "输机费(SJF)" }, { "CODE": "QTF", "NAME": "其他费(QTF)" }];
 
 //货物类型
 var hwlx_js_data = [{ "CODE": "1", "NAME": "整箱(1)" }, { "CODE": "2", "NAME": "散货(2)" }];
