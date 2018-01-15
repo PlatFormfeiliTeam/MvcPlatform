@@ -4001,7 +4001,7 @@ namespace MvcPlatform.Controllers
                     }
                     break;
             }
-            where += @" and lda.BUSIUNITCODE ='" + json_user.Value<string>("CUSTOMERHSCODE") + "' and ort.BUSITYPE not in('40','41')";
+            where += @" and lda.BUSIUNITCODE ='" + json_user.Value<string>("CUSTOMERHSCODE") + "' and ort.BUSITYPE in('10','11','20','21','30','31','50','51')"; //+"' and ort.BUSITYPE not in('40','41')";
 
             string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.SHEETNUM,det.modifyflag,
                               lda.declarationcode,to_char(lda.reptime,'yyyy-mm-dd') reptime,lda.contractno,lda.goodsnum,lda.goodsnw,lda.goodsgw,lda.blno,

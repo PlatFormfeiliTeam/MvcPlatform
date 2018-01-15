@@ -627,7 +627,7 @@ namespace MvcPlatform.Common
             string ISRECEIVER = json_user.Value<string>("ISRECEIVER");//add 20180101
 
             IDatabase db = SeRedis.redis.GetDatabase();
-            string sql = ""; 
+            string sql = "";
 
             string json_jydw = "";//经营单位 :公用
             if (db.KeyExists("common_data:jydw"))
@@ -948,9 +948,9 @@ namespace MvcPlatform.Common
             //}
             //else
             //{
-                sql = @"select * from sys_customer where DOCSERVICECOMPANY=1";
-                json_dzfwdw = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
-                //db.StringSet("common_data:dzfwdw", json_dzfwdw);
+            sql = @"select * from sys_customer where DOCSERVICECOMPANY=1";
+            json_dzfwdw = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+            //db.StringSet("common_data:dzfwdw", json_dzfwdw);
             //}
 
             //委托单位or结算单位
@@ -961,9 +961,22 @@ namespace MvcPlatform.Common
             //}
             //else
             //{
-                sql = @"select * from sys_customer where (ISCUSTOMER=1 or ISCOMPANY=1)";
-                json_wtdw = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
-                //db.StringSet("common_data:wtdw", json_wtdw);
+            sql = @"select a.*,NAME||'('||CODE||')' CODENAME from sys_customer a where (ISCUSTOMER=1 or ISCOMPANY=1)";
+            json_wtdw = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+            //db.StringSet("common_data:wtdw", json_wtdw);
+            //}
+
+            //费用状态
+            string json_fyzt= "[]";
+            //if (db.KeyExists("common_data:fyzt"))
+            //{
+            //    json_fyzt = db.StringGet("common_data:fyzt");
+            //}
+            //else
+            //{
+                sql = @"select a.*,NAME||'('||CODE||')' CODENAME from finance_status a order by code";
+                json_fyzt = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
+            //    db.StringSet("common_data:fyzt", json_fyzt);
             //}
 
             if (ParaType == "predata")//ListPreData.cshtml 导入用的
@@ -978,6 +991,11 @@ namespace MvcPlatform.Common
             if (ParaType == "filerecoginze")//List_FileRecoginze.cshtml 导入用的
             {
                 return "{jydw:" + json_jydw + "}";
+            }
+
+            if (ParaType == "CustomsService")//关务服务
+            {
+                return "{jydw:" + json_jydw + ",wtdw:" + json_wtdw + ",fyzt:" + json_fyzt + "}";
             }
 
             return "{jydw:" + json_jydw + ",sbfs_all:" + json_sbfs_all + ",sbfs:" + json_sbfs + ",sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",bzzl:" + json_bzzl

@@ -89,7 +89,12 @@
     <submenu>/Common/OrderTrack?menuxml=domestic</submenu>
     <submenu>/Common/FileConsult?menuxml=domestic</submenu>
   </rootmenu>
-  
+
+  <rootmenu>
+    <menu>/OrderCustomsService/Index</menu>
+    <submenu>/OrderCustomsService/Create</submenu>
+  </rootmenu>
+
   <!-- 报关单管理-->
   
   <rootmenu>
