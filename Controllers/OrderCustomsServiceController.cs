@@ -334,6 +334,7 @@ namespace MvcPlatform.Controllers
 
         public string ExportCustomsList()
         {
+            string wtlx_cus = Request["wtlx_cus"];
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string sql = QueryCondition();
             sql += " order by a.createtime desc";
@@ -370,7 +371,7 @@ namespace MvcPlatform.Controllers
                 NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
                 rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
                 rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["CREATETIME"].ToString());
-                rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["ENTRUSTTYPE"].ToString());
+                rowtemp.CreateCell(2).SetCellValue(GetName(dt.Rows[i]["ENTRUSTTYPE"].ToString(), wtlx_cus));
                 rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CUSTOMERNAME"].ToString());
                 rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["CLEARUNITNAME"].ToString());
 
@@ -450,6 +451,18 @@ namespace MvcPlatform.Controllers
 
         #endregion
 
+        public string GetName(string value, string datasource)
+        {
+            string name = "";
+
+            JArray jarray = JArray.Parse(datasource);
+            foreach (JObject json in jarray)
+            {
+                if (json.Value<string>("CODE") == value) { name = json.Value<string>("NAME"); break; }
+            }
+
+            return name;
+        }
 
         private string GetPageSql(string tempsql, string order, string asc)
         {

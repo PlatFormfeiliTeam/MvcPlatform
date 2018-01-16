@@ -1,4 +1,5 @@
 ﻿var common_data_jydw = [], common_data_wtdw = [];
+var store_wtlx_CustomsService;
 
 Ext.onReady(function () {
     Ext.Ajax.request({//对公共基础数据发起一次请求
@@ -8,6 +9,8 @@ Ext.onReady(function () {
             var commondata = Ext.decode(response.responseText);
             common_data_jydw = commondata.jydw;//经营单位
             common_data_wtdw = commondata.wtdw;//委托单位
+
+            store_wtlx_CustomsService = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: wtlx_js_data_CustomsService });
 
             initSearch_CusService();
             bindgrid();
@@ -144,7 +147,16 @@ function bindgrid() {
         { header: 'ID', dataIndex: 'ID', hidden: true, locked: true },
         { header: '维护时间', dataIndex: 'SUBMITTIME', width: 120, locked: true },
         { header: '创建时间', dataIndex: 'CREATETIME', width: 120, locked: true },
-        { header: '委托类型', dataIndex: 'ENTRUSTTYPE', width: 100, locked: true },
+        {
+            header: '委托类型', dataIndex: 'ENTRUSTTYPE', width: 100, locked: true, renderer: function renderOrder(value, cellmeta, record, rowIndex, columnIndex, store) {
+                var rtn = "";
+                var rec = store_wtlx_CustomsService.findRecord('CODE', value);
+                if (rec) {
+                    rtn = rec.get("NAME");
+                }
+                return rtn;
+            }
+        },
         { header: '委托单位', dataIndex: 'CUSTOMERNAME', width: 130, locked: true },
         { header: '结算单位', dataIndex: 'CLEARUNITNAME', width: 130, locked: true },
         { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 130, locked: true },
@@ -205,6 +217,7 @@ function ExportCustoms() {
     myMask.show();
 
     var data = {
+        wtlx_cus: JSON.stringify(wtlx_js_data_CustomsService),
         busitypeid: 70,
         OnlySelf: Ext.get('OnlySelfi').el.dom.className,
         BUSIUNITCODE: Ext.getCmp('s_combo_busiunitname').getValue(), CUSNO: Ext.getCmp('field_CUSNO').getValue(),

@@ -961,7 +961,7 @@ namespace MvcPlatform.Common
             //}
             //else
             //{
-            sql = @"select a.*,NAME||'('||CODE||')' CODENAME from sys_customer a where (ISCUSTOMER=1 or ISCOMPANY=1)";
+            sql = @"select a.*,NAME||'('||CODE||')' CODENAME from sys_customer a where (ISCUSTOMER=1 or ISCOMPANY=1) and enabled=1";
             json_wtdw = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
             //db.StringSet("common_data:wtdw", json_wtdw);
             //}
