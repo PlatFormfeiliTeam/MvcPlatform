@@ -25,7 +25,11 @@
     }
             </style>
         <![endif]-->
-    
+    <style>        
+        .modal {
+            top: 20%;
+        }
+    </style>
 </head>
 <body>
     <div id="header">
@@ -38,35 +42,87 @@
     </div>
 
     <div style="min-height: 657px; margin-top: 100px; background-image: url('/Images/outlogin.jpg'); background-repeat: no-repeat; background-position: center; ">
-        <div style="border: 1px solid #ffffff; float: right; width: 350px; padding: 50px 50px 42px 50px; margin: 175px 360px 30px 40px; background-color: #ffffff">
+       
+        <!-- Button trigger modal -->
+        <button type="button" id="btn_show" style="display:none;" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+            Launch demo modal
+        </button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h3 class="modal-title" id="myModalLabel">系统更新</h3>
+                    </div>
+                    <div class="modal-body">
+                        登录：新增<font color="blue">公司代码</font>,内容为公司全称的汉语拼音首字母拼写。
+                        <br /><font color="blue">例如：昆山吉时报关有限公司KSJSBGYXGS</font>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        @*<button type="button" class="btn btn-primary">Save changes</button>*@
+                    </div>
+                </div>
+            </div>
+        </div>
+
+         <div style="border: 1px solid #ffffff; float: right; width: 350px; padding: 50px 50px 42px 50px; margin: 175px 360px 30px 40px; background-color: #ffffff">
             <form action="/Account/Login?ReturnUrl=@Url.Encode(ViewBag.ReturnUrl)" method="post">
                 <label for="user_name">登录名</label>
-                <div class="input-group" style="margin-bottom: 20px">
+                <div class="input-group"> @*style="margin-bottom: 20px"*@
                     <span class="input-group-addon icon iconfont">&#xe611;</span>
                     @Html.TextBoxFor(u => u.NAME, new { @class = "form-control" })
                 </div>
+                <div style="padding-left:40px;">
+                    <label style="color:red" id="validate">
+                        @Html.ValidationMessageFor(u => u.NAME)
+                    </label>
+                </div>
                 <label for="password">登录密码</label>
-                <div class="input-group">
+                <div class="input-group"> @*style="margin-bottom: 20px"*@
                     <span class="input-group-addon icon iconfont">&#xe65e;</span>
                     @Html.PasswordFor(u => u.PASSWORD, new { @class = "form-control" })
                 </div>
-                <div style="line-height:35px">
+                <div style="padding-left:40px;">
                     <label style="color:red" id="validate">
-                        @Html.ValidationMessageFor(u => u.NAME)
                         @Html.ValidationMessageFor(u => u.PASSWORD)
+                    </label>
+                </div>
+                <label for="customercode">公司代码</label>
+                <div class="input-group">
+                    <span class="input-group-addon icon iconfont">&#xe629;</span>
+                    @Html.TextBoxFor(u => u.CUSTOMERCODE, new { @class = "form-control" })
+                </div>
+                <div style="padding-left:40px;">
+                    <label style="color:red" id="validate">
+                        @Html.ValidationMessageFor(u => u.CUSTOMERCODE)
+                    </label>
+                </div>
+                <div> @*style="line-height:35px;font-size:12px"*@
+                    <label style="color:red" id="validate">
                         @Html.ValidationMessage("ERROR")
                     </label>
                 </div>
                 <button type="submit" id='btn_login' class="btn btn-primary btn-group-justified">登录</button>
             </form>
         </div>
+
     </div>
 
 
         
-            <div style="text-align: center; margin: 2px 0px 0px 0px; font-size: 13px;padding:20px">
-                <p>关于我们 合作伙伴 营销中心 联系客服 诚征英才 联系我们 网站地图 法律声明© 2016 feili.com 版权所有</p>
-                <p>&copy; Copyright 2015 - 2016. | 苏ICP备05048421号</p>
-            </div>
+    <div style="text-align: center; margin: 2px 0px 0px 0px; font-size: 13px;padding:20px">
+        <p>关于我们 合作伙伴 营销中心 联系客服 诚征英才 联系我们 网站地图 法律声明© 2016 feili.com 版权所有</p>
+        <p>&copy; Copyright 2015 - 2016. | 苏ICP备05048421号</p>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#btn_show").trigger('click');
+        });
+    </script>
+
 </body>
 </html>

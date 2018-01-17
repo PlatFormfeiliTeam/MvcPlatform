@@ -18,5 +18,8 @@ namespace MvcPlatform.Models
 
         [Required(AllowEmptyStrings = false, ErrorMessage = "密码不能为空")]
         public string PASSWORD { get; set; }
+
+        [Required(AllowEmptyStrings = false, ErrorMessage = "公司代码不能为空")]
+        public string CUSTOMERCODE { get; set; }
     }
 }

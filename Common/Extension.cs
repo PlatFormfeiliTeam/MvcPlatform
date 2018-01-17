@@ -35,6 +35,8 @@ namespace MvcPlatform.Common
         }
         public static JObject Get_UserInfo(string account)
         {
+            JObject json_account = (JObject)JsonConvert.DeserializeObject(account);
+
             IDatabase db = SeRedis.redis.GetDatabase();
             string result = "";
             if (db.KeyExists(account))
@@ -53,10 +55,13 @@ namespace MvcPlatform.Common
                             from SYS_USER u 
                                  left join cusdoc.sys_customer c on u.customerid = c.id 
                                  left join cusdoc.base_company d on c.hscode=d.code
-                                 left join cusdoc.base_company e on c.ciqcode=e.INSPCODE where u.name ='" + account + "'";
+                                 left join cusdoc.base_company e on c.ciqcode=e.INSPCODE 
+                            where lower(u.name) ='" + json_account.Value<string>("NAME").ToLower() + "' and lower(c.code)='" + json_account.Value<string>("CUSTOMERCODE").ToLower() + "'";
                 DataTable dt = DBMgr.GetDataTable(sql);
+
                 IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
                 iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
                 string jsonstr = JsonConvert.SerializeObject(dt, iso);
                 jsonstr = jsonstr.Replace("[", "").Replace("]", "");
                 //db.StringSet(account, jsonstr);

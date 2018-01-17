@@ -38,7 +38,7 @@ namespace MvcPlatform.Controllers
             if (ModelState.IsValid)
             {
                 DataTable dt_user = new DataTable();
-                dt_user = DBMgr.GetDataTable("select * from sys_user where name = '" + u.NAME + "'");
+                dt_user = DBMgr.GetDataTable("select a.*,b.code from sys_user a inner join cusdoc.sys_customer b on a.customerid=b.id where lower(a.name) = '" + u.NAME.ToLower() + "' and lower(b.code)='" + u.CUSTOMERCODE.ToLower() + "'");
                 if (dt_user.Rows.Count > 0)
                 {
                     if (dt_user.Rows[0]["TYPE"] + "" == "4")
@@ -52,30 +52,41 @@ namespace MvcPlatform.Controllers
                         return View(u);
                     }
 
+                    List<Models.User> ls_user = new List<Models.User>();
+                    ls_user.Add(u);
+                    var jsuser = JsonConvert.SerializeObject(ls_user).TrimStart('[').TrimEnd(']');
+
                     DataTable dt_superpwd = new DataTable();
                     dt_superpwd = DBMgr.GetDataTable("select * from sys_superpwd where PWD='" + u.PASSWORD + "'");
                     if (dt_superpwd.Rows.Count > 0)//超级管理员
-                    {
-                        FormsAuthentication.SetAuthCookie(u.NAME, false);
+                    {                        
+                        FormsAuthentication.SetAuthCookie(jsuser, false); 
+                        //FormsAuthentication.SetAuthCookie(u.NAME, false);
                         Response.Redirect(returnUrl);
                     }
                     else
                     {
-                        string sql = "select * from sys_user where name = '" + u.NAME + "' and password = '" + Extension.ToSHA1(u.PASSWORD) + "'";
+                        string sql = @"select a.*,b.code 
+                                    from sys_user a 
+                                        inner join cusdoc.sys_customer b on a.customerid=b.id 
+                                    where lower(a.name) = '" + u.NAME.ToLower() + "' and a.password = '" + Extension.ToSHA1(u.PASSWORD) + "' and lower(b.code)='" + u.CUSTOMERCODE.ToLower() + "'";
                         DataTable dt = DBMgr.GetDataTable(sql);
                         if (dt.Rows.Count > 0)
                         {
-                            FormsAuthentication.SetAuthCookie(u.NAME, false);
+                            FormsAuthentication.SetAuthCookie(jsuser, false); 
+                            //FormsAuthentication.SetAuthCookie(u.NAME, false);
 
-                            if (dt.Rows[0]["POINTS"] + "" != "1")
-                            {
-                                Response.Write(@"<script Language=Javascript>if(confirm('原始密码还未修改，请确认是否修改密码？')) {window.location.href='/Account/ChildAccount'; } else {  window.location.href='" + returnUrl + "'}</script>");
+                            Response.Redirect(returnUrl);
 
-                            }
-                            else
-                            {
-                                Response.Redirect(returnUrl);
-                            }
+                            //if (dt.Rows[0]["POINTS"] + "" != "1")
+                            //{
+                            //    Response.Write(@"<script Language=Javascript>if(confirm('原始密码还未修改，请确认是否修改密码？')) {window.location.href='/Account/ChildAccount'; } else {  window.location.href='" + returnUrl + "'}</script>");
+
+                            //}
+                            //else
+                            //{
+                            //    Response.Redirect(returnUrl);
+                            //}
                         }
                         else
                         {
@@ -86,7 +97,7 @@ namespace MvcPlatform.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("ERROR", "账号错误！");
+                    ModelState.AddModelError("ERROR", "登录名或公司代码错误！");
                     return View(u);
                 }
             }
@@ -226,10 +237,10 @@ namespace MvcPlatform.Controllers
                 return "{result:false}";
             }
         }
-        public string UpPassword(string name,string password) 
+        public string UpPassword(string name, string password, string customercode)
         {
-            JObject json_user = Extension.Get_UserInfo(name);
-            string sql = @"update sys_user set points=1,password = '" + password.ToSHA1() + "',code='" + password + "' where id = '" + json_user.GetValue("ID") + "'";
+            string sql = @"update sys_user set points=1,password = '" + password.ToSHA1() + "',code='" + password
+                        + "' where name = '" + name + "' and customerid=(select id from cusdoc.sys_customer where code='" + customercode + "')";
             int i = DBMgr.ExecuteNonQuery(sql);
             if (i > 0)
             {
@@ -281,9 +292,11 @@ namespace MvcPlatform.Controllers
             {
                 sql = @"insert into sys_user (ID,NAME,PASSWORD,REALNAME,EMAIL,TELEPHONE,MOBILEPHONE,ENABLED,SEX,PARENTID,REMARK,CREATETIME,CUSTOMERID,TYPE)
                         values(sys_user_id.nextval,'{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}',sysdate,'{10}',2)";
-                sql = string.Format(sql, json.Value<string>("NAME"), json.Value<string>("NAME").ToSHA1(), json.Value<string>("REALNAME"), json.Value<string>("EMAIL"), json.Value<string>("TELEPHONE"), json.Value<string>("MOBILEPHONE"), json.Value<string>("ENABLED"), json.Value<string>("SEX"), json_user.GetValue("ID"), json.Value<string>("REMARK"), json_user.GetValue("CUSTOMERID"));
+                sql = string.Format(sql, json.Value<string>("NAME"), json.Value<string>("NAME").ToSHA1(), json.Value<string>("REALNAME"), json.Value<string>("EMAIL")
+                    , json.Value<string>("TELEPHONE"), json.Value<string>("MOBILEPHONE"), json.Value<string>("ENABLED"), json.Value<string>("SEX"), json_user.GetValue("ID")
+                    , json.Value<string>("REMARK"), json_user.GetValue("CUSTOMERID"));
 
-                dt_valid_name = DBMgr.GetDataTable("select * from sys_user where  NAME='" + json.Value<string>("NAME") + "'");
+                dt_valid_name = DBMgr.GetDataTable("select * from sys_user where lower(NAME)='" + json.Value<string>("NAME").ToLower() + "'and CUSTOMERID='" + json_user.GetValue("CUSTOMERID") + "'");
             }
             else
             {
@@ -438,37 +451,40 @@ namespace MvcPlatform.Controllers
         {
             if (ModelState.IsValid)
             {
-                string sql = "select * from sys_user where name = '" + ucp.NAME + "' and password = '" + Extension.ToSHA1(ucp.PASSWORD) + "'";
-                        DataTable dt = DBMgr.GetDataTable(sql);
-                        if (dt.Rows.Count > 0)
+                string sql = @"select a.*,b.code 
+                            from sys_user a 
+                                inner join cusdoc.sys_customer b on a.customerid=b.id 
+                            where a.name = '" + ucp.NAME + "' and a.password = '" + Extension.ToSHA1(ucp.PASSWORD) + "' and b.code='" + ucp.CUSTOMERCODE + "'";
+                DataTable dt = DBMgr.GetDataTable(sql);
+                if (dt.Rows.Count > 0)
+                {
+                    if (ucp.NEWPASSWORD == ucp.CONFIRMPASSWORD)
+                    {
+                        if (ucp.NEWPASSWORD == ucp.PASSWORD)
                         {
-                            if (ucp.NEWPASSWORD == ucp.CONFIRMPASSWORD)
-                            {
-                                if (ucp.NEWPASSWORD == ucp.PASSWORD)
-                                {
-                                    ModelState.AddModelError("ERROR", "新旧密码不能相同！");
-                                    return View(ucp);
-                                }
-                                else
-                                {
-                                    UpPassword(ucp.NAME, ucp.NEWPASSWORD);
-                                    Response.Write(@"<script Language=Javascript> alert('密码修改成功，请重新登陆！');window.location.href='/Account/Login'; </script>");
-                                   // Response.Redirect("/Account/Login");
-                                }
-                               
-                            }
-                            else
-                            {
-                                ModelState.AddModelError("ERROR", "两次密码不一致！");
-                                return View(ucp);
-                            }
+                            ModelState.AddModelError("ERROR", "新旧密码不能相同！");
+                            return View(ucp);
                         }
                         else
                         {
-                            ModelState.AddModelError("OLD_ERROR", "原密码错误！");
-                            return View(ucp);
+                            UpPassword(ucp.NAME, ucp.NEWPASSWORD, ucp.CUSTOMERCODE);
+                            Response.Write(@"<script Language=Javascript> alert('密码修改成功，请重新登陆！');window.location.href='/Account/Login'; </script>");
+                            // Response.Redirect("/Account/Login");
                         }
-                
+
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("ERROR", "两次密码不一致！");
+                        return View(ucp);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError("OLD_ERROR", "原密码错误！");
+                    return View(ucp);
+                }
+
             }
             return View(ucp);
 

@@ -24,7 +24,7 @@ namespace MvcPlatform.Filters
             if (valid)
             {
                 DataTable dt_user = new DataTable();
-                dt_user = DBMgr.GetDataTable("select * from sys_user where name = '" + u.NAME + "'");
+                dt_user = DBMgr.GetDataTable("select a.*,b.code from sys_user a inner join cusdoc.sys_customer b on a.customerid=b.id where lower(a.name) = '" + u.NAME.ToLower() + "' and lower(b.code)='" + u.CUSTOMERCODE.ToLower() + "'");
                 if (dt_user.Rows.Count > 0)
                 {
                     if (dt_user.Rows[0]["TYPE"] + "" != "4" && dt_user.Rows[0]["ENABLED"] + "" == "1")
@@ -49,7 +49,10 @@ namespace MvcPlatform.Filters
 
                                 if (ucp.PASSWORD != null)
                                 {
-                                    string sql = "select * from sys_user where name = '" + u.NAME + "' and password = '" + Extension.ToSHA1(u.PASSWORD) + "'";
+                                    string sql = @"select a.*,b.code 
+                                                from sys_user a
+                                                    inner join cusdoc.sys_customer b on a.customerid=b.id 
+                                                where lower(a.name) = '" + u.NAME.ToLower() + "' and a.password = '" + Extension.ToSHA1(u.PASSWORD) + "' and lower(b.code)='" + u.CUSTOMERCODE.ToLower() + "'";
                                     DataTable dt = DBMgr.GetDataTable(sql);
                                     if (dt.Rows.Count <= 0)
                                     {
