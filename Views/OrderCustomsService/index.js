@@ -29,9 +29,9 @@ function initSearch_CusService() {
         id: 's_combo_busiunitname',
         name: 'BUSIUNITNAME',
         store: store_busiunitname,
-        fieldLabel: '经营单位',
+        fieldLabel: '经营单位',tabIndex: 1,
         displayField: 'NAME',
-        minChars: 4,
+        minChars: 4, 
         valueField: 'CODE',
         triggerAction: 'all',
         hideTrigger: true,
@@ -42,12 +42,12 @@ function initSearch_CusService() {
     //企业编号
     var field_CUSNO = Ext.create('Ext.form.field.Text', {
         id: 'field_CUSNO',
-        fieldLabel: '企业编号',
+        fieldLabel: '企业编号', tabIndex: 2,
         name: 'CUSNO'
     });
 
-    var start_date = Ext.create('Ext.form.field.Date', { id: 'start_date', name: 'start_date', format: 'Y-m-d', emptyText: '开始日期', flex: .5, margin: 0 });
-    var end_date = Ext.create('Ext.form.field.Date', { id: 'end_date', name: 'end_date', format: 'Y-m-d', emptyText: '结束日期', flex: .5, margin: 0 });    
+    var start_date = Ext.create('Ext.form.field.Date', { id: 'start_date', name: 'start_date', format: 'Y-m-d', emptyText: '开始日期', tabIndex: 3, flex: .5, margin: 0 });
+    var end_date = Ext.create('Ext.form.field.Date', { id: 'end_date', name: 'end_date', format: 'Y-m-d', emptyText: '结束日期', tabIndex: 4, flex: .5, margin: 0 });
     var condate = Ext.create('Ext.form.FieldContainer', { fieldLabel: '创建日期', layout: 'hbox', columnWidth: .33, items: [start_date, end_date] });
 
     //委托单位
@@ -59,7 +59,7 @@ function initSearch_CusService() {
         id: 'combo_wtdw',
         name: 'CUSTOMERCODE',
         store: store_wtdw,       
-        fieldLabel: '委托单位', 
+        fieldLabel: '委托单位', tabIndex: 5,
         displayField: 'CODENAME',
         valueField: 'CODE',
         hideTrigger: true,
@@ -71,12 +71,12 @@ function initSearch_CusService() {
     //订单编号
     var field_CODE = Ext.create('Ext.form.field.Text', {
         id: 'field_CODE',
-        fieldLabel: '订单编号',
+        fieldLabel: '订单编号', tabIndex: 6,
         name: 'CODE'
     });
 
-    var start_date2 = Ext.create('Ext.form.field.Date', { id: 'start_date2', name: 'start_date2', format: 'Y-m-d', emptyText: '开始日期', flex: .5, margin: 0 });
-    var end_date2 = Ext.create('Ext.form.field.Date', { id: 'end_date2', name: 'end_date2', format: 'Y-m-d', emptyText: '结束日期', flex: .5, margin: 0 });
+    var start_date2 = Ext.create('Ext.form.field.Date', { id: 'start_date2', name: 'start_date2', format: 'Y-m-d', emptyText: '开始日期', tabIndex: 7, flex: .5, margin: 0 });
+    var end_date2 = Ext.create('Ext.form.field.Date', { id: 'end_date2', name: 'end_date2', format: 'Y-m-d', emptyText: '结束日期', tabIndex: 8, flex: .5, margin: 0 });
     var condate2 = Ext.create('Ext.form.FieldContainer', { fieldLabel: '维护日期', layout: 'hbox', columnWidth: .33, items: [start_date2, end_date2] });
 
 

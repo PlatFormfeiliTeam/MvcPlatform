@@ -635,16 +635,16 @@ namespace MvcPlatform.Common
             string sql = "";
 
             string json_jydw = "";//经营单位 :公用
-            if (db.KeyExists("common_data:jydw"))
-            {
-                json_jydw = db.StringGet("common_data:jydw");
-            }
-            else
-            {
+            //if (db.KeyExists("common_data:jydw"))
+            //{
+            //    json_jydw = db.StringGet("common_data:jydw");
+            //}
+            //else
+            //{
                 sql = "SELECT CODE,NAME||'('||CODE||')' NAME FROM BASE_COMPANY where CODE is not null and enabled=1";
                 json_jydw = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
-                db.StringSet("common_data:jydw", json_jydw);
-            }
+            //    db.StringSet("common_data:jydw", json_jydw);
+            //}
 
             string json_unit = "[]";//单位 :公用
             if (db.KeyExists("common_data:unit"))
