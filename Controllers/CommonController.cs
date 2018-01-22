@@ -873,6 +873,9 @@ namespace MvcPlatform.Controllers
                     case "REPWAYNAME"://申报方式
                         where += " and ort.REPWAYID='" + Request["VALUE1"] + "' ";
                         break;
+                    case "PORTCODE"://进出口岸
+                        where += " and lda.PORTCODE='" + Request["VALUE1"] + "' ";
+                        break;
                 }
             }
             if (!string.IsNullOrEmpty(Request["VALUE2"]))//判断查询条件2是否有值
@@ -968,6 +971,9 @@ namespace MvcPlatform.Controllers
                         break;
                     case "REPWAYNAME"://申报方式
                         where += " and ort.REPWAYID='" + Request["VALUE5"] + "' ";
+                        break;
+                    case "PORTCODE"://进出口岸
+                        where += " and lda.PORTCODE='" + Request["VALUE5"] + "' ";
                         break;
                 }
             }

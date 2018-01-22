@@ -3,7 +3,7 @@
 //传参示例 /Common/DeclareList?busitypeid=11&role=customer   
 var busitypeid = getQueryString_new("busitypeid"); var role = getQueryString_new("role");
 var pgbar; var store_sbfs; var store_bgfs; var store_busitype; var store_modifyflag;
-var common_data_jydw = [], common_data_sbfs = [], common_data_bgfs = [];
+var common_data_jydw = [], common_data_sbfs = [], common_data_bgfs = [], common_data_sbgq = [];
 var busitype = "";
 switch (busitypeid) {
     case "10":
@@ -35,6 +35,7 @@ Ext.onReady(function () {
             common_data_jydw = commondata.jydw;//经营单位  查询区要用
             common_data_sbfs = commondata.sbfs;//申报方式  这个基础数据调取出来的目的就是为了列表页字段显示时render处理
             common_data_bgfs = commondata.bgfs;//报关方式  这个基础数据调取出来的目的就是为了列表页字段显示时render处理
+            common_data_sbgq = commondata.sbgq;//申报关区 进口口岸
 
             initSearch();  //查询区域
 
@@ -151,7 +152,7 @@ Ext.onReady(function () {
 function initSearch() {
     var store_1 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: [{ "NAME": "经营单位", "CODE": "BUSIUNITCODE"},{"NAME": "申报方式", "CODE": "REPWAYNAME" }]
+        data: [{ "NAME": "经营单位", "CODE": "BUSIUNITCODE" }, { "NAME": "申报方式", "CODE": "REPWAYNAME" }, { "NAME": "进出口岸", "CODE": "PORTCODE" }]
     });
     var combo_1 = Ext.create('Ext.form.field.ComboBox', {
         id: 'CONDITION1',
@@ -175,6 +176,10 @@ function initSearch() {
                    if (newValue == "BUSIUNITCODE") {
                        combo_1_1.minChars = 4;
                        store_1_1.loadData(common_data_jydw);
+                   }
+                   if (newValue == "PORTCODE") {
+                       combo_1_1.minChars = "1";
+                       store_1_1.loadData(common_data_sbgq);
                    }
                }
            }
@@ -376,6 +381,10 @@ function initSearch() {
                   if (newValue == "BUSIUNITCODE") {
                       combo_5_1.minChars = 4;
                       store_5_1.loadData(common_data_jydw);
+                  }
+                  if (newValue == "PORTCODE") {
+                      combo_5_1.minChars = "1";
+                      store_5_1.loadData(common_data_sbgq);
                   }
               }
           }
