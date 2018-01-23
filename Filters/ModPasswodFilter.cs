@@ -19,6 +19,7 @@ namespace MvcPlatform.Filters
             UserChangePWD ucp = new UserChangePWD();
             ucp.NAME = u.NAME;
             ucp.PASSWORD = u.PASSWORD;
+            ucp.CUSTOMERCODE = u.CUSTOMERCODE;
             bool valid = filterContext.Controller.ValidateRequest;
 
             if (valid)

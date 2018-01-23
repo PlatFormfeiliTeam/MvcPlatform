@@ -59,7 +59,19 @@
                         @Html.ValidationMessage("ERROR")
                     </label>
                 </div>
+            </div>
+            <div style="width:350px;height:80px">
+                <label for="user_name" style="width: 80px;float: left;padding-top:7px">公司代码</label>
+                <div class="input-group" style="width: 248px;float:left;margin-right:5px">
+                    <span class="input-group-addon icon iconfont">&#xe611;</span>
+                    @Html.TextBoxFor(u => u.CUSTOMERCODE, new { @class = "form-control", @readonly = "readonly", @value = Model.CUSTOMERCODE })
                 </div>
+                <div style="line-height: 35px;width: 248px;float:left;padding-left:80px">
+                    <label style="color:red" id="validate">
+                        @Html.ValidationMessageFor(u => u.CUSTOMERCODE)
+                    </label>
+                </div>
+            </div>
             <div style="width: 350px; height:60px; align-content:center">
                 <button type="submit" id='btn_login' class="btn btn-primary btn-group-justified" style="width:328px">确认修改</button>
            </div>
