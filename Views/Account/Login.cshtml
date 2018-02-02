@@ -91,7 +91,7 @@
                         @Html.ValidationMessageFor(u => u.PASSWORD)
                     </label>
                 </div>
-                <label for="customercode">公司代码</label>
+                <label for="customercode">公司代码<font style="color:blue;">(汉语拼音首字母拼写)</font></label>
                 <div class="input-group">
                     <span class="input-group-addon icon iconfont">&#xe629;</span>
                     @Html.TextBoxFor(u => u.CUSTOMERCODE, new { @class = "form-control" })
@@ -123,7 +123,7 @@
     <script type="text/javascript">
 
         $(document).ready(function () {
-            $("#btn_show").trigger('click');
+            //$("#btn_show").trigger('click');
 
             if ($.cookie("rmbuser") == "true") {  
                 $("#NAME").val($.cookie("username"));
