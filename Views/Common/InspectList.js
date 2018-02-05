@@ -237,7 +237,8 @@ function initSearch() {
         items: [combo_3, combo_3_1]
     }
 
-    var inspsearch_condition4_data =[{ "NAME": "订单委托日期", "CODE": "SUBMITTIME" }];
+    var inspsearch_condition4_data = [{ "NAME": "订单委托日期", "CODE": "SUBMITTIME" }, { "NAME": "删单日期", "CODE": "DELORDERTIME" }, { "NAME": "改单日期", "CODE": "MODORDERTIME" }
+            , { "NAME": "改单完成日期", "CODE": "MODFINISHTIME" }];
 
     var store_4 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],

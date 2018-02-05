@@ -123,6 +123,10 @@ namespace MvcPlatform.Filters
             {
                 return false;
             }
+            if (filterContext.HttpContext.Request.Url.AbsolutePath == "/Common/UploadFile_site")
+            {
+                return false;
+            }
             if (filterContext.HttpContext.Request.Url.AbsolutePath == "/OrderFile/UploadFile")
             {
                 return false;

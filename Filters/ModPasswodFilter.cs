@@ -16,6 +16,11 @@ namespace MvcPlatform.Filters
         {
 
             User u = (User)filterContext.ActionParameters["u"];
+            if (u.NAME == null || u.CUSTOMERCODE == null)
+            {
+                return;
+            }
+
             UserChangePWD ucp = new UserChangePWD();
             ucp.NAME = u.NAME;
             ucp.PASSWORD = u.PASSWORD;

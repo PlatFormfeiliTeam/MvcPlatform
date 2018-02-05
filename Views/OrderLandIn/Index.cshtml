@@ -40,7 +40,9 @@
                 Ext.regModel('TRADE', {
                     fields: ['ID', 'ENTRUSTTYPE', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE',
                          'SUBMITTIME', 'BUSIUNITCODE', 'BUSIUNITNAME', 'CONTRACTNO', 'DIVIDENO', 'REPWAYID', 'GOODSNUM',
-                         'GOODSGW', 'CUSTOMAREACODE', 'LAWFLAG', 'ISINVALID', 'BUSITYPE', 'PRINTSTATUS', 'STATUS']
+                         'GOODSGW', 'CUSTOMAREACODE', 'LAWFLAG', 'ISINVALID', 'BUSITYPE', 'PRINTSTATUS', 'STATUS',
+                        'ISCHECK', 'AUDITFLAG', 'INSPISCHECK', 'ISFUMIGATION'
+                    ]
                 })
                 store_Trade = Ext.create('Ext.data.JsonStore', {
                     model: 'TRADE',
@@ -102,7 +104,11 @@
                     { header: '进/出口岸', dataIndex: 'PORTCODE', width: 70 },//需要显示编码
                     { header: '申报方式', dataIndex: 'REPWAYID', width: 100, renderer: renderOrder },
                     { header: '法检', dataIndex: 'LAWFLAG', width: 60, renderer: renderOrder },
-                    { header: '委托时间', dataIndex: 'SUBMITTIME', width: 130 }
+                    { header: '委托时间', dataIndex: 'SUBMITTIME', width: 130 },
+                    { header: '报关查验', dataIndex: 'ISCHECK', width: 60, renderer: renderOrder },
+                    { header: '报关稽核', dataIndex: 'AUDITFLAG', width: 60, renderer: renderOrder },
+                    { header: '报检查验', dataIndex: 'INSPISCHECK', width: 60, renderer: renderOrder },
+                    { header: '报检熏蒸', dataIndex: 'ISFUMIGATION', width: 60, renderer: renderOrder }
                     ],
                     listeners:
                     {
@@ -148,6 +154,7 @@
             <button onclick="DeleteNotGuoNei()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-trash-o"></i>&nbsp;删除</button>
             <button id="btn_mutiedit" type="button" class="btn btn-primary btn-sm dropdown-toggle" onclick="openwin('LYJK','landin')"><i class="fa fa-pencil-square-o fa-fw"></i>&nbsp;批量维护</button>           
             <button onclick="Views('landin')" type="button" class="btn btn-primary btn-sm"><i class="fa fa-file-text-o"></i>&nbsp;详细</button>
+            <button id="btn_Site" onclick="SiteMaintain('landin')" type="button" class="btn btn-primary btn-sm"><i class="fa fa-globe"></i>&nbsp;现场维护</button>
         </div>
         <div class="btn-group fr" role="group">
             <button onclick="changeOnlySelfStyle()" class="btn btn-primary btn-sm"><i id="OnlySelfi" class="fa fa-check-square-o"></i>&nbsp;仅本人</button>

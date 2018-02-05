@@ -34,11 +34,19 @@ var declarationsearch_js_condition4_data = [{ "NAME": "订单委托日期", "COD
 //查询区域 查询条件1 /Common/loadcondition1
 var search_js_condition1_data = [{ "NAME": "经营单位", "CODE": "BUSIUNITCODE" }, { "NAME": "申报关区", "CODE": "CUSTOMDISTRICTCODE" }, { "NAME": "进口口岸", "CODE": "PORTCODE" }, { "NAME": "申报方式", "CODE": "REPWAYID" }];
 //查询区域 查询条件2 /Common/loadcondition2
-var search_js_condition2_data = [{ "NAME": "订单编号", "CODE": "CODE" }, { "NAME": "客户编号", "CODE": "CUSNO" }, { "NAME": "分单号", "CODE": "DIVIDENO" }, { "NAME": "合同发票号", "CODE": "CONTRACTNO" }, { "NAME": "载货清单号", "CODE": "MANIFEST" }, { "NAME": "海关提运单号", "CODE": "SECONDLADINGBILLNO" }];
+var search_js_condition2_data = [{ "NAME": "订单编号", "CODE": "CODE" }, { "NAME": "客户编号", "CODE": "CUSNO" }, { "NAME": "分单号", "CODE": "DIVIDENO" }
+    , { "NAME": "合同发票号", "CODE": "CONTRACTNO" }, { "NAME": "载货清单号", "CODE": "MANIFEST" }, { "NAME": "海关提运单号", "CODE": "SECONDLADINGBILLNO" }
+    , { "NAME": "报关单号", "CODE": "DECLARATIONCODE" }, { "NAME": "报检单号", "CODE": "INSPECTIONCODE" }, { "NAME": "通关单号", "CODE": "CLEARANCECODE" }
+    ];
 //查询区域 查询条件3 /Common/loadcondition3
 var search_js_condition3_data = [{ "NAME": "报关状态", "CODE": "bgzt" }, { "NAME": "报检状态", "CODE": "bjzt" }];
 //查询区域 查询条件4 /Common/loadcondition4
-var search_js_condition4_data = [{ "NAME": "委托日期", "CODE": "SUBMITTIME" }, { "NAME": "订单开始时间", "CODE": "CSSTARTTIME" }];
+var search_js_condition4_data = [{ "NAME": "订单开始日期", "CODE": "CSSTARTTIME" }, { "NAME": "委托日期", "CODE": "SUBMITTIME" }
+    , { "NAME": "报关查验日期", "CODE": "DECLCHECKTIME" }, { "NAME": "报检查验日期", "CODE": "INSPCHECKTIME" }
+    , { "NAME": "报关稽核日期", "CODE": "AUDITFLAGTIME" }, { "NAME": "报检熏蒸日期", "CODE": "FUMIGATIONTIME" }
+    , { "NAME": "现场报关日期", "CODE": "SITEAPPLYTIME" }, { "NAME": "现场报检日期", "CODE": "INSPSITEAPPLYTIME" }
+    , { "NAME": "报关放行日期", "CODE": "SITEPASSTIME" }, { "NAME": "报检放行日期", "CODE": "INSPSITEPASSTIME" }
+    ];
 
 //查询区域 订单状态
 

@@ -210,7 +210,7 @@
     //操作需求
     var field_DOREQUEST = Ext.create('Ext.form.field.Text', {
         id: 'field_DOREQUEST',
-        tabIndex: 23, flex: 1, margin: 0, tabIndex: 6,
+        flex: 1, margin: 0, tabIndex: 6,
         name: 'DOREQUEST'
     });
     var container_DOREQUEST = {
@@ -224,7 +224,7 @@
     //结算备注
     var field_CLEARREMARK = Ext.create('Ext.form.field.Text', {
         id: 'field_CLEARREMARK',
-        tabIndex: 23, flex: 1, margin: 0, tabIndex: 7,
+        flex: 1, margin: 0, tabIndex: 7,
         name: 'CLEARREMARK'
     });
     var container_CLEARREMARK = {

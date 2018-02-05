@@ -321,7 +321,8 @@ function initSearch() {
     }
     var store_4 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: declarationsearch_js_condition4_data
+        data: [{ "NAME": "订单委托日期", "CODE": "SUBMITTIME" }, { "NAME": "申报日期", "CODE": "REPTIME" }, { "NAME": "删单日期", "CODE": "DELORDERTIME" }
+            , { "NAME": "改单日期", "CODE": "MODORDERTIME" }, { "NAME": "改单完成日期", "CODE": "MODFINISHTIME" }]
     });
     var combo_4 = Ext.create("Ext.form.ComboBox", {
         id: 'CONDITION4',
@@ -747,6 +748,7 @@ function openrwindow(url, width, height) {
     var iLeft = (window.screen.availWidth - 10 - iWidth) / 2; //获得窗口的水平位置; 
     window.open(url, '', 'height=' + iHeight + ',,innerHeight=' + iHeight + ',width=' + iWidth + ',innerWidth=' + iWidth + ',top=' + iTop + ',left=' + iLeft + ',location=yes,scrollbars=yes');
 }
+
 function Searchstatus() {
     var recs = Ext.getCmp('declare_grid').getSelectionModel().getSelection();
     if (recs.length == 0) {
@@ -787,8 +789,6 @@ function Searchstatus() {
 
     openrwindow("/Common/ClearanceStatus?menuxml=" + menuxml + "&id=" + id + "&rowIndex=" + index + "&currentPage=" + currentPage, 1200, 800);
 }
-
-
 
 function ExportDecl() {
 
@@ -834,3 +834,4 @@ function ExportDecl() {
         }
     });
 }
+

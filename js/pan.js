@@ -1722,6 +1722,15 @@ function renderOrder(value, cellmeta, record, rowIndex, columnIndex, store) {
                 rtn = rec.get("NAME");
             }
             break;
+        case "ISCHECK": case "INSPISCHECK":
+            rtn = value == "1" ? "查验" : "";
+            break;
+        case "AUDITFLAG":
+            rtn = value == "1" ? "稽核" : "";
+            break;
+        case "ISFUMIGATION":
+            rtn = value == "1" ? "熏蒸" : "";
+            break;
     }
     return rtn;
 }
@@ -2013,4 +2022,52 @@ function printBarcode_Domestic() {//打印条码 国内
     }
     //window.open("/barcode/barcode_orderno.html?declcode=" + orderno);
     window.open("/barcode/barcode_orderno.html?declcode=" + orderno, '', 'toolbar=yes,menubar=yes, location=yes,scrollbars=yes,resizable=yes');
+}
+
+
+//现场维护
+function SiteMaintain(paramenu) {
+    var recs = gridpanel.getSelectionModel().getSelection();
+    if (recs.length == 0) {
+        Ext.MessageBox.alert('提示', '请选择需要现场维护的记录！');
+        return;
+    }
+    opencenterwin("/Common/OrderSite?menuxml=" + paramenu + "&ordercode=" + recs[0].get("CODE") + "&entrusttype=" + recs[0].get("ENTRUSTTYPE"), 1600, 900);
+}
+
+//删改单维护
+function ModifyMaintain(type, Compentid) {
+    var recs = Ext.getCmp(Compentid).getSelectionModel().getSelection();
+    if (recs.length != 1) {
+        Ext.Msg.alert("提示", "请选择一笔维护记录!");
+        return;
+    }
+    var menuxml = "";
+    switch (recs[0].get("BUSITYPE")) {
+        case "11":
+            menuxml = type + "_modify_airin";
+            break;
+        case "10":
+            menuxml = type + "_modify_airout";
+            break;
+        case "21":
+            menuxml = type + "_modify_seain";
+            break;
+        case "20":
+            menuxml = type + "_modify_seaout";
+            break;
+        case "31":
+            menuxml = type + "_modify_landin";
+            break;
+        case "30":
+            menuxml = type + "_modify_landout";
+            break;
+        case "40": case "41":
+            menuxml = type + "_modify_domestic";
+            break;
+        case "50": case "51":
+            menuxml = type + "_modify_special";
+            break; 
+    }
+    opencenterwin("/Common/ModifyMaintain?menuxml=" + menuxml + "&type=" + type + "&code=" + recs[0].get("CODE") + "&ordercode=" + recs[0].get("ORDERCODE") + "&busitypeid=" + recs[0].get("BUSITYPE"), 1600, 900);
 }

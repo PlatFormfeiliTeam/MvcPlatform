@@ -149,6 +149,113 @@ namespace MvcPlatform.Controllers
         {
             return View();
         }
+
+        public ActionResult OrderSite(string busitypeid)//现场维护
+        {
+            switch (busitypeid)
+            {
+                case "11":
+                    ViewBag.navigator = "订单中心>>空运进口";
+                    break;
+                case "10":
+                    ViewBag.navigator = "订单中心>>空出订单";
+                    break;
+                case "21":
+                    ViewBag.navigator = "订单中心>>海进订单";
+                    break;
+                case "20":
+                    ViewBag.navigator = "订单中心>>海出订单";
+                    break;
+                case "31":
+                    ViewBag.navigator = "订单中心>>陆进订单";
+                    break;
+                case "30":
+                    ViewBag.navigator = "订单中心>>陆出订单";
+                    break;
+                case "40-41":
+                    ViewBag.navigator = "订单中心>>国内订单";
+                    break;
+                case "50-51":
+                    ViewBag.navigator = "订单中心>>特殊区域订单";
+                    break;
+                default:
+                    break;
+            }
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
+
+        public ActionResult ModifyMaintain(string type, string busitypeid)//删改单维护
+        {
+            if (type == "decl")
+            {
+                switch (busitypeid)
+                {
+                    case "11":
+                        ViewBag.navigator = "空运进口>>报关单管理";
+                        break;
+                    case "10":
+                        ViewBag.navigator = "空出订单>>报关单管理";
+                        break;
+                    case "21":
+                        ViewBag.navigator = "海进订单>>报关单管理";
+                        break;
+                    case "20":
+                        ViewBag.navigator = "海出订单>>报关单管理";
+                        break;
+                    case "31":
+                        ViewBag.navigator = "陆进订单>>报关单管理";
+                        break;
+                    case "30":
+                        ViewBag.navigator = "陆出订单>>报关单管理";
+                        break;
+                    case "40-41":
+                        ViewBag.navigator = "国内订单>>报关单管理";
+                        break;
+                    case "50-51":
+                        ViewBag.navigator = "特殊区域订单>>报关单管理";
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (type == "insp")
+            {
+                switch (busitypeid)
+                {
+                    case "11":
+                        ViewBag.navigator = "空运进口>>报检单管理";
+                        break;
+                    case "10":
+                        ViewBag.navigator = "空出订单>>报检单管理";
+                        break;
+                    case "21":
+                        ViewBag.navigator = "海进订单>>报检单管理";
+                        break;
+                    case "20":
+                        ViewBag.navigator = "海出订单>>报检单管理";
+                        break;
+                    case "31":
+                        ViewBag.navigator = "陆进订单>>报检单管理";
+                        break;
+                    case "30":
+                        ViewBag.navigator = "陆出订单>>报检单管理";
+                        break;
+                    case "40-41":
+                        ViewBag.navigator = "国内订单>>报检单管理";
+                        break;
+                    case "50-51":
+                        ViewBag.navigator = "特殊区域订单>>报检单管理";
+                        break;
+                    default:
+                        break;
+                }
+            }
+            
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
        
         //登录后显示顶部当前用户中文名称 by heguiqin 2016-08-25
         public string CurrentUser()
@@ -193,7 +300,7 @@ namespace MvcPlatform.Controllers
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
 
-            string where = ""; bool bf_MANIFEST_STORAGE = false; bool bf_DECLCARNO = false;
+            string where = ""; bool bf_MANIFEST_STORAGE = false; bool bf_DECLCARNO = false; bool bf_declcode = false; bool bf_inspcode = false; bool bf_clearcecode = false;
             if (!string.IsNullOrEmpty(Request["seniorsearch"] + ""))
             {
                 string[] seniorarray = Request["seniorsearch"].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
@@ -203,12 +310,12 @@ namespace MvcPlatform.Controllers
                     if (i != seniorarray.Length - 1)
                     {
                         //where += "instr(DIVIDENO,'" + seniorarray[i] + "')>0 or ";
-                        where += "DIVIDENO='" + seniorarray[i] + "' or ";
+                        where += "a.DIVIDENO='" + seniorarray[i] + "' or ";
                     }
                     else
                     {
                         //where += "instr(DIVIDENO,'" + seniorarray[i] + "')>0)";
-                        where += "DIVIDENO='" + seniorarray[i] + "')";
+                        where += "a.DIVIDENO='" + seniorarray[i] + "')";
                     }
                 }
             }
@@ -217,16 +324,16 @@ namespace MvcPlatform.Controllers
                 switch (Request["CONDITION1"])
                 {
                     case "BUSIUNITCODE"://经营单位
-                        where += " and BUSIUNITCODE='" + Request["VALUE1"] + "' ";
+                        where += " and a.BUSIUNITCODE='" + Request["VALUE1"] + "' ";
                         break;
                     case "CUSTOMDISTRICTCODE"://申报关区
-                        where += " and CUSTOMAREACODE='" + Request["VALUE1"] + "' ";
+                        where += " and a.CUSTOMAREACODE='" + Request["VALUE1"] + "' ";
                         break;
                     case "PORTCODE"://进口口岸
-                        where += " and PORTCODE='" + Request["VALUE1"] + "' ";
+                        where += " and a.PORTCODE='" + Request["VALUE1"] + "' ";
                         break;
                     case "REPWAYID"://申报方式
-                        where += " and REPWAYID='" + Request["VALUE1"] + "' ";
+                        where += " and a.REPWAYID='" + Request["VALUE1"] + "' ";
                         break;
                 }
             }
@@ -235,26 +342,38 @@ namespace MvcPlatform.Controllers
                 switch (Request["CONDITION2"])
                 {
                     case "CODE"://订单编号
-                        where += " and instr(CODE,'" + Request["VALUE2"].Trim() + "')>0 ";
+                        where += " and instr(a.CODE,'" + Request["VALUE2"].Trim() + "')>0 ";
                         break;
                     case "CUSNO"://客户编号
-                        where += " and instr(CUSNO,'" + Request["VALUE2"].Trim() + "')>0 ";
+                        where += " and instr(a.CUSNO,'" + Request["VALUE2"].Trim() + "')>0 ";
                         break;
                     case "DIVIDENO"://分单号
-                        where += " and instr(DIVIDENO,'" + Request["VALUE2"].Trim() + "')>0 ";
+                        where += " and instr(a.DIVIDENO,'" + Request["VALUE2"].Trim() + "')>0 ";
                         break;
                     case "CONTRACTNO"://合同发票号
-                        where += " and instr(CONTRACTNO,'" + Request["VALUE2"].Trim() + "')>0  ";
+                        where += " and instr(a.CONTRACTNO,'" + Request["VALUE2"].Trim() + "')>0  ";
                         break;
                     case "MANIFEST"://载货清单号
-                        where += " and instr(MANIFEST,'" + Request["VALUE2"].Trim() + "')>0  ";
+                        where += " and instr(a.MANIFEST,'" + Request["VALUE2"].Trim() + "')>0  ";
                         break;
                     case "SECONDLADINGBILLNO"://海关提运单号
-                        where += " and instr(SECONDLADINGBILLNO,'" + Request["VALUE2"].Trim() + "')>0  ";
+                        where += " and instr(a.SECONDLADINGBILLNO,'" + Request["VALUE2"].Trim() + "')>0  ";
                         break;
                     case "DECLCARNO"://报关车号
                         bf_DECLCARNO = true;
                         where += " and instr(c.CDCARNAME,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "DECLARATIONCODE"://报关单号
+                         bf_declcode = true;
+                         where += " and instr(d.DECLARATIONCODE,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "INSPECTIONCODE"://报检单号
+                         bf_inspcode = true;
+                         where += " and instr(e.INSPECTIONCODE,'" + Request["VALUE2"] + "')>0 ";
+                        break;
+                    case "CLEARANCECODE"://通关单号
+                         bf_clearcecode = true;
+                         where += " and instr(e.CLEARANCECODE,'" + Request["VALUE2"] + "')>0 ";
                         break;
                 }
             }
@@ -265,45 +384,45 @@ namespace MvcPlatform.Controllers
                     case "bgzt":
                         if ((Request["VALUE3"] + "") == "草稿")  //草稿=草稿
                         {
-                            where += " and DECLSTATUS=0 ";
+                            where += " and a.DECLSTATUS=0 ";
                         }
                         if ((Request["VALUE3"] + "") == "已委托")  //已委托=已委托
                         {
-                            where += " and DECLSTATUS=10 ";
+                            where += " and a.DECLSTATUS=10 ";
                         }
                         if ((Request["VALUE3"] + "") == "申报中")  //申报中=申报中
                         {
-                            where += " and DECLSTATUS=100 ";
+                            where += " and a.DECLSTATUS=100 ";
                         }
                         if ((Request["VALUE3"] + "") == "申报完结")  //申报完结=申报完结
                         {
-                            where += " and DECLSTATUS>=130 ";
+                            where += " and a.DECLSTATUS>=130 ";
                         }
                         if ((Request["VALUE3"] + "") == "未完结")  //未完结
                         {
-                            where += " and DECLSTATUS<130 ";
+                            where += " and a.DECLSTATUS<130 ";
                         }
                         break;
                     case "bjzt":
                         if ((Request["VALUE3"] + "") == "草稿")  //草稿=草稿
                         {
-                            where += " and INSPSTATUS=0 ";
+                            where += " and a.INSPSTATUS=0 ";
                         }
                         if ((Request["VALUE3"] + "") == "已委托")  //已委托=已委托
                         {
-                            where += " and INSPSTATUS=10 ";
+                            where += " and a.INSPSTATUS=10 ";
                         }
                         if ((Request["VALUE3"] + "") == "申报中")  //申报中=申报中
                         {
-                            where += " and INSPSTATUS=100 ";
+                            where += " and a.INSPSTATUS=100 ";
                         }
                         if ((Request["VALUE3"] + "") == "申报完结")  //申报完结=申报完结
                         {
-                            where += " and INSPSTATUS>=130 ";
+                            where += " and a.INSPSTATUS>=130 ";
                         }
                         if ((Request["VALUE3"] + "") == "未完结")  //未完结
                         {
-                            where += " and INSPSTATUS<130 ";
+                            where += " and a.INSPSTATUS<130 ";
                         }
                         break;
                     case "MANIFEST_STORAGE":
@@ -327,24 +446,104 @@ namespace MvcPlatform.Controllers
             }
             switch (Request["CONDITION4"])
             {
-                case "SUBMITTIME"://委托日期 
-                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
-                    {
-                        where += " and SUBMITTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
-                    }
-                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
-                    {
-                        where += " and SUBMITTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
-                    }
-                    break;
                 case "CSSTARTTIME"://订单开始时间
                     if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
                     {
-                        where += " and CREATETIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                        where += " and a.CREATETIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
                     }
                     if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
                     {
-                        where += " and CREATETIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                        where += " and a.CREATETIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "SUBMITTIME"://委托日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and a.SUBMITTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and a.SUBMITTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "DECLCHECKTIME"://报关查验日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and a.DECLCHECKTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and a.DECLCHECKTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "INSPCHECKTIME"://报检查验日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and a.INSPCHECKTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and a.INSPCHECKTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "AUDITFLAGTIME"://报关稽核日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and a.AUDITFLAGTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and a.AUDITFLAGTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "FUMIGATIONTIME"://报检熏蒸日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and a.FUMIGATIONTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and a.FUMIGATIONTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "SITEAPPLYTIME"://现场报关日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and a.SITEAPPLYTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and a.SITEAPPLYTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "INSPSITEAPPLYTIME"://现场报检日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and a.INSPSITEAPPLYTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and a.INSPSITEAPPLYTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "SITEPASSTIME"://报关放行日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and a.SITEPASSTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and a.SITEPASSTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "INSPSITEPASSTIME"://报检放行日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and a.INSPSITEPASSTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and a.INSPSITEPASSTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
                     }
                     break;
             }
@@ -353,16 +552,16 @@ namespace MvcPlatform.Controllers
                 switch (Request["CONDITION5"])
                 {
                     case "BUSIUNITCODE"://经营单位
-                        where += " and BUSIUNITCODE='" + Request["VALUE5"] + "' ";
+                        where += " and a.BUSIUNITCODE='" + Request["VALUE5"] + "' ";
                         break;
                     case "CUSTOMDISTRICTCODE"://申报关区
-                        where += " and CUSTOMAREACODE='" + Request["VALUE5"] + "' ";
+                        where += " and a.CUSTOMAREACODE='" + Request["VALUE5"] + "' ";
                         break;
                     case "PORTCODE"://进口口岸
-                        where += " and PORTCODE='" + Request["VALUE5"] + "' ";
+                        where += " and a.PORTCODE='" + Request["VALUE5"] + "' ";
                         break;
                     case "REPWAYID"://申报方式
-                        where += " and REPWAYID='" + Request["VALUE5"] + "' ";
+                        where += " and a.REPWAYID='" + Request["VALUE5"] + "' ";
                         break;
                 }
             }
@@ -371,26 +570,38 @@ namespace MvcPlatform.Controllers
                 switch (Request["CONDITION6"])
                 {
                     case "CODE"://订单编号
-                        where += " and instr(CODE,'" + Request["VALUE6"].Trim() + "')>0 ";
+                        where += " and instr(a.CODE,'" + Request["VALUE6"].Trim() + "')>0 ";
                         break;
                     case "CUSNO"://客户编号
-                        where += " and instr(CUSNO,'" + Request["VALUE6"].Trim() + "')>0 ";
+                        where += " and instr(a.CUSNO,'" + Request["VALUE6"].Trim() + "')>0 ";
                         break;
                     case "DIVIDENO"://分单号
-                        where += " and instr(DIVIDENO,'" + Request["VALUE6"].Trim() + "')>0 ";
+                        where += " and instr(a.DIVIDENO,'" + Request["VALUE6"].Trim() + "')>0 ";
                         break;
                     case "CONTRACTNO"://合同发票号
-                        where += " and instr(CONTRACTNO,'" + Request["VALUE6"].Trim() + "')>0  ";
+                        where += " and instr(a.CONTRACTNO,'" + Request["VALUE6"].Trim() + "')>0  ";
                         break;
                     case "MANIFEST"://载货清单号
-                        where += " and instr(MANIFEST,'" + Request["VALUE6"].Trim() + "')>0  ";
+                        where += " and instr(a.MANIFEST,'" + Request["VALUE6"].Trim() + "')>0  ";
                         break;
                     case "SECONDLADINGBILLNO"://海关提运单号
-                        where += " and instr(SECONDLADINGBILLNO,'" + Request["VALUE6"].Trim() + "')>0  ";
+                        where += " and instr(a.SECONDLADINGBILLNO,'" + Request["VALUE6"].Trim() + "')>0  ";
                         break;
                     case "DECLCARNO"://报关车号
                         bf_DECLCARNO = true;
                         where += " and instr(c.CDCARNAME,'" + Request["VALUE6"] + "')>0 ";
+                        break;
+                    case "DECLARATIONCODE"://报关单号
+                        bf_declcode = true;
+                        where += " and instr(d.DECLARATIONCODE,'" + Request["VALUE6"] + "')>0 ";
+                        break;
+                    case "INSPECTIONCODE"://报检单号
+                        bf_inspcode = true;
+                        where += " and instr(e.INSPECTIONCODE,'" + Request["VALUE6"] + "')>0 ";
+                        break;
+                    case "CLEARANCECODE"://通关单号
+                        bf_clearcecode = true;
+                        where += " and instr(e.CLEARANCECODE,'" + Request["VALUE6"] + "')>0 ";
                         break;
                 }
             }
@@ -401,45 +612,45 @@ namespace MvcPlatform.Controllers
                     case "bgzt":
                         if ((Request["VALUE7"] + "") == "草稿")  //草稿=草稿
                         {
-                            where += " and DECLSTATUS=0 ";
+                            where += " and a.DECLSTATUS=0 ";
                         }
                         if ((Request["VALUE7"] + "") == "已委托")  //已委托=已委托
                         {
-                            where += " and DECLSTATUS=10 ";
+                            where += " and a.DECLSTATUS=10 ";
                         }
                         if ((Request["VALUE7"] + "") == "申报中")  //申报中=申报中
                         {
-                            where += " and DECLSTATUS=100 ";
+                            where += " and a.DECLSTATUS=100 ";
                         }
                         if ((Request["VALUE7"] + "") == "申报完结")  //申报完结=申报完结
                         {
-                            where += " and DECLSTATUS>=130 ";
+                            where += " and a.DECLSTATUS>=130 ";
                         }
                         if ((Request["VALUE7"] + "") == "未完结")  //未完结
                         {
-                            where += " and DECLSTATUS<130 ";
+                            where += " and a.DECLSTATUS<130 ";
                         }
                         break;
                     case "bjzt":
                         if ((Request["VALUE7"] + "") == "草稿")  //草稿=草稿
                         {
-                            where += " and INSPSTATUS=0 ";
+                            where += " and a.INSPSTATUS=0 ";
                         }
                         if ((Request["VALUE7"] + "") == "已委托")  //已委托=已委托
                         {
-                            where += " and INSPSTATUS=10 ";
+                            where += " and a.INSPSTATUS=10 ";
                         }
                         if ((Request["VALUE7"] + "") == "申报中")  //申报中=申报中
                         {
-                            where += " and INSPSTATUS=100 ";
+                            where += " and a.INSPSTATUS=100 ";
                         }
                         if ((Request["VALUE7"] + "") == "申报完结")  //申报完结=申报完结
                         {
-                            where += " and INSPSTATUS>=130 ";
+                            where += " and a.INSPSTATUS>=130 ";
                         }
                         if ((Request["VALUE7"] + "") == "未完结")  //未完结
                         {
-                            where += " and INSPSTATUS<130 ";
+                            where += " and a.INSPSTATUS<130 ";
                         }
                         break;
                     case "MANIFEST_STORAGE":
@@ -463,30 +674,110 @@ namespace MvcPlatform.Controllers
             }
             switch (Request["CONDITION8"])
             {
-                case "SUBMITTIME"://委托日期 
-                    if (!string.IsNullOrEmpty(Request["VALUE8_1"]))//如果开始时间有值
-                    {
-                        where += " and SUBMITTIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
-                    }
-                    if (!string.IsNullOrEmpty(Request["VALUE8_2"]))//如果结束时间有值
-                    {
-                        where += " and SUBMITTIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
-                    }
-                    break;
                 case "CSSTARTTIME"://订单开始时间
                     if (!string.IsNullOrEmpty(Request["VALUE8_1"]))//如果开始时间有值
                     {
-                        where += " and CREATETIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                        where += " and a.CREATETIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
                     }
                     if (!string.IsNullOrEmpty(Request["VALUE8_2"]))//如果结束时间有值
                     {
-                        where += " and CREATETIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                        where += " and a.CREATETIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "SUBMITTIME"://委托日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE8_1"]))//如果开始时间有值
+                    {
+                        where += " and a.SUBMITTIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE8_2"]))//如果结束时间有值
+                    {
+                        where += " and a.SUBMITTIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "DECLCHECKTIME"://报关查验日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE8_1"]))//如果开始时间有值
+                    {
+                        where += " and a.DECLCHECKTIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE8_2"]))//如果结束时间有值
+                    {
+                        where += " and a.DECLCHECKTIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "INSPCHECKTIME"://报检查验日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE8_1"]))//如果开始时间有值
+                    {
+                        where += " and a.INSPCHECKTIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE8_2"]))//如果结束时间有值
+                    {
+                        where += " and a.INSPCHECKTIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "AUDITFLAGTIME"://报关稽核日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE8_1"]))//如果开始时间有值
+                    {
+                        where += " and a.AUDITFLAGTIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE8_2"]))//如果结束时间有值
+                    {
+                        where += " and a.AUDITFLAGTIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "FUMIGATIONTIME"://报检熏蒸日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE8_1"]))//如果开始时间有值
+                    {
+                        where += " and a.FUMIGATIONTIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE8_2"]))//如果结束时间有值
+                    {
+                        where += " and a.FUMIGATIONTIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "SITEAPPLYTIME"://现场报关日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE8_1"]))//如果开始时间有值
+                    {
+                        where += " and a.SITEAPPLYTIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE8_2"]))//如果结束时间有值
+                    {
+                        where += " and a.SITEAPPLYTIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "INSPSITEAPPLYTIME"://现场报检日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE8_1"]))//如果开始时间有值
+                    {
+                        where += " and a.INSPSITEAPPLYTIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE8_2"]))//如果结束时间有值
+                    {
+                        where += " and a.INSPSITEAPPLYTIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "SITEPASSTIME"://报关放行日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE8_1"]))//如果开始时间有值
+                    {
+                        where += " and a.SITEPASSTIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE8_2"]))//如果结束时间有值
+                    {
+                        where += " and a.SITEPASSTIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "INSPSITEPASSTIME"://报检放行日期 
+                    if (!string.IsNullOrEmpty(Request["VALUE8_1"]))//如果开始时间有值
+                    {
+                        where += " and a.INSPSITEPASSTIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE8_2"]))//如果结束时间有值
+                    {
+                        where += " and a.INSPSITEPASSTIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
                     }
                     break;
             }
             if ((Request["OnlySelf"] + "").Trim() == "fa fa-check-square-o")
             {
-                where += " and (CREATEUSERID = " + json_user.Value<string>("ID") + " or submitusername='" + json_user.Value<string>("REALNAME") + "') ";
+                where += " and (a.CREATEUSERID = " + json_user.Value<string>("ID") + " or a.submitusername='" + json_user.Value<string>("REALNAME") + "') ";
             }
 
             where += " and ISINVALID=0 ";
@@ -503,6 +794,21 @@ namespace MvcPlatform.Controllers
                 sql += @" left join (select ordercode,listagg(to_char(cdcarname),',') within group(order by containerorder) as cdcarname 
                                     from list_predeclcontainer  
                                     GROUP BY ordercode) c on a.code = c.ordercode ";
+            }
+
+            if (bf_declcode)
+            {
+                 sql += @" left join (select ordercode,listagg(to_char(declarationcode),',') within group(order by code) as declarationcode 
+                                    from list_declaration  
+                                    GROUP BY ordercode) d on a.code = d.ordercode ";
+            }
+
+            if (bf_inspcode == true || bf_clearcecode == true)
+            {
+                sql += @" left join (select ordercode,listagg(to_char(inspectioncode),',') within group(order by code) as inspectioncode 
+                                           ,listagg(to_char(clearancecode),',') within group(order by code) as clearancecode 
+                                    from list_inspection
+                                    GROUP BY ordercode) e on a.code = e.ordercode ";
             }
 
             sql += " where instr('" + Request["busitypeid"] + "',a.BUSITYPE)>0 ";
@@ -959,6 +1265,36 @@ namespace MvcPlatform.Controllers
                         where += " and lda.REPTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
                     }
                     break;
+                case "DELORDERTIME"://删单日期
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and det.DELORDERTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and det.DELORDERTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "MODORDERTIME"://改单日期
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and det.MODORDERTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and det.MODORDERTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "MODFINISHTIME"://改单完成日期
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and det.MODFINISHTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and det.MODFINISHTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
             }
 
 
@@ -1058,6 +1394,36 @@ namespace MvcPlatform.Controllers
                         where += " and lda.REPTIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";//REPSTARTTIME
                     }
                     break;
+                case "DELORDERTIME"://删单日期
+                    if (!string.IsNullOrEmpty(Request["VALUE8_1"]))//如果开始时间有值
+                    {
+                        where += " and det.DELORDERTIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE8_2"]))//如果结束时间有值
+                    {
+                        where += " and det.DELORDERTIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "MODORDERTIME"://改单日期
+                    if (!string.IsNullOrEmpty(Request["VALUE8_1"]))//如果开始时间有值
+                    {
+                        where += " and det.MODORDERTIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE8_2"]))//如果结束时间有值
+                    {
+                        where += " and det.MODORDERTIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "MODFINISHTIME"://改单完成日期
+                    if (!string.IsNullOrEmpty(Request["VALUE8_1"]))//如果开始时间有值
+                    {
+                        where += " and det.MODFINISHTIME>=to_date('" + Request["VALUE8_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE8_2"]))//如果结束时间有值
+                    {
+                        where += " and det.MODFINISHTIME<=to_date('" + Request["VALUE8_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
             }
 
 
@@ -1101,6 +1467,7 @@ namespace MvcPlatform.Controllers
             }
 
             string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.ISPRINT,det.SHEETNUM,det.modifyflag,det.transname as pretransname,
+                              det.delordertime,det.delorderusername,det.modordertime,det.modorderusername,det.modfinishtime,det.modfinishusername,
                               lda.declarationcode,to_char(lda.reptime,'yyyy-mm-dd') reptime,lda.contractno,lda.goodsnum,lda.goodsnw,lda.goodsgw,lda.blno,
                               lda.transname,lda.voyageno,lda.portcode,
                               lda.trademethod,lda.declkind DECLWAY,lda.declkind DECLWAYNAME,  
@@ -2508,6 +2875,36 @@ namespace MvcPlatform.Controllers
                         where += " and lo.SUBMITTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
                     }
                     break;
+                case "DELORDERTIME"://删单日期
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and li.DELORDERTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and li.DELORDERTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "MODORDERTIME"://改单日期
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and li.MODORDERTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and li.MODORDERTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
+                case "MODFINISHTIME"://改单完成日期
+                    if (!string.IsNullOrEmpty(Request["VALUE4_1"]))//如果开始时间有值
+                    {
+                        where += " and li.MODFINISHTIME>=to_date('" + Request["VALUE4_1"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    if (!string.IsNullOrEmpty(Request["VALUE4_2"]))//如果结束时间有值
+                    {
+                        where += " and li.MODFINISHTIME<=to_date('" + Request["VALUE4_2"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    break;
             }
             if (role == "supplier") //如果是现场服务
             {
@@ -2549,6 +2946,7 @@ namespace MvcPlatform.Controllers
 
             string sql = @"select li.ID,li.CODE,li.ORDERCODE,li.INSPSTATUS,li.ISPRINT,li.APPROVALCODE,li.INSPECTIONCODE,li.CLEARANCECODE
                                 ,li.TRADEWAY,li.ISNEEDCLEARANCE,li.LAWFLAG,li.STATUS,li.MODIFYFLAG ,li.SHEETNUM
+                                ,li.delordertime,li.delorderusername,li.modordertime,li.modorderusername,li.modfinishtime,li.modfinishusername
                                 ,lo.CUSNO,lo.CREATETIME,lo.SUBMITTIME,lo.BUSIUNITCODE ,lo.BUSIUNITNAME ,lo.CONTRACTNO ,lo.BUSITYPE
                                 ,cus.SCENEINSPECTID 
                             from list_inspection li
@@ -3095,7 +3493,13 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(0).SetCellValue("报关状态"); row1.CreateCell(1).SetCellValue("报检状态"); row1.CreateCell(2).SetCellValue("物流状态"); row1.CreateCell(3).SetCellValue("订单编号"); row1.CreateCell(4).SetCellValue("客户编号");
                 row1.CreateCell(5).SetCellValue("经营单位"); row1.CreateCell(6).SetCellValue("合同号"); row1.CreateCell(7).SetCellValue("总单号"); row1.CreateCell(8).SetCellValue("分单号"); 
                 row1.CreateCell(9).SetCellValue("件数/重量"); row1.CreateCell(10).SetCellValue("打印状态");row1.CreateCell(11).SetCellValue("申报关区"); row1.CreateCell(12).SetCellValue("进/出口岸");
-                row1.CreateCell(13).SetCellValue("申报方式");row1.CreateCell(14).SetCellValue("转关预录号");row1.CreateCell(15).SetCellValue("法检"); row1.CreateCell(16).SetCellValue("委托时间");                 
+                row1.CreateCell(13).SetCellValue("申报方式");row1.CreateCell(14).SetCellValue("转关预录号");row1.CreateCell(15).SetCellValue("法检"); row1.CreateCell(16).SetCellValue("委托时间");
+
+                row1.CreateCell(17).SetCellValue("报关查验"); row1.CreateCell(18).SetCellValue("报关稽核"); row1.CreateCell(19).SetCellValue("报检查验"); row1.CreateCell(20).SetCellValue("报检熏蒸");
+                row1.CreateCell(21).SetCellValue("报关查验日期"); row1.CreateCell(22).SetCellValue("报关查验人"); row1.CreateCell(23).SetCellValue("报关稽核日期"); row1.CreateCell(24).SetCellValue("报关稽核人");
+                row1.CreateCell(25).SetCellValue("现场报关日期"); row1.CreateCell(26).SetCellValue("现场报关人"); row1.CreateCell(27).SetCellValue("报关放行日期"); row1.CreateCell(28).SetCellValue("报关放行人");
+                row1.CreateCell(29).SetCellValue("报检查验日期"); row1.CreateCell(30).SetCellValue("报检查验人"); row1.CreateCell(31).SetCellValue("报检熏蒸日期"); row1.CreateCell(32).SetCellValue("报检熏蒸人");
+                row1.CreateCell(33).SetCellValue("现场报检日期"); row1.CreateCell(34).SetCellValue("现场报检人"); row1.CreateCell(35).SetCellValue("报检放行日期"); row1.CreateCell(36).SetCellValue("报检放行人");
 
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
@@ -3127,6 +3531,30 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["TURNPRENO"].ToString());
                     rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
                     rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
+
+
+                    rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["ISCHECK"].ToString() == "1" ? "查验" : "");
+                    rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["AUDITFLAG"].ToString() == "1" ? "稽核" : "");
+                    rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["INSPISCHECK"].ToString() == "1" ? "查验" : "");
+                    rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["ISFUMIGATION"].ToString() == "1" ? "熏蒸" : "");
+                    rowtemp.CreateCell(21).SetCellValue(dt.Rows[i]["DECLCHECKTIME"].ToString());
+                    rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["DECLCHECKNAME"].ToString());
+                    rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["AUDITFLAGTIME"].ToString());
+                    rowtemp.CreateCell(24).SetCellValue(dt.Rows[i]["AUDITFLAGNAME"].ToString());
+                    rowtemp.CreateCell(25).SetCellValue(dt.Rows[i]["SITEAPPLYTIME"].ToString());
+                    rowtemp.CreateCell(26).SetCellValue(dt.Rows[i]["SITEAPPLYUSERNAME"].ToString());
+                    rowtemp.CreateCell(27).SetCellValue(dt.Rows[i]["SITEPASSTIME"].ToString());
+                    rowtemp.CreateCell(28).SetCellValue(dt.Rows[i]["SITEPASSUSERNAME"].ToString());
+                    rowtemp.CreateCell(29).SetCellValue(dt.Rows[i]["INSPCHECKTIME"].ToString());
+                    rowtemp.CreateCell(30).SetCellValue(dt.Rows[i]["INSPCHECKNAME"].ToString());
+                    rowtemp.CreateCell(31).SetCellValue(dt.Rows[i]["FUMIGATIONTIME"].ToString());
+                    rowtemp.CreateCell(32).SetCellValue(dt.Rows[i]["FUMIGATIONNAME"].ToString());
+                    rowtemp.CreateCell(33).SetCellValue(dt.Rows[i]["INSPSITEAPPLYTIME"].ToString());
+                    rowtemp.CreateCell(34).SetCellValue(dt.Rows[i]["INSPSITEAPPLYUSERNAME"].ToString());
+                    rowtemp.CreateCell(35).SetCellValue(dt.Rows[i]["INSPSITEPASSTIME"].ToString());
+                    rowtemp.CreateCell(36).SetCellValue(dt.Rows[i]["INSPSITEPASSUSERNAME"].ToString());
+
+
                 }
             }
             #endregion
@@ -3141,6 +3569,12 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(4).SetCellValue("经营单位"); row1.CreateCell(5).SetCellValue("合同号"); row1.CreateCell(6).SetCellValue("总单号"); row1.CreateCell(7).SetCellValue("分单号");
                 row1.CreateCell(8).SetCellValue("件数/重量"); row1.CreateCell(9).SetCellValue("打印状态"); row1.CreateCell(10).SetCellValue("申报关区"); row1.CreateCell(11).SetCellValue("进/出口岸");
                 row1.CreateCell(12).SetCellValue("申报方式"); row1.CreateCell(13).SetCellValue("运抵编号"); row1.CreateCell(14).SetCellValue("法检"); row1.CreateCell(15).SetCellValue("委托时间");
+
+                row1.CreateCell(16).SetCellValue("报关查验"); row1.CreateCell(17).SetCellValue("报关稽核"); row1.CreateCell(18).SetCellValue("报检查验"); row1.CreateCell(19).SetCellValue("报检熏蒸");
+                row1.CreateCell(20).SetCellValue("报关查验日期"); row1.CreateCell(21).SetCellValue("报关查验人"); row1.CreateCell(22).SetCellValue("报关稽核日期"); row1.CreateCell(23).SetCellValue("报关稽核人");
+                row1.CreateCell(24).SetCellValue("现场报关日期"); row1.CreateCell(25).SetCellValue("现场报关人"); row1.CreateCell(26).SetCellValue("报关放行日期"); row1.CreateCell(27).SetCellValue("报关放行人");
+                row1.CreateCell(28).SetCellValue("报检查验日期"); row1.CreateCell(29).SetCellValue("报检查验人"); row1.CreateCell(30).SetCellValue("报检熏蒸日期"); row1.CreateCell(31).SetCellValue("报检熏蒸人");
+                row1.CreateCell(32).SetCellValue("现场报检日期"); row1.CreateCell(33).SetCellValue("现场报检人"); row1.CreateCell(34).SetCellValue("报检放行日期"); row1.CreateCell(35).SetCellValue("报检放行人");
 
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
@@ -3171,6 +3605,27 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["ARRIVEDNO"].ToString());
                     rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
                     rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
+
+                    rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["ISCHECK"].ToString() == "1" ? "查验" : "");
+                    rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["AUDITFLAG"].ToString() == "1" ? "稽核" : "");
+                    rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["INSPISCHECK"].ToString() == "1" ? "查验" : "");
+                    rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["ISFUMIGATION"].ToString() == "1" ? "熏蒸" : "");
+                    rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["DECLCHECKTIME"].ToString());
+                    rowtemp.CreateCell(21).SetCellValue(dt.Rows[i]["DECLCHECKNAME"].ToString());
+                    rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["AUDITFLAGTIME"].ToString());
+                    rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["AUDITFLAGNAME"].ToString());
+                    rowtemp.CreateCell(24).SetCellValue(dt.Rows[i]["SITEAPPLYTIME"].ToString());
+                    rowtemp.CreateCell(25).SetCellValue(dt.Rows[i]["SITEAPPLYUSERNAME"].ToString());
+                    rowtemp.CreateCell(26).SetCellValue(dt.Rows[i]["SITEPASSTIME"].ToString());
+                    rowtemp.CreateCell(27).SetCellValue(dt.Rows[i]["SITEPASSUSERNAME"].ToString());
+                    rowtemp.CreateCell(28).SetCellValue(dt.Rows[i]["INSPCHECKTIME"].ToString());
+                    rowtemp.CreateCell(29).SetCellValue(dt.Rows[i]["INSPCHECKNAME"].ToString());
+                    rowtemp.CreateCell(30).SetCellValue(dt.Rows[i]["FUMIGATIONTIME"].ToString());
+                    rowtemp.CreateCell(31).SetCellValue(dt.Rows[i]["FUMIGATIONNAME"].ToString());
+                    rowtemp.CreateCell(32).SetCellValue(dt.Rows[i]["INSPSITEAPPLYTIME"].ToString());
+                    rowtemp.CreateCell(33).SetCellValue(dt.Rows[i]["INSPSITEAPPLYUSERNAME"].ToString());
+                    rowtemp.CreateCell(34).SetCellValue(dt.Rows[i]["INSPSITEPASSTIME"].ToString());
+                    rowtemp.CreateCell(35).SetCellValue(dt.Rows[i]["INSPSITEPASSUSERNAME"].ToString());
                 }
             }
             #endregion
@@ -3185,6 +3640,12 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(4).SetCellValue("经营单位"); row1.CreateCell(5).SetCellValue("合同号"); row1.CreateCell(6).SetCellValue("打印状态"); row1.CreateCell(7).SetCellValue("国检提单号");
                 row1.CreateCell(8).SetCellValue("海关提单号"); row1.CreateCell(9).SetCellValue("件数/重量"); row1.CreateCell(10).SetCellValue("申报关区"); row1.CreateCell(11).SetCellValue("进/出口岸");
                 row1.CreateCell(12).SetCellValue("申报方式"); row1.CreateCell(13).SetCellValue("转关预录号"); row1.CreateCell(14).SetCellValue("法检"); row1.CreateCell(15).SetCellValue("委托时间");
+
+                row1.CreateCell(16).SetCellValue("报关查验"); row1.CreateCell(17).SetCellValue("报关稽核"); row1.CreateCell(18).SetCellValue("报检查验"); row1.CreateCell(19).SetCellValue("报检熏蒸");
+                row1.CreateCell(20).SetCellValue("报关查验日期"); row1.CreateCell(21).SetCellValue("报关查验人"); row1.CreateCell(22).SetCellValue("报关稽核日期"); row1.CreateCell(23).SetCellValue("报关稽核人");
+                row1.CreateCell(24).SetCellValue("现场报关日期"); row1.CreateCell(25).SetCellValue("现场报关人"); row1.CreateCell(26).SetCellValue("报关放行日期"); row1.CreateCell(27).SetCellValue("报关放行人");
+                row1.CreateCell(28).SetCellValue("报检查验日期"); row1.CreateCell(29).SetCellValue("报检查验人"); row1.CreateCell(30).SetCellValue("报检熏蒸日期"); row1.CreateCell(31).SetCellValue("报检熏蒸人");
+                row1.CreateCell(32).SetCellValue("现场报检日期"); row1.CreateCell(33).SetCellValue("现场报检人"); row1.CreateCell(34).SetCellValue("报检放行日期"); row1.CreateCell(35).SetCellValue("报检放行人");
 
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
@@ -3215,6 +3676,28 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["TURNPRENO"].ToString());
                     rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
                     rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
+
+                    rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["ISCHECK"].ToString() == "1" ? "查验" : "");
+                    rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["AUDITFLAG"].ToString() == "1" ? "稽核" : "");
+                    rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["INSPISCHECK"].ToString() == "1" ? "查验" : "");
+                    rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["ISFUMIGATION"].ToString() == "1" ? "熏蒸" : "");
+                    rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["DECLCHECKTIME"].ToString());
+                    rowtemp.CreateCell(21).SetCellValue(dt.Rows[i]["DECLCHECKNAME"].ToString());
+                    rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["AUDITFLAGTIME"].ToString());
+                    rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["AUDITFLAGNAME"].ToString());
+                    rowtemp.CreateCell(24).SetCellValue(dt.Rows[i]["SITEAPPLYTIME"].ToString());
+                    rowtemp.CreateCell(25).SetCellValue(dt.Rows[i]["SITEAPPLYUSERNAME"].ToString());
+                    rowtemp.CreateCell(26).SetCellValue(dt.Rows[i]["SITEPASSTIME"].ToString());
+                    rowtemp.CreateCell(27).SetCellValue(dt.Rows[i]["SITEPASSUSERNAME"].ToString());
+                    rowtemp.CreateCell(28).SetCellValue(dt.Rows[i]["INSPCHECKTIME"].ToString());
+                    rowtemp.CreateCell(29).SetCellValue(dt.Rows[i]["INSPCHECKNAME"].ToString());
+                    rowtemp.CreateCell(30).SetCellValue(dt.Rows[i]["FUMIGATIONTIME"].ToString());
+                    rowtemp.CreateCell(31).SetCellValue(dt.Rows[i]["FUMIGATIONNAME"].ToString());
+                    rowtemp.CreateCell(32).SetCellValue(dt.Rows[i]["INSPSITEAPPLYTIME"].ToString());
+                    rowtemp.CreateCell(33).SetCellValue(dt.Rows[i]["INSPSITEAPPLYUSERNAME"].ToString());
+                    rowtemp.CreateCell(34).SetCellValue(dt.Rows[i]["INSPSITEPASSTIME"].ToString());
+                    rowtemp.CreateCell(35).SetCellValue(dt.Rows[i]["INSPSITEPASSUSERNAME"].ToString());
+
                 }
             }
             #endregion
@@ -3229,6 +3712,12 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(4).SetCellValue("经营单位"); row1.CreateCell(5).SetCellValue("合同号"); row1.CreateCell(6).SetCellValue("提单号"); row1.CreateCell(7).SetCellValue("打印状态");
                 row1.CreateCell(8).SetCellValue("运抵编号"); row1.CreateCell(9).SetCellValue("件数/重量"); row1.CreateCell(10).SetCellValue("申报关区"); row1.CreateCell(11).SetCellValue("进/出口岸");
                 row1.CreateCell(12).SetCellValue("申报方式"); row1.CreateCell(13).SetCellValue("转关预录号"); row1.CreateCell(14).SetCellValue("法检"); row1.CreateCell(15).SetCellValue("委托时间");
+
+                row1.CreateCell(16).SetCellValue("报关查验"); row1.CreateCell(17).SetCellValue("报关稽核"); row1.CreateCell(18).SetCellValue("报检查验"); row1.CreateCell(19).SetCellValue("报检熏蒸");
+                row1.CreateCell(20).SetCellValue("报关查验日期"); row1.CreateCell(21).SetCellValue("报关查验人"); row1.CreateCell(22).SetCellValue("报关稽核日期"); row1.CreateCell(23).SetCellValue("报关稽核人");
+                row1.CreateCell(24).SetCellValue("现场报关日期"); row1.CreateCell(25).SetCellValue("现场报关人"); row1.CreateCell(26).SetCellValue("报关放行日期"); row1.CreateCell(27).SetCellValue("报关放行人");
+                row1.CreateCell(28).SetCellValue("报检查验日期"); row1.CreateCell(29).SetCellValue("报检查验人"); row1.CreateCell(30).SetCellValue("报检熏蒸日期"); row1.CreateCell(31).SetCellValue("报检熏蒸人");
+                row1.CreateCell(32).SetCellValue("现场报检日期"); row1.CreateCell(33).SetCellValue("现场报检人"); row1.CreateCell(34).SetCellValue("报检放行日期"); row1.CreateCell(35).SetCellValue("报检放行人");
 
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
@@ -3259,6 +3748,28 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["TURNPRENO"].ToString());
                     rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
                     rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
+
+                    rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["ISCHECK"].ToString() == "1" ? "查验" : "");
+                    rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["AUDITFLAG"].ToString() == "1" ? "稽核" : "");
+                    rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["INSPISCHECK"].ToString() == "1" ? "查验" : "");
+                    rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["ISFUMIGATION"].ToString() == "1" ? "熏蒸" : "");
+                    rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["DECLCHECKTIME"].ToString());
+                    rowtemp.CreateCell(21).SetCellValue(dt.Rows[i]["DECLCHECKNAME"].ToString());
+                    rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["AUDITFLAGTIME"].ToString());
+                    rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["AUDITFLAGNAME"].ToString());
+                    rowtemp.CreateCell(24).SetCellValue(dt.Rows[i]["SITEAPPLYTIME"].ToString());
+                    rowtemp.CreateCell(25).SetCellValue(dt.Rows[i]["SITEAPPLYUSERNAME"].ToString());
+                    rowtemp.CreateCell(26).SetCellValue(dt.Rows[i]["SITEPASSTIME"].ToString());
+                    rowtemp.CreateCell(27).SetCellValue(dt.Rows[i]["SITEPASSUSERNAME"].ToString());
+                    rowtemp.CreateCell(28).SetCellValue(dt.Rows[i]["INSPCHECKTIME"].ToString());
+                    rowtemp.CreateCell(29).SetCellValue(dt.Rows[i]["INSPCHECKNAME"].ToString());
+                    rowtemp.CreateCell(30).SetCellValue(dt.Rows[i]["FUMIGATIONTIME"].ToString());
+                    rowtemp.CreateCell(31).SetCellValue(dt.Rows[i]["FUMIGATIONNAME"].ToString());
+                    rowtemp.CreateCell(32).SetCellValue(dt.Rows[i]["INSPSITEAPPLYTIME"].ToString());
+                    rowtemp.CreateCell(33).SetCellValue(dt.Rows[i]["INSPSITEAPPLYUSERNAME"].ToString());
+                    rowtemp.CreateCell(34).SetCellValue(dt.Rows[i]["INSPSITEPASSTIME"].ToString());
+                    rowtemp.CreateCell(35).SetCellValue(dt.Rows[i]["INSPSITEPASSUSERNAME"].ToString());
+
                 }
             }
             #endregion
@@ -3273,6 +3784,12 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(4).SetCellValue("经营单位"); row1.CreateCell(5).SetCellValue("合同号"); row1.CreateCell(6).SetCellValue("分单号"); row1.CreateCell(7).SetCellValue("打印状态");
                 row1.CreateCell(8).SetCellValue("件数/重量"); row1.CreateCell(9).SetCellValue("申报关区"); row1.CreateCell(10).SetCellValue("进/出口岸"); row1.CreateCell(11).SetCellValue("申报方式");
                 row1.CreateCell(12).SetCellValue("法检"); row1.CreateCell(13).SetCellValue("委托时间");
+
+                row1.CreateCell(14).SetCellValue("报关查验"); row1.CreateCell(15).SetCellValue("报关稽核"); row1.CreateCell(16).SetCellValue("报检查验"); row1.CreateCell(17).SetCellValue("报检熏蒸");
+                row1.CreateCell(18).SetCellValue("报关查验日期"); row1.CreateCell(19).SetCellValue("报关查验人"); row1.CreateCell(20).SetCellValue("报关稽核日期"); row1.CreateCell(21).SetCellValue("报关稽核人");
+                row1.CreateCell(22).SetCellValue("现场报关日期"); row1.CreateCell(23).SetCellValue("现场报关人"); row1.CreateCell(24).SetCellValue("报关放行日期"); row1.CreateCell(25).SetCellValue("报关放行人");
+                row1.CreateCell(26).SetCellValue("报检查验日期"); row1.CreateCell(27).SetCellValue("报检查验人"); row1.CreateCell(28).SetCellValue("报检熏蒸日期"); row1.CreateCell(29).SetCellValue("报检熏蒸人");
+                row1.CreateCell(30).SetCellValue("现场报检日期"); row1.CreateCell(31).SetCellValue("现场报检人"); row1.CreateCell(32).SetCellValue("报检放行日期"); row1.CreateCell(33).SetCellValue("报检放行人");
 
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
@@ -3301,6 +3818,29 @@ namespace MvcPlatform.Controllers
 
                     rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
                     rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
+
+
+                    rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["ISCHECK"].ToString() == "1" ? "查验" : "");
+                    rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["AUDITFLAG"].ToString() == "1" ? "稽核" : "");
+                    rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["INSPISCHECK"].ToString() == "1" ? "查验" : "");
+                    rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["ISFUMIGATION"].ToString() == "1" ? "熏蒸" : "");
+                    rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["DECLCHECKTIME"].ToString());
+                    rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["DECLCHECKNAME"].ToString());
+                    rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["AUDITFLAGTIME"].ToString());
+                    rowtemp.CreateCell(21).SetCellValue(dt.Rows[i]["AUDITFLAGNAME"].ToString());
+                    rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["SITEAPPLYTIME"].ToString());
+                    rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["SITEAPPLYUSERNAME"].ToString());
+                    rowtemp.CreateCell(24).SetCellValue(dt.Rows[i]["SITEPASSTIME"].ToString());
+                    rowtemp.CreateCell(25).SetCellValue(dt.Rows[i]["SITEPASSUSERNAME"].ToString());
+                    rowtemp.CreateCell(26).SetCellValue(dt.Rows[i]["INSPCHECKTIME"].ToString());
+                    rowtemp.CreateCell(27).SetCellValue(dt.Rows[i]["INSPCHECKNAME"].ToString());
+                    rowtemp.CreateCell(28).SetCellValue(dt.Rows[i]["FUMIGATIONTIME"].ToString());
+                    rowtemp.CreateCell(29).SetCellValue(dt.Rows[i]["FUMIGATIONNAME"].ToString());
+                    rowtemp.CreateCell(30).SetCellValue(dt.Rows[i]["INSPSITEAPPLYTIME"].ToString());
+                    rowtemp.CreateCell(31).SetCellValue(dt.Rows[i]["INSPSITEAPPLYUSERNAME"].ToString());
+                    rowtemp.CreateCell(32).SetCellValue(dt.Rows[i]["INSPSITEPASSTIME"].ToString());
+                    rowtemp.CreateCell(33).SetCellValue(dt.Rows[i]["INSPSITEPASSUSERNAME"].ToString());
+
                 }
             }
             #endregion
@@ -3316,6 +3856,12 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(8).SetCellValue("打印状态"); row1.CreateCell(9).SetCellValue("件数/重量"); row1.CreateCell(10).SetCellValue("申报关区"); row1.CreateCell(11).SetCellValue("进/出口岸");
                 row1.CreateCell(12).SetCellValue("申报方式"); row1.CreateCell(13).SetCellValue("运抵编号"); row1.CreateCell(14).SetCellValue("转关预录号"); row1.CreateCell(15).SetCellValue("法检");
                 row1.CreateCell(16).SetCellValue("委托时间");
+
+                row1.CreateCell(17).SetCellValue("报关查验"); row1.CreateCell(18).SetCellValue("报关稽核"); row1.CreateCell(19).SetCellValue("报检查验"); row1.CreateCell(20).SetCellValue("报检熏蒸");
+                row1.CreateCell(21).SetCellValue("报关查验日期"); row1.CreateCell(22).SetCellValue("报关查验人"); row1.CreateCell(23).SetCellValue("报关稽核日期"); row1.CreateCell(24).SetCellValue("报关稽核人");
+                row1.CreateCell(25).SetCellValue("现场报关日期"); row1.CreateCell(26).SetCellValue("现场报关人"); row1.CreateCell(27).SetCellValue("报关放行日期"); row1.CreateCell(28).SetCellValue("报关放行人");
+                row1.CreateCell(29).SetCellValue("报检查验日期"); row1.CreateCell(30).SetCellValue("报检查验人"); row1.CreateCell(31).SetCellValue("报检熏蒸日期"); row1.CreateCell(32).SetCellValue("报检熏蒸人");
+                row1.CreateCell(33).SetCellValue("现场报检日期"); row1.CreateCell(34).SetCellValue("现场报检人"); row1.CreateCell(35).SetCellValue("报检放行日期"); row1.CreateCell(36).SetCellValue("报检放行人");
 
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
@@ -3348,6 +3894,29 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
 
                     rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
+
+
+                    rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["ISCHECK"].ToString() == "1" ? "查验" : "");
+                    rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["AUDITFLAG"].ToString() == "1" ? "稽核" : "");
+                    rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["INSPISCHECK"].ToString() == "1" ? "查验" : "");
+                    rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["ISFUMIGATION"].ToString() == "1" ? "熏蒸" : "");
+                    rowtemp.CreateCell(21).SetCellValue(dt.Rows[i]["DECLCHECKTIME"].ToString());
+                    rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["DECLCHECKNAME"].ToString());
+                    rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["AUDITFLAGTIME"].ToString());
+                    rowtemp.CreateCell(24).SetCellValue(dt.Rows[i]["AUDITFLAGNAME"].ToString());
+                    rowtemp.CreateCell(25).SetCellValue(dt.Rows[i]["SITEAPPLYTIME"].ToString());
+                    rowtemp.CreateCell(26).SetCellValue(dt.Rows[i]["SITEAPPLYUSERNAME"].ToString());
+                    rowtemp.CreateCell(27).SetCellValue(dt.Rows[i]["SITEPASSTIME"].ToString());
+                    rowtemp.CreateCell(28).SetCellValue(dt.Rows[i]["SITEPASSUSERNAME"].ToString());
+                    rowtemp.CreateCell(29).SetCellValue(dt.Rows[i]["INSPCHECKTIME"].ToString());
+                    rowtemp.CreateCell(30).SetCellValue(dt.Rows[i]["INSPCHECKNAME"].ToString());
+                    rowtemp.CreateCell(31).SetCellValue(dt.Rows[i]["FUMIGATIONTIME"].ToString());
+                    rowtemp.CreateCell(32).SetCellValue(dt.Rows[i]["FUMIGATIONNAME"].ToString());
+                    rowtemp.CreateCell(33).SetCellValue(dt.Rows[i]["INSPSITEAPPLYTIME"].ToString());
+                    rowtemp.CreateCell(34).SetCellValue(dt.Rows[i]["INSPSITEAPPLYUSERNAME"].ToString());
+                    rowtemp.CreateCell(35).SetCellValue(dt.Rows[i]["INSPSITEPASSTIME"].ToString());
+                    rowtemp.CreateCell(36).SetCellValue(dt.Rows[i]["INSPSITEPASSUSERNAME"].ToString());
+
                 }
             }
             #endregion
@@ -3362,6 +3931,12 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(4).SetCellValue("经营单位"); row1.CreateCell(5).SetCellValue("合同号"); row1.CreateCell(6).SetCellValue("件数/重量"); row1.CreateCell(7).SetCellValue("打印状态");
                 row1.CreateCell(8).SetCellValue("申报关区"); row1.CreateCell(9).SetCellValue("申报方式"); row1.CreateCell(10).SetCellValue("法检"); row1.CreateCell(11).SetCellValue("业务类型");
                 row1.CreateCell(12).SetCellValue("两单关联号"); row1.CreateCell(13).SetCellValue("委托时间"); row1.CreateCell(14).SetCellValue("多单关联号");
+
+                row1.CreateCell(15).SetCellValue("报关查验"); row1.CreateCell(16).SetCellValue("报关稽核"); row1.CreateCell(17).SetCellValue("报检查验"); row1.CreateCell(18).SetCellValue("报检熏蒸");
+                row1.CreateCell(19).SetCellValue("报关查验日期"); row1.CreateCell(20).SetCellValue("报关查验人"); row1.CreateCell(21).SetCellValue("报关稽核日期"); row1.CreateCell(22).SetCellValue("报关稽核人");
+                row1.CreateCell(23).SetCellValue("现场报关日期"); row1.CreateCell(24).SetCellValue("现场报关人"); row1.CreateCell(25).SetCellValue("报关放行日期"); row1.CreateCell(26).SetCellValue("报关放行人");
+                row1.CreateCell(27).SetCellValue("报检查验日期"); row1.CreateCell(28).SetCellValue("报检查验人"); row1.CreateCell(29).SetCellValue("报检熏蒸日期"); row1.CreateCell(30).SetCellValue("报检熏蒸人");
+                row1.CreateCell(31).SetCellValue("现场报检日期"); row1.CreateCell(32).SetCellValue("现场报检人"); row1.CreateCell(33).SetCellValue("报检放行日期"); row1.CreateCell(34).SetCellValue("报检放行人");
 
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
@@ -3402,6 +3977,27 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["ASSOCIATENO"].ToString());
                     rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
                     rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["CORRESPONDNO"].ToString());
+
+                    rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["ISCHECK"].ToString() == "1" ? "查验" : "");
+                    rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["AUDITFLAG"].ToString() == "1" ? "稽核" : "");
+                    rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["INSPISCHECK"].ToString() == "1" ? "查验" : "");
+                    rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["ISFUMIGATION"].ToString() == "1" ? "熏蒸" : "");
+                    rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["DECLCHECKTIME"].ToString());
+                    rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["DECLCHECKNAME"].ToString());
+                    rowtemp.CreateCell(21).SetCellValue(dt.Rows[i]["AUDITFLAGTIME"].ToString());
+                    rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["AUDITFLAGNAME"].ToString());
+                    rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["SITEAPPLYTIME"].ToString());
+                    rowtemp.CreateCell(24).SetCellValue(dt.Rows[i]["SITEAPPLYUSERNAME"].ToString());
+                    rowtemp.CreateCell(25).SetCellValue(dt.Rows[i]["SITEPASSTIME"].ToString());
+                    rowtemp.CreateCell(26).SetCellValue(dt.Rows[i]["SITEPASSUSERNAME"].ToString());
+                    rowtemp.CreateCell(27).SetCellValue(dt.Rows[i]["INSPCHECKTIME"].ToString());
+                    rowtemp.CreateCell(28).SetCellValue(dt.Rows[i]["INSPCHECKNAME"].ToString());
+                    rowtemp.CreateCell(29).SetCellValue(dt.Rows[i]["FUMIGATIONTIME"].ToString());
+                    rowtemp.CreateCell(30).SetCellValue(dt.Rows[i]["FUMIGATIONNAME"].ToString());
+                    rowtemp.CreateCell(31).SetCellValue(dt.Rows[i]["INSPSITEAPPLYTIME"].ToString());
+                    rowtemp.CreateCell(32).SetCellValue(dt.Rows[i]["INSPSITEAPPLYUSERNAME"].ToString());
+                    rowtemp.CreateCell(33).SetCellValue(dt.Rows[i]["INSPSITEPASSTIME"].ToString());
+                    rowtemp.CreateCell(34).SetCellValue(dt.Rows[i]["INSPSITEPASSUSERNAME"].ToString());
                     
                 }
             }
@@ -3417,6 +4013,12 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(4).SetCellValue("合同号"); row1.CreateCell(5).SetCellValue("经营单位"); row1.CreateCell(6).SetCellValue("打印状态"); row1.CreateCell(7).SetCellValue("申报方式");
                 row1.CreateCell(8).SetCellValue("件数/重量"); row1.CreateCell(9).SetCellValue("申报关区"); row1.CreateCell(10).SetCellValue("进/出口岸"); row1.CreateCell(11).SetCellValue("转关预录号"); 
                 row1.CreateCell(12).SetCellValue("法检"); row1.CreateCell(13).SetCellValue("委托时间");
+
+                row1.CreateCell(14).SetCellValue("报关查验"); row1.CreateCell(15).SetCellValue("报关稽核"); row1.CreateCell(16).SetCellValue("报检查验"); row1.CreateCell(17).SetCellValue("报检熏蒸");
+                row1.CreateCell(18).SetCellValue("报关查验日期"); row1.CreateCell(19).SetCellValue("报关查验人"); row1.CreateCell(20).SetCellValue("报关稽核日期"); row1.CreateCell(21).SetCellValue("报关稽核人");
+                row1.CreateCell(22).SetCellValue("现场报关日期"); row1.CreateCell(23).SetCellValue("现场报关人"); row1.CreateCell(24).SetCellValue("报关放行日期"); row1.CreateCell(25).SetCellValue("报关放行人");
+                row1.CreateCell(26).SetCellValue("报检查验日期"); row1.CreateCell(27).SetCellValue("报检查验人"); row1.CreateCell(28).SetCellValue("报检熏蒸日期"); row1.CreateCell(29).SetCellValue("报检熏蒸人");
+                row1.CreateCell(30).SetCellValue("现场报检日期"); row1.CreateCell(31).SetCellValue("现场报检人"); row1.CreateCell(32).SetCellValue("报检放行日期"); row1.CreateCell(33).SetCellValue("报检放行人");
 
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
@@ -3443,8 +4045,30 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["PORTCODE"].ToString());
                     rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["TURNPRENO"].ToString());                
                    
-                    rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
-                    rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
+                    rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["LAWFLAG"].ToString() == "1" ? "有" : "无");
+                    rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
+
+                    rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["ISCHECK"].ToString() == "1" ? "查验" : "");
+                    rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["AUDITFLAG"].ToString() == "1" ? "稽核" : "");
+                    rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["INSPISCHECK"].ToString() == "1" ? "查验" : "");
+                    rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["ISFUMIGATION"].ToString() == "1" ? "熏蒸" : "");
+                    rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["DECLCHECKTIME"].ToString());
+                    rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["DECLCHECKNAME"].ToString());
+                    rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["AUDITFLAGTIME"].ToString());
+                    rowtemp.CreateCell(21).SetCellValue(dt.Rows[i]["AUDITFLAGNAME"].ToString());
+                    rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["SITEAPPLYTIME"].ToString());
+                    rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["SITEAPPLYUSERNAME"].ToString());
+                    rowtemp.CreateCell(24).SetCellValue(dt.Rows[i]["SITEPASSTIME"].ToString());
+                    rowtemp.CreateCell(25).SetCellValue(dt.Rows[i]["SITEPASSUSERNAME"].ToString());
+                    rowtemp.CreateCell(26).SetCellValue(dt.Rows[i]["INSPCHECKTIME"].ToString());
+                    rowtemp.CreateCell(27).SetCellValue(dt.Rows[i]["INSPCHECKNAME"].ToString());
+                    rowtemp.CreateCell(28).SetCellValue(dt.Rows[i]["FUMIGATIONTIME"].ToString());
+                    rowtemp.CreateCell(29).SetCellValue(dt.Rows[i]["FUMIGATIONNAME"].ToString());
+                    rowtemp.CreateCell(30).SetCellValue(dt.Rows[i]["INSPSITEAPPLYTIME"].ToString());
+                    rowtemp.CreateCell(31).SetCellValue(dt.Rows[i]["INSPSITEAPPLYUSERNAME"].ToString());
+                    rowtemp.CreateCell(32).SetCellValue(dt.Rows[i]["INSPSITEPASSTIME"].ToString());
+                    rowtemp.CreateCell(33).SetCellValue(dt.Rows[i]["INSPSITEPASSUSERNAME"].ToString());
+
                 }
             }
             #endregion
@@ -3512,8 +4136,9 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(4).SetCellValue("总单号"); row1.CreateCell(5).SetCellValue("分单号"); row1.CreateCell(6).SetCellValue("打印标志"); row1.CreateCell(7).SetCellValue("申报日期"); 
                 row1.CreateCell(8).SetCellValue("运输工具名称"); row1.CreateCell(9).SetCellValue("业务类型"); row1.CreateCell(10).SetCellValue("出口口岸");row1.CreateCell(11).SetCellValue("提运单号"); 
                 row1.CreateCell(12).SetCellValue("申报方式");row1.CreateCell(13).SetCellValue("报关方式"); row1.CreateCell(14).SetCellValue("贸易方式");row1.CreateCell(15).SetCellValue("合同协议号");
-                row1.CreateCell(16).SetCellValue("件数");row1.CreateCell(17).SetCellValue("重量"); row1.CreateCell(18).SetCellValue("张数"); row1.CreateCell(19).SetCellValue("删改单"); 
-                row1.CreateCell(20).SetCellValue("订单编号"); row1.CreateCell(21).SetCellValue("客户编号");
+                row1.CreateCell(16).SetCellValue("件数");row1.CreateCell(17).SetCellValue("重量"); row1.CreateCell(18).SetCellValue("张数"); row1.CreateCell(19).SetCellValue("删改单");
+                row1.CreateCell(20).SetCellValue("订单编号"); row1.CreateCell(21).SetCellValue("客户编号"); row1.CreateCell(22).SetCellValue("删单日期"); row1.CreateCell(23).SetCellValue("删单人");
+                row1.CreateCell(24).SetCellValue("改单日期"); row1.CreateCell(25).SetCellValue("改单人"); row1.CreateCell(26).SetCellValue("改单完成日期"); row1.CreateCell(27).SetCellValue("改单完成人");
                 
                 
 
@@ -3563,6 +4188,13 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
                     rowtemp.CreateCell(21).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
 
+                    rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["DELORDERTIME"].ToString());
+                    rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["DELORDERUSERNAME"].ToString());
+                    rowtemp.CreateCell(24).SetCellValue(dt.Rows[i]["MODORDERTIME"].ToString());
+                    rowtemp.CreateCell(25).SetCellValue(dt.Rows[i]["MODORDERUSERNAME"].ToString());
+                    rowtemp.CreateCell(26).SetCellValue(dt.Rows[i]["MODFINISHTIME"].ToString());
+                    rowtemp.CreateCell(27).SetCellValue(dt.Rows[i]["MODFINISHUSERNAME"].ToString());
+
                 }
             }
             #endregion
@@ -3574,8 +4206,9 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(4).SetCellValue("海运提单号"); row1.CreateCell(5).SetCellValue("打印标志"); row1.CreateCell(6).SetCellValue("申报日期"); row1.CreateCell(7).SetCellValue("运输工具名称"); 
                 row1.CreateCell(8).SetCellValue("业务类型"); row1.CreateCell(9).SetCellValue("出口口岸"); row1.CreateCell(10).SetCellValue("提运单号"); row1.CreateCell(11).SetCellValue("申报方式");
                 row1.CreateCell(12).SetCellValue("报关方式"); row1.CreateCell(13).SetCellValue("贸易方式"); row1.CreateCell(14).SetCellValue("合同协议号"); row1.CreateCell(15).SetCellValue("件数");
-                row1.CreateCell(16).SetCellValue("重量");row1.CreateCell(17).SetCellValue("张数"); row1.CreateCell(18).SetCellValue("删改单"); row1.CreateCell(19).SetCellValue("订单编号"); 
-                row1.CreateCell(20).SetCellValue("客户编号");
+                row1.CreateCell(16).SetCellValue("重量");row1.CreateCell(17).SetCellValue("张数"); row1.CreateCell(18).SetCellValue("删改单"); row1.CreateCell(19).SetCellValue("订单编号");
+                row1.CreateCell(20).SetCellValue("客户编号"); row1.CreateCell(21).SetCellValue("删单日期"); row1.CreateCell(22).SetCellValue("删单人");row1.CreateCell(23).SetCellValue("改单日期");
+                 row1.CreateCell(24).SetCellValue("改单人"); row1.CreateCell(25).SetCellValue("改单完成日期"); row1.CreateCell(26).SetCellValue("改单完成人");
 
 
                 //将数据逐步写入sheet_S各个行
@@ -3623,6 +4256,12 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
                     rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
 
+                    rowtemp.CreateCell(21).SetCellValue(dt.Rows[i]["DELORDERTIME"].ToString());
+                    rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["DELORDERUSERNAME"].ToString());
+                    rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["MODORDERTIME"].ToString());
+                    rowtemp.CreateCell(24).SetCellValue(dt.Rows[i]["MODORDERUSERNAME"].ToString());
+                    rowtemp.CreateCell(25).SetCellValue(dt.Rows[i]["MODFINISHTIME"].ToString());
+                    rowtemp.CreateCell(26).SetCellValue(dt.Rows[i]["MODFINISHUSERNAME"].ToString());
                 }
             }
             #endregion
@@ -3635,7 +4274,8 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(8).SetCellValue("出口口岸");row1.CreateCell(9).SetCellValue("提运单号"); row1.CreateCell(10).SetCellValue("申报方式"); row1.CreateCell(11).SetCellValue("报关方式"); 
                 row1.CreateCell(12).SetCellValue("贸易方式");row1.CreateCell(13).SetCellValue("合同协议号"); row1.CreateCell(14).SetCellValue("件数"); row1.CreateCell(15).SetCellValue("重量"); 
                 row1.CreateCell(16).SetCellValue("张数");row1.CreateCell(17).SetCellValue("删改单"); row1.CreateCell(18).SetCellValue("订单编号"); row1.CreateCell(19).SetCellValue("客户编号");
-                
+                row1.CreateCell(20).SetCellValue("删单日期"); row1.CreateCell(21).SetCellValue("删单人");row1.CreateCell(22).SetCellValue("改单日期"); row1.CreateCell(23).SetCellValue("改单人");
+                 row1.CreateCell(24).SetCellValue("改单完成日期"); row1.CreateCell(25).SetCellValue("改单完成人");
 
                 //将数据逐步写入sheet_S各个行
                 for (int i = 0; i < dt.Rows.Count; i++)
@@ -3681,6 +4321,13 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
                     rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
 
+                    rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["DELORDERTIME"].ToString());
+                    rowtemp.CreateCell(21).SetCellValue(dt.Rows[i]["DELORDERUSERNAME"].ToString());
+                    rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["MODORDERTIME"].ToString());
+                    rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["MODORDERUSERNAME"].ToString());
+                    rowtemp.CreateCell(24).SetCellValue(dt.Rows[i]["MODFINISHTIME"].ToString());
+                    rowtemp.CreateCell(25).SetCellValue(dt.Rows[i]["MODFINISHUSERNAME"].ToString());
+
                 }
             }
             #endregion
@@ -3693,8 +4340,9 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(8).SetCellValue("运输工具名称"); row1.CreateCell(9).SetCellValue("业务类型"); row1.CreateCell(10).SetCellValue("出口口岸"); row1.CreateCell(11).SetCellValue("提运单号");               
                 row1.CreateCell(12).SetCellValue("申报方式"); row1.CreateCell(13).SetCellValue("报关方式"); row1.CreateCell(14).SetCellValue("贸易方式"); row1.CreateCell(15).SetCellValue("合同协议号");
                 row1.CreateCell(16).SetCellValue("件数");row1.CreateCell(17).SetCellValue("重量"); row1.CreateCell(18).SetCellValue("张数"); row1.CreateCell(19).SetCellValue("多单关联号"); 
-                row1.CreateCell(20).SetCellValue("删改单"); row1.CreateCell(21).SetCellValue("订单编号"); row1.CreateCell(22).SetCellValue("客户编号");
-               
+                row1.CreateCell(20).SetCellValue("删改单"); row1.CreateCell(21).SetCellValue("订单编号"); row1.CreateCell(22).SetCellValue("客户编号");row1.CreateCell(23).SetCellValue("删单日期"); 
+                row1.CreateCell(24).SetCellValue("删单人");row1.CreateCell(25).SetCellValue("改单日期"); row1.CreateCell(26).SetCellValue("改单人"); row1.CreateCell(27).SetCellValue("改单完成日期");
+                row1.CreateCell(28).SetCellValue("改单完成人");
 
                 //将数据逐步写入sheet_S各个行
                 for (int i = 0; i < dt.Rows.Count; i++)
@@ -3741,7 +4389,14 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["CORRESPONDNO"].ToString());
                     rowtemp.CreateCell(20).SetCellValue(getStatusName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
                     rowtemp.CreateCell(21).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
-                    rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["CUSNO"].ToString());                 
+                    rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+
+                    rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["DELORDERTIME"].ToString());
+                    rowtemp.CreateCell(24).SetCellValue(dt.Rows[i]["DELORDERUSERNAME"].ToString());
+                    rowtemp.CreateCell(25).SetCellValue(dt.Rows[i]["MODORDERTIME"].ToString());
+                    rowtemp.CreateCell(26).SetCellValue(dt.Rows[i]["MODORDERUSERNAME"].ToString());
+                    rowtemp.CreateCell(27).SetCellValue(dt.Rows[i]["MODFINISHTIME"].ToString());
+                    rowtemp.CreateCell(28).SetCellValue(dt.Rows[i]["MODFINISHUSERNAME"].ToString());
 
                 }
             }
@@ -3755,7 +4410,8 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(8).SetCellValue("出口口岸"); row1.CreateCell(9).SetCellValue("提运单号"); row1.CreateCell(10).SetCellValue("申报方式"); row1.CreateCell(11).SetCellValue("报关方式");
                 row1.CreateCell(12).SetCellValue("贸易方式");row1.CreateCell(13).SetCellValue("合同协议号"); row1.CreateCell(14).SetCellValue("件数");row1.CreateCell(15).SetCellValue("重量"); 
                 row1.CreateCell(16).SetCellValue("张数") ;row1.CreateCell(17).SetCellValue("删改单"); row1.CreateCell(18).SetCellValue("订单编号"); row1.CreateCell(19).SetCellValue("客户编号");
-                
+                row1.CreateCell(20).SetCellValue("删单日期"); row1.CreateCell(21).SetCellValue("删单人");row1.CreateCell(22).SetCellValue("改单日期"); row1.CreateCell(23).SetCellValue("改单人");
+                row1.CreateCell(24).SetCellValue("改单完成日期"); row1.CreateCell(25).SetCellValue("改单完成人");
 
                 //将数据逐步写入sheet_S各个行
                 for (int i = 0; i < dt.Rows.Count; i++)
@@ -3800,6 +4456,13 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(17).SetCellValue(getStatusName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
                     rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
                     rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+
+                    rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["DELORDERTIME"].ToString());
+                    rowtemp.CreateCell(21).SetCellValue(dt.Rows[i]["DELORDERUSERNAME"].ToString());
+                    rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["MODORDERTIME"].ToString());
+                    rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["MODORDERUSERNAME"].ToString());
+                    rowtemp.CreateCell(24).SetCellValue(dt.Rows[i]["MODFINISHTIME"].ToString());
+                    rowtemp.CreateCell(25).SetCellValue(dt.Rows[i]["MODFINISHUSERNAME"].ToString());
 
                 }
             }
@@ -4528,8 +5191,8 @@ namespace MvcPlatform.Controllers
             row1.CreateCell(4).SetCellValue("经营单位"); row1.CreateCell(5).SetCellValue("通关单号"); row1.CreateCell(6).SetCellValue("监管方式"); row1.CreateCell(7).SetCellValue("打印标志");
             row1.CreateCell(8).SetCellValue("张数"); row1.CreateCell(9).SetCellValue("删改单"); row1.CreateCell(10).SetCellValue("业务类型"); row1.CreateCell(11).SetCellValue("是否需通关单");
             row1.CreateCell(12).SetCellValue("是否法检"); row1.CreateCell(13).SetCellValue("委托时间"); row1.CreateCell(14).SetCellValue("合同发票号"); row1.CreateCell(15).SetCellValue("订单编号");
-            row1.CreateCell(16).SetCellValue("客户编号");
-
+            row1.CreateCell(16).SetCellValue("客户编号");row1.CreateCell(17).SetCellValue("删单日期"); row1.CreateCell(18).SetCellValue("删单人");row1.CreateCell(19).SetCellValue("改单日期");            
+             row1.CreateCell(20).SetCellValue("改单人"); row1.CreateCell(21).SetCellValue("改单完成日期"); row1.CreateCell(22).SetCellValue("改单完成人");
 
             //将数据逐步写入sheet_S各个行
             for (int i = 0; i < dt.Rows.Count; i++)
@@ -4552,6 +5215,14 @@ namespace MvcPlatform.Controllers
                 rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["CONTRACTNO"].ToString());
                 rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["ORDERCODE"].ToString());
                 rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+
+                rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["DELORDERTIME"].ToString());
+                rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["DELORDERUSERNAME"].ToString());
+                rowtemp.CreateCell(19).SetCellValue(dt.Rows[i]["MODORDERTIME"].ToString());
+                rowtemp.CreateCell(20).SetCellValue(dt.Rows[i]["MODORDERUSERNAME"].ToString());
+                rowtemp.CreateCell(21).SetCellValue(dt.Rows[i]["MODFINISHTIME"].ToString());
+                rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["MODFINISHUSERNAME"].ToString());
+
             }
 
             // 写入到客户端 
@@ -4605,6 +5276,762 @@ namespace MvcPlatform.Controllers
      
         #endregion
 
+        #region 现场服务
+        public string loadorder_site()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string ordercode = Request["ordercode"];
+            DataTable dt;
+            string sql = "";
+            string formdata = "{}"; string filedata_decl = "[]"; string filedata_insp = "[]";
+            string curuser = "{CUSTOMERCODE:'" + json_user.Value<string>("CUSTOMERCODE") + "',REALNAME:'" + json_user.Value<string>("REALNAME") + "',ID:'" + json_user.Value<string>("ID") + "'}";
 
+            if (!string.IsNullOrEmpty(ordercode))//订单号为空
+            {
+                IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+                iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+                //订单基本信息 CONTAINERTRUCK 这个字段本身不属于list_order表,虚拟出来存储集装箱和报关车号记录,是个数组形式的字符串
+                sql = @"select (case when (t.SITEAPPLYTIME is null or t.SITEAPPLYTIME='') then 0 else 1 end) SITEFLAG
+                            ,(case when (t.SITEPASSTIME is null or t.SITEPASSTIME='') then 0 else 1 end) PASSFLAG
+                            ,(case when (t.INSPSITEAPPLYTIME is null or t.INSPSITEAPPLYTIME='') then 0 else 1 end) INSPSITEFLAG
+                            ,(case when (t.INSPSITEPASSTIME is null or t.INSPSITEPASSTIME='') then 0 else 1 end) INSPPASSFLAG 
+                            ,t.* 
+                        from LIST_ORDER t where t.CODE = '" + ordercode + "' and rownum=1";
+                dt = DBMgr.GetDataTable(sql);
+                formdata = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
+
+                if (dt.Rows[0]["ENTRUSTTYPE"].ToString() == "01" || dt.Rows[0]["ENTRUSTTYPE"].ToString() == "03")
+                {
+                    //订单随附文件
+                    sql = @"select * from LIST_ATTACHMENT where filetype=67 and ordercode='" + ordercode + "'";
+                    filedata_decl = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso);
+                }
+
+                if (dt.Rows[0]["ENTRUSTTYPE"].ToString() == "02" || dt.Rows[0]["ENTRUSTTYPE"].ToString() == "03")
+                {
+                    //订单随附文件
+                    sql = @"select * from LIST_ATTACHMENT where filetype=68 and ordercode='" + ordercode + "'";
+                    filedata_insp = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql), iso);
+                }
+                
+            }
+            string result = "{formdata:" + formdata + ",filedata_decl:" + filedata_decl + ",filedata_insp:" + filedata_insp + ",curuser:" + curuser + "}";
+            return result;
+        }
+
+        public string saveorder_site()
+        {
+            MethodSvc.MethodServiceClient msc = new MethodSvc.MethodServiceClient();
+
+            System.Uri Uri = new Uri("ftp://" + ConfigurationManager.AppSettings["FTPServer"] + ":" + ConfigurationManager.AppSettings["FTPPortNO"]);
+            string UserName = ConfigurationManager.AppSettings["FTPUserName"];
+            string Password = ConfigurationManager.AppSettings["FTPPassword"];
+            FtpHelper ftp = new FtpHelper(Uri, UserName, Password);
+
+            //string filedata = Request["filedata"];
+
+            JObject json = (JObject)JsonConvert.DeserializeObject(Request["formpanel_base"]);
+            JObject json_decl = (JObject)JsonConvert.DeserializeObject(Request["formpanel_decl"]);
+            JObject json_insp = (JObject)JsonConvert.DeserializeObject(Request["formpanel_insp"]);
+            string ordercode = json.Value<string>("CODE");
+
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string sql = ""; string resultmsg = "{success:false}"; 
+            string feoremark = "";//记录是否需要调用费用接口
+            List<string> delfile = new List<string>();
+
+            sql = @"select code,entrusttype,declstatus,inspstatus,ischeck,auditflag
+                        ,to_char(siteapplytime,'yyyy/mm/dd hh24:mi:ss') as siteapplytime,to_char(sitepasstime,'yyyy/mm/dd hh24:mi:ss') as sitepasstime                        
+                        ,inspischeck,isfumigation
+                        ,to_char(inspsiteapplytime,'yyyy/mm/dd hh24:mi:ss') as inspsiteapplytime,to_char(inspsitepasstime,'yyyy/mm/dd hh24:mi:ss') as inspsitepasstime
+                    from list_order lo where lo.code='" + ordercode + "'";
+            DataTable dt_order = DBMgr.GetDataTable(sql);
+            string db_entrusttype = dt_order.Rows[0]["ENTRUSTTYPE"].ToString(); 
+
+            string db_ischeck = dt_order.Rows[0]["ISCHECK"].ToString();
+            string db_auditflag = dt_order.Rows[0]["AUDITFLAG"].ToString();
+            string db_siteapplytime = dt_order.Rows[0]["SITEAPPLYTIME"].ToString();
+            string db_sitepasstime = dt_order.Rows[0]["SITEPASSTIME"].ToString();
+
+            string db_inspischeck = dt_order.Rows[0]["INSPISCHECK"].ToString();
+            string db_isfumigation = dt_order.Rows[0]["ISFUMIGATION"].ToString();
+            string db_inspsiteapplytime = dt_order.Rows[0]["INSPSITEAPPLYTIME"].ToString();
+            string db_inspsitepasstime = dt_order.Rows[0]["INSPSITEPASSTIME"].ToString();
+
+            OracleConnection conn = null;
+            OracleTransaction ot = null;
+            conn = DBMgr.getOrclCon();
+            try
+            {
+                conn.Open();
+                ot = conn.BeginTransaction();
+
+                //============================================================================================================业务信息
+                sql = @"update list_order set clearremark='{1}' where code='{0}'";
+                sql = string.Format(sql, ordercode, json.Value<string>("CLEARREMARK"));
+                DBMgr.ExecuteNonQuery(sql, conn);
+
+
+                #region 现场报关
+                //===============================================================================================================================现场报关
+                if (db_entrusttype == "01" || db_entrusttype == "03")
+                {
+                    //-------------------------------------------------------------------------------------------------------------------------查验
+                    if (json_decl.Value<string>("ISCHECK") == "on")
+                    {
+                        if (db_ischeck != "1")
+                        {
+                            feoremark += "list_order.ischeck查验标志为1";
+
+                            sql = @"insert into list_updatehistory(id,UPDATETIME,TYPE
+                                            ,ORDERCODE,USERID,NEWFIELD,NAME,CODE,FIELD,FIELDNAME) 
+                                    values(LIST_UPDATEHISTORY_ID.nextval,sysdate,'1'
+                                            ,'" + ordercode + "','" + json_user.Value<string>("ID") + "','1','" + json_user.Value<string>("REALNAME") + "','" + ordercode + "','ISCHECK','报关查验'"
+                                                + ")";
+                            DBMgr.ExecuteNonQuery(sql, conn);
+                        }
+
+                        sql = @"update list_order 
+                            set ischeck=1,declcheckid='{1}',declcheckname='{2}',declchecktime=to_date('{3}','yyyy-MM-dd HH24:mi:ss'),checkremark='{4}'  
+                            where code='{0}'";
+                        sql = string.Format(sql, ordercode, json_decl.Value<string>("DECLCHECKID"), json_decl.Value<string>("DECLCHECKNAME"), json_decl.Value<string>("DECLCHECKTIME"), json_decl.Value<string>("CHECKREMARK"));
+                        DBMgr.ExecuteNonQuery(sql, conn);
+                    }
+                    else//查验未勾选
+                    {
+                        if (db_ischeck == "1")
+                        {
+                            feoremark += "list_order.ischeck查验标志为0";
+
+                            sql = @"update list_order 
+                            set ischeck=0,declcheckid=null,declcheckname=null,declchecktime=null,checkpic=0,checkremark='' 
+                            where code='" + ordercode + "'";
+                            DBMgr.ExecuteNonQuery(sql, conn);
+
+                            sql = @"insert into list_updatehistory(id,UPDATETIME,TYPE
+                                            ,ORDERCODE,USERID,NEWFIELD,NAME,CODE,FIELD,FIELDNAME) 
+                                    values(LIST_UPDATEHISTORY_ID.nextval,sysdate,'1'
+                                            ,'" + ordercode + "','" + json_user.Value<string>("ID") + "','0','" + json_user.Value<string>("REALNAME") + "','" + ordercode + "','ISCHECK','报关查验'"
+                                                + ")";
+                            DBMgr.ExecuteNonQuery(sql, conn);
+                        }                       
+
+                        DataTable dt = DBMgr.GetDataTable("select * from list_attachment where ordercode='" + ordercode + "' and filetype='67'");
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            delfile.Add(dr["FILENAME"] + "");
+                        }
+
+                        sql = "delete LIST_ATTACHMENT where ordercode='" + ordercode + "' and filetype='67'";
+                        DBMgr.ExecuteNonQuery(sql, conn);
+
+                    }
+                    //-------------------------------------------------------------------------------------------------------------------------稽核
+                    if (json_decl.Value<string>("AUDITFLAG") == "on")
+                    {
+                        if (db_auditflag != "1")
+                        {
+                            feoremark += "list_order.auditflag稽核标志修改为1";
+
+                            sql = @"insert into list_updatehistory(id,UPDATETIME,TYPE
+                                            ,ORDERCODE,USERID,NEWFIELD,NAME,CODE,FIELD,FIELDNAME) 
+                                    values(LIST_UPDATEHISTORY_ID.nextval,sysdate,'1'
+                                            ,'" + ordercode + "','" + json_user.Value<string>("ID") + "','1','" + json_user.Value<string>("REALNAME") + "','" + ordercode + "','AUDITFLAG','稽核标志'"
+                                               + ")";
+                            DBMgr.ExecuteNonQuery(sql, conn);
+                        }
+
+                        sql = @"update list_order 
+                            set auditflag=1,auditflagid='{1}',auditflagname='{2}',auditflagtime=to_date('{3}','yyyy-MM-dd HH24:mi:ss'),auditcontent='{4}' 
+                            where code='{0}'";
+                        sql = string.Format(sql, ordercode, json_decl.Value<string>("AUDITFLAGID"), json_decl.Value<string>("AUDITFLAGNAME"), json_decl.Value<string>("AUDITFLAGTIME"), json_decl.Value<string>("AUDITCONTENT"));
+                        DBMgr.ExecuteNonQuery(sql, conn);
+                    }
+                    else
+                    {
+                        if (db_auditflag == "1")
+                        {
+                            feoremark += "list_order.auditflag稽核标志修改为0";
+
+                            sql = @"update list_order 
+                            set auditflag=0,auditflagid=null,auditflagname=null,auditflagtime=null,auditcontent=''  
+                            where code='" + ordercode + "'";
+                            DBMgr.ExecuteNonQuery(sql, conn);
+
+                            sql = @"insert into list_updatehistory(id,UPDATETIME,TYPE
+                                            ,ORDERCODE,USERID,NEWFIELD,NAME,CODE,FIELD,FIELDNAME) 
+                                    values(LIST_UPDATEHISTORY_ID.nextval,sysdate,'1'
+                                            ,'" + ordercode + "','" + json_user.Value<string>("ID") + "','0','" + json_user.Value<string>("REALNAME") + "','" + ordercode + "','AUDITFLAG','稽核标志'"
+                                                    + ")";
+                            DBMgr.ExecuteNonQuery(sql, conn);
+                        }
+                    }
+
+                    //-------------------------------------------------------------------------------------------------------------------------现场报关
+                    if (json_decl.Value<string>("SITEFLAG") == "on")
+                    {
+                        if (db_siteapplytime == "")
+                        {
+                            feoremark += "list_order.siteapplytime现场报关";
+
+                            sql = @"update list_order 
+                                set siteapplyuserid='{1}',siteapplyusername='{2}',siteapplytime=to_date('{3}','yyyy-MM-dd HH24:mi:ss'),declstatus=150 
+                                where code='{0}'";
+                            sql = string.Format(sql, ordercode, json_decl.Value<string>("SITEAPPLYUSERID"), json_decl.Value<string>("SITEAPPLYUSERNAME"), json_decl.Value<string>("SITEAPPLYTIME"));
+                            DBMgr.ExecuteNonQuery(sql, conn);
+
+                            msc.redis_OrderStatusLog(ordercode);//状态缓存
+
+                            sql = @"insert into list_updatehistory(id,UPDATETIME,TYPE
+                                            ,ORDERCODE,USERID,NEWFIELD,NAME,CODE,FIELD,FIELDNAME) 
+                                    values(LIST_UPDATEHISTORY_ID.nextval,sysdate,'1'
+                                            ,'" + ordercode + "','" + json_user.Value<string>("ID") + "','" + json_decl.Value<string>("SITEAPPLYTIME") + "','" + json_user.Value<string>("REALNAME") + "','" + ordercode + "','SITEAPPLYTIME','现场报关'"
+                                                    + ")";
+                            DBMgr.ExecuteNonQuery(sql, conn);
+                        }
+                    }
+
+                    //-------------------------------------------------------------------------------------------------------------------------现场放行
+                    if (json_decl.Value<string>("PASSFLAG") == "on")
+                    {
+                        if (db_sitepasstime == "")
+                        {
+                            sql = @"update list_order 
+                                set sitepassuserid='{1}',sitepassusername='{2}',sitepasstime=to_date('{3}','yyyy-MM-dd HH24:mi:ss'),declstatus=160 
+                                where code='{0}'";
+                            sql = string.Format(sql, ordercode, json_decl.Value<string>("SITEPASSUSERID"), json_decl.Value<string>("SITEPASSUSERNAME"), json_decl.Value<string>("SITEPASSTIME"));
+                            DBMgr.ExecuteNonQuery(sql, conn);
+
+                            msc.redis_OrderStatusLog(ordercode);//状态缓存
+
+                            sql = @"insert into list_updatehistory(id,UPDATETIME,TYPE
+                                            ,ORDERCODE,USERID,NEWFIELD,NAME,CODE,FIELD,FIELDNAME) 
+                                    values(LIST_UPDATEHISTORY_ID.nextval,sysdate,'1'
+                                            ,'" + ordercode + "','" + json_user.Value<string>("ID") + "','" + json_decl.Value<string>("SITEPASSTIME") + "','" + json_user.Value<string>("REALNAME") + "','" + ordercode + "','SITEPASSTIME','报关放行'"
+                                                    + ")";
+                            DBMgr.ExecuteNonQuery(sql, conn);
+                        }
+                    }
+
+                }
+
+                #endregion
+
+                #region 现场报检
+
+                //===============================================================================================================================现场报检
+                if (db_entrusttype == "02" || db_entrusttype == "03")
+                {
+                    //-------------------------------------------------------------------------------------------------------------------------查验
+                    if (json_insp.Value<string>("INSPISCHECK") == "on")
+                    {
+                        if (db_inspischeck != "1")
+                        {
+                            feoremark += "list_order.inspischeck查验标志为1";
+
+                            sql = @"insert into list_updatehistory(id,UPDATETIME,TYPE
+                                            ,ORDERCODE,USERID,NEWFIELD,NAME,CODE,FIELD,FIELDNAME) 
+                                    values(LIST_UPDATEHISTORY_ID.nextval,sysdate,'1'
+                                            ,'" + ordercode + "','" + json_user.Value<string>("ID") + "','1','" + json_user.Value<string>("REALNAME") + "','" + ordercode + "','INSPISCHECK','报检查验'"
+                                                + ")";
+                            DBMgr.ExecuteNonQuery(sql, conn);
+                        }
+
+                        sql = @"update list_order 
+                            set inspischeck=1,inspcheckid='{1}',inspcheckname='{2}',inspchecktime=to_date('{3}','yyyy-MM-dd HH24:mi:ss'),inspcheckremark='{4}'  
+                            where code='{0}'";
+                        sql = string.Format(sql, ordercode, json_insp.Value<string>("INSPCHECKID"), json_insp.Value<string>("INSPCHECKNAME"), json_insp.Value<string>("INSPCHECKTIME"), json_insp.Value<string>("INSPCHECKREMARK"));
+                        DBMgr.ExecuteNonQuery(sql, conn);                        
+                    }
+                    else//查验未勾选
+                    {
+                        if (db_inspischeck == "1")
+                        {
+                            feoremark += "list_order.inspischeck查验标志为0";
+
+                            sql = @"update list_order 
+                            set inspischeck=0,inspcheckid=null,inspcheckname=null,inspchecktime=null,inspcheckpic=0,inspcheckremark=''
+                            where code='" + ordercode + "'";
+                            DBMgr.ExecuteNonQuery(sql, conn);
+
+                            sql = @"insert into list_updatehistory(id,UPDATETIME,TYPE
+                                            ,ORDERCODE,USERID,NEWFIELD,NAME,CODE,FIELD,FIELDNAME) 
+                                    values(LIST_UPDATEHISTORY_ID.nextval,sysdate,'0'
+                                            ,'" + ordercode + "','" + json_user.Value<string>("ID") + "','0','" + json_user.Value<string>("REALNAME") + "','" + ordercode + "','INSPISCHECK','报检查验'"
+                                                + ")";
+                            DBMgr.ExecuteNonQuery(sql, conn);
+                        }
+
+                        DataTable dt = DBMgr.GetDataTable("select * from list_attachment where ordercode='" + ordercode + "' and filetype='68'");
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            delfile.Add(dr["FILENAME"] + "");
+                        }
+
+                        sql = "delete LIST_ATTACHMENT where ordercode='" + ordercode + "' and filetype='68'";
+                        DBMgr.ExecuteNonQuery(sql, conn);
+
+                    }
+                    //-------------------------------------------------------------------------------------------------------------------------熏蒸
+                    if (json_insp.Value<string>("ISFUMIGATION") == "on")
+                    {
+                        if (db_isfumigation != "1")
+                        {
+                            sql = @"insert into list_updatehistory(id,UPDATETIME,TYPE
+                                            ,ORDERCODE,USERID,NEWFIELD,NAME,CODE,FIELD,FIELDNAME) 
+                                    values(LIST_UPDATEHISTORY_ID.nextval,sysdate,'1'
+                                            ,'" + ordercode + "','" + json_user.Value<string>("ID") + "','1','" + json_user.Value<string>("REALNAME") + "','" + ordercode + "','ISFUMIGATION','熏蒸标志'"
+                                                    + ")";
+                            DBMgr.ExecuteNonQuery(sql, conn);
+                        }
+
+                        sql = @"update list_order 
+                            set isfumigation=1,fumigationid='{1}',fumigationname='{2}',fumigationtime=to_date('{3}','yyyy-MM-dd HH24:mi:ss')
+                            where code='{0}'";
+                        sql = string.Format(sql, ordercode, json_insp.Value<string>("FUMIGATIONID"), json_insp.Value<string>("FUMIGATIONNAME"), json_insp.Value<string>("FUMIGATIONTIME"));
+                        DBMgr.ExecuteNonQuery(sql, conn);
+                    }
+                    else
+                    {
+                        if (db_isfumigation == "1")
+                        {
+                            sql = @"update list_order 
+                            set isfumigation=0,fumigationid=null,fumigationname=null,fumigationtime=null  
+                            where code='" + ordercode + "'";
+                            DBMgr.ExecuteNonQuery(sql, conn);
+
+                            sql = @"insert into list_updatehistory(id,UPDATETIME,TYPE
+                                            ,ORDERCODE,USERID,NEWFIELD,NAME,CODE,FIELD,FIELDNAME) 
+                                    values(LIST_UPDATEHISTORY_ID.nextval,sysdate,'1'
+                                            ,'" + ordercode + "','" + json_user.Value<string>("ID") + "','0','" + json_user.Value<string>("REALNAME") + "','" + ordercode + "','ISFUMIGATION','熏蒸标志'"
+                                                    + ")";
+                            DBMgr.ExecuteNonQuery(sql, conn);
+                        }
+                    }
+
+                    //-------------------------------------------------------------------------------------------------------------------------现场报检
+                    if (json_insp.Value<string>("INSPSITEFLAG") == "on")
+                    {
+                        if (db_inspsiteapplytime == "")
+                        {
+                            sql = @"update list_order 
+                                set inspsiteapplyuserid='{1}',inspsiteapplyusername='{2}',inspsiteapplytime=to_date('{3}','yyyy-MM-dd HH24:mi:ss'),inspstatus=150 
+                                where code='{0}'";
+                            sql = string.Format(sql, ordercode, json_insp.Value<string>("INSPSITEAPPLYUSERID"), json_insp.Value<string>("INSPSITEAPPLYUSERNAME"), json_insp.Value<string>("INSPSITEAPPLYTIME"));
+                            DBMgr.ExecuteNonQuery(sql, conn);
+
+                            msc.redis_OrderStatusLog(ordercode);//状态缓存
+
+                            sql = @"insert into list_updatehistory(id,UPDATETIME,TYPE
+                                            ,ORDERCODE,USERID,NEWFIELD,NAME,CODE,FIELD,FIELDNAME) 
+                                    values(LIST_UPDATEHISTORY_ID.nextval,sysdate,'1'
+                                            ,'" + ordercode + "','" + json_user.Value<string>("ID") + "','" + json_decl.Value<string>("SITEAPPLYTIME") + "','" + json_user.Value<string>("REALNAME") + "','" + ordercode + "','INSPSITEAPPLYTIME','现场报检'"
+                                                    + ")";
+                            DBMgr.ExecuteNonQuery(sql, conn);
+                        }
+                    }
+
+                    //-------------------------------------------------------------------------------------------------------------------------现场放行
+                    if (json_insp.Value<string>("INSPPASSFLAG") == "on")
+                    {
+                        if (db_inspsitepasstime == "")
+                        {
+                            sql = @"update list_order 
+                                set inspsitepassuserid='{1}',inspsitepassusername='{2}',inspsitepasstime=to_date('{3}','yyyy-MM-dd HH24:mi:ss'),inspstatus=160 
+                                where code='{0}'";
+                            sql = string.Format(sql, ordercode, json_insp.Value<string>("INSPSITEPASSUSERID"), json_insp.Value<string>("INSPSITEPASSUSERNAME"), json_insp.Value<string>("INSPSITEPASSTIME"));
+                            DBMgr.ExecuteNonQuery(sql, conn);
+
+                            msc.redis_OrderStatusLog(ordercode);//状态缓存
+
+                            sql = @"insert into list_updatehistory(id,UPDATETIME,TYPE
+                                            ,ORDERCODE,USERID,NEWFIELD,NAME,CODE,FIELD,FIELDNAME) 
+                                    values(LIST_UPDATEHISTORY_ID.nextval,sysdate,'1'
+                                            ,'" + ordercode + "','" + json_user.Value<string>("ID") + "','" + json_decl.Value<string>("SITEPASSTIME") + "','" + json_user.Value<string>("REALNAME") + "','" + ordercode + "','INSPSITEPASSTIME','报检放行'"
+                                                    + ")";
+                            DBMgr.ExecuteNonQuery(sql, conn);
+                        }
+                    }
+
+                }
+                #endregion               
+
+                ot.Commit();
+                foreach (string item in delfile)//提交之后删除文件
+                {
+                    ftp.DeleteFile(item);
+                }
+
+                resultmsg = "{success:true,ordercode:'" + ordercode + "'}";
+            }
+            catch (Exception ex)
+            {
+                ot.Rollback();
+            }
+            finally
+            {
+                conn.Close();
+            }
+
+            //============================================================================================================费用接口
+            if (feoremark != "")
+            {
+                //add 20180115 费用异常接口
+                if (dt_order.Rows[0]["entrusttype"].ToString() == "03")
+                {
+                    if (Convert.ToInt32(dt_order.Rows[0]["declstatus"].ToString()) >= 160 && Convert.ToInt32(dt_order.Rows[0]["inspstatus"].ToString()) >= 120)
+                    {
+                        msc.FinanceExceptionOrder(ordercode, json_user.Value<string>("NAME"), feoremark);
+                    }
+                }
+                else
+                {
+                    if (Convert.ToInt32(dt_order.Rows[0]["declstatus"].ToString()) >= 160)
+                    {
+                        msc.FinanceExceptionOrder(ordercode, json_user.Value<string>("NAME"), feoremark);
+                    }
+                }
+            }
+            //============================================================================================================
+            
+            return resultmsg;
+        }
+
+        public ActionResult UploadFile_site(int? chunk, string name, string ordercode, string filetype)
+        {
+            var fileUpload = Request.Files[0];
+            var uploadPath = Server.MapPath("/FileUpload/ordersite");
+            chunk = chunk ?? 0;
+            using (var fs = new FileStream(Path.Combine(uploadPath, name), chunk == 0 ? FileMode.Create : FileMode.Append))
+            {
+                var buffer = new byte[fileUpload.InputStream.Length];
+                fileUpload.InputStream.Read(buffer, 0, buffer.Length);
+                fs.Write(buffer, 0, buffer.Length);
+            }
+            UploadFile_site_save(name, Path.GetFileName(fileUpload.FileName), filetype, ordercode);
+            return Content("chunk uploaded", "text/plain");
+        }
+
+        public string UploadFile_site_save(string name, string originalname, string filetype, string ordercode)
+        {
+            string sql = ""; string resultmsg = "{success:false}";
+            try
+            {
+                JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+                string dicPath = System.AppDomain.CurrentDomain.BaseDirectory;
+                string filepath = @"FileUpload\ordersite\" + name;
+                FileInfo fi = new FileInfo(dicPath + filepath);
+
+                System.Uri Uri = new Uri("ftp://" + ConfigurationManager.AppSettings["FTPServer"] + ":" + ConfigurationManager.AppSettings["FTPPortNO"]);
+                string UserName = ConfigurationManager.AppSettings["FTPUserName"];
+                string Password = ConfigurationManager.AppSettings["FTPPassword"];
+                FtpHelper ftp = new FtpHelper(Uri, UserName, Password);
+                string ftppath = "/" + filetype + "/" + ordercode + "/" + name;
+
+                 bool bf = ftp.UploadFile(dicPath + filepath, ftppath, true); ;
+                 if (bf)
+                 {
+                     OracleConnection conn = null;
+                     OracleTransaction ot = null;
+                     conn = DBMgr.getOrclCon();
+                     try
+                     {
+                         conn.Open();
+                         ot = conn.BeginTransaction();
+                         sql = @"insert into LIST_ATTACHMENT (id
+                                                ,filename,originalname,filetype,uploadtime,uploaduserid,customercode,ordercode
+                                                ,sizes,filetypename,filesuffix)
+                                        values(List_Attachment_Id.Nextval,'{0}','{1}','{2}',sysdate,{3},'{4}','{5}'
+                                                ,'{6}','{7}','{8}')";
+                         sql = string.Format(sql
+                             , ftppath, originalname, filetype, json_user.Value<string>("ID"), json_user.Value<string>("CUSTOMERCODE"), ordercode
+                             , fi.Length, "查验文件", ".jpg");
+                         DBMgr.ExecuteNonQuery(sql, conn);
+
+                         DBMgr.ExecuteNonQuery("update list_order set checkpic=1 where code='" + ordercode + "'", conn);
+
+                         ot.Commit();
+                         fi.Delete();//插入成功，后删除本地文件
+                         resultmsg = "{success:true}";
+                     }
+                     catch (Exception ex)
+                     {
+                         ot.Rollback();
+                         ftp.DeleteFile(ftppath);//插入失败后，远程删除文件，本地文件暂且留着
+                     }
+                     finally
+                     {
+                         conn.Close();
+                     }
+                 }//ftp失败，本地文件暂且留着
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            return resultmsg;
+        }
+
+        #endregion
+
+        #region 删改单维护
+        public string loaddata_modify()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string type = Request["type"]; string code = Request["code"]; string ordercode = Request["ordercode"];
+            DataTable dt;
+            string sql = "";
+            string formdata = "{}"; string formdata_ini = "{}"; 
+            string curuser = "{CUSTOMERCODE:'" + json_user.Value<string>("CUSTOMERCODE") + "',REALNAME:'" + json_user.Value<string>("REALNAME") + "',ID:'" + json_user.Value<string>("ID") + "'}";
+
+            if (!string.IsNullOrEmpty(code))
+            {
+                IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+                iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+                //订单基本信息
+                sql = @"select t.code,t.clearremark,t.receiverunitcode,t.receiverunitname,t.customercode,t.docservicecode from LIST_ORDER t where t.CODE = '" + ordercode + "'";
+                dt = DBMgr.GetDataTable(sql);
+                formdata = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
+
+                sql = @"select a.code
+                                ,(case when (a.delordertime is null or a.delordertime='') then 0 else 1 end) DEL_MODIFYFLAG,a.delordertime,a.delorderusername,a.delorderuserid
+                                ,(case when (a.modordertime is null or a.modordertime='') then 0 else 1 end) MOD_MODIFYFLAG,a.modordertime,a.modorderusername,a.modorderuserid
+                                ,(case when (a.modfinishtime is null or a.modfinishtime='') then 0 else 1 end) FIN_MODIFYFLAG,a.modfinishtime,a.modfinishusername,a.modfinishuserid ";
+                if (type == "dec")
+                {
+                    sql += @",a.declremark 
+                            from list_declaration a where a.CODE = '" + code + "'";
+                    
+                }
+                if (type == "insp")
+                {
+                    sql += @",a.inspremark 
+                            from list_inspection a where a.CODE = '" + code + "'";
+                }
+                dt = DBMgr.GetDataTable(sql);
+                formdata_ini = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');              
+            }
+            string result = "{formdata:" + formdata + ",formdata_ini:" + formdata_ini + ",curuser:" + curuser + "}";
+            return result;
+        }
+
+        public string savemodify()
+        {
+            MethodSvc.MethodServiceClient msc = new MethodSvc.MethodServiceClient();
+
+            JObject json = (JObject)JsonConvert.DeserializeObject(Request["formpanel_base"]);
+            JObject json_decl_or_insp = (JObject)JsonConvert.DeserializeObject(Request["formpanel"]);
+            string ordercode = Request["ordercode"]; string code = Request["code"]; string type = Request["type"]; string busitypeid = Request["busitypeid"];
+
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string sql = ""; string resultmsg = "{success:false}";                      
+
+            sql = @"select code,entrusttype,declstatus,inspstatus from list_order lo where lo.code='" + ordercode + "'";
+            DataTable dt_order = DBMgr.GetDataTable(sql);
+
+
+            //============================================================================================================业务信息
+            sql = @"update list_order set clearremark='{1}' where code='{0}'";
+            sql = string.Format(sql, ordercode, json.Value<string>("CLEARREMARK"));
+            DBMgr.ExecuteNonQuery(sql);
+
+            int modifyflag = 0;
+
+            #region 报关单
+
+            if (type == "dec")
+            {
+                sql = @"select code,ordercode,declarationcode,modifyflag from list_declaration ld where ld.code='" + code + "'";
+                DataTable dt_decl = DBMgr.GetDataTable(sql);
+                string declarationcode = dt_decl.Rows[0]["declarationcode"].ToString();
+                int db_modifyflag = Convert.ToInt32(dt_decl.Rows[0]["modifyflag"].ToString() == "" ? "0" : dt_decl.Rows[0]["modifyflag"].ToString());
+
+
+                if (json_decl_or_insp.Value<string>("DEL_MODIFYFLAG") == "on")//删单1
+                {
+                    modifyflag = 1;
+
+                    sql = @"select ld.code,ld.ordercode from list_declaration ld inner join config_filesplit cfs on ld.busiunitcode=cfs.busiunitcode and cfs.filetype='53' and ld.code='" + code + "'";
+                    DataTable dt = DBMgr.GetDataTable(sql);
+                    if (dt != null)
+                    {
+                        if (dt.Rows.Count > 0)
+                        {
+                            if (!string.IsNullOrEmpty(ordercode))
+                            {
+                                sql = @"update list_attachmentdetail t1 set t1.filetypeid='162' where t1.ordercode='" + ordercode + "' and t1.filetypeid='53'";
+                                DBMgr.ExecuteNonQuery(sql);
+                            }
+                        }
+                    }
+                }
+
+                if (json_decl_or_insp.Value<string>("MOD_MODIFYFLAG") == "on")//改单2
+                {
+                    modifyflag = 2;
+
+                    DateTime time = DateTime.Now;
+                    sql = @"update list_declaration_after set dataconfirm='1',dataconfirmusertime=to_date('" + time + "','yyyy-MM-dd HH24:mi:ss') where code='" + code + "' and xzlb like '报关单%'";
+                    DBMgr.ExecuteNonQuery(sql);
+                }
+
+                if (json_decl_or_insp.Value<string>("FIN_MODIFYFLAG") == "on")//改单完成3
+                {
+                    modifyflag = 3;
+                }
+
+                //修改删改单标志
+                if (modifyflag == 0)
+                {
+                    sql = @",delorderuserid=null,delorderusername=null,delordertime=null
+                            ,modorderuserid=null,modorderusername=null,modordertime=null
+                            ,modfinishuserid=null,modfinishusername=null,modfinishtime=null";
+                }
+
+                if (modifyflag == 1)
+                {
+                    sql = @",delorderuserid='{0}',delorderusername='{1}',delordertime=to_date('{2}','yyyy-MM-dd HH24:mi:ss')
+                            ,modorderuserid=null,modorderusername=null,modordertime=null
+                            ,modfinishuserid=null,modfinishusername=null,modfinishtime=null";
+
+                    sql = string.Format(sql, json_decl_or_insp.Value<string>("DELORDERUSERID"), json_decl_or_insp.Value<string>("DELORDERUSERNAME"), json_decl_or_insp.Value<string>("DELORDERTIME"));
+                }
+                if (modifyflag == 2)
+                {
+                    sql = @",delorderuserid=null,delorderusername=null,delordertime=null
+                            ,modorderuserid='{0}',modorderusername='{1}',modordertime=to_date('{2}','yyyy-MM-dd HH24:mi:ss')
+                            ,modfinishuserid=null,modfinishusername=null,modfinishtime=null";
+
+                    sql = string.Format(sql, json_decl_or_insp.Value<string>("MODORDERUSERID"), json_decl_or_insp.Value<string>("MODORDERUSERNAME"), json_decl_or_insp.Value<string>("MODORDERTIME"));
+                }
+                if (modifyflag == 3)
+                {
+                    sql = @",delorderuserid=null,delorderusername=null,delordertime=null
+                            ,modorderuserid=null,modorderusername=null,modordertime=null
+                            ,modfinishuserid='{0}',modfinishusername='{1}',modfinishtime=to_date('{2}','yyyy-MM-dd HH24:mi:ss')";
+
+                    sql = string.Format(sql, json_decl_or_insp.Value<string>("MODFINISHUSERID"), json_decl_or_insp.Value<string>("MODFINISHUSERNAME"), json_decl_or_insp.Value<string>("MODFINISHTIME"));
+                }
+                sql = @"update list_declaration set modifyflag=" + modifyflag + ",declremark='" + json_decl_or_insp.Value<string>("DECLREMARK") + "'"
+                    + sql 
+                    + " where code='" + code + "'";
+                DBMgr.ExecuteNonQuery(sql);
+
+                //修改订单的报关状态
+                sql = "select customsstatus from list_declaration where ordercode='" + ordercode + "'  and isinvalid=0 and modifyflag<>1";
+                bool flag = true;
+                DataTable dt_order_status = DBMgr.GetDataTable(sql);
+                if (dt_order_status != null)
+                {
+                    if (dt_order_status.Rows.Count > 0)
+                    {
+                        foreach (DataRow dr in dt_order_status.Rows)
+                        {
+                            if (dr["customsstatus"].ToString() == "" || (dr["customsstatus"].ToString() != "已结关" && dr["customsstatus"].ToString() != "已放行"))
+                            {
+                                flag = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (flag)
+                {
+                    sql = "update list_order set declstatus=160,sitepassusername='system_tool_modify',sitepasstime=sysdate,siteapplyuserid=-2 where code='" + ordercode + "'";
+                    DBMgr.ExecuteNonQuery(sql);
+                }                
+
+                if (db_modifyflag != modifyflag)//修改有变化
+                {                   
+                    msc.redis_DeclarationLog(ordercode, code, declarationcode, "", "0"); //调用缓存接口redis_DeclarationLog
+
+                    if (dt_order.Rows[0]["entrusttype"].ToString() == "03")//需要调用费用接口
+                    {
+                        if (Convert.ToInt32(dt_order.Rows[0]["declstatus"].ToString()) >= 160 && Convert.ToInt32(dt_order.Rows[0]["inspstatus"].ToString()) >= 120)
+                        {
+                            //add 20180115 费用异常接口
+                            msc.FinanceExceptionOrder(ordercode, json_user.Value<string>("NAME"), "list_declaration.modifyflag修改为" + modifyflag.ToString());
+                        }
+                    }
+                    else
+                    {
+                        if (Convert.ToInt32(dt_order.Rows[0]["declstatus"].ToString()) >= 160)
+                        {
+                            //add 20180115 费用异常接口
+                            msc.FinanceExceptionOrder(ordercode, json_user.Value<string>("NAME"), "list_declaration.modifyflag修改为" + modifyflag.ToString());
+                        }
+                    }
+                }
+            }
+
+            #endregion
+
+            #region 报检单
+
+            if (type == "insp")
+            {
+                if (json_decl_or_insp.Value<string>("DEL_MODIFYFLAG") == "on")//删单1
+                {
+                    modifyflag = 1;
+                }
+                if (json_decl_or_insp.Value<string>("MOD_MODIFYFLAG") == "on")//改单2
+                {
+                    modifyflag = 2;
+                }
+                if (json_decl_or_insp.Value<string>("FIN_MODIFYFLAG") == "on")//改单完成3
+                {
+                    modifyflag = 3;
+                }
+                //修改删改单标志
+                if (modifyflag == 0)
+                {
+                    sql = @",delorderuserid=null,delorderusername=null,delordertime=null
+                            ,modorderuserid=null,modorderusername=null,modordertime=null
+                            ,modfinishuserid=null,modfinishusername=null,modfinishtime=null";
+                }
+                if (modifyflag == 1)
+                {
+                    sql = @",delorderuserid='{0}',delorderusername='{1}',delordertime=to_date('{2}','yyyy-MM-dd HH24:mi:ss')
+                            ,modorderuserid=null,modorderusername=null,modordertime=null
+                            ,modfinishuserid=null,modfinishusername=null,modfinishtime=null";
+
+                    sql = string.Format(sql, json_decl_or_insp.Value<string>("DELORDERUSERID"), json_decl_or_insp.Value<string>("DELORDERUSERNAME"), json_decl_or_insp.Value<string>("DELORDERTIME"));
+                }
+                if (modifyflag == 2)
+                {
+                    sql = @",delorderuserid=null,delorderusername=null,delordertime=null
+                            ,modorderuserid='{0}',modorderusername='{1}',modordertime=to_date('{2}','yyyy-MM-dd HH24:mi:ss')
+                            ,modfinishuserid=null,modfinishusername=null,modfinishtime=null";
+
+                    sql = string.Format(sql, json_decl_or_insp.Value<string>("MODORDERUSERID"), json_decl_or_insp.Value<string>("MODORDERUSERNAME"), json_decl_or_insp.Value<string>("MODORDERTIME"));
+                }
+                if (modifyflag == 3)
+                {
+                    sql = @",delorderuserid=null,delorderusername=null,delordertime=null
+                            ,modorderuserid=null,modorderusername=null,modordertime=null
+                            ,modfinishuserid='{0}',modfinishusername='{1}',modfinishtime=to_date('{2}','yyyy-MM-dd HH24:mi:ss')";
+
+                    sql = string.Format(sql, json_decl_or_insp.Value<string>("MODFINISHUSERID"), json_decl_or_insp.Value<string>("MODFINISHUSERNAME"), json_decl_or_insp.Value<string>("MODFINISHTIME"));
+                }
+                
+                sql = @"update list_inspection set modifyflag=" + modifyflag + ",inspremark='" + json_decl_or_insp.Value<string>("INSPREMARK") + "'"
+                   + sql
+                   + " where code='" + code + "'";
+                DBMgr.ExecuteNonQuery(sql);
+            }
+
+            #endregion
+
+            resultmsg = "{success:true,ordercode:'" + ordercode + "',code:'" + code + "',type:'" + type + "',busitypeid:'" + busitypeid + "'}";
+
+
+            return resultmsg;
+        }
+
+        #endregion
     }
 }

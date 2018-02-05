@@ -17,6 +17,7 @@
     <submenu>/Common/OrderTrack?menuxml=airin</submenu>
     <submenu>/Common/FileConsult?menuxml=airin</submenu>
     <submenu>/EnterpriseOrder/GoodsTrack?menuxml=airin</submenu>
+    <submenu>/Common/OrderSite?menuxml=airin</submenu>
   </rootmenu>
   
    <rootmenu>
@@ -27,6 +28,7 @@
     <submenu>/Common/OrderTrack?menuxml=airout</submenu>
     <submenu>/Common/FileConsult?menuxml=airout</submenu>
     <submenu>/EnterpriseOrder/GoodsTrack?menuxml=airout</submenu>
+    <submenu>/Common/OrderSite?menuxml=airout</submenu>
   </rootmenu> 
   
   
@@ -37,6 +39,7 @@
     <submenu>/Common/OrderView?menuxml=landin</submenu>
     <submenu>/Common/OrderTrack?menuxml=landin</submenu>
     <submenu>/Common/FileConsult?menuxml=landin</submenu>
+    <submenu>/Common/OrderSite?menuxml=landin</submenu>
   </rootmenu>
   
     
@@ -47,6 +50,7 @@
     <submenu>/Common/OrderView?menuxml=landout</submenu>
     <submenu>/Common/OrderTrack?menuxml=landout</submenu>
     <submenu>/Common/FileConsult?menuxml=landout</submenu>
+    <submenu>/Common/OrderSite?menuxml=landout</submenu>
   </rootmenu>    
     
   
@@ -58,6 +62,7 @@
     <submenu>/Common/OrderTrack?menuxml=seain</submenu>
     <submenu>/Common/FileConsult?menuxml=seain</submenu>    
     <submenu>/EnterpriseOrder/GoodsTrack?menuxml=seain</submenu>
+    <submenu>/Common/OrderSite?menuxml=seain</submenu>
   </rootmenu>
     
     
@@ -69,6 +74,7 @@
     <submenu>/Common/OrderTrack?menuxml=seaout</submenu>
     <submenu>/Common/FileConsult?menuxml=seaout</submenu>
     <submenu>/EnterpriseOrder/GoodsTrack?menuxml=seaout</submenu>
+    <submenu>/Common/OrderSite?menuxml=seaout</submenu>
   </rootmenu> 
   
     
@@ -79,6 +85,7 @@
     <submenu>/Common/OrderView?menuxml=special</submenu>
     <submenu>/Common/OrderTrack?menuxml=special</submenu>
     <submenu>/Common/FileConsult?menuxml=special</submenu>
+    <submenu>/Common/OrderSite?menuxml=special</submenu>
   </rootmenu>
     
   <rootmenu>
@@ -88,6 +95,7 @@
     <submenu>/OrderDomestic/OrderView?menuxml=domestic</submenu>
     <submenu>/Common/OrderTrack?menuxml=domestic</submenu>
     <submenu>/Common/FileConsult?menuxml=domestic</submenu>
+    <submenu>/Common/OrderSite?menuxml=domestic</submenu>
   </rootmenu>
 
   <rootmenu>
@@ -103,6 +111,7 @@
     <submenu>/Common/ClearanceStatus?menuxml=dec_cle_airin</submenu>
     <submenu>/Common/FileConsult_Declare?menuxml=dec_cle_airin</submenu><!-- ClearanceStatus里的报关单打印-->
     <submenu>/Common/MultiPrint?menuxml=dec_mul_airin</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=dec_modify_airin</submenu>
   </rootmenu>
   <rootmenu>
     <menu>/Common/DeclareList?busitypeid=10&amp;role=customer</menu>
@@ -110,6 +119,7 @@
     <submenu>/Common/ClearanceStatus?menuxml=dec_cle_airout</submenu>
     <submenu>/Common/FileConsult_Declare?menuxml=dec_cle_airout</submenu><!-- ClearanceStatus里的报关单打印-->
     <submenu>/Common/MultiPrint?menuxml=dec_mul_airout</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=dec_modify_airout</submenu>
   </rootmenu>  
   <rootmenu>
     <menu>/Common/DeclareList?busitypeid=31&amp;role=customer</menu>
@@ -117,6 +127,7 @@
     <submenu>/Common/ClearanceStatus?menuxml=dec_cle_landin</submenu>
     <submenu>/Common/FileConsult_Declare?menuxml=dec_cle_landin</submenu><!-- ClearanceStatus里的报关单打印-->
     <submenu>/Common/MultiPrint?menuxml=dec_mul_landin</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=dec_modify_landin</submenu>
   </rootmenu>
   <rootmenu>
     <menu>/Common/DeclareList?busitypeid=30&amp;role=customer</menu>
@@ -124,6 +135,7 @@
     <submenu>/Common/ClearanceStatus?menuxml=dec_cle_landout</submenu>
     <submenu>/Common/FileConsult_Declare?menuxml=dec_cle_landout</submenu><!-- ClearanceStatus里的报关单打印-->
     <submenu>/Common/MultiPrint?menuxml=dec_mul_landout</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=dec_modify_landout</submenu>
   </rootmenu>
   <rootmenu>
     <menu>/Common/DeclareList?busitypeid=21&amp;role=customer</menu>
@@ -131,6 +143,7 @@
     <submenu>/Common/ClearanceStatus?menuxml=dec_cle_seain</submenu>
     <submenu>/Common/FileConsult_Declare?menuxml=dec_cle_seain</submenu><!-- ClearanceStatus里的报关单打印-->
     <submenu>/Common/MultiPrint?menuxml=dec_mul_seain</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=dec_modify_seain</submenu>
   </rootmenu>
   <rootmenu>
     <menu>/Common/DeclareList?busitypeid=20&amp;role=customer</menu>
@@ -138,6 +151,7 @@
     <submenu>/Common/ClearanceStatus?menuxml=dec_cle_seaout</submenu>
     <submenu>/Common/FileConsult_Declare?menuxml=dec_cle_seaout</submenu><!-- ClearanceStatus里的报关单打印-->
     <submenu>/Common/MultiPrint?menuxml=dec_mul_seaout</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=dec_modify_seaout</submenu>
   </rootmenu>
   <rootmenu>
     <menu>/Common/DeclareList?busitypeid=40-41&amp;role=customer</menu>
@@ -145,6 +159,7 @@
     <submenu>/Common/ClearanceStatus?menuxml=dec_cle_domestic</submenu>
     <submenu>/Common/FileConsult_Declare?menuxml=dec_cle_domestic</submenu><!-- ClearanceStatus里的报关单打印-->
     <submenu>/Common/MultiPrint?menuxml=dec_mul_domestic</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=dec_modify_domestic</submenu>
   </rootmenu>
   <rootmenu>
     <menu>/Common/DeclareList?busitypeid=50-51&amp;role=customer</menu>
@@ -152,6 +167,7 @@
     <submenu>/Common/ClearanceStatus?menuxml=dec_cle_special</submenu>
     <submenu>/Common/FileConsult_Declare?menuxml=dec_cle_special</submenu><!-- ClearanceStatus里的报关单打印-->
     <submenu>/Common/MultiPrint?menuxml=dec_mul_special</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=dec_modify_special</submenu>
   </rootmenu>
   
   <!-- 报检单管理-->
@@ -160,41 +176,49 @@
     <menu>/Common/InspectList?busitypeid=11&amp;role=customer</menu>
     <submenu>/Common/FileConsult?menuxml=insp_airin</submenu>
     <submenu>/Common/MultiPrint?menuxml=insp_mul_airin</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=insp_modify_airin</submenu>
   </rootmenu>
   <rootmenu>
     <menu>/Common/InspectList?busitypeid=10&amp;role=customer</menu>
     <submenu>/Common/FileConsult?menuxml=insp_airout</submenu>
     <submenu>/Common/MultiPrint?menuxml=insp_mul_airout</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=insp_modify_airout</submenu>
   </rootmenu>  
   <rootmenu>
     <menu>/Common/InspectList?busitypeid=31&amp;role=customer</menu>
     <submenu>/Common/FileConsult?menuxml=insp_landin</submenu>
     <submenu>/Common/MultiPrint?menuxml=insp_mul_landin</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=insp_modify_landin</submenu>
   </rootmenu>
   <rootmenu>
     <menu>/Common/InspectList?busitypeid=30&amp;role=customer</menu>
     <submenu>/Common/FileConsult?menuxml=insp_landout</submenu>
     <submenu>/Common/MultiPrint?menuxml=insp_mul_landout</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=insp_modify_landout</submenu>
   </rootmenu>
   <rootmenu>
     <menu>/Common/InspectList?busitypeid=21&amp;role=customer</menu>
     <submenu>/Common/FileConsult?menuxml=insp_seain</submenu>
     <submenu>/Common/MultiPrint?menuxml=insp_mul_seain</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=insp_modify_seain</submenu>
   </rootmenu>
   <rootmenu>
     <menu>/Common/InspectList?busitypeid=20&amp;role=customer</menu>
     <submenu>/Common/FileConsult?menuxml=insp_seaout</submenu>
     <submenu>/Common/MultiPrint?menuxml=insp_mul_seaout</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=insp_modify_seaout</submenu>
   </rootmenu>
   <rootmenu>
     <menu>/Common/InspectList?busitypeid=40-41&amp;role=customer</menu>
     <submenu>/Common/FileConsult?menuxml=insp_domestic</submenu>
     <submenu>/Common/MultiPrint?menuxml=insp_mul_domestic</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=insp_modify_domestic</submenu>
   </rootmenu>
   <rootmenu>
     <menu>/Common/InspectList?busitypeid=50-51&amp;role=customer</menu>
     <submenu>/Common/FileConsult?menuxml=insp_special</submenu>
     <submenu>/Common/MultiPrint?menuxml=insp_mul_special</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=insp_modify_special</submenu>
   </rootmenu>
   
   <!-- 客户服务->文件委托 -->
