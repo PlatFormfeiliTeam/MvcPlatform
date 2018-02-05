@@ -95,6 +95,8 @@ function form_ini_decl() {
                     field_DECLCHECKNAME.setValue(curuserRealname);
                     field_DECLCHECKID.setValue(curuserId);
                     field_CHECKREMARK.setValue("");
+                    field_CHECKREMARK.setReadOnly(false);
+                    field_CHECKREMARK.setFieldStyle('background-color: #FFFFFF; background-image: none;');
 
                     if (uploader == null) {
                         upload_ini();
@@ -105,6 +107,8 @@ function form_ini_decl() {
                     field_DECLCHECKNAME.setValue("");
                     field_DECLCHECKID.setValue("");
                     field_CHECKREMARK.setValue("");
+                    field_CHECKREMARK.setReadOnly(true);
+                    field_CHECKREMARK.setFieldStyle('background-color: #CECECE; background-image: none;');
 
                     if (uploader) {
                         uploader.destroy();
@@ -132,7 +136,8 @@ function form_ini_decl() {
         id: 'field_CHECKREMARK',
         tabIndex: 3, 
         name: 'CHECKREMARK',
-        fieldLabel: '查验备注', columnWidth: .35
+        fieldLabel: '查验备注', columnWidth: .35,
+        readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
 
     var btn_checkpic = Ext.create('Ext.Button', {
@@ -188,11 +193,15 @@ function form_ini_decl() {
                     field_AUDITFLAGNAME.setValue(curuserRealname);
                     field_AUDITFLAGID.setValue(curuserId);
                     field_AUDITCONTENT.setValue("");
+                    field_AUDITCONTENT.setReadOnly(false);
+                    field_AUDITCONTENT.setFieldStyle('background-color: #FFFFFF; background-image: none;');
                 } else {
                     field_AUDITFLAGTIME.setValue("");
                     field_AUDITFLAGNAME.setValue("");
                     field_AUDITFLAGID.setValue("");
                     field_AUDITCONTENT.setValue("");
+                    field_AUDITCONTENT.setReadOnly(true);
+                    field_AUDITCONTENT.setFieldStyle('background-color: #CECECE; background-image: none;');
                 }
             }
         }
@@ -216,7 +225,8 @@ function form_ini_decl() {
         id: 'field_AUDITCONTENT',
         tabIndex: 5, 
         name: 'AUDITCONTENT', columnWidth: .35,
-        fieldLabel: '稽核内容'
+        fieldLabel: '稽核内容',
+        readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
 
 
@@ -349,6 +359,8 @@ function form_ini_insp() {
                     field_INSPCHECKNAME.setValue(curuserRealname);
                     field_INSPCHECKID.setValue(curuserId);
                     field_INSPCHECKREMARK.setValue("");
+                    field_INSPCHECKREMARK.setReadOnly(false);
+                    field_INSPCHECKREMARK.setFieldStyle('background-color: #FFFFFF; background-image: none;');
 
                     if (insp_uploader == null) {
                         insp_upload_ini();
@@ -359,6 +371,8 @@ function form_ini_insp() {
                     field_INSPCHECKNAME.setValue("");
                     field_INSPCHECKID.setValue("");
                     field_INSPCHECKREMARK.setValue("");
+                    field_INSPCHECKREMARK.setReadOnly(true);
+                    field_INSPCHECKREMARK.setFieldStyle('background-color: #CECECE; background-image: none;');
 
                     if (insp_uploader) {
                         insp_uploader.destroy();
@@ -386,7 +400,8 @@ function form_ini_insp() {
         id: 'field_INSPCHECKREMARK',
         tabIndex: 9, 
         name: 'INSPCHECKREMARK',
-        fieldLabel: '查验备注', columnWidth: .35
+        fieldLabel: '查验备注', columnWidth: .35,
+        readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
     var btn_inspcheckpic = Ext.create('Ext.Button', {
         text: '上传查验图片', flex: .5, id: 'inspupfiles',
@@ -694,7 +709,7 @@ function upload_ini() {
                 { title: "Image files", extensions: "jpg,gif,png" }
             ]
         },
-        multipart_params: { ordercode: ordercode, filetype: "67" }
+        multipart_params: { ordercode: ordercode, filetype: "67", formpanel_decl: Ext.encode(Ext.getCmp("formpanel_decl").getForm().getValues()) }
     });
     uploader.init();
     uploader.bind('FilesAdded', function (up, files) {
@@ -727,7 +742,7 @@ function insp_upload_ini() {
                 { title: "Image files", extensions: "jpg,gif,png" }
             ]
         },
-        multipart_params: { ordercode: ordercode, filetype: "68" }
+        multipart_params: { ordercode: ordercode, filetype: "68", formpanel_insp: Ext.encode(Ext.getCmp("formpanel_insp").getForm().getValues()) }
     });
     insp_uploader.init();
     insp_uploader.bind('FilesAdded', function (up, files) {

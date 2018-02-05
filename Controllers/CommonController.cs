@@ -5709,7 +5709,87 @@ namespace MvcPlatform.Controllers
                 fileUpload.InputStream.Read(buffer, 0, buffer.Length);
                 fs.Write(buffer, 0, buffer.Length);
             }
-            UploadFile_site_save(name, Path.GetFileName(fileUpload.FileName), filetype, ordercode);
+
+            UploadFile_site_save(name, Path.GetFileName(fileUpload.FileName), filetype, ordercode);//保存查验图片
+
+            //保存查验标记
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string feoremark = "";//记录是否需要调用费用接口
+
+            string sql = @"select code,entrusttype,declstatus,inspstatus,ischeck,inspischeck
+                    from list_order lo where lo.code='" + ordercode + "'";
+            DataTable dt_order = DBMgr.GetDataTable(sql);
+            string db_ischeck = dt_order.Rows[0]["ISCHECK"].ToString();
+            string db_inspischeck = dt_order.Rows[0]["INSPISCHECK"].ToString();
+
+            if (filetype == "67")
+            {
+                JObject json_decl = (JObject)JsonConvert.DeserializeObject(Request["formpanel_decl"]);
+
+                if (db_ischeck != "1")
+                {
+                    feoremark += "list_order.ischeck查验标志为1";
+
+                    sql = @"insert into list_updatehistory(id,UPDATETIME,TYPE
+                                            ,ORDERCODE,USERID,NEWFIELD,NAME,CODE,FIELD,FIELDNAME) 
+                                    values(LIST_UPDATEHISTORY_ID.nextval,sysdate,'1'
+                                            ,'" + ordercode + "','" + json_user.Value<string>("ID") + "','1','" + json_user.Value<string>("REALNAME") + "','" + ordercode + "','ISCHECK','报关查验'"
+                                        + ")";
+                    DBMgr.ExecuteNonQuery(sql);
+                }
+
+                sql = @"update list_order 
+                            set ischeck=1,declcheckid='{1}',declcheckname='{2}',declchecktime=to_date('{3}','yyyy-MM-dd HH24:mi:ss'),checkremark='{4}'  
+                            where code='{0}'";
+                sql = string.Format(sql, ordercode, json_decl.Value<string>("DECLCHECKID"), json_decl.Value<string>("DECLCHECKNAME"), json_decl.Value<string>("DECLCHECKTIME"), json_decl.Value<string>("CHECKREMARK"));
+                DBMgr.ExecuteNonQuery(sql);
+            }
+            if (filetype == "68")
+            {
+                JObject json_insp = (JObject)JsonConvert.DeserializeObject(Request["formpanel_insp"]);
+
+                if (db_inspischeck != "1")
+                {
+                    feoremark += "list_order.inspischeck查验标志为1";
+
+                    sql = @"insert into list_updatehistory(id,UPDATETIME,TYPE
+                                            ,ORDERCODE,USERID,NEWFIELD,NAME,CODE,FIELD,FIELDNAME) 
+                                    values(LIST_UPDATEHISTORY_ID.nextval,sysdate,'1'
+                                            ,'" + ordercode + "','" + json_user.Value<string>("ID") + "','1','" + json_user.Value<string>("REALNAME") + "','" + ordercode + "','INSPISCHECK','报检查验'"
+                                        + ")";
+                    DBMgr.ExecuteNonQuery(sql);
+                }
+
+                sql = @"update list_order 
+                            set inspischeck=1,inspcheckid='{1}',inspcheckname='{2}',inspchecktime=to_date('{3}','yyyy-MM-dd HH24:mi:ss'),inspcheckremark='{4}'  
+                            where code='{0}'";
+                sql = string.Format(sql, ordercode, json_insp.Value<string>("INSPCHECKID"), json_insp.Value<string>("INSPCHECKNAME"), json_insp.Value<string>("INSPCHECKTIME"), json_insp.Value<string>("INSPCHECKREMARK"));
+                DBMgr.ExecuteNonQuery(sql);                     
+            }
+
+            //============================================================================================================费用接口
+            if (feoremark != "")
+            {
+
+                MethodSvc.MethodServiceClient msc = new MethodSvc.MethodServiceClient();
+                //add 20180115 费用异常接口
+                if (dt_order.Rows[0]["entrusttype"].ToString() == "03")
+                {
+                    if (Convert.ToInt32(dt_order.Rows[0]["declstatus"].ToString()) >= 160 && Convert.ToInt32(dt_order.Rows[0]["inspstatus"].ToString()) >= 120)
+                    {
+                        msc.FinanceExceptionOrder(ordercode, json_user.Value<string>("NAME"), feoremark);
+                    }
+                }
+                else
+                {
+                    if (Convert.ToInt32(dt_order.Rows[0]["declstatus"].ToString()) >= 160)
+                    {
+                        msc.FinanceExceptionOrder(ordercode, json_user.Value<string>("NAME"), feoremark);
+                    }
+                }
+            }
+            //============================================================================================================
+
             return Content("chunk uploaded", "text/plain");
         }
 
