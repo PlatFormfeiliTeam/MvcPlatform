@@ -188,7 +188,7 @@ function initSearch() {
 
     var store_3 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: [{ "NAME": "打印标志", "CODE": "DYBZ" }, { "NAME": "报检状态", "CODE": "BJZT" }]
+        data: [{ "NAME": "打印标志", "CODE": "DYBZ" }, { "NAME": "报检状态", "CODE": "BJZT" }, { "NAME": "删改单", "CODE": "SGD" }]
     });    
 
     var combo_3 = Ext.create("Ext.form.ComboBox", {
@@ -211,6 +211,9 @@ function initSearch() {
                     }
                     if (newValue == "BJZT") {
                         store_3_1.loadData(insp_condition3_data_bj);
+                    }
+                    if (newValue == "SGD") {
+                        store_3_1.loadData(modifyflag_data);
                     }
                 }
             }

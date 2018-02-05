@@ -2861,6 +2861,9 @@ namespace MvcPlatform.Controllers
                         if (Request["VALUE3"] == "1") { where += " and li.STATUS = 130 "; }
                         if (Request["VALUE3"] == "0") { where += " and li.STATUS < 130 "; }
                         break;
+                    case "SGD"://删改单
+                        where += " and li.MODIFYFLAG='" + Request["VALUE3"] + "' ";
+                        break;
                 }
             }
             switch (Request["CONDITION4"])
