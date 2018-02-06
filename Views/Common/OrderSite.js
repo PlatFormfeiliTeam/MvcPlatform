@@ -5,14 +5,7 @@ var uploader; var insp_uploader;
 var file_decl = "[]"; var file_insp = "[]";
 
 Ext.onReady(function () {
-    form_ini_base();//表单初始化
-   
-    if (entrusttype == "01" || entrusttype == "03") {
-        form_ini_decl();
-    }
-    if (entrusttype == "02" || entrusttype == "03") {
-        form_ini_insp();
-    }    
+    form_ini_base();//表单初始化  
     //form_ini_btn();
     loadform(); //初始化表单信息,无论是新增还是修改
 
@@ -77,7 +70,7 @@ function form_ini_decl() {
         html: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;现场报关</span></h4>'
     }
     var tbar_decl = Ext.create('Ext.toolbar.Toolbar', {
-        items: [label_declinfo]
+        items: [label_declinfo, '->', '<span style="color:blue">说明：申报完成 才可以 现场维护</span>']
     });
 
     //查验
@@ -341,7 +334,7 @@ function form_ini_insp() {
         html: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;现场报检</span></h4>'
     }
     var tbar_insp = Ext.create('Ext.toolbar.Toolbar', {
-        items: [label_inspinfo]
+        items: [label_inspinfo, '->', '<span style="color:blue">说明：申报完成 才可以 现场维护</span>']
     });
 
     //查验
@@ -607,16 +600,57 @@ function loadform() {
         params: { ordercode: ordercode },
         success: function (response, opts) {
             var data = Ext.decode(response.responseText);
+            entrusttype = data.formdata.ENTRUSTTYPE;
             Ext.getCmp("formpanel_base").getForm().setValues(data.formdata);
 
             if (entrusttype == "01" || entrusttype == "03") {
+                if (!Ext.getCmp("formpanel_decl")) { form_ini_decl(); }
                 Ext.getCmp("formpanel_decl").getForm().setValues(data.formdata);
+
+                if (data.formdata.DECLSTATUS != null && data.formdata.DECLSTATUS != "") {
+                    if (parseInt(data.formdata.DECLSTATUS) >= 120) {
+                        Ext.getCmp("chk_ISCHECK").setReadOnly(false);
+                        Ext.getCmp("chk_AUDITFLAG").setReadOnly(false);
+                        Ext.getCmp("chk_SITEFLAG").setReadOnly(false);
+                        Ext.getCmp("chk_PASSFLAG").setReadOnly(false);
+                    } else {
+                        Ext.getCmp("chk_ISCHECK").setReadOnly(true);
+                        Ext.getCmp("chk_AUDITFLAG").setReadOnly(true);
+                        Ext.getCmp("chk_SITEFLAG").setReadOnly(true);
+                        Ext.getCmp("chk_PASSFLAG").setReadOnly(true);
+                    }
+                } else {
+                    Ext.getCmp("chk_ISCHECK").setReadOnly(true);
+                    Ext.getCmp("chk_AUDITFLAG").setReadOnly(true);
+                    Ext.getCmp("chk_SITEFLAG").setReadOnly(true);
+                    Ext.getCmp("chk_PASSFLAG").setReadOnly(true);
+                }
 
                 if (data.formdata.SITEAPPLYTIME != "" && data.formdata.SITEAPPLYTIME != null) { Ext.getCmp("chk_SITEFLAG").setReadOnly(true); }
                 if (data.formdata.SITEPASSTIME != "" && data.formdata.SITEPASSTIME != null) { Ext.getCmp("chk_PASSFLAG").setReadOnly(true); }
             }
             if (entrusttype == "02" || entrusttype == "03") {
+                if (!Ext.getCmp("formpanel_insp")) { form_ini_insp(); }
                 Ext.getCmp("formpanel_insp").getForm().setValues(data.formdata);
+
+                if (data.formdata.INSPSTATUS != null && data.formdata.INSPSTATUS != "") {
+                    if (parseInt(data.formdata.INSPSTATUS) >= 120) {
+                        Ext.getCmp("chk_INSPISCHECK").setReadOnly(false);
+                        Ext.getCmp("chk_ISFUMIGATION").setReadOnly(false);
+                        Ext.getCmp("chk_INSPSITEFLAG").setReadOnly(false);
+                        Ext.getCmp("chk_INSPPASSFLAG").setReadOnly(false);
+                    } else {
+                        Ext.getCmp("chk_INSPISCHECK").setReadOnly(true);
+                        Ext.getCmp("chk_ISFUMIGATION").setReadOnly(true);
+                        Ext.getCmp("chk_INSPSITEFLAG").setReadOnly(true);
+                        Ext.getCmp("chk_INSPPASSFLAG").setReadOnly(true);
+                    }
+                } else {
+                    Ext.getCmp("chk_INSPISCHECK").setReadOnly(true);
+                    Ext.getCmp("chk_ISFUMIGATION").setReadOnly(true);
+                    Ext.getCmp("chk_INSPSITEFLAG").setReadOnly(true);
+                    Ext.getCmp("chk_INSPPASSFLAG").setReadOnly(true);
+                }
 
                 if (data.formdata.INSPSITEAPPLYTIME != "" && data.formdata.INSPSITEAPPLYTIME != null) { Ext.getCmp("chk_INSPSITEFLAG").setReadOnly(true); }
                 if (data.formdata.INSPSITEPASSTIME != "" && data.formdata.INSPSITEPASSTIME != null) { Ext.getCmp("chk_INSPPASSFLAG").setReadOnly(true); }
