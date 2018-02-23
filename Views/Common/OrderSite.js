@@ -104,7 +104,7 @@ function form_ini_decl() {
                     field_CHECKREMARK.setFieldStyle('background-color: #CECECE; background-image: none;');
 
                     if (uploader) {
-                        uploader.destroy();
+                        uploader.destroy(); uploader = null;
                     }
                 }
             }
@@ -140,6 +140,7 @@ function form_ini_decl() {
                 Ext.MessageBox.alert("提示", "无查验标志，不能上传查验图片！");
                 return false;
             }
+            uploader.setOption()
         }
     });
     var btn_showcheckpic = Ext.create('Ext.Button', {
@@ -156,7 +157,7 @@ function form_ini_decl() {
 
             var strview = '';
             for (var i = 0; i < file_decl.length; i++) {
-                strview += '<li><img src="' + url + '/file/' + file_decl[i]["FILENAME"] + '" data-original="' + url + '/file/' + file_decl[i]["FILENAME"] + '" alt="图片' + i + '"></li>';
+                strview += '<li><img id="img_decl_' + i.toString() + '" src="' + url + '/file/' + file_decl[i]["FILENAME"] + '" data-original="' + url + '/file/' + file_decl[i]["FILENAME"] + '" alt="图片' + i + '"></li>';
             }
             $('#viewer').html(strview);
             $('#viewer').viewer('update');
@@ -368,7 +369,7 @@ function form_ini_insp() {
                     field_INSPCHECKREMARK.setFieldStyle('background-color: #CECECE; background-image: none;');
 
                     if (insp_uploader) {
-                        insp_uploader.destroy();
+                        insp_uploader.destroy(); insp_uploader = null;
                     }
                 }
             }
@@ -607,53 +608,69 @@ function loadform() {
                 if (!Ext.getCmp("formpanel_decl")) { form_ini_decl(); }
                 Ext.getCmp("formpanel_decl").getForm().setValues(data.formdata);
 
-                if (data.formdata.DECLSTATUS != null && data.formdata.DECLSTATUS != "") {
-                    if (parseInt(data.formdata.DECLSTATUS) >= 120) {
-                        Ext.getCmp("chk_ISCHECK").setReadOnly(false);
-                        Ext.getCmp("chk_AUDITFLAG").setReadOnly(false);
-                        Ext.getCmp("chk_SITEFLAG").setReadOnly(false);
-                        Ext.getCmp("chk_PASSFLAG").setReadOnly(false);
+                if (data.formdata.RECEIVERUNITCODE == data.curuser.CUSTOMERCODE) {
+                    if (data.formdata.DECLSTATUS != null && data.formdata.DECLSTATUS != "") {
+                        if (parseInt(data.formdata.DECLSTATUS) >= 120) {
+                            Ext.getCmp("chk_ISCHECK").setReadOnly(false);
+                            Ext.getCmp("chk_AUDITFLAG").setReadOnly(false);
+                            Ext.getCmp("chk_SITEFLAG").setReadOnly(false);
+                            Ext.getCmp("chk_PASSFLAG").setReadOnly(false);
+                        } else {
+                            Ext.getCmp("chk_ISCHECK").setReadOnly(true);
+                            Ext.getCmp("chk_AUDITFLAG").setReadOnly(true);
+                            Ext.getCmp("chk_SITEFLAG").setReadOnly(true);
+                            Ext.getCmp("chk_PASSFLAG").setReadOnly(true);
+                        }
                     } else {
                         Ext.getCmp("chk_ISCHECK").setReadOnly(true);
                         Ext.getCmp("chk_AUDITFLAG").setReadOnly(true);
                         Ext.getCmp("chk_SITEFLAG").setReadOnly(true);
                         Ext.getCmp("chk_PASSFLAG").setReadOnly(true);
                     }
+
+                    if (data.formdata.SITEAPPLYTIME != "" && data.formdata.SITEAPPLYTIME != null) { Ext.getCmp("chk_SITEFLAG").setReadOnly(true); }
+                    if (data.formdata.SITEPASSTIME != "" && data.formdata.SITEPASSTIME != null) { Ext.getCmp("chk_PASSFLAG").setReadOnly(true); }
+                    
                 } else {
                     Ext.getCmp("chk_ISCHECK").setReadOnly(true);
                     Ext.getCmp("chk_AUDITFLAG").setReadOnly(true);
                     Ext.getCmp("chk_SITEFLAG").setReadOnly(true);
                     Ext.getCmp("chk_PASSFLAG").setReadOnly(true);
-                }
-
-                if (data.formdata.SITEAPPLYTIME != "" && data.formdata.SITEAPPLYTIME != null) { Ext.getCmp("chk_SITEFLAG").setReadOnly(true); }
-                if (data.formdata.SITEPASSTIME != "" && data.formdata.SITEPASSTIME != null) { Ext.getCmp("chk_PASSFLAG").setReadOnly(true); }
+                }               
             }
             if (entrusttype == "02" || entrusttype == "03") {
                 if (!Ext.getCmp("formpanel_insp")) { form_ini_insp(); }
                 Ext.getCmp("formpanel_insp").getForm().setValues(data.formdata);
 
-                if (data.formdata.INSPSTATUS != null && data.formdata.INSPSTATUS != "") {
-                    if (parseInt(data.formdata.INSPSTATUS) >= 120) {
-                        Ext.getCmp("chk_INSPISCHECK").setReadOnly(false);
-                        Ext.getCmp("chk_ISFUMIGATION").setReadOnly(false);
-                        Ext.getCmp("chk_INSPSITEFLAG").setReadOnly(false);
-                        Ext.getCmp("chk_INSPPASSFLAG").setReadOnly(false);
+                if (data.formdata.RECEIVERUNITCODE == data.curuser.CUSTOMERCODE) {
+                    if (data.formdata.INSPSTATUS != null && data.formdata.INSPSTATUS != "") {
+                        if (parseInt(data.formdata.INSPSTATUS) >= 120) {
+                            Ext.getCmp("chk_INSPISCHECK").setReadOnly(false);
+                            Ext.getCmp("chk_ISFUMIGATION").setReadOnly(false);
+                            Ext.getCmp("chk_INSPSITEFLAG").setReadOnly(false);
+                            Ext.getCmp("chk_INSPPASSFLAG").setReadOnly(false);
+                        } else {
+                            Ext.getCmp("chk_INSPISCHECK").setReadOnly(true);
+                            Ext.getCmp("chk_ISFUMIGATION").setReadOnly(true);
+                            Ext.getCmp("chk_INSPSITEFLAG").setReadOnly(true);
+                            Ext.getCmp("chk_INSPPASSFLAG").setReadOnly(true);
+                        }
                     } else {
                         Ext.getCmp("chk_INSPISCHECK").setReadOnly(true);
                         Ext.getCmp("chk_ISFUMIGATION").setReadOnly(true);
                         Ext.getCmp("chk_INSPSITEFLAG").setReadOnly(true);
                         Ext.getCmp("chk_INSPPASSFLAG").setReadOnly(true);
                     }
+
+                    if (data.formdata.INSPSITEAPPLYTIME != "" && data.formdata.INSPSITEAPPLYTIME != null) { Ext.getCmp("chk_INSPSITEFLAG").setReadOnly(true); }
+                    if (data.formdata.INSPSITEPASSTIME != "" && data.formdata.INSPSITEPASSTIME != null) { Ext.getCmp("chk_INSPPASSFLAG").setReadOnly(true); }
                 } else {
                     Ext.getCmp("chk_INSPISCHECK").setReadOnly(true);
                     Ext.getCmp("chk_ISFUMIGATION").setReadOnly(true);
                     Ext.getCmp("chk_INSPSITEFLAG").setReadOnly(true);
                     Ext.getCmp("chk_INSPPASSFLAG").setReadOnly(true);
+                    
                 }
-
-                if (data.formdata.INSPSITEAPPLYTIME != "" && data.formdata.INSPSITEAPPLYTIME != null) { Ext.getCmp("chk_INSPSITEFLAG").setReadOnly(true); }
-                if (data.formdata.INSPSITEPASSTIME != "" && data.formdata.INSPSITEPASSTIME != null) { Ext.getCmp("chk_INSPPASSFLAG").setReadOnly(true); }
             }
 
             file_decl = data.filedata_decl;
@@ -750,8 +767,10 @@ function upload_ini() {
         myMask.show();
         uploader.start();
     });
+    uploader.bind('BeforeUpload', function (up, file) {
+        uploader.setOption("multipart_params", { "ordercode": ordercode, "filetype": "67", "formpanel_decl": Ext.encode(Ext.getCmp("formpanel_decl").getForm().getValues()) });
+    });
     uploader.bind('FileUploaded', function (up, file) {
-
     });
     uploader.bind('UploadComplete', function (up, files) {
         myMask.hide();
@@ -782,6 +801,9 @@ function insp_upload_ini() {
     insp_uploader.bind('FilesAdded', function (up, files) {
         myMask.show();
         insp_uploader.start();
+    });
+    insp_uploader.bind('BeforeUpload', function (up, file) {
+        insp_uploader.setOption("multipart_params", { "ordercode": ordercode, "filetype": "68", "formpanel_insp": Ext.encode(Ext.getCmp("formpanel_insp").getForm().getValues()) });
     });
     insp_uploader.bind('FileUploaded', function (up, file) {
     });
