@@ -266,6 +266,13 @@ function loadform() {
                 if (!Ext.getCmp('formpanel_btn')) {
                     form_ini_btn();//保存之后加载数据，不需要创建
                 }
+            } else {
+                Ext.Array.each(Ext.getCmp("formpanel_base").getForm().getFields().items, function (item) {
+                    item.setReadOnly(true);
+                });
+                Ext.Array.each(Ext.getCmp("formpanel").getForm().getFields().items, function (item) {
+                    item.setReadOnly(true);
+                });
             }
             curuserRealname = data.curuser.REALNAME; curuserId = data.curuser.ID;
         }
