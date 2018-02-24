@@ -157,7 +157,7 @@ function form_ini_decl() {
 
             var strview = '';
             for (var i = 0; i < file_decl.length; i++) {
-                strview += '<li><img id="img_decl_' + i.toString() + '" src="' + url + '/file/' + file_decl[i]["FILENAME"] + '" data-original="' + url + '/file/' + file_decl[i]["FILENAME"] + '" alt="图片' + i + '"></li>';
+                strview += '<li><img src="' + url + '/file/' + file_decl[i]["FILENAME"] + '" data-original="' + url + '/file/' + file_decl[i]["FILENAME"] + '" alt="报关图片' + i + '"></li>';
             }
             $('#viewer').html(strview);
             $('#viewer').viewer('update');
@@ -420,7 +420,7 @@ function form_ini_insp() {
 
             var strview = '';
             for (var i = 0; i < file_insp.length; i++) {
-                strview += '<li><img src="' + url + '/file/' + file_insp[i]["FILENAME"] + '" data-original="' + url + '/file/' + file_insp[i]["FILENAME"] + '" alt="图片' + i + '"></li>';
+                strview += '<li><img src="' + url + '/file/' + file_insp[i]["FILENAME"] + '" data-original="' + url + '/file/' + file_insp[i]["FILENAME"] + '" alt="报检图片' + i + '"></li>';
             }
             $('#viewer').html(strview);
             $('#viewer').viewer('update');
@@ -669,7 +669,6 @@ function loadform() {
                     Ext.getCmp("chk_ISFUMIGATION").setReadOnly(true);
                     Ext.getCmp("chk_INSPSITEFLAG").setReadOnly(true);
                     Ext.getCmp("chk_INSPPASSFLAG").setReadOnly(true);
-                    
                 }
             }
 
@@ -681,6 +680,8 @@ function loadform() {
                 if (!Ext.getCmp('formpanel_btn')) {
                     form_ini_btn();//保存之后加载数据，不需要创建
                 }
+            } else {
+                Ext.getCmp("field_CLEARREMARK").setReadOnly(true);
             }
             curuserRealname = data.curuser.REALNAME; curuserId = data.curuser.ID;
         }

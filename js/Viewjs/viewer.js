@@ -93,7 +93,30 @@ var DEFAULTS = {
   viewed: null
 };
 
-var TEMPLATE = '<div class="viewer-container">' + '<div class="viewer-canvas"></div>' + '<div class="viewer-footer">' + '<div class="viewer-title"></div>' + '<ul class="viewer-toolbar">' + '<li role="button" class="viewer-zoom-in" data-action="zoom-in"></li>' + '<li role="button" class="viewer-zoom-out" data-action="zoom-out"></li>' + '<li role="button" class="viewer-one-to-one" data-action="one-to-one"></li>' + '<li role="button" class="viewer-reset" data-action="reset"></li>' + '<li role="button" class="viewer-prev" data-action="prev"></li>' + '<li role="button" class="viewer-play" data-action="play"></li>' + '<li role="button" class="viewer-next" data-action="next"></li>' + '<li role="button" class="viewer-rotate-left" data-action="rotate-left"></li>' + '<li role="button" class="viewer-rotate-right" data-action="rotate-right"></li>' + '<li role="button" class="viewer-flip-horizontal" data-action="flip-horizontal"></li>' + '<li role="button" class="viewer-flip-vertical" data-action="flip-vertical"></li>' + '</ul>' + '<div class="viewer-navbar">' + '<ul class="viewer-list"></ul>' + '</div>' + '</div>' + '<div class="viewer-tooltip"></div>' + '<div role="button" class="viewer-button" data-action="mix"></div>' + '<div class="viewer-player"></div>' + '</div>';
+var TEMPLATE = '<div class="viewer-container">'
+                + '<div class="viewer-canvas"></div>'
+                + '<div class="viewer-footer">'
+                    + '<div class="viewer-title"></div>'
+                    + '<ul class="viewer-toolbar">'
+                        + '<li role="button" class="viewer-zoom-in" data-action="zoom-in"></li>'
+                        + '<li role="button" class="viewer-zoom-out" data-action="zoom-out"></li>'
+                        + '<li role="button" class="viewer-one-to-one" data-action="one-to-one"></li>'
+                        + '<li role="button" class="viewer-reset" data-action="reset"></li>'
+                        + '<li role="button" class="viewer-prev" data-action="prev"></li>'
+                        + '<li role="button" class="viewer-play" data-action="play"></li>'
+                        + '<li role="button" class="viewer-next" data-action="next"></li>'
+                        + '<li role="button" class="viewer-rotate-left" data-action="rotate-left"></li>'
+                        + '<li role="button" class="viewer-rotate-right" data-action="rotate-right"></li>'
+                        + '<li role="button" class="viewer-flip-horizontal" data-action="flip-horizontal"></li>'
+                        + '<li role="button" class="viewer-flip-vertical" data-action="flip-vertical"><i class="fa fa-trash-o"></i></li>'
+                        + '<li role="button" class="viewer-close" data-action="deleteimg" ></li>'
+                    + '</ul>'
+                    + '<div class="viewer-navbar">' + '<ul class="viewer-list"></ul>' + '</div>'
+                + '</div>'
+                + '<div class="viewer-tooltip"></div>'
+                + '<div role="button" class="viewer-button" data-action="mix"></div>'
+                + '<div class="viewer-player"></div>'
+            + '</div>';
 
 var _window = window;
 var PointerEvent = _window.PointerEvent;
@@ -675,6 +698,10 @@ var handlers = {
         this.scaleY(-image.scaleY || -1);
         break;
 
+    case 'deleteimg':
+        this.deleteimg();
+        break;
+
       default:
         if (this.played) {
           this.stop();
@@ -1122,6 +1149,64 @@ var methods = {
     }
   },
 
+
+  deleteimg: function deleteimg() {
+      var _this = this;
+
+      var $item = _this.$items.eq(_this.index);
+      var $img = $item.find('img');
+      var typeimg = $img.attr('alt').substr(0, 2);
+      
+      Ext.MessageBox.confirm('提示', '确定要删除当前图片吗？', function (btn) {
+          if (btn == 'yes') {
+
+              var id, filename;
+              if (typeimg == "报关") { id = file_decl[_this.index]["ID"]; filename = file_decl[_this.index]["FILENAME"]; }
+              if (typeimg == "报检") { id = file_insp[_this.index]["ID"]; filename = file_insp[_this.index]["FILENAME"]; }
+
+              Ext.Ajax.request({
+                  url: '/Common/DeleteCheckPic',
+                  params: { id: id, filename: filename },
+                  success: function (response, success, option) {
+                      var res = Ext.decode(response.responseText);
+                      if (res.success) {
+                          Ext.MessageBox.alert('提示', '删除成功！', function () {
+                              var strview = '';
+                              if (typeimg == "报关") {
+                                  file_decl.splice(_this.index, 1);
+
+                                  for (var i = 0; i < file_decl.length; i++) {
+                                      strview += '<li><img src="' + url + '/file/' + file_decl[i]["FILENAME"] + '" data-original="' + url + '/file/' + file_decl[i]["FILENAME"] + '" alt="报关图片' + i + '"></li>';
+                                  }
+                              }
+                              if (typeimg == "报检") {
+                                  file_insp.splice(_this.index, 1);
+
+                                  for (var i = 0; i < file_insp.length; i++) {
+                                      strview += '<li><img src="' + url + '/file/' + file_insp[i]["FILENAME"] + '" data-original="' + url + '/file/' + file_insp[i]["FILENAME"] + '" alt="报检图片' + i + '"></li>';
+                                  }
+                              }
+
+                              if (strview == "") {
+                                  _this.hide();
+                                  Ext.MessageBox.alert("提示", "没有" + typeimg + "查验图片!");
+                              } else {
+                                  $('#viewer').html(strview);
+                                  $('#viewer').viewer('update');
+                                  $('#viewer').viewer('show');
+                              }
+                             
+                          });
+                      }
+                      else {
+                          Ext.MessageBox.alert('提示', '删除失败！');
+                      }
+                  }
+              });
+          }
+      });
+     
+  },
 
   /**
    * View the previous image.

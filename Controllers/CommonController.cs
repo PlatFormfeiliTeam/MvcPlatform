@@ -5858,6 +5858,23 @@ namespace MvcPlatform.Controllers
             return resultmsg;
         }
 
+        public string DeleteCheckPic()
+        {
+            string result = "{success:false}";
+
+            //删除订单随附文件
+            System.Uri Uri = new Uri("ftp://" + ConfigurationManager.AppSettings["FTPServer"] + ":" + ConfigurationManager.AppSettings["FTPPortNO"]);
+            string UserName = ConfigurationManager.AppSettings["FTPUserName"];
+            string Password = ConfigurationManager.AppSettings["FTPPassword"];
+            FtpHelper ftp = new FtpHelper(Uri, UserName, Password);
+            ftp.DeleteFile(Request["filename"] + "");
+
+            DBMgr.ExecuteNonQuery("delete from list_attachment where id='" + Request["id"] + "'");
+            result = "{success:true}";
+
+            return result;
+        }
+
         #endregion
 
         #region 删改单维护
