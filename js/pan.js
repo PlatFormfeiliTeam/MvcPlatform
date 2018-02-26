@@ -2028,7 +2028,7 @@ function printBarcode_Domestic() {//打印条码 国内
 //现场维护
 function SiteMaintain(paramenu) {
     var recs = gridpanel.getSelectionModel().getSelection();
-    if (recs.length == 0) {
+    if (recs.length != 1) {
         Ext.MessageBox.alert('提示', '请选择需要现场维护的记录！');
         return;
     }
