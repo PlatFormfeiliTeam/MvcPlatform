@@ -2029,7 +2029,7 @@ function printBarcode_Domestic() {//打印条码 国内
 function SiteMaintain(paramenu) {
     var recs = gridpanel.getSelectionModel().getSelection();
     if (recs.length != 1) {
-        Ext.MessageBox.alert('提示', '请选择需要现场维护的记录！');
+        Ext.MessageBox.alert('提示', '请选择一笔维护记录！');
         return;
     }
     opencenterwin("/Common/OrderSite?menuxml=" + paramenu + "&ordercode=" + recs[0].get("CODE") + "&entrusttype=" + recs[0].get("ENTRUSTTYPE"), 1600, 900);
