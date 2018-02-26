@@ -637,7 +637,7 @@ function loadform() {
                     Ext.getCmp("chk_SITEFLAG").setReadOnly(true);
                     Ext.getCmp("chk_PASSFLAG").setReadOnly(true);
                 }               
-            }
+            } 
             if (entrusttype == "02" || entrusttype == "03") {
                 if (!Ext.getCmp("formpanel_insp")) { form_ini_insp(); }
                 Ext.getCmp("formpanel_insp").getForm().setValues(data.formdata);
@@ -775,7 +775,7 @@ function upload_ini() {
     });
     uploader.bind('UploadComplete', function (up, files) {
         myMask.hide();
-        loadform();
+        updatefile();
         Ext.MessageBox.alert("提示", "上传成功！");
     });
 }
@@ -810,8 +810,19 @@ function insp_upload_ini() {
     });
     insp_uploader.bind('UploadComplete', function (up, files) {
         myMask.hide();
-        Ext.MessageBox.alert("提示", "上传成功！", function () {
-            loadform();
-        });
+        updatefile();
+        Ext.MessageBox.alert("提示", "上传成功！");
+    });
+}
+
+function updatefile() {
+    Ext.Ajax.request({
+        url: "/Common/loadorder_site",
+        params: { ordercode: ordercode },
+        success: function (response, opts) {
+            var data = Ext.decode(response.responseText);
+            file_decl = data.filedata_decl;
+            file_insp = data.filedata_insp;
+        }
     });
 }
