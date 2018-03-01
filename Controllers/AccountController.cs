@@ -240,7 +240,7 @@ namespace MvcPlatform.Controllers
         public string UpPassword(string name, string password, string customercode)
         {
             string sql = @"update sys_user set points=1,password = '" + password.ToSHA1() + "',code='" + password
-                        + "' where name = '" + name + "' and customerid=(select id from cusdoc.sys_customer where code='" + customercode + "')";
+                        + "' where lower(name) = '" + name.ToLower() + "' and customerid=(select id from cusdoc.sys_customer where lower(code)='" + customercode.ToLower() + "')";
             int i = DBMgr.ExecuteNonQuery(sql);
             if (i > 0)
             {
@@ -329,7 +329,7 @@ namespace MvcPlatform.Controllers
         //初始化密码
         public string InitialPsd()
         {
-            string sql = "update sys_user set points=0,password='" + Request["NAME"].ToSHA1() + "' where id='" + Request["ID"] + "'";
+            string sql = "update sys_user set points=0,password='" + Request["NAME"].ToSHA1() + "',code='" + Request["NAME"] + "' where id='" + Request["ID"] + "'";
             try
             {
                 DBMgr.ExecuteNonQuery(sql);
@@ -454,7 +454,7 @@ namespace MvcPlatform.Controllers
                 string sql = @"select a.*,b.code 
                             from sys_user a 
                                 inner join cusdoc.sys_customer b on a.customerid=b.id 
-                            where a.name = '" + ucp.NAME + "' and a.password = '" + Extension.ToSHA1(ucp.PASSWORD) + "' and b.code='" + ucp.CUSTOMERCODE + "'";
+                            where lower(a.name) = '" + ucp.NAME.ToLower() + "' and a.password = '" + Extension.ToSHA1(ucp.PASSWORD) + "' and lower(b.code)='" + ucp.CUSTOMERCODE.ToLower() + "'";
                 DataTable dt = DBMgr.GetDataTable(sql);
                 if (dt.Rows.Count > 0)
                 {
