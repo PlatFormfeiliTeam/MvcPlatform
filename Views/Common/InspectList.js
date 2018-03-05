@@ -264,14 +264,38 @@ function initSearch() {
         margin: 0,
         flex: .325,
         emptyText: '开始日期',
-        format: 'Y-m-d'
+        format: 'Y-m-d',
+        listeners: {
+            focus: function (cb) {
+                var con = Ext.Date.format(Ext.getCmp("CONDITION4_2").getValue(), 'Y-m-d');
+                if (con != "") {
+                    var da_before = new Date(con);
+                    da_before.setFullYear(da_before.getFullYear() - 1);
+                    var da = new Date(con);
+
+                    cb.setMinValue(da_before); cb.setMaxValue(da);
+                }
+            }
+        }
     })
     var date_4_2 = Ext.create('Ext.form.field.Date', {
         id: 'CONDITION4_2',
         margin: 0,
         flex: .325,
         emptyText: '结束日期',
-        format: 'Y-m-d'
+        format: 'Y-m-d',
+        listeners: {
+            focus: function (cb) {
+                var con = Ext.Date.format(Ext.getCmp("CONDITION4_1").getValue(), 'Y-m-d');
+                if (con != "") {
+                    var da_after = new Date(con);
+                    da_after.setFullYear(da_after.getFullYear() + 1);
+                    var da = new Date(con);
+
+                    cb.setMinValue(da); cb.setMaxValue(da_after);
+                }
+            }
+        }
     })
     var condition4 = {
         xtype: 'fieldcontainer',
@@ -290,6 +314,20 @@ function initSearch() {
         { layout: 'column', border: 0, items: [condition1, condition2, condition3, condition4] }
         ]
     });
+
+    //初始化时间控件
+    var before = new Date();
+    before.setDate(before.getDate() - 3);
+    var beforeday = Ext.Date.format(before, 'm/d/Y');
+
+    var today = Ext.Date.format(new Date(), 'm/d/Y');
+
+    if (Ext.getCmp("CONDITION4").getValue() == "SUBMITTIME") {
+        Ext.getCmp("CONDITION4_1").setValue(beforeday); Ext.getCmp("CONDITION4_2").setValue(today);
+    }
+    //if (Ext.getCmp("CONDITION8").getValue() == "SUBMITTIME") {
+    //    Ext.getCmp("CONDITION8_1").setValue(beforeday); Ext.getCmp("CONDITION8_2").setValue(today);
+    //}
 
 }
 
