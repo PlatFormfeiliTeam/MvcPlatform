@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://tempuri.org/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+      <s:element name="TemplateSend">
+        <s:complexType />
+      </s:element>
+      <s:element name="TemplateSendResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="LoginExceptionSend">
+        <s:complexType />
+      </s:element>
+      <s:element name="LoginExceptionSendResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetAccessToken">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetAccessTokenResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetAccessTokenResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="TemplateSendSoapIn">
+    <wsdl:part name="parameters" element="tns:TemplateSend" />
+  </wsdl:message>
+  <wsdl:message name="TemplateSendSoapOut">
+    <wsdl:part name="parameters" element="tns:TemplateSendResponse" />
+  </wsdl:message>
+  <wsdl:message name="LoginExceptionSendSoapIn">
+    <wsdl:part name="parameters" element="tns:LoginExceptionSend" />
+  </wsdl:message>
+  <wsdl:message name="LoginExceptionSendSoapOut">
+    <wsdl:part name="parameters" element="tns:LoginExceptionSendResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetAccessTokenSoapIn">
+    <wsdl:part name="parameters" element="tns:GetAccessToken" />
+  </wsdl:message>
+  <wsdl:message name="GetAccessTokenSoapOut">
+    <wsdl:part name="parameters" element="tns:GetAccessTokenResponse" />
+  </wsdl:message>
+  <wsdl:portType name="BGServiceSoap">
+    <wsdl:operation name="TemplateSend">
+      <wsdl:input message="tns:TemplateSendSoapIn" />
+      <wsdl:output message="tns:TemplateSendSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="LoginExceptionSend">
+      <wsdl:input message="tns:LoginExceptionSendSoapIn" />
+      <wsdl:output message="tns:LoginExceptionSendSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAccessToken">
+      <wsdl:input message="tns:GetAccessTokenSoapIn" />
+      <wsdl:output message="tns:GetAccessTokenSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BGServiceSoap" type="tns:BGServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="TemplateSend">
+      <soap:operation soapAction="http://tempuri.org/TemplateSend" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LoginExceptionSend">
+      <soap:operation soapAction="http://tempuri.org/LoginExceptionSend" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAccessToken">
+      <soap:operation soapAction="http://tempuri.org/GetAccessToken" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="BGServiceSoap12" type="tns:BGServiceSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="TemplateSend">
+      <soap12:operation soapAction="http://tempuri.org/TemplateSend" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="LoginExceptionSend">
+      <soap12:operation soapAction="http://tempuri.org/LoginExceptionSend" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAccessToken">
+      <soap12:operation soapAction="http://tempuri.org/GetAccessToken" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="BGService">
+    <wsdl:port name="BGServiceSoap" binding="tns:BGServiceSoap">
+      <soap:address location="http://192.168.252.8:8088/BGService.asmx" />
+    </wsdl:port>
+    <wsdl:port name="BGServiceSoap12" binding="tns:BGServiceSoap12">
+      <soap12:address location="http://192.168.252.8:8088/BGService.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

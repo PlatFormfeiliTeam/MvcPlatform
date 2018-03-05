@@ -15,6 +15,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using MvcPlatform.Models;
 using System.IO;
+using MvcPlatform.WeChat;
+
 namespace MvcPlatform.Controllers
 {
     public class AccountController : Controller
@@ -148,7 +150,16 @@ namespace MvcPlatform.Controllers
             DataTable dt = DBMgr.GetDataTable(sql);
             string json = JsonConvert.SerializeObject(dt);
             json = json.TrimStart('[').TrimEnd(']');
-            return "{data:" + json + "}";
+
+            //微信开发
+            string QrcodeUrl = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token={0}";//WxQrcodeAPI接口
+            WeChatServer.BGServiceSoapClient ws = new WeChatServer.BGServiceSoapClient();
+            QrcodeUrl = string.Format(QrcodeUrl, ws.GetAccessToken());
+            string PostJson = "{\"expire_seconds\": 1800, \"action_name\": \"QR_LIMIT_STR_SCENE\", \"action_info\": {\"scene\": {\"scene_str\": \"" + json_user.GetValue("ID") + "\"}}}";
+            string a = WeChatHelper.SendHttpRequest(QrcodeUrl, PostJson);
+
+
+            return "{data:" + json + ",a:"+a+"}";
         }
         public string loaduserInfo()
         {
