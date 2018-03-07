@@ -351,6 +351,9 @@ function initSearch() {
                     var da = new Date(con);
 
                     cb.setMinValue(da_before); cb.setMaxValue(da);
+                } else {
+                    //cb.reset();//没用
+                    cb.setMinValue(new Date("0000-01-01")); cb.setMaxValue(new Date("9999-12-31"));
                 }
             }
         }
@@ -370,6 +373,9 @@ function initSearch() {
                     var da = new Date(con);
 
                     cb.setMinValue(da); cb.setMaxValue(da_after);
+                } else {
+                    //cb.reset();//没用
+                    cb.setMinValue(new Date("0000-01-01")); cb.setMaxValue(new Date("9999-12-31"));
                 }
             }
         }
@@ -547,6 +553,9 @@ function initSearch() {
                     var da = new Date(con);
 
                     cb.setMinValue(da_before); cb.setMaxValue(da);
+                } else {
+                    //cb.reset();//没用
+                    cb.setMinValue(new Date("0000-01-01")); cb.setMaxValue(new Date("9999-12-31"));
                 }
             }
         }
@@ -566,6 +575,9 @@ function initSearch() {
                     var da = new Date(con);
 
                     cb.setMinValue(da); cb.setMaxValue(da_after);
+                } else {
+                    //cb.reset();//没用
+                    cb.setMinValue(new Date("0000-01-01")); cb.setMaxValue(new Date("9999-12-31"));
                 }
             }
         }
