@@ -271,6 +271,7 @@ function initSearch() {
                 if (con != "") {
                     var da_before = new Date(con);
                     da_before.setFullYear(da_before.getFullYear() - 1);
+                    da_before.setDate(da_before.getDate() + 1);
                     var da = new Date(con);
 
                     cb.setMinValue(da_before); cb.setMaxValue(da);
@@ -293,6 +294,7 @@ function initSearch() {
                 if (con != "") {
                     var da_after = new Date(con);
                     da_after.setFullYear(da_after.getFullYear() + 1);
+                    da_after.setDate(da_after.getDate() - 1);
                     var da = new Date(con);
 
                     cb.setMinValue(da); cb.setMaxValue(da_after);
