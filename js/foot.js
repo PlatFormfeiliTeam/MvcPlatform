@@ -29,7 +29,7 @@
         placement: 'top',
         title: '<div style="text-align:center; color:red; text-decoration:underline; font-size:12px;">扫描二维码，关注我们</div>',
         html: 'true', //needed to show html of course
-        content: '<div id="popOverBox" align="center"><img src="/Images/float/erweima.png" /></div>',
+        content: '<div id="popOverBox" align="center"><img src="/Images/float/wechat_fllow.png" /></div>',
         animation: false
     }).on("mouseenter", function () {
         var _this = this;
