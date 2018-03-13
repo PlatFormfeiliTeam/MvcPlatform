@@ -50,6 +50,7 @@
         name: 'CUSTOMERID'
     });
     form_supplier = Ext.create('Ext.form.Panel', {
+        id:'form_supplier',
         border: 0,
         fieldDefaults: {
             margin: '10 10'

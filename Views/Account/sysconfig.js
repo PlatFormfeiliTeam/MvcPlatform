@@ -31,6 +31,7 @@
         name: 'WEIGHTCHECK'
     })
     form_sysconfig = Ext.create('Ext.form.Panel', {
+        id: 'form_sysconfig',
         items: [cbg_busitype, cbg_needweightconfirm, field_id, field_customerid],
         buttonAlign: 'center',
         buttons: [{

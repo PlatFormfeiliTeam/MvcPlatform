@@ -74,11 +74,18 @@
                 /////////////////////////////////////////////////////////////
                 //Ext.getCmp('wechat_img').setSrc("https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + data.a.ticket + "");
                 
-                form_supplier.getForm().setValues(data.data);
-                form_sysconfig.getForm().setValues(data.data);
+                if (Ext.getCmp("form_supplier")) {
+                    form_supplier.getForm().setValues(data.data);
+                }
+                if (Ext.getCmp("form_sysconfig")) {
+                    form_sysconfig.getForm().setValues(data.data);
+                }
+                
                 if (data.data.BUSITYPES) {
                     var items = data.data.BUSITYPES.split(',');
-                    Ext.getCmp('cb_group_busitype').setValue({ BUSITYPES: items });
+                    if (Ext.getCmp("cb_group_busitype")) {
+                        Ext.getCmp('cb_group_busitype').setValue({ BUSITYPES: items });
+                    }
                 }
             }
         });
