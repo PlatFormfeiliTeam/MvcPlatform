@@ -5340,7 +5340,7 @@ namespace MvcPlatform.Controllers
             string ordercode = json.Value<string>("CODE");
 
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-            string sql = ""; string resultmsg = "{success:false}"; 
+            string sql = ""; string resultmsg = "";// "{success:false}"; 
             string feoremark = "";//记录是否需要调用费用接口
             List<string> delfile = new List<string>();
 
@@ -5494,7 +5494,11 @@ namespace MvcPlatform.Controllers
                                             ,'" + ordercode + "','" + json_user.Value<string>("ID") + "','" + json_decl.Value<string>("SITEAPPLYTIME") + "','" + json_user.Value<string>("REALNAME") + "','" + ordercode + "','SITEAPPLYTIME','现场报关'"
                                                         + ")";
                                 DBMgr.ExecuteNonQuery(sql, conn);
-                            }                            
+                            }
+                            else
+                            {
+                                resultmsg = "{success:false}";
+                            }                       
                         }
                     }
 
@@ -5519,6 +5523,10 @@ namespace MvcPlatform.Controllers
                                             ,'" + ordercode + "','" + json_user.Value<string>("ID") + "','" + json_decl.Value<string>("SITEPASSTIME") + "','" + json_user.Value<string>("REALNAME") + "','" + ordercode + "','SITEPASSTIME','报关放行'"
                                                         + ")";
                                 DBMgr.ExecuteNonQuery(sql, conn);
+                            }
+                            else
+                            {
+                                resultmsg = "{success:false}";
                             }
                         }
                     }
@@ -5641,6 +5649,10 @@ namespace MvcPlatform.Controllers
                                                         + ")";
                                 DBMgr.ExecuteNonQuery(sql, conn);
                             }
+                            else
+                            {
+                                resultmsg = "{success:false}";
+                            }
                         }
                     }
 
@@ -5666,19 +5678,25 @@ namespace MvcPlatform.Controllers
                                                         + ")";
                                 DBMgr.ExecuteNonQuery(sql, conn);
                             }
+                            else
+                            {
+                                resultmsg = "{success:false}";
+                            }
                         }
                     }
 
                 }
                 #endregion               
 
-                ot.Commit();
+                if (resultmsg == "")
+                {
+                    ot.Commit();
+                    resultmsg = "{success:true,ordercode:'" + ordercode + "'}";
+                }
                 foreach (string item in delfile)//提交之后删除文件
                 {
                     ftp.DeleteFile(item);
-                }
-
-                resultmsg = "{success:true,ordercode:'" + ordercode + "'}";
+                }               
             }
             catch (Exception ex)
             {
