@@ -5478,20 +5478,23 @@ namespace MvcPlatform.Controllers
                         {
                             feoremark += "list_order.siteapplytime现场报关";
 
-                            sql = @"update list_order 
+                            if (Convert.ToInt32(dt_order.Rows[0]["declstatus"].ToString()) <= 150)
+                            {
+                                sql = @"update list_order 
                                 set siteapplyuserid='{1}',siteapplyusername='{2}',siteapplytime=to_date('{3}','yyyy-MM-dd HH24:mi:ss'),declstatus=150 
                                 where code='{0}'";
-                            sql = string.Format(sql, ordercode, json_decl.Value<string>("SITEAPPLYUSERID"), json_decl.Value<string>("SITEAPPLYUSERNAME"), json_decl.Value<string>("SITEAPPLYTIME"));
-                            DBMgr.ExecuteNonQuery(sql, conn);
+                                sql = string.Format(sql, ordercode, json_decl.Value<string>("SITEAPPLYUSERID"), json_decl.Value<string>("SITEAPPLYUSERNAME"), json_decl.Value<string>("SITEAPPLYTIME"));
+                                DBMgr.ExecuteNonQuery(sql, conn);
 
-                            msc.redis_OrderStatusLog(ordercode);//状态缓存
+                                msc.redis_OrderStatusLog(ordercode);//状态缓存
 
-                            sql = @"insert into list_updatehistory(id,UPDATETIME,TYPE
+                                sql = @"insert into list_updatehistory(id,UPDATETIME,TYPE
                                             ,ORDERCODE,USERID,NEWFIELD,NAME,CODE,FIELD,FIELDNAME) 
                                     values(LIST_UPDATEHISTORY_ID.nextval,sysdate,'1'
                                             ,'" + ordercode + "','" + json_user.Value<string>("ID") + "','" + json_decl.Value<string>("SITEAPPLYTIME") + "','" + json_user.Value<string>("REALNAME") + "','" + ordercode + "','SITEAPPLYTIME','现场报关'"
-                                                    + ")";
-                            DBMgr.ExecuteNonQuery(sql, conn);
+                                                        + ")";
+                                DBMgr.ExecuteNonQuery(sql, conn);
+                            }                            
                         }
                     }
 
@@ -5500,20 +5503,23 @@ namespace MvcPlatform.Controllers
                     {
                         if (db_sitepasstime == "")
                         {
-                            sql = @"update list_order 
+                            if (Convert.ToInt32(dt_order.Rows[0]["declstatus"].ToString()) <= 160)
+                            {
+                                sql = @"update list_order 
                                 set sitepassuserid='{1}',sitepassusername='{2}',sitepasstime=to_date('{3}','yyyy-MM-dd HH24:mi:ss'),declstatus=160 
                                 where code='{0}'";
-                            sql = string.Format(sql, ordercode, json_decl.Value<string>("SITEPASSUSERID"), json_decl.Value<string>("SITEPASSUSERNAME"), json_decl.Value<string>("SITEPASSTIME"));
-                            DBMgr.ExecuteNonQuery(sql, conn);
+                                sql = string.Format(sql, ordercode, json_decl.Value<string>("SITEPASSUSERID"), json_decl.Value<string>("SITEPASSUSERNAME"), json_decl.Value<string>("SITEPASSTIME"));
+                                DBMgr.ExecuteNonQuery(sql, conn);
 
-                            msc.redis_OrderStatusLog(ordercode);//状态缓存
+                                msc.redis_OrderStatusLog(ordercode);//状态缓存
 
-                            sql = @"insert into list_updatehistory(id,UPDATETIME,TYPE
+                                sql = @"insert into list_updatehistory(id,UPDATETIME,TYPE
                                             ,ORDERCODE,USERID,NEWFIELD,NAME,CODE,FIELD,FIELDNAME) 
                                     values(LIST_UPDATEHISTORY_ID.nextval,sysdate,'1'
                                             ,'" + ordercode + "','" + json_user.Value<string>("ID") + "','" + json_decl.Value<string>("SITEPASSTIME") + "','" + json_user.Value<string>("REALNAME") + "','" + ordercode + "','SITEPASSTIME','报关放行'"
-                                                    + ")";
-                            DBMgr.ExecuteNonQuery(sql, conn);
+                                                        + ")";
+                                DBMgr.ExecuteNonQuery(sql, conn);
+                            }
                         }
                     }
 
@@ -5618,20 +5624,23 @@ namespace MvcPlatform.Controllers
                     {
                         if (db_inspsiteapplytime == "")
                         {
-                            sql = @"update list_order 
+                            if (Convert.ToInt32(dt_order.Rows[0]["inspstatus"].ToString()) <= 150)
+                            {
+                                sql = @"update list_order 
                                 set inspsiteapplyuserid='{1}',inspsiteapplyusername='{2}',inspsiteapplytime=to_date('{3}','yyyy-MM-dd HH24:mi:ss'),inspstatus=150 
                                 where code='{0}'";
-                            sql = string.Format(sql, ordercode, json_insp.Value<string>("INSPSITEAPPLYUSERID"), json_insp.Value<string>("INSPSITEAPPLYUSERNAME"), json_insp.Value<string>("INSPSITEAPPLYTIME"));
-                            DBMgr.ExecuteNonQuery(sql, conn);
+                                sql = string.Format(sql, ordercode, json_insp.Value<string>("INSPSITEAPPLYUSERID"), json_insp.Value<string>("INSPSITEAPPLYUSERNAME"), json_insp.Value<string>("INSPSITEAPPLYTIME"));
+                                DBMgr.ExecuteNonQuery(sql, conn);
 
-                            msc.redis_OrderStatusLog(ordercode);//状态缓存
+                                msc.redis_OrderStatusLog(ordercode);//状态缓存
 
-                            sql = @"insert into list_updatehistory(id,UPDATETIME,TYPE
+                                sql = @"insert into list_updatehistory(id,UPDATETIME,TYPE
                                             ,ORDERCODE,USERID,NEWFIELD,NAME,CODE,FIELD,FIELDNAME) 
                                     values(LIST_UPDATEHISTORY_ID.nextval,sysdate,'1'
                                             ,'" + ordercode + "','" + json_user.Value<string>("ID") + "','" + json_decl.Value<string>("SITEAPPLYTIME") + "','" + json_user.Value<string>("REALNAME") + "','" + ordercode + "','INSPSITEAPPLYTIME','现场报检'"
-                                                    + ")";
-                            DBMgr.ExecuteNonQuery(sql, conn);
+                                                        + ")";
+                                DBMgr.ExecuteNonQuery(sql, conn);
+                            }
                         }
                     }
 
@@ -5640,20 +5649,23 @@ namespace MvcPlatform.Controllers
                     {
                         if (db_inspsitepasstime == "")
                         {
-                            sql = @"update list_order 
+                            if (Convert.ToInt32(dt_order.Rows[0]["inspstatus"].ToString()) <= 160)
+                            {
+                                sql = @"update list_order 
                                 set inspsitepassuserid='{1}',inspsitepassusername='{2}',inspsitepasstime=to_date('{3}','yyyy-MM-dd HH24:mi:ss'),inspstatus=160 
                                 where code='{0}'";
-                            sql = string.Format(sql, ordercode, json_insp.Value<string>("INSPSITEPASSUSERID"), json_insp.Value<string>("INSPSITEPASSUSERNAME"), json_insp.Value<string>("INSPSITEPASSTIME"));
-                            DBMgr.ExecuteNonQuery(sql, conn);
+                                sql = string.Format(sql, ordercode, json_insp.Value<string>("INSPSITEPASSUSERID"), json_insp.Value<string>("INSPSITEPASSUSERNAME"), json_insp.Value<string>("INSPSITEPASSTIME"));
+                                DBMgr.ExecuteNonQuery(sql, conn);
 
-                            msc.redis_OrderStatusLog(ordercode);//状态缓存
+                                msc.redis_OrderStatusLog(ordercode);//状态缓存
 
-                            sql = @"insert into list_updatehistory(id,UPDATETIME,TYPE
+                                sql = @"insert into list_updatehistory(id,UPDATETIME,TYPE
                                             ,ORDERCODE,USERID,NEWFIELD,NAME,CODE,FIELD,FIELDNAME) 
                                     values(LIST_UPDATEHISTORY_ID.nextval,sysdate,'1'
                                             ,'" + ordercode + "','" + json_user.Value<string>("ID") + "','" + json_decl.Value<string>("SITEPASSTIME") + "','" + json_user.Value<string>("REALNAME") + "','" + ordercode + "','INSPSITEPASSTIME','报检放行'"
-                                                    + ")";
-                            DBMgr.ExecuteNonQuery(sql, conn);
+                                                        + ")";
+                                DBMgr.ExecuteNonQuery(sql, conn);
+                            }
                         }
                     }
 
@@ -6041,7 +6053,7 @@ namespace MvcPlatform.Controllers
                 }
                 if (flag)
                 {
-                    sql = "update list_order set declstatus=160,sitepassusername='system_tool_modify',sitepasstime=sysdate,siteapplyuserid=-2 where code='" + ordercode + "'";
+                    sql = "update list_order set declstatus=160,sitepassusername='system_tool_modify',sitepasstime=sysdate,siteapplyuserid=-2 where code='" + ordercode + "' and declstatus<=160";
                     DBMgr.ExecuteNonQuery(sql);
                 }                
 

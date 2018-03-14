@@ -1003,6 +1003,11 @@ namespace MvcPlatform.Common
                 return "{jydw:" + json_jydw + ",wtdw:" + json_wtdw + ",fyzt:" + json_fyzt + "}";
             }
 
+            if (ParaType == "OrderManeger")//关务服务2
+            {
+                return "{jydw:" + json_jydw + ",wtdw:" + json_wtdw + "}";
+            }
+
             return "{jydw:" + json_jydw + ",sbfs_all:" + json_sbfs_all + ",sbfs:" + json_sbfs + ",sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",bzzl:" + json_bzzl
                 + ",myfs:" + json_myfs + ",containertype:" + json_containertype + ",containersize:" + json_containersize + ",truckno:" + json_truckno
                 + ",relacontainer:" + json_relacontainer + ",mzbz:" + json_mzbz + ",jylb:" + json_jylb + ",json_sbkb:" + json_sbkb
