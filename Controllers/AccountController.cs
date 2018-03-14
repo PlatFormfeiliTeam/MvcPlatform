@@ -161,6 +161,29 @@ namespace MvcPlatform.Controllers
 
             return "{data:" + json + ",a:"+a+"}";
         }
+        public string loaduserInfo_m()
+        {
+            string strWhere = string.Empty;
+            if (!string.IsNullOrEmpty(Request["NAME_S"]))
+            {
+                strWhere += " and name like '%" + Request["NAME_S"] + "%' ";
+            }
+            if (!string.IsNullOrEmpty(Request["REALNAME_S"]))
+            {
+                strWhere += " and realname like '%" + Request["REALNAME_S"] + "%' ";
+            }
+            if (!string.IsNullOrEmpty(Request["ENABLED_S"]))
+            {
+                strWhere += " and enabled='" + Request["ENABLED_S"] + "' ";
+            }
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            string sql = @"select * from sys_user where parentid ='" + json_user.GetValue("ID") + "'" + strWhere;
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql));
+            var json = JsonConvert.SerializeObject(dt, iso);
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
         public string loaduserInfo()
         {
             string strWhere = string.Empty;
@@ -176,7 +199,7 @@ namespace MvcPlatform.Controllers
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-            string sql = @"select * from sys_user where parentid ='" + json_user.GetValue("ID") + "'" + strWhere;
+            string sql = @"select * from sys_user where parentid ='" + json_user.GetValue("ID") + "' and enabled=1" + strWhere;
             DataTable dt = DBMgr.GetDataTable(GetPageSql(sql));
             var json = JsonConvert.SerializeObject(dt, iso);
             return "{rows:" + json + ",total:" + totalProperty + "}";
@@ -325,7 +348,8 @@ namespace MvcPlatform.Controllers
         }
         public string Delete()
         {
-            string sql = "delete from sys_user where id='" + Request["ID"] + "'";
+            //string sql = "delete from sys_user where id='" + Request["ID"] + "'";
+            string sql = "delete from sys_user where id in(" + Request["ID"] + ")";
             try
             {
                 DBMgr.ExecuteNonQuery(sql);

@@ -2,16 +2,22 @@
     Ext.regModel('User', { fields: ['ID', 'NAME', 'REALNAME', 'EMAIL', 'TELEPHONE', 'MOBILEPHONE', 'POSITIONID', 'SEX', 'ENABLED', 'CREATETIME', 'PARENTID', 'REMARK'] });
     store_user = Ext.create('Ext.data.JsonStore', {
         model: 'User',
+        pageSize: 20,
         proxy: {
             type: 'ajax',
-            url: '/Account/loaduserInfo',
+            url: '/Account/loaduserInfo_m',
             reader: {
                 root: 'rows',
                 type: 'json',
                 totalProperty: 'total'
             }
         },
-        autoLoad: true
+        autoLoad: true,
+        listeners: {
+            beforeload: function (store, options) {
+                store_user.getProxy().extraParams = Ext.getCmp('formpanel_sub_search').getForm().getValues();
+            }
+        }
     })
     var tbar = Ext.create('Ext.toolbar.Toolbar', {
         items: [{
@@ -36,9 +42,16 @@
                             Ext.MessageBox.alert('提示', '请选择需要删除的记录！');
                             return;
                         }
+
+                        var ids = "";
+                        Ext.each(recs, function (rec) {
+                            ids = ids + rec.get("ID") + ",";
+                        });
+                        ids = ids.substr(0, ids.length - 1);
+
                         Ext.Ajax.request({
                             url: '/Account/Delete',
-                            params: { ID: recs[0].get("ID") },
+                            params: { ID: ids },//recs[0].get("ID")
                             success: function (response, option) {
                                 var data = Ext.decode(response.responseText);
                                 if (data.result == true) {
@@ -74,17 +87,32 @@
                             }
                         });
                     }
-                }, '->', '<span>说明：初始化密码后密码与登录账号相同</span>']
-    })
+                },
+                '<span style="color:blue;">说明：初始化密码后密码与登录账号相同</span>'
+                , '->'
+                , {
+                    text: '<i class="fa fa-search"></i>&nbsp;查 询', handler: function () {
+                        Ext.getCmp("pgbar_sub").moveFirst();
+                    }
+                }
+                , {
+                    text: '<i class="fa fa-refresh"></i>&nbsp;重 置', handler: function () {
+                        Ext.each(Ext.getCmp('formpanel_sub_search').getForm().getFields().items, function (field) {
+                            field.reset();
+                        });
+                    }
+                }
+        ]
+    });
     var pgbar = Ext.create('Ext.toolbar.Paging', {
+        id: 'pgbar_sub',
         displayMsg: '显示 {0} - {1} 条,共计 {2} 条',
         store: store_user,
         displayInfo: true
     })
     gridpanel = Ext.create('Ext.grid.Panel', {
-        // title: '子账户信息',
         tbar: tbar,
-        // renderTo: 'appConId',
+        region: 'center',
         store: store_user,
         height: 443,
         selModel: { selType: 'checkboxmodel' },
@@ -110,4 +138,38 @@
            { header: '备注', dataIndex: 'REMARK', flex: 1 }
         ]
     })
+}
+
+function init_search() {
+    var txtNAME = Ext.create('Ext.form.field.Text', { id: 'NAME_S', name: 'NAME_S', fieldLabel: '登录账号' });
+    var txtREALNAME = Ext.create('Ext.form.field.Text', { id: 'REALNAME_S', name: 'REALNAME_S', fieldLabel: '姓名' });
+
+    var store_ENABLED_S = Ext.create('Ext.data.JsonStore', {
+        fields: ['CODE', 'NAME'],
+        data: [{ "CODE": 0, "NAME": "停用" }, { "CODE": 1, "NAME": "启用" }]
+    });
+    var combo_ENABLED_S = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_ENABLED_S',
+        name: 'ENABLED_S',
+        store: store_ENABLED_S,
+        queryMode: 'local',
+        anyMatch: true,
+        fieldLabel: '是否启用',
+        displayField: 'NAME',
+        valueField: 'CODE'
+    });
+
+    var formpanel_sub_search = Ext.create('Ext.form.Panel', {
+        id: 'formpanel_sub_search',
+        region: 'north',
+        border: 0,
+        fieldDefaults: {
+            margin: '5',
+            columnWidth: 0.25,
+            labelWidth: 70
+        },
+        items: [
+        { layout: 'column', border: 0, items: [txtNAME, txtREALNAME, combo_ENABLED_S] }
+        ]
+    });
 }

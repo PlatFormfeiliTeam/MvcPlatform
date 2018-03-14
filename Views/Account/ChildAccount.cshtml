@@ -32,10 +32,10 @@
                 form_chat_init();
                 var items = [{ title: '基本信息', items: [formuser_panel] }];
                 if (data.data.TYPE == 1 && !data.data.PARENTID) {//如果是主账户
-                    subaccount_init();
+                    subaccount_init(); init_search();
                     supplier_ini();
                     sysconfig_ini();
-                    items.push({ title: '子账户信息', items: [gridpanel] });
+                    items.push({ title: '子账户信息', items: [Ext.getCmp("formpanel_sub_search"), gridpanel] });
                     //如果CUSTOMER的角色包含客户
                     if (data.data.ISCUSTOMER) {
                         items.push({ title: '供应商设置', items: [form_supplier] });
