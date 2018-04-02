@@ -983,6 +983,7 @@ namespace MvcPlatform.Common
                 json_fyzt = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
             //    db.StringSet("common_data:fyzt", json_fyzt);
             //}
+           
 
             if (ParaType == "predata")//ListPreData.cshtml 导入用的
             {
@@ -1003,9 +1004,22 @@ namespace MvcPlatform.Common
                 return "{jydw:" + json_jydw + ",wtdw:" + json_wtdw + ",fyzt:" + json_fyzt + "}";
             }
 
-            if (ParaType == "OrderManeger")//关务服务2
+            if (ParaType == "OrderManager")//关务服务2
             {
-                return "{jydw:" + json_jydw + ",wtdw:" + json_wtdw + "}";
+                //业务类型
+                string json_busi = "[]";
+                //if (db.KeyExists("common_data:busi"))
+                //{
+                //    json_busi = db.StringGet("common_data:busi");
+                //}
+                //else
+                //{
+                sql = @"select a.CODE,a.NAME,a.NAME||'('||a.CODE||')' CODENAME from sys_busitype a where enabled=1 order by a.code";
+                json_busi = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+                //db.StringSet("common_data:busi", json_busi);
+                //}
+                
+                return "{jydw:" + json_jydw + ",wtdw:" + json_wtdw + ",busi:" + json_busi + "}";
             }
 
             return "{jydw:" + json_jydw + ",sbfs_all:" + json_sbfs_all + ",sbfs:" + json_sbfs + ",sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",bzzl:" + json_bzzl

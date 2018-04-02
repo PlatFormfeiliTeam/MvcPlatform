@@ -102,6 +102,10 @@
     <menu>/OrderCustomsService/Index</menu>
     <submenu>/OrderCustomsService/Create</submenu>
   </rootmenu>
+  <rootmenu>
+    <menu>/OrderManager/Index</menu>
+    <submenu>/OrderManager/Create</submenu>
+  </rootmenu>
 
   <!-- 报关单管理-->
   
