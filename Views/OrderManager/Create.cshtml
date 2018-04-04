@@ -13,10 +13,8 @@
 
 <script type="text/javascript">
     var ordercode = getQueryString("ordercode"); 
-    
-    var pagename = "关务维护页面"; var configtype = "界面维护";
-
     var common_data_jydw = [], common_data_wtdw = [], common_data_busi = [];
+    var curuserRealname = ""; curuserId = "";
 
     Ext.onReady(function () {
         Ext.Ajax.request({
@@ -29,7 +27,6 @@
                 common_data_busi = commondata.busi;//业务类型
 
                 form_ini();//基础信息
-                //form_ini_con();//可配信息
                 form_ini_btn();//form button
                 loadform_OrderM(); //初始化表单信息,无论是新增还是修改
             }
@@ -38,8 +35,6 @@
 </script>
 <div class="container">
     <div id="div_form"></div>
-    <br />
-    <div id="div_form_con"></div>
     <br />
     <div id="div_form_btn"></div>
 </div>

@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Web;
@@ -112,9 +113,46 @@ namespace MvcPlatform.Controllers
                 where += " and (a.CREATEUSERID = " + json_user.Value<string>("ID") + " or a.submitusername='" + json_user.Value<string>("REALNAME") + "') ";
             }
 
+            if (!string.IsNullOrEmpty(Request["TEXTONE"]))
+            {
+                where += " and a.TEXTONE='" + Request["TEXTONE"].Trim() + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["TEXTTWO"]))
+            {
+                where += " and a.TEXTTWO='" + Request["TEXTTWO"].Trim() + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["NUMONE"]))
+            {
+                where += " and a.NUMONE='" + Request["NUMONE"].Trim() + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["NUMTWO"]))
+            {
+                where += " and a.NUMTWO='" + Request["NUMTWO"].Trim() + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["DATEONE"]))
+            {
+                where += " and a.DATEONE>=to_date('" + Request["DATEONE"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                //where += " and a.DATEONE>=to_date('" + Request["DATEONE"] + "','yyyy-mm-dd hh24:mi:ss') ";
+            }
+            if (!string.IsNullOrEmpty(Request["DATETWO"]))
+            {
+                where += " and a.DATETWO>=to_date('" + Request["DATETWO"] + "','yyyy-mm-dd hh24:mi:ss') ";
+                //where += " and a.DATETWO<=to_date('" + Request["DATETWO"].Replace("00:00:00", "23:59:59") + "','yyyy-mm-dd hh24:mi:ss') ";
+            }
+            if (!string.IsNullOrEmpty(Request["USERNAMEONE"]))
+            {
+                where += " and a.USERNAMEONE='" + Request["USERNAMEONE"].Trim() + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["USERNAMETWO"]))
+            {
+                where += " and a.USERNAMETWO='" + Request["USERNAMETWO"].Trim() + "'";
+            }
+
             string sql = @"select a.ID,a.BUSITYPE,a.CREATETIME,a.SUBMITTIME,a.ENTRUSTTYPE,a.CUSTOMERCODE,a.CUSTOMERNAME,a.CLEARUNIT,a.CLEARUNITNAME 
                                 ,a.BUSIUNITCODE,a.BUSIUNITNAME,a.CODE,a.CUSNO,a.DOREQUEST,a.CLEARREMARK
                                 ,b.busiitemname ENTRUSTTYPENAME
+                                ,a.TEXTONE,a.TEXTTWO,a.NUMONE,a.NUMTWO,to_char(a.DATEONE,'yyyy-mm-dd') DATEONE,to_char(a.DATETWO,'yyyy-mm-dd') DATETWO
+                                ,a.USERNAMEONE,a.USERIDONE,a.USERNAMETWO,a.USERIDTWO 
                         from LIST_ORDER a 
                             left join web_customsconfig b on a.busitype=b.busitypecode and a.entrusttype=b.busiitemcode
                         where a.ISINVALID=0 and b.enable=1";
@@ -151,6 +189,40 @@ namespace MvcPlatform.Controllers
             return sql;
         }
 
+        public string CompleteOrderM()
+        {
+            string ordercode = Request["ordercode"]; string result = "{success:true}";
+
+            string sql = @"select SUBMITTIME from list_order where code='" + ordercode + "'";
+            DataTable dt = DBMgr.GetDataTable(sql);
+            if (dt.Rows[0]["SUBMITTIME"].ToString() != "")
+            {
+                return "{success:false,flag:'E'}";
+            }
+
+            sql = @"update list_order set SUBMITTIME=sysdate where code='" + ordercode + "'";
+            DBMgr.ExecuteNonQuery(sql);
+            
+            return result;
+        }
+
+        public string DeleteOrderM()
+        {
+            string ordercode = Request["ordercode"]; string result = "{success:true}";
+
+            string sql = @"select SUBMITTIME from list_order where code='" + ordercode + "'";
+            DataTable dt = DBMgr.GetDataTable(sql);
+            if (dt.Rows[0]["SUBMITTIME"].ToString() != "")
+            {
+                return "{success:false,flag:'E'}";
+            }
+
+            sql = @"delete list_order where code='" + ordercode + "'";
+            DBMgr.ExecuteNonQuery(sql);
+
+            return result;
+        }
+
         private string GetPageSql(string tempsql, string order, string asc)
         {
             int start = Convert.ToInt32(Request["start"]);
@@ -162,105 +234,29 @@ namespace MvcPlatform.Controllers
             return pageSql;
         }
 
-        public string Getele(string pagename, string configtype, string busitype, string entrusttype, string ordercode)
+        public string Getlabelname(string busitype, string entrusttype)
         {
-            string sql = string.Empty; string fieldcolumn = "[]"; string fieldcolumn_con = "{}";
-            string result = "{fieldcolumn:" + fieldcolumn + ",fieldcolumn_con:" + fieldcolumn_con + "}"; 
-
-            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
-
-            DataTable dt = new DataTable();
-            sql = @"select * from web_pageconfig where enabled=1 and pagename='{0}' and configcontent='{1}' and customercode='{2}'";
-            sql = string.Format(sql, pagename, "业务类型=" + busitype + ";业务细项=" + entrusttype, json_user.Value<string>("CUSTOMERCODE"));
-            dt = DBMgr.GetDataTable(sql);
-
-            if (dt == null) { return result; }
-            if (dt.Rows.Count != 1) { return result; }
-            int parentid = Convert.ToInt32(dt.Rows[0]["ID"].ToString() == "" ? "0" : dt.Rows[0]["ID"].ToString());
+            string sql = string.Empty; 
 
             DataTable dt_field = new DataTable();
-            sql = @"select name,controltype,selectcontent,tablecode,fieldcode 
-                    from web_pageconfig_detail 
-                    where enabled=1 and configtype='" + configtype + "' and parentid=" + parentid + " order by orderno";
+            sql = @"select originname,configname 
+                    from web_customscost 
+                    where busitypecode='" + busitype + "' and busiitemcode='" + entrusttype + "'";
             dt_field = DBMgr.GetDataTable(sql);
-            fieldcolumn = JsonConvert.SerializeObject(dt_field);
+            var fieldcolumn = JsonConvert.SerializeObject(dt_field);
 
             //-------------------------------------------------------------------------------------------------------------------
-            if (ordercode == "")//为空,则不需要赋值
-            {
-                result = "{fieldcolumn:" + fieldcolumn + ",fieldcolumn_con:" + fieldcolumn_con + "}";
-                return result;
-            }
 
-            string ParTableName = "LIST_ORDER";
-
-            DataTable dt_con = new DataTable();
-            dt_con.Rows.Add(dt_con.NewRow());
-
-            if (dt_field != null)
-            {
-                string fieldname = "";
-                for (int fi = 0; fi < dt_field.Rows.Count; fi++)
-                {
-                    fieldname = dt_field.Rows[fi]["TABLECODE"].ToString() + "|" + dt_field.Rows[fi]["FIELDCODE"].ToString();
-                    switch (dt_field.Rows[fi]["CONTROLTYPE"].ToString())
-                    {
-                        case "文本":
-                            dt_con.Columns.Add(fieldname + "|" + "text", typeof(string));
-                            break;
-                        case "数字":
-                            dt_con.Columns.Add(fieldname + "|" + "number", typeof(string));
-                            break;
-                        case "日期":
-                            dt_con.Columns.Add(fieldname + "|" + "date", typeof(string));
-                            break;
-                        case "下拉框":
-                            dt_con.Columns.Add(fieldname + "|" + "combox", typeof(string));
-                            break;
-                        default:
-                            dt_con.Columns.Add(fieldname + "|" + "text", typeof(string));
-                            break;
-                    }
-
-                    sql = @"select ";
-                    if (dt_field.Rows[fi]["CONTROLTYPE"].ToString() == "日期")//sql = "to_char(" + dt_field.Rows[fi]["FIELDCODE"].ToString() + ",'yyyy-mm-dd hh24:mi')";                        
-                    {
-                        sql = sql + "to_char(" + dt_field.Rows[fi]["FIELDCODE"].ToString() + ",'yyyy-mm-dd')";
-                    }
-                    else
-                    {
-                        sql = sql + dt_field.Rows[fi]["FIELDCODE"].ToString();
-                    }
-                    sql = sql + " from " + dt_field.Rows[fi]["TABLECODE"].ToString();
-
-                    if (dt_field.Rows[fi]["TABLECODE"].ToString().ToUpper() == ParTableName.ToUpper())//跟主表同一张表
-                    {
-                        sql = sql + " where code='" + ordercode + "'";
-                    }
-                    else
-                    {
-                        sql = sql + " where ordercode='" + ordercode + "'";
-                    }
-                    
-                    DataTable dt_fieldvalue = DBMgr.GetDataTable(sql);
-
-                    if (dt_fieldvalue == null) { continue; }
-                    if (dt_fieldvalue.Rows.Count <= 0) { continue; }
-                    dt_con.Rows[0][dt_con.Columns.Count - 1] = dt_fieldvalue.Rows[0][0].ToString();
-                }
-            }
-            fieldcolumn_con = JsonConvert.SerializeObject(dt_con).TrimStart('[').TrimEnd(']');
-            //-------------------------------------------------------------------------------------------------------------------
-
-            result = "{fieldcolumn:" + fieldcolumn + ",fieldcolumn_con:" + fieldcolumn_con + "}";
-            return result;
+            return "{fieldcolumn:" + fieldcolumn + "}";
         }
 
         public string loadform_OrderM(string ordercode, string pagename, string configtype)
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string sql = "";
-            string result = "{}"; string formdata = "{}"; 
+            string result = "{}"; string formdata = "{}";
+            string curuser = "{CUSTOMERCODE:'" + json_user.Value<string>("CUSTOMERCODE") + "',REALNAME:'" + json_user.Value<string>("REALNAME") + "',ID:'" + json_user.Value<string>("ID") + "'}";
+
             if (string.IsNullOrEmpty(ordercode))
             {
 
@@ -273,22 +269,22 @@ namespace MvcPlatform.Controllers
                 sql = @"select CODE,BUSITYPE,ENTRUSTTYPE,CUSTOMERCODE,CUSTOMERNAME,BUSIUNITCODE
                             ,BUSIUNITNAME,CLEARUNIT,CLEARUNITNAME,CUSNO,CREATEUSERID                          
                             ,CREATEUSERNAME,CREATETIME,SUBMITUSERID,SUBMITUSERNAME,SUBMITTIME,DOREQUEST,CLEARREMARK
+                            ,TEXTONE,TEXTTWO,NUMONE,NUMTWO,to_char(DATEONE,'yyyy-mm-dd') DATEONE,to_char(DATETWO,'yyyy-mm-dd') DATETWO,USERNAMEONE,USERIDONE,USERNAMETWO,USERIDTWO 
                         from list_order where code='" + ordercode + "'";
                 DataTable dt = new DataTable();
                 dt = DBMgr.GetDataTable(sql);
                 formdata = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');                
             }
-            result = "{formdata:" + formdata + "}";
+            result = "{formdata:" + formdata + ",curuser:" + curuser + "}";
             return result;
         }
 
         public string Save_OrderM()
         {
-            JObject json = (JObject)JsonConvert.DeserializeObject(Request["formdata_str"]);
-            JObject json_con = (JObject)JsonConvert.DeserializeObject(Request["formdata_con"]);
+            JObject json = (JObject)JsonConvert.DeserializeObject(Request["formdata"]);
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
 
-            string sql = ""; string resultmsg = "{success:false}"; string ParTableName = "LIST_ORDER";
+            string sql = ""; string resultmsg = "{success:false}"; 
             string ordercode = string.Empty;
             try
             {
@@ -296,147 +292,145 @@ namespace MvcPlatform.Controllers
                 if (string.IsNullOrEmpty(Request["ordercode"]))//新增
                 {
                     ordercode = Extension.getOrderCode();
-                    sql = @"INSERT INTO " + ParTableName + @" (ID,
+                    sql = @"INSERT INTO LIST_ORDER (ID,
                             BUSITYPE,CODE,ENTRUSTTYPE,CUSTOMERCODE,CUSTOMERNAME,BUSIUNITCODE
                             ,BUSIUNITNAME,CLEARUNIT,CLEARUNITNAME,CUSNO,CREATEUSERID                          
-                            ,CREATEUSERNAME,CREATETIME,SUBMITUSERID,SUBMITUSERNAME,SUBMITTIME,DOREQUEST,CLEARREMARK
-                            ,RECEIVERUNITCODE,RECEIVERUNITNAME
+                            ,CREATEUSERNAME,CREATETIME,DOREQUEST,CLEARREMARK,RECEIVERUNITCODE,RECEIVERUNITNAME
+                            ,TEXTONE,TEXTTWO,NUMONE,NUMTWO,DATEONE
+                            ,DATETWO,USERNAMEONE,USERIDONE,USERNAMETWO,USERIDTWO 
                         ) VALUES (LIST_ORDER_id.Nextval
                             ,'{0}','{1}','{2}','{3}','{4}','{5}'
                             ,'{6}','{7}','{8}','{9}','{10}'
-                            ,'{11}',sysdate,'{12}','{13}',sysdate,'{14}','{15}'
-                            ,'{16}','{17}'
+                            ,'{11}',sysdate,'{12}','{13}','{14}','{15}'     
+                            ,'{16}','{17}','{18}','{19}',to_date('{20}','yyyy-MM-dd HH24:mi:ss')
+                            ,to_date('{21}','yyyy-MM-dd HH24:mi:ss'),'{22}','{23}','{24}','{25}'                       
                             )";
                     sql = string.Format(sql
                             , json.Value<string>("BUSITYPE"), ordercode, json.Value<string>("ENTRUSTTYPE"), json.Value<string>("CUSTOMERCODE"), json.Value<string>("CUSTOMERNAME"), json.Value<string>("BUSIUNITCODE")
                             , json.Value<string>("BUSIUNITNAME"), json.Value<string>("CLEARUNIT"), json.Value<string>("CLEARUNITNAME"), json.Value<string>("CUSNO"), json_user.Value<string>("ID")
-                            , json_user.Value<string>("REALNAME"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"), json.Value<string>("DOREQUEST"), json.Value<string>("CLEARREMARK")
-                            , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
+                            , json_user.Value<string>("REALNAME"), json.Value<string>("DOREQUEST"), json.Value<string>("CLEARREMARK"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
+                            , json.Value<string>("TEXTONE"), json.Value<string>("TEXTTWO"), json.Value<string>("NUMONE"), json.Value<string>("NUMTWO"), json.Value<string>("DATEONE")
+                            , json.Value<string>("DATETWO"), json.Value<string>("USERNAMEONE"), json.Value<string>("USERIDONE"), json.Value<string>("USERNAMETWO"), json.Value<string>("USERIDTWO")
                        );
                 }
                 else//修改
                 {
                     ordercode = Request["ordercode"];
-                    sql = @"UPDATE " + ParTableName + @" SET BUSITYPE='{1}',ENTRUSTTYPE='{2}',CUSTOMERCODE='{3}',CUSTOMERNAME='{4}',BUSIUNITCODE='{5}'             
-                            ,BUSIUNITNAME='{6}',CLEARUNIT='{7}',CLEARUNITNAME='{8}',CUSNO='{9}',SUBMITUSERID='{10}'          
-                            ,SUBMITUSERNAME='{11}',SUBMITTIME=sysdate,DOREQUEST='{12}',CLEARREMARK='{13}',RECEIVERUNITCODE='{14}',RECEIVERUNITNAME='{15}'                              
+                    sql = @"UPDATE LIST_ORDER SET BUSITYPE='{1}',ENTRUSTTYPE='{2}',CUSTOMERCODE='{3}',CUSTOMERNAME='{4}',BUSIUNITCODE='{5}'             
+                            ,BUSIUNITNAME='{6}',CLEARUNIT='{7}',CLEARUNITNAME='{8}',CUSNO='{9}',DOREQUEST='{10}'         
+                            ,CLEARREMARK='{11}',RECEIVERUNITCODE='{12}',RECEIVERUNITNAME='{13}',TEXTONE='{14}',TEXTTWO='{15}'
+                            ,NUMONE='{16}',NUMTWO='{17}',DATEONE=to_date('{18}','yyyy-MM-dd HH24:mi:ss'),DATETWO=to_date('{19}','yyyy-MM-dd HH24:mi:ss'),USERNAMEONE='{20}'
+                            ,USERIDONE='{21}',USERNAMETWO='{22}',USERIDTWO='{23}'                               
                         WHERE CODE='{0}'                          
                         ";
                     sql = string.Format(sql
                             , ordercode, json.Value<string>("BUSITYPE"), json.Value<string>("ENTRUSTTYPE"), json.Value<string>("CUSTOMERCODE"), json.Value<string>("CUSTOMERNAME"), json.Value<string>("BUSIUNITCODE")
-                            , json.Value<string>("BUSIUNITNAME"), json.Value<string>("CLEARUNIT"), json.Value<string>("CLEARUNITNAME"), json.Value<string>("CUSNO"), json_user.Value<string>("ID")
-                            , json_user.Value<string>("REALNAME"), json.Value<string>("DOREQUEST"), json.Value<string>("CLEARREMARK"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
+                            , json.Value<string>("BUSIUNITNAME"), json.Value<string>("CLEARUNIT"), json.Value<string>("CLEARUNITNAME"), json.Value<string>("CUSNO"),json.Value<string>("DOREQUEST")
+                            , json.Value<string>("CLEARREMARK"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("TEXTONE"), json.Value<string>("TEXTTWO")
+                            , json.Value<string>("NUMONE"), json.Value<string>("NUMTWO"), json.Value<string>("DATEONE"), json.Value<string>("DATETWO"), json.Value<string>("USERNAMEONE")
+                            , json.Value<string>("USERIDONE"), json.Value<string>("USERNAMETWO"), json.Value<string>("USERIDTWO")
                             );
 
                 }
                 if (sql != "")
                 {
-                    int ii = DBMgr.ExecuteNonQuery(sql);
-                    if (ii == 1)
+                    int i = DBMgr.ExecuteNonQuery(sql);
+                    if (i > 0)
                     {
-                        //-----------------------------------------------------------可配信息sql拼接-------------------------------------------------------------------------------
-                        string tablename = "", fieldname = "", typename = "";  DataTable dt = new DataTable();
-                        string all_tablename = ParTableName.ToUpper() + ";";
-
-                        foreach (JProperty jp in (JToken)json_con)
-                        {
-                            tablename = jp.Name.Substring(0, jp.Name.IndexOf('|'));
-                            fieldname = jp.Name.Substring(jp.Name.IndexOf('|') + 1, jp.Name.LastIndexOf('|') - 1 - jp.Name.IndexOf('|'));
-                            typename = jp.Name.Substring(jp.Name.LastIndexOf('|') + 1);
-
-                            if (tablename.ToUpper() == ParTableName.ToUpper())//跟主表同一张表
-                            {
-                                if (typename == "date")
-                                {
-                                    sql = @"update " + tablename + " set " + fieldname + "=to_date('" + jp.Value.ToString() + "','yyyy-MM-dd HH24:mi:ss') where code='" + ordercode + "'";
-                                }
-                                else
-                                {
-                                    sql = @"update " + tablename + " set " + fieldname + "='" + jp.Value.ToString() + "' where code='" + ordercode + "'";
-                                }
-                                
-                                sqllist.Add(sql);
-
-                            }
-                            else if (all_tablename.Contains(tablename.ToUpper()))//非主表，但是是前面字段用过的表
-                            {
-                                if (typename == "date")
-                                {
-                                    sql = @"update " + tablename + " set " + fieldname + "=to_date('" + jp.Value.ToString() + "','yyyy-MM-dd HH24:mi:ss') where ordercode='" + ordercode + "'";
-                                }
-                                else
-                                {
-                                    sql = @"update " + tablename + " set " + fieldname + "='" + jp.Value.ToString() + "' where ordercode='" + ordercode + "'";
-                                }
-
-                                sqllist.Add(sql);
-                            }
-                            else
-                            {
-                                dt = DBMgr.GetDataTable(@"select code from " + tablename + " where ordercode='" + ordercode + "'");
-                                if (dt != null)
-                                {
-                                    if (dt.Rows.Count <= 0)
-                                    {
-                                        if (typename == "date")
-                                        {
-                                            sql = @"insert into " + tablename + " (id,ordercode," + fieldname + ") VALUES (" + tablename + "_id.Nextval,'" + ordercode + "',to_date('" + jp.Value.ToString() + ",'yyyy-MM-dd HH24:mi:ss'))";
-                                        }
-                                        else
-                                        {
-                                            sql = @"insert into " + tablename + " (id,ordercode," + fieldname + ") VALUES (" + tablename + "_id.Nextval,'" + ordercode + "','" + jp.Value.ToString() + "')";
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (typename == "date")
-                                        {
-                                            sql = @"update " + tablename + " set " + fieldname + "='to_date(" + jp.Value.ToString() + "','yyyy-MM-dd HH24:mi:ss') where ordercode='" + ordercode + "'";
-                                        }
-                                        else
-                                        {
-                                            sql = @"update " + tablename + " set " + fieldname + "='" + jp.Value.ToString() + "' where ordercode='" + ordercode + "'";
-                                        }
-                                        
-                                    }
-                                    sqllist.Add(sql);
-                                    all_tablename = all_tablename + tablename.ToUpper() + ";";
-                                }
-                            }
-                        }
-                        //--------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-                        OracleConnection conn = null;
-                        OracleTransaction ot = null;
-                        conn = DBMgr.getOrclCon();
-                        try
-                        {
-                            conn.Open();
-                            ot = conn.BeginTransaction();
-                            for (int i = 0; i < sqllist.Count; i++)
-                            {
-                                DBMgr.ExecuteNonQuery(sqllist[i], conn);
-                            }
-                            ot.Commit();
-                            resultmsg = "{success:true,ordercode:'" + ordercode + "'}";
-                        }
-                        catch (Exception ex)
-                        {
-                            ot.Rollback();
-                        }
-                        finally
-                        {
-                            conn.Close();
-                        }
+                        resultmsg = "{success:true,ordercode:'" + ordercode + "'}";
                     }
                 }
-                
+
             }
             catch (Exception ex)
             {
 
             }
             return resultmsg;
+        }
+
+        public string ExportOrderM()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string sql = QueryCondition();
+            sql += " order by a.createtime desc";
+            string common_data_busi = Request["common_data_busi"];
+
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+            DataTable dt_count = DBMgr.GetDataTable("select count(1) from (" + sql + ") a");
+            int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
+            if (Convert.ToInt32(dt_count.Rows[0][0]) > WebDownCount)
+            {
+                return "{success:false,WebDownCount:" + WebDownCount + "}";
+            }
+
+            DataTable dt = DBMgr.GetDataTable(sql);
+
+            //创建Excel文件的对象
+            NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();
+
+            //添加一个导出成功sheet
+            NPOI.SS.UserModel.ISheet sheet_S;
+            string filename = "关务服务2.xls";
+
+            sheet_S = book.CreateSheet("关务服务2"); 
+
+            NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
+            row1.CreateCell(0).SetCellValue("业务完成"); row1.CreateCell(1).SetCellValue("创建时间"); row1.CreateCell(2).SetCellValue("业务细项"); row1.CreateCell(3).SetCellValue("委托单位"); row1.CreateCell(4).SetCellValue("结算单位");
+            row1.CreateCell(5).SetCellValue("经营单位"); row1.CreateCell(6).SetCellValue("业务类型"); row1.CreateCell(7).SetCellValue("企业编号"); row1.CreateCell(8).SetCellValue("订单编号");
+            row1.CreateCell(9).SetCellValue("操作需求"); row1.CreateCell(10).SetCellValue("结算备注"); row1.CreateCell(11).SetCellValue("文本1"); row1.CreateCell(12).SetCellValue("文本2");
+            row1.CreateCell(13).SetCellValue("数字1"); row1.CreateCell(14).SetCellValue("数字2"); row1.CreateCell(15).SetCellValue("日期1"); row1.CreateCell(16).SetCellValue("人员1");
+            row1.CreateCell(17).SetCellValue("日期2"); row1.CreateCell(18).SetCellValue("人员2"); 
+
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
+                rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["CREATETIME"].ToString());
+                rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["ENTRUSTTYPENAME"].ToString());
+                rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CUSTOMERNAME"].ToString());
+                rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["CLEARUNITNAME"].ToString());
+
+                rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
+                rowtemp.CreateCell(6).SetCellValue(getName(dt.Rows[i]["BUSITYPE"].ToString(), common_data_busi));
+                rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
+                rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["CODE"].ToString());
+
+                rowtemp.CreateCell(9).SetCellValue(dt.Rows[i]["DOREQUEST"].ToString());
+                rowtemp.CreateCell(10).SetCellValue(dt.Rows[i]["CLEARREMARK"].ToString());
+                rowtemp.CreateCell(11).SetCellValue(dt.Rows[i]["TEXTONE"].ToString());
+                rowtemp.CreateCell(12).SetCellValue(dt.Rows[i]["TEXTTWO"].ToString());
+
+                rowtemp.CreateCell(13).SetCellValue(dt.Rows[i]["NUMONE"].ToString());
+                rowtemp.CreateCell(14).SetCellValue(dt.Rows[i]["NUMTWO"].ToString());
+                rowtemp.CreateCell(15).SetCellValue(dt.Rows[i]["DATEONE"].ToString());
+                rowtemp.CreateCell(16).SetCellValue(dt.Rows[i]["USERNAMEONE"].ToString());
+
+                rowtemp.CreateCell(17).SetCellValue(dt.Rows[i]["DATETWO"].ToString());
+                rowtemp.CreateCell(18).SetCellValue(dt.Rows[i]["USERNAMETWO"].ToString());
+            }
+
+
+            // 写入到客户端 
+            //System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            //book.Write(ms);
+            //ms.Seek(0, SeekOrigin.Begin);
+            //return File(ms, "application/vnd.ms-excel", filename);
+
+            return Extension.getPathname(filename, book);
+        }
+
+        public string getName(string curstatus, string dec_insp_status)
+        {
+            string statusname = "";
+            JArray jarray = JArray.Parse(dec_insp_status);
+            foreach (JObject json in jarray)
+            {
+                if (json.Value<string>("CODE") == curstatus) { statusname = json.Value<string>("NAME"); break; }
+            }
+            return statusname;
         }
 
     }

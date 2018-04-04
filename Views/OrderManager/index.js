@@ -60,7 +60,6 @@ function initSearch_OrderM() {
         valueField: 'CODE',
         triggerAction: 'all',
         queryMode: 'local',
-        minChars: 1,
         hideTrigger: true,
         anyMatch: true,
         queryMode: 'local',
@@ -80,8 +79,11 @@ function initSearch_OrderM() {
                     success: function (response, opts) {
                         var commondata = Ext.decode(response.responseText);//业务细项
                         store_ENTRUSTTYPE.loadData(commondata.ywxx);
+
+                        change_ini_label();
                     }
                 });
+                
             }
         }
     });
@@ -165,7 +167,6 @@ function initSearch_OrderM() {
         valueField: 'CODE',
         triggerAction: 'all',
         queryMode: 'local',
-        minChars: 1,
         hideTrigger: true,
         anyMatch: true,
         queryMode: 'local',
@@ -176,6 +177,9 @@ function initSearch_OrderM() {
                     cb.store.clearFilter();
                     cb.expand()
                 };
+            },
+            change: function (combo, newValue, oldValue, eOpts) {
+                change_ini_label();
             }
         }
     });
@@ -271,17 +275,21 @@ function bindgrid() {
                 { header: '企业编号', dataIndex: 'CUSNO', width: 100 },
                 { header: '订单编号', dataIndex: 'CODE', width: 100 },
                 { header: '操作需求', dataIndex: 'DOREQUEST', width: 130 },
-                { header: '结算备注', dataIndex: 'CLEARREMARK', width: 130 }
+                { header: '结算备注', dataIndex: 'CLEARREMARK', width: 130 },
+                { header: '文本1', dataIndex: 'TEXTONE', width: 100 },
+                { header: '文本2', dataIndex: 'TEXTTWO', width: 100 },
+                { header: '数字1', dataIndex: 'NUMONE', width: 100 },
+                { header: '数字2', dataIndex: 'NUMTWO', width: 100 },
+                { header: '日期1', dataIndex: 'DATEONE', width: 100 },
+                { header: '人员1', dataIndex: 'USERNAMEONE', width: 100 },
+                { header: '日期2', dataIndex: 'DATETWO', width: 100 },
+                { header: '人员2', dataIndex: 'USERNAMETWO', width: 100 }
     ];
 
-    //Ext.regModel('TRADE', {
-    //    fields: ['ID', 'BUSITYPE', 'CREATETIME', 'SUBMITTIME', 'ENTRUSTTYPE', 'CUSTOMERCODE', 'CUSTOMERNAME', 'CLEARUNIT', 'CLEARUNITNAME'
-    //            , 'BUSIUNITCODE', 'BUSIUNITNAME', 'CODE', 'CUSNO', 'DOREQUEST', 'CLEARREMARK', 'ENTRUSTTYPENAME']
-    //});
     var store_Trade = Ext.create('Ext.data.JsonStore', {
-        //model: 'TRADE',
         fields: ['ID', 'BUSITYPE', 'CREATETIME', 'SUBMITTIME', 'ENTRUSTTYPE', 'CUSTOMERCODE', 'CUSTOMERNAME', 'CLEARUNIT', 'CLEARUNITNAME'
-                , 'BUSIUNITCODE', 'BUSIUNITNAME', 'CODE', 'CUSNO', 'DOREQUEST', 'CLEARREMARK', 'ENTRUSTTYPENAME'],
+                , 'BUSIUNITCODE', 'BUSIUNITNAME', 'CODE', 'CUSNO', 'DOREQUEST', 'CLEARREMARK', 'ENTRUSTTYPENAME'
+                , 'TEXTONE', 'TEXTTWO', 'NUMONE', 'NUMTWO', 'DATEONE', 'DATETWO', 'USERNAMEONE', 'USERNAMETWO'],
         pageSize: 20,
         proxy: {
             type: 'ajax',
@@ -302,6 +310,21 @@ function bindgrid() {
                     CUSTOMERCODE: Ext.getCmp('combo_wtdw').getValue(), CODE: Ext.getCmp('field_CODE').getValue(), entrusttype: Ext.getCmp('combo_ENTRUSTTYPE').getValue(),
                     start_date2: Ext.Date.format(Ext.getCmp("start_date2").getValue(), 'Y-m-d H:i:s'), end_date2: Ext.Date.format(Ext.getCmp("end_date2").getValue(), 'Y-m-d H:i:s')
                 }
+                var TEXTONE = ""; var TEXTTWO = "";var NUMONE = ""; var NUMTWO = "";                
+                var DATEONE = ""; var DATETWO = ""; var USERNAMEONE = ""; var USERNAMETWO = "";
+
+                if (Ext.getCmp('win_seniorOrderM')) {
+                    TEXTONE = Ext.getCmp('field_TEXTONE').getValue(); TEXTTWO = Ext.getCmp('field_TEXTTWO').getValue();
+                    NUMONE = Ext.getCmp('field_NUMONE').getValue(); NUMTWO = Ext.getCmp('field_NUMTWO').getValue();
+                    DATEONE = Ext.Date.format(Ext.getCmp('field_DATEONE').getValue(), 'Y-m-d H:i:s'); DATETWO = Ext.Date.format(Ext.getCmp('field_DATETWO').getValue(), 'Y-m-d H:i:s');
+                    USERNAMEONE = Ext.getCmp('field_USERNAMEONE').getValue(); USERNAMETWO = Ext.getCmp('field_USERNAMETWO').getValue();
+                }
+                var new_params = {
+                    TEXTONE: TEXTONE, TEXTTWO: TEXTTWO,NUMONE: NUMONE, NUMTWO: NUMTWO,                    
+                    DATEONE: DATEONE, DATETWO: DATETWO,USERNAMEONE: USERNAMEONE, USERNAMETWO: USERNAMETWO                    
+                }
+                Ext.apply(store_Trade.proxy.extraParams, new_params);
+
             }
         }
     });
@@ -377,6 +400,293 @@ function Reset() {
     Ext.getCmp("end_date2").setValue("");
 }
 
-function DeleteOrderM() {
+function seniorOrderM(pgbar) {
+    if (Ext.getCmp('win_seniorOrderM')) {
+        Ext.getCmp('win_seniorOrderM').expand();
+        return;
+    }
 
+    var field_TEXTONE = Ext.create('Ext.form.field.Text', {
+        id: 'field_TEXTONE',
+        name: 'TEXTONE',//tabIndex: 5,        
+        fieldLabel: '文本1'
+    });
+    var field_TEXTTWO = Ext.create('Ext.form.field.Text', {
+        id: 'field_TEXTTWO',
+        name: 'TEXTTWO',//tabIndex: 5,        
+        fieldLabel: '文本2'
+    });
+
+    var field_NUMONE = Ext.create('Ext.form.field.Number', {
+        id: 'field_NUMONE',
+        name: 'NUMONE', hideTrigger: true,//tabIndex: 5,        
+        fieldLabel: '数字1'
+    });
+    var field_NUMTWO = Ext.create('Ext.form.field.Number', {
+        id: 'field_NUMTWO',
+        name: 'NUMTWO', hideTrigger: true,//tabIndex: 5,        
+        fieldLabel: '数字2'
+    });
+
+    //日期1
+    var field_DATEONE = Ext.create('Ext.form.field.Date', {
+        id: 'field_DATEONE',
+        name: 'DATEONE', format: 'Y-m-d',
+        fieldLabel: '日期1',
+        listeners: {
+            change: function (me, newValue, oldValue, eOpts) {
+                if (newValue != "") {
+                    field_USERNAMEONE.setValue(curuserRealname);
+                    field_USERIDONE.setValue(curuserId);
+                } else {
+                    field_USERNAMEONE.setValue("");
+                    field_USERIDONE.setValue("");
+                }
+            }
+        }
+    });
+    //人员1
+    var field_USERNAMEONE = Ext.create('Ext.form.field.Text', {
+        id: 'field_USERNAMEONE',
+        name: 'USERNAMEONE',
+        fieldLabel: '人员1'
+    });
+    var field_USERIDONE = Ext.create('Ext.form.field.Hidden', { name: 'USERIDONE' });
+
+    //日期2
+    var field_DATETWO = Ext.create('Ext.form.field.Date', {
+        id: 'field_DATETWO',
+        name: 'DATETWO', format: 'Y-m-d',
+        fieldLabel: '日期2',
+        listeners: {
+            change: function (me, newValue, oldValue, eOpts) {
+                if (newValue != "") {
+                    field_USERNAMETWO.setValue(curuserRealname);
+                    field_USERIDTWO.setValue(curuserId);
+                } else {
+                    field_USERNAMETWO.setValue("");
+                    field_USERIDTWO.setValue("");
+                }
+            }
+        }
+    });
+    //人员2
+    var field_USERNAMETWO = Ext.create('Ext.form.field.Text', {
+        id: 'field_USERNAMETWO',
+        name: 'USERNAMETWO',
+        fieldLabel: '人员2'
+    });
+    var field_USERIDTWO = Ext.create('Ext.form.field.Hidden', { name: 'USERIDTWO' });
+
+
+    var f_formpanel = Ext.create('Ext.form.Panel', {
+        id: "f_formpanel",
+        minHeight: 140,
+        border: 0,
+        fieldDefaults: {
+            margin: '0 5 10 0',
+            labelWidth: 80,
+            columnWidth: .25,
+            labelAlign: 'right',
+            labelSeparator: '',
+            msgTarget: 'under',
+            validateOnBlur: false,
+            validateOnChange: false
+        },
+        items: [
+            { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_TEXTONE, field_NUMONE, field_DATEONE, field_USERNAMEONE] },
+            { layout: 'column', height: 42, border: 0, items: [field_TEXTTWO, field_NUMTWO, field_DATETWO, field_USERNAMETWO] },
+            field_USERIDONE, field_USERIDTWO
+        ]
+    });
+
+    var win_seniorOrderM = Ext.create("Ext.window.Window", {
+        id: 'win_seniorOrderM',
+        title: "高级查询",
+        width: 1000,
+        height: 150,
+        collapsible: true,
+        //modal: true,
+        items: [f_formpanel],
+        buttonAlign: 'center',
+        buttons: [{
+            text: '<i class="fa fa-search"></i>&nbsp;查 询', handler: function () {               
+                Ext.getCmp("pgbar").moveFirst();
+                win_seniorOrderM.collapse();
+            }
+        }]
+    });
+    win_seniorOrderM.show();
+    change_ini_label();
+}
+
+function change_ini_label() {
+    Ext.getCmp("field_TEXTONE").setFieldLabel("文本1"); Ext.getCmp("field_TEXTTWO").setFieldLabel("文本2");
+    Ext.getCmp("field_NUMONE").setFieldLabel("数字1"); Ext.getCmp("field_NUMTWO").setFieldLabel("数字2");
+    Ext.getCmp("field_DATEONE").setFieldLabel("日期1"); Ext.getCmp("field_DATETWO").setFieldLabel("日期2");
+    Ext.getCmp("field_USERNAMEONE").setFieldLabel("人员1"); Ext.getCmp("field_USERNAMETWO").setFieldLabel("人员2");
+
+    var f_busitype = Ext.getCmp("combo_BUSITYPE").getValue();
+    var f_entrusttype = Ext.getCmp("combo_ENTRUSTTYPE").getValue();
+
+    Ext.Ajax.request({
+        url: "/OrderManager/Getlabelname",
+        params: { busitype: f_busitype, entrusttype: f_entrusttype },
+        success: function (response, opts) {
+            var json = Ext.decode(response.responseText);
+            var jsonobj = json.fieldcolumn;
+
+            for (var i = 0; i < jsonobj.length; i++) {
+                switch (jsonobj[i].ORIGINNAME) {
+                    case "文本1":
+                        Ext.getCmp("field_TEXTONE").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        break;
+                    case "文本2":
+                        Ext.getCmp("field_TEXTTWO").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        break;
+                    case "数字1":
+                        Ext.getCmp("field_NUMONE").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        break;
+                    case "数字2":
+                        Ext.getCmp("field_NUMTWO").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        break;
+                    case "日期1":
+                        Ext.getCmp("field_DATEONE").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        break;
+                    case "日期2":
+                        Ext.getCmp("field_DATETWO").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        break;
+                    case "人员1":
+                        Ext.getCmp("field_USERNAMEONE").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        break;
+                    case "人员2":
+                        Ext.getCmp("field_USERNAMETWO").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+        }
+    });
+}
+
+function CompleteOrderM() {
+    var recs = Ext.getCmp("gridpanel").getSelectionModel().getSelection();
+    if (recs.length == 0) {
+        Ext.MessageBox.alert('提示', '请选择需要操作的记录！');
+        return;
+    }
+
+    if (recs[0].get("SUBMITTIME") != "" && recs[0].get("SUBMITTIME") != null) {
+        Ext.MessageBox.alert('提示', '订单业务已完成,不能再次完成！');
+        return;
+    }
+
+    Ext.MessageBox.confirm("提示", "确定要业务完成吗？", function (btn) {
+        if (btn == 'yes') {
+            Ext.Ajax.request({
+                url: '/OrderManager/CompleteOrderM',
+                params: { ordercode: recs[0].get("CODE") },
+                success: function (response, success, option) {
+                    var res = Ext.decode(response.responseText);
+                    if (res.success) {
+                        Ext.MessageBox.alert('提示', '业务完成成功！', function () {
+                            Ext.getCmp("pgbar").moveFirst();
+                        });
+                    }
+                    else {
+                        if (res.flag == "E") { Ext.MessageBox.alert('提示', '订单业务已完成,不能再次完成！'); }
+                        else {
+                            Ext.MessageBox.alert('提示', '业务完成失败！');
+                        }
+                    }
+                }
+            });
+        }
+    });
+}
+
+function DeleteOrderM() {
+    var recs = Ext.getCmp("gridpanel").getSelectionModel().getSelection();
+    if (recs.length == 0) {
+        Ext.MessageBox.alert('提示', '请选择需要删除的记录！');
+        return;
+    }
+
+    if (recs[0].get("SUBMITTIME") != "" && recs[0].get("SUBMITTIME") != null) {
+        Ext.MessageBox.alert('提示', '订单业务已完成,不能删除！');
+        return;
+    }
+
+    Ext.MessageBox.confirm("提示", "确定要删除所选择的记录吗？", function (btn) {
+        if (btn == 'yes') {
+            Ext.Ajax.request({
+                url: '/OrderManager/DeleteOrderM',
+                params: { ordercode: recs[0].get("CODE") },
+                success: function (response, success, option) {
+                    var res = Ext.decode(response.responseText);
+                    if (res.success) {
+                        Ext.MessageBox.alert('提示', '删除成功！', function () {
+                            Ext.getCmp("pgbar").moveFirst();
+                        });
+                    }
+                    else {
+                        if (res.flag == "E") { Ext.MessageBox.alert('提示', '订单业务已完成,不能删除！'); }
+                        else {
+                            Ext.MessageBox.alert('提示', '删除失败！');
+                        }
+                    }
+                }
+            });
+        }
+    });
+}
+
+function ExportOrderM() {
+    var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "数据导出中，请稍等..." });
+    myMask.show();
+
+    var TEXTONE = ""; var TEXTTWO = ""; var NUMONE = ""; var NUMTWO = "";
+    var DATEONE = ""; var DATETWO = ""; var USERNAMEONE = ""; var USERNAMETWO = "";
+
+    if (Ext.getCmp('win_seniorOrderM')) {
+        TEXTONE = Ext.getCmp('field_TEXTONE').getValue(); TEXTTWO = Ext.getCmp('field_TEXTTWO').getValue();
+        NUMONE = Ext.getCmp('field_NUMONE').getValue(); NUMTWO = Ext.getCmp('field_NUMTWO').getValue();
+        DATEONE = Ext.Date.format(Ext.getCmp('field_DATEONE').getValue(), 'Y-m-d H:i:s'); DATETWO = Ext.Date.format(Ext.getCmp('field_DATETWO').getValue(), 'Y-m-d H:i:s');
+        USERNAMEONE = Ext.getCmp('field_USERNAMEONE').getValue(); USERNAMETWO = Ext.getCmp('field_USERNAMETWO').getValue();
+    }
+
+    var data = {
+        common_data_busi: JSON.stringify(common_data_busi),
+        OnlySelf: Ext.get('OnlySelfi').el.dom.className,
+        BUSIUNITCODE: Ext.getCmp('s_combo_busiunitname').getValue(), CUSNO: Ext.getCmp('field_CUSNO').getValue(), busitypeid: Ext.getCmp('combo_BUSITYPE').getValue(),
+        start_date: Ext.Date.format(Ext.getCmp("start_date").getValue(), 'Y-m-d H:i:s'), end_date: Ext.Date.format(Ext.getCmp("end_date").getValue(), 'Y-m-d H:i:s'),
+        CUSTOMERCODE: Ext.getCmp('combo_wtdw').getValue(), CODE: Ext.getCmp('field_CODE').getValue(), entrusttype: Ext.getCmp('combo_ENTRUSTTYPE').getValue(),
+        start_date2: Ext.Date.format(Ext.getCmp("start_date2").getValue(), 'Y-m-d H:i:s'), end_date2: Ext.Date.format(Ext.getCmp("end_date2").getValue(), 'Y-m-d H:i:s'),
+        TEXTONE: TEXTONE, TEXTTWO: TEXTTWO, NUMONE: NUMONE, NUMTWO: NUMTWO,
+        DATEONE: DATEONE, DATETWO: DATETWO, USERNAMEONE: USERNAMEONE, USERNAMETWO: USERNAMETWO
+    }
+
+    Ext.Ajax.request({
+        url: '/OrderManager/ExportOrderM',
+        method: 'POST',
+        params: data,
+        success: function (response, option) {
+            var json = Ext.decode(response.responseText);
+            if (json.success == false) {
+                Ext.MessageBox.alert('提示', '综合需求及性能，导出记录限制' + json.WebDownCount + '！');
+            } else {
+                Ext.Ajax.request({
+                    url: '/Common/DownloadFile',
+                    method: 'POST',
+                    params: Ext.decode(response.responseText),
+                    form: 'exportform',
+                    success: function (response, option) {
+                    }
+                });
+            }
+            myMask.hide();
+        }
+    });
 }

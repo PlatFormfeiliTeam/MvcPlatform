@@ -65,7 +65,7 @@
                         } else {
                             combo_ENTRUSTTYPE.setValue(entrusttype);//编辑页赋值
                         }
-                        form_ini_con();
+                        change_ini_label();
                     }
                 });
             }
@@ -100,7 +100,7 @@
                 };
             },
             change: function (combo, newValue, oldValue, eOpts) {
-                form_ini_con();
+                change_ini_label();
             }
         },
         allowBlank: false,
@@ -284,7 +284,85 @@
         items: [field_CLEARREMARK]
     }
 
-    var field_ORIGINALCOSTIDS = Ext.create('Ext.form.field.Hidden', { id: 'field_ORIGINALCOSTIDS', name: 'ORIGINALCOSTIDS' });
+    var label_goinfo = {
+        xtype: 'label',
+        margin: '5',
+        html: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;可配信息</span></h4>'
+    }
+
+    var field_TEXTONE = Ext.create('Ext.form.field.Text', {
+        id: 'field_TEXTONE',
+        name: 'TEXTONE',//tabIndex: 5,        
+        fieldLabel: '文本1'
+    });
+    var field_TEXTTWO = Ext.create('Ext.form.field.Text', {
+        id: 'field_TEXTTWO',
+        name: 'TEXTTWO',//tabIndex: 5,        
+        fieldLabel: '文本2'
+    });
+
+    var field_NUMONE = Ext.create('Ext.form.field.Number', {
+        id: 'field_NUMONE',
+        name: 'NUMONE', hideTrigger: true,//tabIndex: 5,        
+        fieldLabel: '数字1'
+    });
+    var field_NUMTWO = Ext.create('Ext.form.field.Number', {
+        id: 'field_NUMTWO',
+        name: 'NUMTWO', hideTrigger: true,//tabIndex: 5,        
+        fieldLabel: '数字2'
+    });
+
+    //日期1
+    var field_DATEONE = Ext.create('Ext.form.field.Date', {
+        id: 'field_DATEONE',
+        name: 'DATEONE', format: 'Y-m-d',
+        fieldLabel: '日期1',
+        listeners: {
+            change: function (me, newValue, oldValue, eOpts) {
+                if (newValue != "") {
+                    field_USERNAMEONE.setValue(curuserRealname);
+                    field_USERIDONE.setValue(curuserId);
+                } else {
+                    field_USERNAMEONE.setValue("");
+                    field_USERIDONE.setValue("");
+                }
+            }
+        }
+    });
+    //人员1
+    var field_USERNAMEONE = Ext.create('Ext.form.field.Text', {
+        id: 'field_USERNAMEONE',
+        name: 'USERNAMEONE',
+        fieldLabel: '人员1',
+        readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;'
+    });
+    var field_USERIDONE = Ext.create('Ext.form.field.Hidden', { name: 'USERIDONE' });
+
+    //日期2
+    var field_DATETWO = Ext.create('Ext.form.field.Date', {
+        id: 'field_DATETWO',
+        name: 'DATETWO', format: 'Y-m-d',
+        fieldLabel: '日期2',
+        listeners: {
+            change: function (me, newValue, oldValue, eOpts) {
+                if (newValue != "") {
+                    field_USERNAMETWO.setValue(curuserRealname);
+                    field_USERIDTWO.setValue(curuserId);
+                } else {
+                    field_USERNAMETWO.setValue("");
+                    field_USERIDTWO.setValue("");
+                }
+            }
+        }
+    });
+    //人员2
+    var field_USERNAMETWO = Ext.create('Ext.form.field.Text', {
+        id: 'field_USERNAMETWO',
+        name: 'USERNAMETWO',
+        fieldLabel: '人员2',
+        readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;'
+    });
+    var field_USERIDTWO = Ext.create('Ext.form.field.Hidden', { name: 'USERIDTWO' });
 
 
     formpanel = Ext.create('Ext.form.Panel', {
@@ -309,123 +387,61 @@
             { layout: 'column', height: 42, border: 0, items: [field_CREATEUSERNAME, field_CREATETIME, field_SUBMITUSERNAME, field_SUBMITTIME] },
             { layout: 'column', height: 42, border: 0, items: [container_DOREQUEST] },
             { layout: 'column', height: 42, border: 0, items: [container_CLEARREMARK] },
-            field_BUSIUNITNAME, field_CUSTOMERNAME, field_CLEARUNITNAME, field_ORIGINALCOSTIDS
+            { layout: 'column', height: 42, margin: '0 0 15 0', border: 0, items: [label_goinfo] },
+            { layout: 'column', height: 42, border: 0, items: [field_TEXTONE, field_NUMONE, field_DATEONE, field_USERNAMEONE] },
+            { layout: 'column', height: 42, border: 0, items: [field_TEXTTWO, field_NUMTWO, field_DATETWO, field_USERNAMETWO] },            
+            field_BUSIUNITNAME, field_CUSTOMERNAME, field_CLEARUNITNAME, field_USERIDONE, field_USERIDTWO
         ]
     });
 }
 
-function form_ini_con() {
-
-    if (Ext.getCmp("formpanel_con")) {
-        Ext.getCmp("formpanel_con").destroy();
-    }
+function change_ini_label() {
+    Ext.getCmp("field_TEXTONE").setFieldLabel("文本1"); Ext.getCmp("field_TEXTTWO").setFieldLabel("文本2");
+    Ext.getCmp("field_NUMONE").setFieldLabel("数字1"); Ext.getCmp("field_NUMTWO").setFieldLabel("数字2");
+    Ext.getCmp("field_DATEONE").setFieldLabel("日期1"); Ext.getCmp("field_DATETWO").setFieldLabel("日期2");
+    Ext.getCmp("field_USERNAMEONE").setFieldLabel("人员1"); Ext.getCmp("field_USERNAMETWO").setFieldLabel("人员2");
 
     var f_busitype = Ext.getCmp("combo_BUSITYPE").getValue();
     var f_entrusttype = Ext.getCmp("combo_ENTRUSTTYPE").getValue();
 
-    var configItem = new Array();
-
     Ext.Ajax.request({
-        url: "/OrderManager/Getele",
-        params: { pagename: pagename, configtype: configtype, busitype: f_busitype, entrusttype: f_entrusttype, ordercode: ordercode },
+        url: "/OrderManager/Getlabelname",
+        params: { busitype: f_busitype, entrusttype: f_entrusttype },
         success: function (response, opts) {
             var json = Ext.decode(response.responseText);
+            var jsonobj = json.fieldcolumn;
 
-            if (Ext.getCmp("formpanel_con")) {
-                Ext.getCmp("formpanel_con").destroy();
-            }
-
-            if (json.fieldcolumn.length > 0) {
-
-                var items_i = [];
-                for (var i = 0; i < json.fieldcolumn.length; i++) {
-
-                    switch (json.fieldcolumn[i].CONTROLTYPE) {
-                        case "文本":
-                            items_i.push(Ext.create('Ext.form.field.Text', { id: json.fieldcolumn[i].TABLECODE + '|' + json.fieldcolumn[i].FIELDCODE + '|' + 'text', name: json.fieldcolumn[i].TABLECODE + '|' + json.fieldcolumn[i].FIELDCODE + '|' + 'text', fieldLabel: json.fieldcolumn[i].NAME }));
-                            break;
-                        case "数字":
-                            items_i.push(Ext.create('Ext.form.field.Number', { id: json.fieldcolumn[i].TABLECODE + '|' + json.fieldcolumn[i].FIELDCODE + '|' + 'number', name: json.fieldcolumn[i].TABLECODE + '|' + json.fieldcolumn[i].FIELDCODE + '|' + 'number', fieldLabel: json.fieldcolumn[i].NAME, hideTrigger: true }));
-                            break;
-                        case "日期":
-                            items_i.push(Ext.create('Ext.form.field.Date', { id: json.fieldcolumn[i].TABLECODE + '|' + json.fieldcolumn[i].FIELDCODE + '|' + 'date', name: json.fieldcolumn[i].TABLECODE + '|' + json.fieldcolumn[i].FIELDCODE + '|' + 'date', fieldLabel: json.fieldcolumn[i].NAME, format: 'Y-m-d' }));
-                            break;
-                        case "下拉框":
-                            if (json.fieldcolumn[i].SELECTCONTENT == null) {
-                                items_i.push(Ext.create('Ext.form.field.Text', { id: json.fieldcolumn[i].TABLECODE + '|' + json.fieldcolumn[i].FIELDCODE + '|' + 'combox', name: json.fieldcolumn[i].TABLECODE + '|' + json.fieldcolumn[i].FIELDCODE + '|' + 'combox', fieldLabel: json.fieldcolumn[i].NAME }));
-
-                            } else if (json.fieldcolumn[i].SELECTCONTENT.length <= 0) {
-                                items_i.push(Ext.create('Ext.form.field.Text', { id: json.fieldcolumn[i].TABLECODE + '|' + json.fieldcolumn[i].FIELDCODE + '|' + 'combox', name: json.fieldcolumn[i].TABLECODE + '|' + json.fieldcolumn[i].FIELDCODE + '|' + 'combox', fieldLabel: json.fieldcolumn[i].NAME }));
-
-                            } else {
-                                var store_ss = Ext.create('Ext.data.JsonStore', { fields: ['NAME'] });
-                                var arraylen = json.fieldcolumn[i].SELECTCONTENT.split(";");
-                                for (var ai = 0; ai < arraylen.length ; ai++) {
-                                    if (arraylen[ai]) {
-                                        store_ss.insert(store_ss.data.length, { 'NAME': arraylen[ai] });
-                                    }
-                                }
-
-                                items_i.push(Ext.create('Ext.form.field.ComboBox', {
-                                    id: json.fieldcolumn[i].TABLECODE + '|' + json.fieldcolumn[i].FIELDCODE + '|' + 'combox', name: json.fieldcolumn[i].TABLECODE + '|' + json.fieldcolumn[i].FIELDCODE + '|' + 'combox', fieldLabel: json.fieldcolumn[i].NAME,
-                                    store: store_ss,
-                                    displayField: 'NAME', valueField: 'NAME', triggerAction: 'all', queryMode: 'local', hideTrigger: true, anyMatch: true,
-                                    listeners: {
-                                        focus: function (cb) {
-                                            if (!cb.getValue()) {
-                                                cb.clearInvalid();
-                                                cb.store.clearFilter();
-                                                cb.expand()
-                                            };
-                                        }
-                                    }
-                                }));
-                            }
-                            break;
-                        default:
-                            items_i.push(Ext.create('Ext.form.field.Text', { id: json.fieldcolumn[i].TABLECODE + '|' + json.fieldcolumn[i].FIELDCODE + '|' + 'text', name: json.fieldcolumn[i].TABLECODE + '|' + json.fieldcolumn[i].FIELDCODE + '|' + 'text', fieldLabel: json.fieldcolumn[i].NAME }));
-                            break;
-
-                    }
-                    if (i == json.fieldcolumn.length - 1 || i % 4 == 3) {
-                        configItem.push({ layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: items_i });
-                        items_i = [];
-                    }
+            for (var i = 0; i < jsonobj.length; i++) {
+                switch (jsonobj[i].ORIGINNAME) {
+                    case "文本1":
+                        Ext.getCmp("field_TEXTONE").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        break;
+                    case "文本2":
+                        Ext.getCmp("field_TEXTTWO").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        break;
+                    case "数字1":
+                        Ext.getCmp("field_NUMONE").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        break;
+                    case "数字2":
+                        Ext.getCmp("field_NUMTWO").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        break;
+                    case "日期1":
+                        Ext.getCmp("field_DATEONE").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        break;
+                    case "日期2":
+                        Ext.getCmp("field_DATETWO").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        break;
+                    case "人员1":
+                        Ext.getCmp("field_USERNAMEONE").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        break;
+                    case "人员2":
+                        Ext.getCmp("field_USERNAMETWO").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        break;
+                    default:
+                        break;
                 }
-
-                if (configItem.length <= 0) { return; }
-
-                var label_baseinfo = {
-                    xtype: 'label',
-                    margin: '5',
-                    html: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;可配信息</span></h4>'
-                }
-                var tbar = Ext.create('Ext.toolbar.Toolbar', {
-                    items: [label_baseinfo, '->']
-                });
-
-                var formpanel_con = Ext.create('Ext.form.Panel', {
-                    id: 'formpanel_con',
-                    renderTo: 'div_form_con',
-                    minHeight: 100,
-                    border: 0,
-                    tbar: tbar,
-                    fieldDefaults: {
-                        margin: '0 5 10 0',
-                        labelWidth: 80,
-                        columnWidth: .25,
-                        labelAlign: 'right',
-                        labelSeparator: '',
-                        msgTarget: 'under',
-                        validateOnBlur: false,
-                        validateOnChange: false
-                    },
-                    items: configItem
-                });
-
-                Ext.getCmp("formpanel_con").getForm().setValues(json.fieldcolumn_con);
             }
-
+            
         }
     });
 }
@@ -450,25 +466,15 @@ function Save_OrderM() {
     if (!Ext.getCmp('formpanel_id').getForm().isValid()) {
         return;
     }
-    if (Ext.getCmp("formpanel_con")) {
-        if (!Ext.getCmp('formpanel_con').getForm().isValid()) {
-            return;
-        }
-    }
 
-    var formdata = Ext.getCmp('formpanel_id').getForm().getValues();
-
-    var formdata_con = "{}";
-    if (Ext.getCmp("formpanel_con")) {
-        formdata_con = Ext.encode(Ext.getCmp('formpanel_con').getForm().getValues());
-    }
-
+    var formdata = Ext.encode(Ext.getCmp('formpanel_id').getForm().getValues());
+    
     var mask = new Ext.LoadMask(Ext.get(Ext.getBody()), { msg: "数据保存中，请稍等..." });
 
     mask.show();
     Ext.Ajax.request({
         url: "/OrderManager/Save_OrderM",
-        params: { ordercode: ordercode, formdata_str: Ext.encode(formdata), formdata_con: formdata_con },
+        params: { ordercode: ordercode, formdata: formdata },
         success: function (response, option) {
             if (response.responseText) {
                 mask.hide();
@@ -495,7 +501,14 @@ function loadform_OrderM() {
             var data = Ext.decode(response.responseText);
 
             Ext.getCmp("formpanel_id").getForm().setValues(data.formdata);
-            //formpanelcontrol();//表单字段控制
+
+            if (data.formdata.SUBMITTIME != "" && data.formdata.SUBMITTIME != null) {
+                document.getElementById("btn_submitorder").disabled = true;
+            } else {
+                document.getElementById("btn_submitorder").disabled = false;
+            }
+
+            curuserRealname = data.curuser.REALNAME; curuserId = data.curuser.ID;
         }
     });
 }
