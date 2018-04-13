@@ -49,8 +49,6 @@ namespace MvcPlatform.Controllers
             return View();
         }
 
-        #region 关务服务2
-
         public string Ini_Base_Data_BUSIITEM()
         {
             string sql = "";
@@ -63,6 +61,8 @@ namespace MvcPlatform.Controllers
 
             return "{ywxx:" + json_ywxx + "}";
         }
+
+        #region 关务服务2
 
         public string LoadList()
         {
@@ -452,7 +452,175 @@ namespace MvcPlatform.Controllers
 
         #region label配置
 
+        public string LoadList_customscost()
+        {
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            string sql = QueryCondition_customscost();
 
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "a.busitypecode", "asc"));
+            var json = JsonConvert.SerializeObject(dt, iso);
+
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
+        public string QueryCondition_customscost()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            string where = "";
+            if (!string.IsNullOrEmpty(Request["busitypeid"]))
+            {
+                where += " and a.busitypecode='" + Request["busitypeid"].Trim() + "'";
+            }
+            if (!string.IsNullOrEmpty(Request["entrusttype"]))//判断查询条件1是否有值
+            {
+                where += " and a.busiitemcode='" + Request["entrusttype"].Trim() + "'";
+            }
+
+            string sql = "select a.* from web_customscost a where 1=1" + where;
+
+            return sql;
+        }
+
+        public string DelCusCost()
+        {
+            string result = "{success:false}";
+            try
+            {
+                string sql = @"delete from web_customscost where id in(" + Request["ids"] + ")";
+                int i = DBMgr.ExecuteNonQuery(sql);
+                if (i > 0)
+                {
+                    result = "{success:true}";
+                }
+            }
+            catch (Exception ex)
+            {
+                result = "{success:false}";
+            }
+
+            return result;
+        }
+
+        public string Save_customscost()
+        {
+            JObject json = (JObject)JsonConvert.DeserializeObject(Request["formdata"]);
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string sql = "";
+
+            string msg = Check_customscost(json);
+            if (msg != "")
+            {
+                return "{success:false,msg:'" + msg + "'}";
+            }
+
+            if (string.IsNullOrEmpty(json.Value<string>("ID")))
+            {
+                sql = @"insert into web_customscost (Id
+                                        ,Busitypecode,Busitypename,Busiitemcode,Busiitemname,Originname,Configname
+                                        ,Createuserid,Createusername
+                                        )
+                        values (web_customscost_id.nextval
+                                    ,'{0}','{1}','{2}','{3}','{4}','{5}'
+                                    ,'{6}','{7}')";
+                sql = string.Format(sql
+                    , json.Value<string>("BUSITYPECODE"), json.Value<string>("BUSITYPENAME"), json.Value<string>("BUSIITEMCODE"), json.Value<string>("BUSIITEMNAME"), json.Value<string>("ORIGINNAME"), json.Value<string>("CONFIGNAME")
+                    , json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
+                    );
+            }
+            else
+            {
+                sql = @"update web_customscost set busitypecode='{1}',busitypename='{2}',busiitemcode='{3}',busiitemname='{4}',Originname='{5}'
+                                    ,Configname='{6}',createuserid='{7}',createusername='{8}' 
+                        where id='{0}'";
+                sql = string.Format(sql, json.Value<string>("ID")
+                   , json.Value<string>("BUSITYPECODE"), json.Value<string>("BUSITYPENAME"), json.Value<string>("BUSIITEMCODE"), json.Value<string>("BUSIITEMNAME"), json.Value<string>("ORIGINNAME")
+                   , json.Value<string>("CONFIGNAME"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
+                   );
+            }
+            int i = DBMgr.ExecuteNonQuery(sql);
+            if (i > 0)
+            {
+                return "{success:true}";
+            }
+            else
+            {
+                return "{success:false}";
+            }
+
+        }
+
+        public string Check_customscost(JObject json)
+        {
+            string msg = "";
+
+            string strWhere = "";
+            if (json.Value<string>("ID") != "")
+            {
+                strWhere = " and t1.id not in ('" + json.Value<string>("ID") + "') ";
+            }
+
+            string sqlStr = "select * from WEB_CUSTOMSCOST t1 where t1.BUSITYPECODE='{0}' and t1.BUSIITEMCODE='{1}' and t1.ORIGINNAME='{2}' " + strWhere;
+            sqlStr = string.Format(sqlStr, json.Value<string>("BUSITYPECODE"), json.Value<string>("BUSIITEMCODE"), json.Value<string>("ORIGINNAME"));
+            DataTable dt = DBMgr.GetDataTable(sqlStr);
+            if (dt.Rows.Count > 0)
+            {
+                msg = "不能重复！";
+            }
+            return msg;
+        }
+
+        public string ExportCusCost()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string sql = QueryCondition_customscost();
+            sql += " order by a.busitypecode asc";
+
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+            DataTable dt_count = DBMgr.GetDataTable("select count(1) from (" + sql + ") a");
+            int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
+            if (Convert.ToInt32(dt_count.Rows[0][0]) > WebDownCount)
+            {
+                return "{success:false,WebDownCount:" + WebDownCount + "}";
+            }
+
+            DataTable dt = DBMgr.GetDataTable(sql);
+
+            //创建Excel文件的对象
+            NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();
+
+            //添加一个导出成功sheet
+            NPOI.SS.UserModel.ISheet sheet_S;
+            string filename = "label配置.xls";
+
+            sheet_S = book.CreateSheet("label配置");
+
+            NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
+            row1.CreateCell(0).SetCellValue("业务类型编号"); row1.CreateCell(1).SetCellValue("业务类型名称"); row1.CreateCell(2).SetCellValue("业务细项编号"); row1.CreateCell(3).SetCellValue("业务细项名称");
+            row1.CreateCell(4).SetCellValue("文本名称"); row1.CreateCell(5).SetCellValue("配置名称"); row1.CreateCell(6).SetCellValue("创建人"); 
+
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["BUSITYPECODE"].ToString());
+                rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["BUSITYPENAME"].ToString());
+                rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["BUSIITEMCODE"].ToString());
+                rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["BUSIITEMNAME"].ToString());
+                rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["ORIGINNAME"].ToString());
+                rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["CONFIGNAME"].ToString());
+                rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["CREATEUSERNAME"].ToString());
+            }
+            // 写入到客户端 
+            //System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            //book.Write(ms);
+            //ms.Seek(0, SeekOrigin.Begin);
+            //return File(ms, "application/vnd.ms-excel", filename);
+
+            return Extension.getPathname(filename, book);
+        }
 
         #endregion
 
