@@ -269,7 +269,7 @@ namespace MvcPlatform.Controllers
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string sql = "";
-            string result = "{}"; string formdata = "{}";
+            string result = "{}"; string formdata = "{}"; string cost_west = "[]"; string cost_east = "[]"; 
             string curuser = "{CUSTOMERCODE:'" + json_user.Value<string>("CUSTOMERCODE") + "',REALNAME:'" + json_user.Value<string>("REALNAME") + "',ID:'" + json_user.Value<string>("ID") + "'}";
 
             if (string.IsNullOrEmpty(ordercode))
@@ -288,9 +288,35 @@ namespace MvcPlatform.Controllers
                         from list_order where code='" + ordercode + "'";
                 DataTable dt = new DataTable();
                 dt = DBMgr.GetDataTable(sql);
-                formdata = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');                
+                formdata = JsonConvert.SerializeObject(dt, iso).TrimStart('[').TrimEnd(']');
+
+                sql = @"select a.BUILDMODE,a.SETTLEMENTUNIT,a.FEECODE,a.COST,a.CURRENCY,a.STATUS 
+                            ,b.NAME FEENAME,b.NAME||'('||a.FEECODE||')' FEECODENAME
+                            ,c.NAME STATUSNAME,c.NAME||'('||a.STATUS||')' STATUSCODENAME
+                            ,d.NAME as CUSTOMERNAME
+                            ,e.NAME as CURRENCYNAME
+                        from finance_costdata a
+                            left join finance_feelist b on a.FEECODE=b.CODE
+                            left join finance_status c on a.STATUS=c.CODE
+                            left join cusdoc.sys_customer d on a.SETTLEMENTUNIT=d.CODE
+                            left join cusdoc.base_declcurrency e on a.CURRENCY=e.CODE
+                        where paytype=1 and ordercode='" + ordercode + "'";
+                cost_west = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
+
+                sql = @"select a.BUILDMODE,a.SETTLEMENTUNIT,a.FEECODE,a.COST,a.CURRENCY,a.STATUS 
+                            ,b.NAME FEENAME,b.NAME||'('||a.FEECODE||')' FEECODENAME
+                            ,c.NAME STATUSNAME,c.NAME||'('||a.STATUS||')' STATUSCODENAME
+                            ,d.NAME as CUSTOMERNAME
+                            ,e.NAME as CURRENCYNAME
+                        from finance_costdata a
+                            left join finance_feelist b on a.FEECODE=b.CODE
+                            left join finance_status c on a.STATUS=c.CODE
+                            left join cusdoc.sys_customer d on a.SETTLEMENTUNIT=d.CODE
+                            left join cusdoc.base_declcurrency e on a.CURRENCY=e.CODE
+                        where paytype=0 and ordercode='" + ordercode + "'";
+                cost_east = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
             }
-            result = "{formdata:" + formdata + ",curuser:" + curuser + "}";
+            result = "{formdata:" + formdata + ",curuser:" + curuser + ",cost_west:" + cost_west + ",cost_east:" + cost_east + "}";
             return result;
         }
 
@@ -352,7 +378,7 @@ namespace MvcPlatform.Controllers
                     int i = DBMgr.ExecuteNonQuery(sql);
                     if (i > 0)
                     {
-                        resultmsg = "{success:true,ordercode:'" + ordercode + "'}";
+                        resultmsg = "{success:true,ordercode:'" + ordercode + "',entrusttype:'" + json.Value<string>("ENTRUSTTYPE") + "'}";
                     }
                 }
 

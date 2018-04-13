@@ -155,7 +155,7 @@ function initSearch_OrderM() {
 
     //业务细项
     var store_ENTRUSTTYPE = Ext.create('Ext.data.JsonStore', {
-        fields: ['CODE', 'NAME']//,data: common_data_ywxx
+        fields: ['CODE', 'NAME', 'CODENAME']//,data: common_data_ywxx
     });
 
     var combo_ENTRUSTTYPE = Ext.create('Ext.form.field.ComboBox', {
@@ -163,7 +163,7 @@ function initSearch_OrderM() {
         name: 'ENTRUSTTYPE',
         store: store_ENTRUSTTYPE,
         fieldLabel: '业务细项',//tabIndex: 3
-        displayField: 'NAME',
+        displayField: 'CODENAME',
         valueField: 'CODE',
         triggerAction: 'all',
         queryMode: 'local',
@@ -348,7 +348,7 @@ function bindgrid() {
         listeners:
         {
             'itemdblclick': function (view, record, item, index, e) {
-                opencenterwin("/OrderManager/Create?ordercode=" + record.get("CODE"), 1600, 900);
+                opencenterwin("/OrderManager/Create?ordercode=" + record.get("CODE") + "&entrusttype=" + record.get("ENTRUSTTYPE"), 1600, 900);
             }
         },
         viewConfig: {
@@ -372,7 +372,7 @@ function EditOrderM() {
         return;
     }
 
-    opencenterwin("/OrderManager/Create?ordercode=" + recs[0].get("CODE"), 1600, 900);
+    opencenterwin("/OrderManager/Create?ordercode=" + recs[0].get("CODE") + "&entrusttype=" + recs[0].get("ENTRUSTTYPE"), 1600, 900);
 }
 
 function changeOnlySelfStyle() {
@@ -521,54 +521,57 @@ function seniorOrderM(pgbar) {
 }
 
 function change_ini_label() {
-    Ext.getCmp("field_TEXTONE").setFieldLabel("文本1"); Ext.getCmp("field_TEXTTWO").setFieldLabel("文本2");
-    Ext.getCmp("field_NUMONE").setFieldLabel("数字1"); Ext.getCmp("field_NUMTWO").setFieldLabel("数字2");
-    Ext.getCmp("field_DATEONE").setFieldLabel("日期1"); Ext.getCmp("field_DATETWO").setFieldLabel("日期2");
-    Ext.getCmp("field_USERNAMEONE").setFieldLabel("人员1"); Ext.getCmp("field_USERNAMETWO").setFieldLabel("人员2");
+    if (Ext.getCmp('win_seniorOrderM')) {
+        Ext.getCmp("field_TEXTONE").setFieldLabel("文本1"); Ext.getCmp("field_TEXTTWO").setFieldLabel("文本2");
+        Ext.getCmp("field_NUMONE").setFieldLabel("数字1"); Ext.getCmp("field_NUMTWO").setFieldLabel("数字2");
+        Ext.getCmp("field_DATEONE").setFieldLabel("日期1"); Ext.getCmp("field_DATETWO").setFieldLabel("日期2");
+        Ext.getCmp("field_USERNAMEONE").setFieldLabel("人员1"); Ext.getCmp("field_USERNAMETWO").setFieldLabel("人员2");
 
-    var f_busitype = Ext.getCmp("combo_BUSITYPE").getValue();
-    var f_entrusttype = Ext.getCmp("combo_ENTRUSTTYPE").getValue();
+        var f_busitype = Ext.getCmp("combo_BUSITYPE").getValue();
+        var f_entrusttype = Ext.getCmp("combo_ENTRUSTTYPE").getValue();
 
-    Ext.Ajax.request({
-        url: "/OrderManager/Getlabelname",
-        params: { busitype: f_busitype, entrusttype: f_entrusttype },
-        success: function (response, opts) {
-            var json = Ext.decode(response.responseText);
-            var jsonobj = json.fieldcolumn;
+        Ext.Ajax.request({
+            url: "/OrderManager/Getlabelname",
+            params: { busitype: f_busitype, entrusttype: f_entrusttype },
+            success: function (response, opts) {
+                var json = Ext.decode(response.responseText);
+                var jsonobj = json.fieldcolumn;
 
-            for (var i = 0; i < jsonobj.length; i++) {
-                switch (jsonobj[i].ORIGINNAME) {
-                    case "文本1":
-                        Ext.getCmp("field_TEXTONE").setFieldLabel(jsonobj[i].CONFIGNAME);
-                        break;
-                    case "文本2":
-                        Ext.getCmp("field_TEXTTWO").setFieldLabel(jsonobj[i].CONFIGNAME);
-                        break;
-                    case "数字1":
-                        Ext.getCmp("field_NUMONE").setFieldLabel(jsonobj[i].CONFIGNAME);
-                        break;
-                    case "数字2":
-                        Ext.getCmp("field_NUMTWO").setFieldLabel(jsonobj[i].CONFIGNAME);
-                        break;
-                    case "日期1":
-                        Ext.getCmp("field_DATEONE").setFieldLabel(jsonobj[i].CONFIGNAME);
-                        break;
-                    case "日期2":
-                        Ext.getCmp("field_DATETWO").setFieldLabel(jsonobj[i].CONFIGNAME);
-                        break;
-                    case "人员1":
-                        Ext.getCmp("field_USERNAMEONE").setFieldLabel(jsonobj[i].CONFIGNAME);
-                        break;
-                    case "人员2":
-                        Ext.getCmp("field_USERNAMETWO").setFieldLabel(jsonobj[i].CONFIGNAME);
-                        break;
-                    default:
-                        break;
+                for (var i = 0; i < jsonobj.length; i++) {
+                    switch (jsonobj[i].ORIGINNAME) {
+                        case "文本1":
+                            Ext.getCmp("field_TEXTONE").setFieldLabel(jsonobj[i].CONFIGNAME);
+                            break;
+                        case "文本2":
+                            Ext.getCmp("field_TEXTTWO").setFieldLabel(jsonobj[i].CONFIGNAME);
+                            break;
+                        case "数字1":
+                            Ext.getCmp("field_NUMONE").setFieldLabel(jsonobj[i].CONFIGNAME);
+                            break;
+                        case "数字2":
+                            Ext.getCmp("field_NUMTWO").setFieldLabel(jsonobj[i].CONFIGNAME);
+                            break;
+                        case "日期1":
+                            Ext.getCmp("field_DATEONE").setFieldLabel(jsonobj[i].CONFIGNAME);
+                            break;
+                        case "日期2":
+                            Ext.getCmp("field_DATETWO").setFieldLabel(jsonobj[i].CONFIGNAME);
+                            break;
+                        case "人员1":
+                            Ext.getCmp("field_USERNAMEONE").setFieldLabel(jsonobj[i].CONFIGNAME);
+                            break;
+                        case "人员2":
+                            Ext.getCmp("field_USERNAMETWO").setFieldLabel(jsonobj[i].CONFIGNAME);
+                            break;
+                        default:
+                            break;
+                    }
                 }
-            }
 
-        }
-    });
+            }
+        });
+
+    }
 }
 
 function CompleteOrderM() {

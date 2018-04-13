@@ -39,6 +39,7 @@
         triggerAction: 'all',
         queryMode: 'local',
         hideTrigger: true,
+        forceSelection: true,
         anyMatch: true,
         queryMode: 'local',
         listeners: {
@@ -58,7 +59,6 @@
                         var commondata = Ext.decode(response.responseText);//业务细项
                         store_ENTRUSTTYPE.loadData(commondata.ywxx);
 
-                        var entrusttype = Ext.getCmp("combo_ENTRUSTTYPE").getValue();
                         var rec = store_ENTRUSTTYPE.findRecord('CODE', entrusttype);
                         if (!rec) {
                             combo_ENTRUSTTYPE.setValue("");//编辑页赋值
@@ -76,7 +76,7 @@
 
     //业务细项
     var store_ENTRUSTTYPE = Ext.create('Ext.data.JsonStore', {
-        fields: ['CODE', 'NAME']//,data: common_data_ywxx
+        fields: ['CODE', 'NAME', 'CODENAME']//,data: common_data_ywxx
     });
 
     var combo_ENTRUSTTYPE = Ext.create('Ext.form.field.ComboBox', {
@@ -84,12 +84,13 @@
         name: 'ENTRUSTTYPE',
         store: store_ENTRUSTTYPE,
         fieldLabel: '业务细项',//tabIndex: 3
-        displayField: 'NAME',
+        displayField: 'CODENAME',
         valueField: 'CODE',
         triggerAction: 'all',
         queryMode: 'local',
         hideTrigger: true,
         anyMatch: true,
+        forceSelection: true,
         queryMode: 'local',
         listeners: {
             focus: function (cb) {
@@ -480,7 +481,7 @@ function Save_OrderM() {
                 mask.hide();
                 var data = Ext.decode(response.responseText);
                 if (data.success) {
-                    ordercode = data.ordercode; 
+                    ordercode = data.ordercode; entrusttype = data.entrusttype;
                     Ext.MessageBox.alert("提示", "保存成功！", function () {
                         loadform_OrderM();
                     });
@@ -502,6 +503,9 @@ function loadform_OrderM() {
 
             Ext.getCmp("formpanel_id").getForm().setValues(data.formdata);
 
+            Ext.getCmp('gridpanel_costwest').store.loadData(data.cost_west);
+            Ext.getCmp('gridpanel_costeast').store.loadData(data.cost_east);
+
             if (data.formdata.SUBMITTIME != "" && data.formdata.SUBMITTIME != null) {
                 document.getElementById("btn_submitorder").disabled = true;
             } else {
@@ -510,5 +514,102 @@ function loadform_OrderM() {
 
             curuserRealname = data.curuser.REALNAME; curuserId = data.curuser.ID;
         }
+    });
+}
+
+function form_ini_cost() {
+    form_ini_cost_west();
+    form_ini_cost_east();
+
+    var label_baseinfo = {
+        xtype: 'label',
+        margin: '5',
+        html: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;费用明细</span></h4>'
+    }
+    var tbar = Ext.create('Ext.toolbar.Toolbar', {
+        items: [label_baseinfo]
+    });
+
+    var panel_cost = Ext.create('Ext.panel.Panel', {
+        id: 'panel_cost',
+        renderTo: 'div_form_cost',
+        border: 0, layout: 'column',
+        //title: '费用明细',
+        tbar: tbar,
+        items: [Ext.getCmp("gridpanel_costwest"), { columnWidth: .04 }, Ext.getCmp("gridpanel_costeast")]
+    });
+}
+
+function form_ini_cost_west() {
+    var store_data_costwest = Ext.create('Ext.data.JsonStore', {
+        storeId: 'store_data_costwest',
+        fields: ['BUILDMODE', 'SETTLEMENTUNIT', 'FEECODE', 'COST', 'CURRENCY', 'STATUS'
+            , 'FEENAME', 'FEECODENAME', 'STATUSNAME', 'STATUSCODENAME','CUSTOMERNAME','CURRENCYNAME'],
+        data: []
+    });
+
+    var gridpanel_costwest = Ext.create('Ext.grid.Panel', {
+        id: 'gridpanel_costwest',
+        title: '应付费用',
+        columnWidth: .48,
+        features: [{ ftype: 'summary' }],
+        store: store_data_costwest,
+        minHeight: 150,
+        selModel: { selType: 'checkboxmodel' },
+        enableColumnHide: false,
+        columns: [
+        { xtype: 'rownumberer', width: 35 },
+        { header: '生成类型', dataIndex: 'BUILDMODE', width: 80 },
+        { header: '结算单位', dataIndex: 'CUSTOMERNAME', width: 130 },
+        { header: '费用名称', dataIndex: 'FEECODENAME', width: 130 },
+        {
+            header: '金额', dataIndex: 'COST', width: 80, summaryType: 'sum', summaryRenderer: function (value, summaryData, dataIndex) {
+                return "合计：" + value;
+            }
+        },
+        { header: '币制', dataIndex: 'CURRENCYNAME', width: 80 },
+        { header: '费用状态', dataIndex: 'STATUSNAME', width: 80 }
+        ],
+        viewConfig: {
+            enableTextSelection: true
+        },
+        forceFit: true
+    });
+}
+
+function form_ini_cost_east() {
+    var store_data_costeast = Ext.create('Ext.data.JsonStore', {
+        storeId: 'store_data_costeast',
+        fields: ['BUILDMODE', 'SETTLEMENTUNIT', 'FEECODE', 'COST', 'CURRENCY', 'STATUS'
+            , 'FEENAME', 'FEECODENAME', 'STATUSNAME', 'STATUSCODENAME','CUSTOMERNAME','CURRENCYNAME'],
+        data: []
+    });
+
+    var gridpanel_costeast = Ext.create('Ext.grid.Panel', {
+        id: 'gridpanel_costeast',
+        title: '应收费用',
+        columnWidth: .48,
+        features: [{ ftype: 'summary' }],
+        store: store_data_costeast,
+        minHeight: 150,
+        selModel: { selType: 'checkboxmodel' },
+        enableColumnHide: false,
+        columns: [
+        { xtype: 'rownumberer', width: 35 },
+        { header: '生成类型', dataIndex: 'BUILDMODE', width: 80 },
+        { header: '结算单位', dataIndex: 'CUSTOMERNAME', width: 130 },
+        { header: '费用名称', dataIndex: 'FEECODENAME', width: 130 },
+        {
+            header: '金额', dataIndex: 'COST', width: 80, summaryType: 'sum', summaryRenderer: function (value, summaryData, dataIndex) {
+                return "合计：" + value;
+            }
+        },
+        { header: '币制', dataIndex: 'CURRENCYNAME', width: 80},
+        { header: '费用状态', dataIndex: 'STATUSNAME', width: 80 }
+        ],
+        viewConfig: {
+            enableTextSelection: true
+        },
+        forceFit: true
     });
 }

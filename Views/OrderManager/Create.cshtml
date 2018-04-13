@@ -12,7 +12,7 @@
 <script src="/Views/OrderManager/form.js?t=@Version"></script>
 
 <script type="text/javascript">
-    var ordercode = getQueryString("ordercode"); 
+    var ordercode = getQueryString("ordercode"); var entrusttype = getQueryString("entrusttype");
     var common_data_jydw = [], common_data_wtdw = [], common_data_busi = [];
     var curuserRealname = ""; curuserId = "";
 
@@ -28,6 +28,7 @@
 
                 form_ini();//基础信息
                 form_ini_btn();//form button
+                form_ini_cost();
                 loadform_OrderM(); //初始化表单信息,无论是新增还是修改
             }
         });
@@ -37,5 +38,7 @@
     <div id="div_form"></div>
     <br />
     <div id="div_form_btn"></div>
+    <br />
+    <div id="div_form_cost"></div>
 </div>
 
