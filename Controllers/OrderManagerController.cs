@@ -23,7 +23,6 @@ namespace MvcPlatform.Controllers
 
         public ActionResult Index()
         {
-            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             ViewBag.navigator = "订单中心>>关务服务2";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
@@ -35,6 +34,22 @@ namespace MvcPlatform.Controllers
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
+
+        public ActionResult ConfigItem()
+        {
+            ViewBag.navigator = "关务服务2>>label配置";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
+
+        public ActionResult BusitypeDetailBaseConfig()
+        {
+            ViewBag.navigator = "关务服务2>>业务细项配置";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
+
+        #region 关务服务2
 
         public string Ini_Base_Data_BUSIITEM()
         {
@@ -432,6 +447,233 @@ namespace MvcPlatform.Controllers
             }
             return statusname;
         }
+
+        #endregion
+
+        #region label配置
+
+
+
+        #endregion
+
+        #region 业务细项配置
+
+        public string LoadList_customsconfig()
+        {
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            string sql = QueryCondition_customsconfig();
+
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "a.busitypecode", "asc"));
+            var json = JsonConvert.SerializeObject(dt, iso);
+
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
+        public string QueryCondition_customsconfig()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+            string where = "";
+            if (!string.IsNullOrEmpty(Request["busitypeid"]))
+            {
+                where += " and a.busitypecode='" + Request["busitypeid"].Trim() + "'";
+            }
+            //if (!string.IsNullOrEmpty(Request["entrusttype"]))//判断查询条件1是否有值
+            //{
+            //    where += " and a.busiitemcode='" + Request["entrusttype"].Trim() + "'";
+            //}
+            if (!string.IsNullOrEmpty(Request["busiitemcode"]))
+            {
+                where += " and a.busiitemcode like '%" + Request["busiitemcode"].Trim() + "%'";
+            }
+            if (!string.IsNullOrEmpty(Request["busiitemname"]))
+            {
+                where += " and a.busiitemname like '%" + Request["busiitemname"].Trim() + "%'";
+            }
+            if (!string.IsNullOrEmpty(Request["enable"]))
+            {
+                where += " and a.enable='" + Request["enable"].Trim() + "'";
+            }
+
+            string sql = "select a.* from web_customsconfig a where 1=1" + where;
+
+            return sql;
+        }
+
+        public string Save_customsconfig()
+        {
+            JObject json = (JObject)JsonConvert.DeserializeObject(Request["formdata"]);
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string sql = "";
+            
+            string msg = Check_customsconfig(json);
+            if (msg != "")
+            {
+                return "{success:false,msg:'" + msg + "'}";
+            }
+
+            if (string.IsNullOrEmpty(json.Value<string>("ID")))
+            {
+                sql = @"insert into web_customsconfig (ID,starttime,enable
+                                    ,busitypecode,busitypename,busiitemcode,busiitemname,createuserid,createusername
+                                    )
+                        values (web_customsconfig_id.nextval,sysdate,1
+                                    ,'{0}','{1}','{2}','{3}','{4}','{5}')";
+                sql = string.Format(sql
+                    , json.Value<string>("BUSITYPECODE"), json.Value<string>("BUSITYPENAME"), json.Value<string>("BUSIITEMCODE"), json.Value<string>("BUSIITEMNAME"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
+                    );
+            }
+            else
+            {
+                sql = @"update web_customsconfig set busitypecode='{1}',busitypename='{2}',busiitemcode='{3}',busiitemname='{4}',enable='{5}'
+                                    ,createuserid='{6}',createusername='{7}',remark='{8}',starttime=sysdate where id='{0}'
+                                    ";
+                sql = string.Format(sql, json.Value<string>("ID")
+                   , json.Value<string>("BUSITYPECODE"), json.Value<string>("BUSITYPENAME"), json.Value<string>("BUSIITEMCODE"), json.Value<string>("BUSIITEMNAME"), json.Value<string>("ENABLE")
+                   , json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"), json.Value<string>("REMARK")
+                   );
+            }
+            int i = DBMgr.ExecuteNonQuery(sql);
+            if (i > 0)
+            {
+                return "{success:true}";
+            }
+            else
+            {
+                return "{success:false}";
+            }
+
+        }
+
+        public string Check_customsconfig(JObject json)
+        {
+            string msg = "";
+
+            string strWhere = "";
+            if (json.Value<string>("ID") != "")
+            {
+                strWhere = " and t1.id not in ('" + json.Value<string>("ID") + "') ";
+            }
+
+            string sqlStr = @"select * from web_customsconfig t1 where t1.busitypecode='" + json.Value<string>("BUSITYPECODE") + "' and t1.busiitemcode='" + json.Value<string>("BUSIITEMCODE") + "'";
+            sqlStr += strWhere;
+            DataTable dt = DBMgr.GetDataTable(sqlStr);
+            if (dt.Rows.Count > 0)
+            {
+                msg = "业务类型+业务细项代码重复！";
+            }
+
+            string sqlStr2 = @"select * from web_customsconfig t1 where t1.busitypecode='" + json.Value<string>("BUSITYPECODE") + "' and t1.busiitemname='" + json.Value<string>("BUSIITEMNAME") + "'";
+            sqlStr2 += strWhere;
+            DataTable dt2 = DBMgr.GetDataTable(sqlStr2);
+            if (dt2.Rows.Count > 0)
+            {
+                msg = "业务类型+业务细项名称重复！";
+            }
+
+            return msg;
+        }
+
+        public string DelCusConfig()
+        {
+            string result = "{success:false}";
+            try
+            {
+                string sql = @"delete from web_customsconfig where id in(" + Request["ids"] + ")";
+                int i = DBMgr.ExecuteNonQuery(sql);
+                if (i > 0)
+                {
+                    result = "{success:true}";
+                }
+            }
+            catch (Exception ex)
+            {
+                result = "{success:false}";
+            }
+
+            return result;
+        }
+
+        public string EnableCusConfig()
+        {
+            string result = "{success:false}";
+            try
+            {
+                JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+                string sql = @"update web_customsconfig set enable={1},enableuserid='{2}',enableusername='{3}' where id in({0})";
+                sql = string.Format(sql, Request["ids"], Request["enable"], json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"));
+
+                int i = DBMgr.ExecuteNonQuery(sql);
+                if (i > 0)
+                {
+                    result = "{success:true}";
+                }
+            }
+            catch (Exception ex)
+            {
+                result = "{success:false}";
+            }
+
+            return result;
+        }
+
+        public string ExportCusConfig()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string sql = QueryCondition_customsconfig();
+            sql += " order by a.busitypecode asc";
+
+            IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+            DataTable dt_count = DBMgr.GetDataTable("select count(1) from (" + sql + ") a");
+            int WebDownCount = Convert.ToInt32(ConfigurationManager.AppSettings["WebDownCount"]);
+            if (Convert.ToInt32(dt_count.Rows[0][0]) > WebDownCount)
+            {
+                return "{success:false,WebDownCount:" + WebDownCount + "}";
+            }
+
+            DataTable dt = DBMgr.GetDataTable(sql);
+
+            //创建Excel文件的对象
+            NPOI.HSSF.UserModel.HSSFWorkbook book = new NPOI.HSSF.UserModel.HSSFWorkbook();
+
+            //添加一个导出成功sheet
+            NPOI.SS.UserModel.ISheet sheet_S;
+            string filename = "业务细项.xls";
+
+            sheet_S = book.CreateSheet("业务细项");
+
+            NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
+            row1.CreateCell(0).SetCellValue("业务类型编号"); row1.CreateCell(1).SetCellValue("业务类型名称"); row1.CreateCell(2).SetCellValue("业务细项编号"); row1.CreateCell(3).SetCellValue("业务细项名称"); 
+            row1.CreateCell(4).SetCellValue("创建时间");row1.CreateCell(5).SetCellValue("是否启用"); row1.CreateCell(6).SetCellValue("创建人"); row1.CreateCell(7).SetCellValue("启禁用人"); 
+            
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
+                rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["BUSITYPECODE"].ToString());
+                rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["BUSITYPENAME"].ToString());
+                rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["BUSIITEMCODE"].ToString());
+                rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["BUSIITEMNAME"].ToString());
+                rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["STARTTIME"].ToString());
+
+                rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["ENABLE"].ToString() == "1" ? "是" : "否");
+                rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["CREATEUSERNAME"].ToString());
+                rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["ENABLEUSERNAME"].ToString());
+            }
+            // 写入到客户端 
+            //System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            //book.Write(ms);
+            //ms.Seek(0, SeekOrigin.Begin);
+            //return File(ms, "application/vnd.ms-excel", filename);
+
+            return Extension.getPathname(filename, book);
+
+        }
+
+        #endregion
 
     }
 }
