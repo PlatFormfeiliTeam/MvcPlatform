@@ -427,9 +427,9 @@ namespace MvcPlatform.Controllers
 
             //添加一个导出成功sheet
             NPOI.SS.UserModel.ISheet sheet_S;
-            string filename = "关务服务2.xls";
+            string filename = "关务服务.xls";
 
-            sheet_S = book.CreateSheet("关务服务2");
+            sheet_S = book.CreateSheet("关务服务");
 
             NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
             row1.CreateCell(0).SetCellValue("业务完成"); row1.CreateCell(1).SetCellValue("创建时间"); row1.CreateCell(2).SetCellValue("业务类别"); row1.CreateCell(3).SetCellValue("业务细项"); 
