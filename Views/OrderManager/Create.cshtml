@@ -12,8 +12,8 @@
 <script src="/Views/OrderManager/form.js?t=@Version"></script>
 
 <script type="text/javascript">
-    var ordercode = getQueryString("ordercode"); var entrusttype = getQueryString("entrusttype");
-    var common_data_jydw = [], common_data_wtdw = [], common_data_busi = [];
+    var ordercode = getQueryString("ordercode"); var busiitemcode = getQueryString("busiitemcode");
+    var common_data_jydw = [], common_data_wtdw = [], common_data_entrust = [];
     var curuserRealname = ""; curuserId = "";
 
     Ext.onReady(function () {
@@ -24,7 +24,7 @@
                 var commondata = Ext.decode(response.responseText)
                 common_data_jydw = commondata.jydw;//经营单位
                 common_data_wtdw = commondata.wtdw;//委托单位
-                common_data_busi = commondata.busi;//业务类型
+                common_data_entrust = commondata.entrust;//业务类别
 
                 form_ini();//基础信息
                 form_ini_btn();//form button

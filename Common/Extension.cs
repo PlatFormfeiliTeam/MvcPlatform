@@ -971,6 +971,21 @@ namespace MvcPlatform.Common
             //db.StringSet("common_data:wtdw", json_wtdw);
             //}
 
+
+            //业务类别
+            string json_entrusttype = "[]";
+            //if (db.KeyExists("common_data:entrust"))
+            //{
+            //    json_entrusttype = db.StringGet("common_data:entrust");
+            //}
+            //else
+            //{
+            sql = @"select a.CODE,a.NAME,a.NAME||'('||a.CODE||')' CODENAME from SYS_ENTRUSTTYPE a where enabled=1 and code in('05','06','07','08','09') order by a.code ";
+            json_entrusttype = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+            //db.StringSet("common_data:entrust", json_entrusttype);
+            //}
+
+
             //费用状态
             string json_fyzt= "[]";
             //if (db.KeyExists("common_data:fyzt"))
@@ -1006,20 +1021,7 @@ namespace MvcPlatform.Common
 
             if (ParaType == "OrderManager")//关务服务2
             {
-                //业务类型
-                string json_busi = "[]";
-                //if (db.KeyExists("common_data:busi"))
-                //{
-                //    json_busi = db.StringGet("common_data:busi");
-                //}
-                //else
-                //{
-                sql = @"select a.CODE,a.NAME,a.NAME||'('||a.CODE||')' CODENAME from sys_busitype a where enabled=1 order by a.code";
-                json_busi = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
-                //db.StringSet("common_data:busi", json_busi);
-                //}
-                
-                return "{jydw:" + json_jydw + ",wtdw:" + json_wtdw + ",busi:" + json_busi + "}";
+                return "{jydw:" + json_jydw + ",wtdw:" + json_wtdw + ",entrust:" + json_entrusttype + "}";
             }
 
             return "{jydw:" + json_jydw + ",sbfs_all:" + json_sbfs_all + ",sbfs:" + json_sbfs + ",sbgq:" + json_sbgq + ",bgfs:" + json_bgfs + ",bzzl:" + json_bzzl

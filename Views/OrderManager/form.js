@@ -24,16 +24,16 @@
         fieldLabel: '企业编号'
     });
 
-    //业务类型
-    var store_busitype = Ext.create('Ext.data.JsonStore', {
+    //业务类别
+    var store_ENTRUSTTYPE = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME', 'CODENAME'],
-        data: common_data_busi
+        data: common_data_entrust
     });
-    var combo_BUSITYPE = Ext.create('Ext.form.field.ComboBox', {
-        id: 'combo_BUSITYPE',
-        name: 'BUSITYPE',
-        store: store_busitype,
-        fieldLabel: '业务类型',//tabIndex: 3
+    var combo_ENTRUSTTYPE = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_ENTRUSTTYPE',
+        name: 'ENTRUSTTYPE',
+        store: store_ENTRUSTTYPE,
+        fieldLabel: '业务类别',//tabIndex: 3
         displayField: 'CODENAME',
         valueField: 'CODE',
         triggerAction: 'all',
@@ -51,19 +51,19 @@
                 };
             },
             change: function (combo, newValue, oldValue, eOpts) {
-                combo_ENTRUSTTYPE.reset();
+                combo_BUSIITEMCODE.reset();
                 Ext.Ajax.request({
                     url: "/OrderManager/Ini_Base_Data_BUSIITEM",
-                    params: { busitype: newValue },
+                    params: { entrusttype: newValue },
                     success: function (response, opts) {
                         var commondata = Ext.decode(response.responseText);//业务细项
-                        store_ENTRUSTTYPE.loadData(commondata.ywxx);
+                        store_BUSIITEMCODE.loadData(commondata.ywxx);
 
-                        var rec = store_ENTRUSTTYPE.findRecord('CODE', entrusttype);
+                        var rec = store_BUSIITEMCODE.findRecord('CODE', busiitemcode);
                         if (!rec) {
-                            combo_ENTRUSTTYPE.setValue("");//编辑页赋值
+                            combo_BUSIITEMCODE.setValue("");//编辑页赋值
                         } else {
-                            combo_ENTRUSTTYPE.setValue(entrusttype);//编辑页赋值
+                            combo_BUSIITEMCODE.setValue(busiitemcode);//编辑页赋值
                         }
                         change_ini_label();
                     }
@@ -75,14 +75,14 @@
     });
 
     //业务细项
-    var store_ENTRUSTTYPE = Ext.create('Ext.data.JsonStore', {
+    var store_BUSIITEMCODE = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME', 'CODENAME']//,data: common_data_ywxx
     });
 
-    var combo_ENTRUSTTYPE = Ext.create('Ext.form.field.ComboBox', {
-        id: 'combo_ENTRUSTTYPE',
-        name: 'ENTRUSTTYPE',
-        store: store_ENTRUSTTYPE,
+    var combo_BUSIITEMCODE = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_BUSIITEMCODE',
+        name: 'BUSIITEMCODE',
+        store: store_BUSIITEMCODE,
         fieldLabel: '业务细项',//tabIndex: 3
         displayField: 'CODENAME',
         valueField: 'CODE',
@@ -102,7 +102,8 @@
             },
             change: function (combo, newValue, oldValue, eOpts) {
                 change_ini_label();
-            }
+            },
+            select: function (records) { field_BUSIITEMNAME.setValue(records.rawValue.substr(0, records.rawValue.lastIndexOf('('))); }
         },
         allowBlank: false,
         blankText: '业务细项不能为空!'
@@ -111,6 +112,7 @@
     var field_CUSTOMERNAME = Ext.create('Ext.form.field.Hidden', { id: 'field_CUSTOMERNAME', name: 'CUSTOMERNAME' });
     var field_BUSIUNITNAME = Ext.create('Ext.form.field.Hidden', { id: 'field_BUSIUNITNAME', name: 'BUSIUNITNAME' });
     var field_CLEARUNITNAME = Ext.create('Ext.form.field.Hidden', { id: 'field_CLEARUNITNAME', name: 'CLEARUNITNAME' });
+    var field_BUSIITEMNAME = Ext.create('Ext.form.field.Hidden', { id: 'field_BUSIITEMNAME', name: 'BUSIITEMNAME' });
 
     //委托单位
     var store_wtdw = Ext.create('Ext.data.JsonStore', {
@@ -383,7 +385,7 @@
             validateOnChange: false
         },
         items: [
-            { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_CODE, field_CUSNO, combo_BUSITYPE, combo_ENTRUSTTYPE] },
+            { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [field_CODE, field_CUSNO, combo_ENTRUSTTYPE, combo_BUSIITEMCODE] },
             { layout: 'column', height: 42, border: 0, items: [field_jydw, combo_wtdw, combo_jsdw] },
             { layout: 'column', height: 42, border: 0, items: [field_CREATEUSERNAME, field_CREATETIME, field_SUBMITUSERNAME, field_SUBMITTIME] },
             { layout: 'column', height: 42, border: 0, items: [container_DOREQUEST] },
@@ -391,7 +393,7 @@
             { layout: 'column', height: 42, margin: '0 0 15 0', border: 0, items: [label_goinfo] },
             { layout: 'column', height: 42, border: 0, items: [field_TEXTONE, field_NUMONE, field_DATEONE, field_USERNAMEONE] },
             { layout: 'column', height: 42, border: 0, items: [field_TEXTTWO, field_NUMTWO, field_DATETWO, field_USERNAMETWO] },            
-            field_BUSIUNITNAME, field_CUSTOMERNAME, field_CLEARUNITNAME, field_USERIDONE, field_USERIDTWO
+            field_BUSIUNITNAME, field_CUSTOMERNAME, field_CLEARUNITNAME, field_BUSIITEMNAME, field_USERIDONE, field_USERIDTWO
         ]
     });
 }
@@ -402,12 +404,12 @@ function change_ini_label() {
     Ext.getCmp("field_DATEONE").setFieldLabel("日期1"); Ext.getCmp("field_DATETWO").setFieldLabel("日期2");
     Ext.getCmp("field_USERNAMEONE").setFieldLabel("人员1"); Ext.getCmp("field_USERNAMETWO").setFieldLabel("人员2");
 
-    var f_busitype = Ext.getCmp("combo_BUSITYPE").getValue();
     var f_entrusttype = Ext.getCmp("combo_ENTRUSTTYPE").getValue();
+    var f_busiitemcode = Ext.getCmp("combo_BUSIITEMCODE").getValue();
 
     Ext.Ajax.request({
         url: "/OrderManager/Getlabelname",
-        params: { busitype: f_busitype, entrusttype: f_entrusttype },
+        params: { entrusttype: f_entrusttype, busiitemcode: f_busiitemcode },
         success: function (response, opts) {
             var json = Ext.decode(response.responseText);
             var jsonobj = json.fieldcolumn;
@@ -555,7 +557,6 @@ function form_ini_cost_west() {
         features: [{ ftype: 'summary' }],
         store: store_data_costwest,
         minHeight: 150,
-        selModel: { selType: 'checkboxmodel' },
         enableColumnHide: false,
         columns: [
         { xtype: 'rownumberer', width: 35 },
@@ -592,7 +593,6 @@ function form_ini_cost_east() {
         features: [{ ftype: 'summary' }],
         store: store_data_costeast,
         minHeight: 150,
-        selModel: { selType: 'checkboxmodel' },
         enableColumnHide: false,
         columns: [
         { xtype: 'rownumberer', width: 35 },

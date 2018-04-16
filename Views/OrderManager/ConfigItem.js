@@ -1,14 +1,14 @@
-﻿var common_data_jydw = [], common_data_wtdw = [], common_data_busi = [];
-var store_busitype; var columns_order = [];
+﻿var common_data_entrust = [];
+var store_entrust;
 Ext.onReady(function () {
     Ext.Ajax.request({//对公共基础数据发起一次请求
         url: "/Common/Ini_Base_Data",
         params: { ParaType: 'OrderManager' },
         success: function (response, option) {
             var commondata = Ext.decode(response.responseText);
-            common_data_busi = commondata.busi;//业务类型
+            common_data_entrust = commondata.entrust;//业务类别
             
-            store_busitype = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME', 'CODENAME'], data: common_data_busi });
+            store_entrust = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME', 'CODENAME'], data: common_data_entrust });
 
             initSearch_CustomsCost();
             bindgrid();
@@ -18,17 +18,11 @@ Ext.onReady(function () {
 
 function initSearch_CustomsCost() {
 
-    //业务类型
-    //var store_busitype = Ext.create('Ext.data.JsonStore', {
-    //    fields: ['CODE', 'NAME', 'CODENAME'],
-    //    data: common_data_busi
-    //});
-
-    var combo_BUSITYPE_S = Ext.create('Ext.form.field.ComboBox', {
-        id: 'combo_BUSITYPE_S',
-        name: 'BUSITYPEID',
-        store: store_busitype,
-        fieldLabel: '业务类型',//tabIndex: 3
+    var combo_ENTRUST_S = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_ENTRUST_S',
+        name: 'ENTRUSTTYPECODE',
+        store: store_entrust,
+        fieldLabel: '业务类别',//tabIndex: 3
         displayField: 'CODENAME',
         valueField: 'CODE',
         triggerAction: 'all',
@@ -45,13 +39,13 @@ function initSearch_CustomsCost() {
                 };
             },
             change: function (combo, newValue, oldValue, eOpts) {
-                combo_ENTRUSTTYPE_S.reset();
+                combo_BUSIITEMCODE_S.reset();
                 Ext.Ajax.request({
                     url: "/OrderManager/Ini_Base_Data_BUSIITEM",
-                    params: { busitype: newValue },
+                    params: { entrusttype: newValue },
                     success: function (response, opts) {
                         var commondata = Ext.decode(response.responseText);//业务细项
-                        store_ENTRUSTTYPE_S.loadData(commondata.ywxx);
+                        store_BUSIITEMCODE_S.loadData(commondata.ywxx);
                     }
                 });
 
@@ -61,14 +55,14 @@ function initSearch_CustomsCost() {
 
 
     //业务细项
-    var store_ENTRUSTTYPE_S = Ext.create('Ext.data.JsonStore', {
+    var store_BUSIITEMCODE_S = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME', 'CODENAME']
     });
 
-    var combo_ENTRUSTTYPE_S = Ext.create('Ext.form.field.ComboBox', {
-        id: 'combo_ENTRUSTTYPE_S',
-        name: 'ENTRUSTTYPE',
-        store: store_ENTRUSTTYPE_S,
+    var combo_BUSIITEMCODE_S = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_BUSIITEMCODE_S',
+        name: 'BUSIITEMCODE',
+        store: store_BUSIITEMCODE_S,
         fieldLabel: '业务细项',//tabIndex: 3
         displayField: 'CODENAME',
         valueField: 'CODE',
@@ -97,7 +91,7 @@ function initSearch_CustomsCost() {
             labelWidth: 80
         },
         items: [
-            { layout: 'column', border: 0, items: [combo_BUSITYPE_S, combo_ENTRUSTTYPE_S] }
+            { layout: 'column', border: 0, items: [combo_ENTRUST_S, combo_BUSIITEMCODE_S] }
         ]
     });
 
@@ -105,7 +99,7 @@ function initSearch_CustomsCost() {
 
 function bindgrid() {
     var store_Trade = Ext.create('Ext.data.JsonStore', {
-        fields: ['BUSITYPECODE', 'BUSITYPENAME', 'BUSIITEMCODE', 'BUSIITEMNAME', 'ORIGINNAME', 'CONFIGNAME', 'CREATEUSERID', 'CREATEUSERNAME', 'ID'],
+        fields: ['ENTRUSTTYPECODE', 'ENTRUSTTYPENAME', 'BUSIITEMCODE', 'BUSIITEMNAME', 'ORIGINNAME', 'CONFIGNAME', 'CREATEUSERID', 'CREATEUSERNAME', 'ID'],
         pageSize: 20,
         proxy: {
             type: 'ajax',
@@ -120,7 +114,7 @@ function bindgrid() {
         listeners: {
             beforeload: function () {
                 store_Trade.getProxy().extraParams = {
-                    busitypeid: Ext.getCmp('combo_BUSITYPE_S').getValue(), entrusttype: Ext.getCmp('combo_ENTRUSTTYPE_S').getValue()
+                    entrusttype: Ext.getCmp('combo_ENTRUST_S').getValue(), busiitemcode: Ext.getCmp('combo_BUSIITEMCODE_S').getValue()
                 }
             }
         }
@@ -144,8 +138,8 @@ function bindgrid() {
         columns: [
                 { xtype: 'rownumberer', width: 35 },
                 { header: 'ID', dataIndex: 'ID', hidden: true, locked: true },
-                { header: '业务类型编号', dataIndex: 'BUSITYPECODE', width: 130 },
-                { header: '业务类型名称', dataIndex: 'BUSITYPENAME', width: 150 },
+                { header: '业务类别编号', dataIndex: 'ENTRUSTTYPECODE', width: 130 },
+                { header: '业务类别名称', dataIndex: 'ENTRUSTTYPENAME', width: 150 },
                 { header: '业务细项编号', dataIndex: 'BUSIITEMCODE', width: 130 },
                 { header: '业务细项名称', dataIndex: 'BUSIITEMNAME', width: 150 },
                 { header: '文本名称', dataIndex: 'ORIGINNAME', width: 200 },
@@ -169,19 +163,19 @@ function Select() {
 }
 
 function Reset() {
-    Ext.getCmp("combo_BUSITYPE_S").setValue("");
-    Ext.getCmp("combo_ENTRUSTTYPE_S").setValue("");
+    Ext.getCmp("combo_ENTRUST_S").setValue("");
+    Ext.getCmp("combo_BUSIITEMCODE_S").setValue("");
 }
 
 function form_ini_win(recs) {
 
     var field_id = Ext.create('Ext.form.field.Hidden', { id: 'ID', name: 'ID' });
 
-    var combo_BUSITYPE = Ext.create('Ext.form.field.ComboBox', {
-        id: 'combo_BUSITYPE',
-        name: 'BUSITYPECODE',
-        store: store_busitype,
-        fieldLabel: '业务类型',//tabIndex: 3
+    var combo_ENTRUST = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_ENTRUST',
+        name: 'ENTRUSTTYPECODE',
+        store: store_entrust,
+        fieldLabel: '业务类别',//tabIndex: 3
         displayField: 'CODENAME',
         valueField: 'CODE',
         triggerAction: 'all',
@@ -202,7 +196,7 @@ function form_ini_win(recs) {
                 combo_BUSIITEMCODE.reset();
                 Ext.Ajax.request({
                     url: "/OrderManager/Ini_Base_Data_BUSIITEM",
-                    params: { busitype: newValue },
+                    params: { entrusttype: newValue },
                     success: function (response, opts) {
                         var commondata = Ext.decode(response.responseText);//业务细项
                         store_BUSIITEM.loadData(commondata.ywxx);
@@ -217,12 +211,12 @@ function form_ini_win(recs) {
                 });
 
             },
-            select: function (records) { field_BUSITYPENAME.setValue(records.rawValue.substr(0, records.rawValue.lastIndexOf('('))); }
+            select: function (records) { field_ENTRUSTTYPENAME.setValue(records.rawValue.substr(0, records.rawValue.lastIndexOf('('))); }
         },
         allowBlank: false,
         blankText: '业务类型不可为空!'
     });
-    var field_BUSITYPENAME = Ext.create('Ext.form.field.Hidden', { id: 'field_BUSITYPENAME', name: 'BUSITYPENAME' });
+    var field_ENTRUSTTYPENAME = Ext.create('Ext.form.field.Hidden', { id: 'field_ENTRUSTTYPENAME', name: 'ENTRUSTTYPENAME' });
 
     //业务细项
     var store_BUSIITEM = Ext.create('Ext.data.JsonStore', {
@@ -311,11 +305,11 @@ function form_ini_win(recs) {
             msgTarget: 'under'
         },
         items: [
-                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_BUSITYPE] },
+                { layout: 'column', height: 42, margin: '5 0 0 0', border: 0, items: [combo_ENTRUST] },
                 { layout: 'column', height: 42, border: 0, items: [combo_BUSIITEMCODE] },
                 { layout: 'column', height: 42, border: 0, items: [combo_ORIGINNAME] },
                 { layout: 'column', height: 42, border: 0, items: [field_CONFIGNAME] },
-                field_id, field_BUSITYPENAME, field_BUSIITEMNAME
+                field_id, field_ENTRUSTTYPENAME, field_BUSIITEMNAME
         ],
         buttonAlign: 'center',
         buttons: [{
@@ -414,7 +408,7 @@ function ExportCusCost() {
     myMask.show();
 
     var data = {
-        busitypeid: Ext.getCmp('combo_BUSITYPE_S').getValue(), entrusttype: Ext.getCmp('combo_ENTRUSTTYPE_S').getValue()
+        entrusttype: Ext.getCmp('combo_ENTRUST_S').getValue(), busiitemcode: Ext.getCmp('combo_BUSIITEMCODE_S').getValue()
     }
 
     Ext.Ajax.request({

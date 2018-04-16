@@ -37,7 +37,7 @@ namespace MvcPlatform.Controllers
 
         public ActionResult ConfigItem()
         {
-            ViewBag.navigator = "关务服务2>>label配置";
+            ViewBag.navigator = "关务服务2>>显示配置";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
@@ -56,7 +56,7 @@ namespace MvcPlatform.Controllers
 
             sql = @"select a.BUSIITEMCODE CODE,a.BUSIITEMNAME NAME,a.BUSIITEMNAME||'('||a.BUSIITEMCODE||')' CODENAME 
                     from web_customsconfig a 
-                    where enable=1 and busitypecode='" + Request["busitype"] + "' order by a.BUSIITEMCODE";
+                    where enable=1 and entrusttypecode='" + Request["entrusttype"] + "' order by a.BUSIITEMCODE";
             json_ywxx = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
 
             return "{ywxx:" + json_ywxx + "}";
@@ -89,9 +89,9 @@ namespace MvcPlatform.Controllers
             {
                 where += " and a.CUSNO='" + Request["CUSNO"].Trim() + "'";
             }
-            if (!string.IsNullOrEmpty(Request["busitypeid"]))//判断查询条件1是否有值
+            if (!string.IsNullOrEmpty(Request["entrusttype"]))//判断查询条件1是否有值
             {
-                where += " and a.busitype='" + Request["busitypeid"].Trim() + "'";
+                where += " and a.entrusttype='" + Request["entrusttype"].Trim() + "'";
             }
             if (!string.IsNullOrEmpty(Request["start_date"]))//如果开始时间有值
             {
@@ -110,9 +110,9 @@ namespace MvcPlatform.Controllers
             {
                 where += " and a.CODE='" + Request["CODE"].Trim() + "'";
             }
-            if (!string.IsNullOrEmpty(Request["entrusttype"]))//判断查询条件1是否有值
+            if (!string.IsNullOrEmpty(Request["busiitemcode"]))//判断查询条件1是否有值
             {
-                where += " and a.entrusttype='" + Request["entrusttype"].Trim() + "'";
+                where += " and a.busiitemcode='" + Request["busiitemcode"].Trim() + "'";
             }
             if (!string.IsNullOrEmpty(Request["start_date2"]))//如果开始时间有值
             {
@@ -165,12 +165,11 @@ namespace MvcPlatform.Controllers
 
             string sql = @"select a.ID,a.BUSITYPE,a.CREATETIME,a.SUBMITTIME,a.ENTRUSTTYPE,a.CUSTOMERCODE,a.CUSTOMERNAME,a.CLEARUNIT,a.CLEARUNITNAME 
                                 ,a.BUSIUNITCODE,a.BUSIUNITNAME,a.CODE,a.CUSNO,a.DOREQUEST,a.CLEARREMARK
-                                ,b.busiitemname ENTRUSTTYPENAME
+                                ,a.BUSIITEMCODE,a.BUSIITEMNAME
                                 ,a.TEXTONE,a.TEXTTWO,a.NUMONE,a.NUMTWO,to_char(a.DATEONE,'yyyy-mm-dd') DATEONE,to_char(a.DATETWO,'yyyy-mm-dd') DATETWO
                                 ,a.USERNAMEONE,a.USERIDONE,a.USERNAMETWO,a.USERIDTWO 
                         from LIST_ORDER a 
-                            left join web_customsconfig b on a.busitype=b.busitypecode and a.entrusttype=b.busiitemcode
-                        where a.ISINVALID=0 and b.enable=1";
+                        where a.ISINVALID=0 and a.busitype='70'";
 
             string rolestr = "";
             rolestr = " a.receiverunitcode='" + json_user.Value<string>("CUSTOMERCODE") + "'";
@@ -223,16 +222,26 @@ namespace MvcPlatform.Controllers
 
         public string DeleteOrderM()
         {
-            string ordercode = Request["ordercode"]; string result = "{success:true}";
+            string ordercodes = Request["ordercodes"]; string result = "{success:true}";
 
-            string sql = @"select SUBMITTIME from list_order where code='" + ordercode + "'";
+            string sql = @"select SUBMITTIME from list_order where code in(" + ordercodes + ")";
             DataTable dt = DBMgr.GetDataTable(sql);
-            if (dt.Rows[0]["SUBMITTIME"].ToString() != "")
+            bool bf = false;
+            foreach (DataRow dr in dt.Rows)
+            {
+                if (dr["SUBMITTIME"].ToString() != "")
+                {
+                    bf = true;
+                    break;
+                }
+            }
+
+            if (bf)
             {
                 return "{success:false,flag:'E'}";
             }
 
-            sql = @"delete list_order where code='" + ordercode + "'";
+            sql = @"delete list_order where code in(" + ordercodes + ")";
             DBMgr.ExecuteNonQuery(sql);
 
             return result;
@@ -249,14 +258,14 @@ namespace MvcPlatform.Controllers
             return pageSql;
         }
 
-        public string Getlabelname(string busitype, string entrusttype)
+        public string Getlabelname(string entrusttype, string busiitemcode)
         {
             string sql = string.Empty; 
 
             DataTable dt_field = new DataTable();
             sql = @"select originname,configname 
                     from web_customscost 
-                    where busitypecode='" + busitype + "' and busiitemcode='" + entrusttype + "'";
+                    where entrusttypecode='" + entrusttype + "' and busiitemcode='" + busiitemcode + "'";
             dt_field = DBMgr.GetDataTable(sql);
             var fieldcolumn = JsonConvert.SerializeObject(dt_field);
 
@@ -283,7 +292,7 @@ namespace MvcPlatform.Controllers
 
                 sql = @"select CODE,BUSITYPE,ENTRUSTTYPE,CUSTOMERCODE,CUSTOMERNAME,BUSIUNITCODE
                             ,BUSIUNITNAME,CLEARUNIT,CLEARUNITNAME,CUSNO,CREATEUSERID                          
-                            ,CREATEUSERNAME,CREATETIME,SUBMITUSERID,SUBMITUSERNAME,SUBMITTIME,DOREQUEST,CLEARREMARK
+                            ,CREATEUSERNAME,CREATETIME,SUBMITUSERID,SUBMITUSERNAME,SUBMITTIME,DOREQUEST,CLEARREMARK,BUSIITEMCODE,BUSIITEMNAME
                             ,TEXTONE,TEXTTWO,NUMONE,NUMTWO,to_char(DATEONE,'yyyy-mm-dd') DATEONE,to_char(DATETWO,'yyyy-mm-dd') DATETWO,USERNAMEONE,USERIDONE,USERNAMETWO,USERIDTWO 
                         from list_order where code='" + ordercode + "'";
                 DataTable dt = new DataTable();
@@ -339,19 +348,22 @@ namespace MvcPlatform.Controllers
                             ,CREATEUSERNAME,CREATETIME,DOREQUEST,CLEARREMARK,RECEIVERUNITCODE,RECEIVERUNITNAME
                             ,TEXTONE,TEXTTWO,NUMONE,NUMTWO,DATEONE
                             ,DATETWO,USERNAMEONE,USERIDONE,USERNAMETWO,USERIDTWO 
+                            ,BUSIITEMCODE,BUSIITEMNAME
                         ) VALUES (LIST_ORDER_id.Nextval
                             ,'{0}','{1}','{2}','{3}','{4}','{5}'
                             ,'{6}','{7}','{8}','{9}','{10}'
                             ,'{11}',sysdate,'{12}','{13}','{14}','{15}'     
                             ,'{16}','{17}','{18}','{19}',to_date('{20}','yyyy-MM-dd HH24:mi:ss')
-                            ,to_date('{21}','yyyy-MM-dd HH24:mi:ss'),'{22}','{23}','{24}','{25}'                       
+                            ,to_date('{21}','yyyy-MM-dd HH24:mi:ss'),'{22}','{23}','{24}','{25}'   
+                            ,'{26}','{27}'                    
                             )";
                     sql = string.Format(sql
-                            , json.Value<string>("BUSITYPE"), ordercode, json.Value<string>("ENTRUSTTYPE"), json.Value<string>("CUSTOMERCODE"), json.Value<string>("CUSTOMERNAME"), json.Value<string>("BUSIUNITCODE")
+                            , "70", ordercode, json.Value<string>("ENTRUSTTYPE"), json.Value<string>("CUSTOMERCODE"), json.Value<string>("CUSTOMERNAME"), json.Value<string>("BUSIUNITCODE")
                             , json.Value<string>("BUSIUNITNAME"), json.Value<string>("CLEARUNIT"), json.Value<string>("CLEARUNITNAME"), json.Value<string>("CUSNO"), json_user.Value<string>("ID")
                             , json_user.Value<string>("REALNAME"), json.Value<string>("DOREQUEST"), json.Value<string>("CLEARREMARK"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME")
                             , json.Value<string>("TEXTONE"), json.Value<string>("TEXTTWO"), json.Value<string>("NUMONE"), json.Value<string>("NUMTWO"), json.Value<string>("DATEONE")
                             , json.Value<string>("DATETWO"), json.Value<string>("USERNAMEONE"), json.Value<string>("USERIDONE"), json.Value<string>("USERNAMETWO"), json.Value<string>("USERIDTWO")
+                            , json.Value<string>("BUSIITEMCODE"), json.Value<string>("BUSIITEMNAME")
                        );
                 }
                 else//修改
@@ -361,15 +373,15 @@ namespace MvcPlatform.Controllers
                             ,BUSIUNITNAME='{6}',CLEARUNIT='{7}',CLEARUNITNAME='{8}',CUSNO='{9}',DOREQUEST='{10}'         
                             ,CLEARREMARK='{11}',RECEIVERUNITCODE='{12}',RECEIVERUNITNAME='{13}',TEXTONE='{14}',TEXTTWO='{15}'
                             ,NUMONE='{16}',NUMTWO='{17}',DATEONE=to_date('{18}','yyyy-MM-dd HH24:mi:ss'),DATETWO=to_date('{19}','yyyy-MM-dd HH24:mi:ss'),USERNAMEONE='{20}'
-                            ,USERIDONE='{21}',USERNAMETWO='{22}',USERIDTWO='{23}'                               
+                            ,USERIDONE='{21}',USERNAMETWO='{22}',USERIDTWO='{23}',BUSIITEMCODE='{24}',BUSIITEMNAME='{25}'                               
                         WHERE CODE='{0}'                          
                         ";
                     sql = string.Format(sql
-                            , ordercode, json.Value<string>("BUSITYPE"), json.Value<string>("ENTRUSTTYPE"), json.Value<string>("CUSTOMERCODE"), json.Value<string>("CUSTOMERNAME"), json.Value<string>("BUSIUNITCODE")
+                            , ordercode, "70", json.Value<string>("ENTRUSTTYPE"), json.Value<string>("CUSTOMERCODE"), json.Value<string>("CUSTOMERNAME"), json.Value<string>("BUSIUNITCODE")
                             , json.Value<string>("BUSIUNITNAME"), json.Value<string>("CLEARUNIT"), json.Value<string>("CLEARUNITNAME"), json.Value<string>("CUSNO"),json.Value<string>("DOREQUEST")
                             , json.Value<string>("CLEARREMARK"), json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), json.Value<string>("TEXTONE"), json.Value<string>("TEXTTWO")
                             , json.Value<string>("NUMONE"), json.Value<string>("NUMTWO"), json.Value<string>("DATEONE"), json.Value<string>("DATETWO"), json.Value<string>("USERNAMEONE")
-                            , json.Value<string>("USERIDONE"), json.Value<string>("USERNAMETWO"), json.Value<string>("USERIDTWO")
+                            , json.Value<string>("USERIDONE"), json.Value<string>("USERNAMETWO"), json.Value<string>("USERIDTWO"), json.Value<string>("BUSIITEMCODE"), json.Value<string>("BUSIITEMNAME")
                             );
 
                 }
@@ -392,6 +404,7 @@ namespace MvcPlatform.Controllers
 
         public string ExportOrderM()
         {
+            string common_data_entrust = Request["common_data_entrust"];
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string sql = QueryCondition();
             sql += " order by a.createtime desc";
@@ -416,11 +429,12 @@ namespace MvcPlatform.Controllers
             NPOI.SS.UserModel.ISheet sheet_S;
             string filename = "关务服务2.xls";
 
-            sheet_S = book.CreateSheet("关务服务2"); 
+            sheet_S = book.CreateSheet("关务服务2");
 
             NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
-            row1.CreateCell(0).SetCellValue("业务完成"); row1.CreateCell(1).SetCellValue("创建时间"); row1.CreateCell(2).SetCellValue("业务细项"); row1.CreateCell(3).SetCellValue("委托单位"); row1.CreateCell(4).SetCellValue("结算单位");
-            row1.CreateCell(5).SetCellValue("经营单位"); row1.CreateCell(6).SetCellValue("业务类型"); row1.CreateCell(7).SetCellValue("企业编号"); row1.CreateCell(8).SetCellValue("订单编号");
+            row1.CreateCell(0).SetCellValue("业务完成"); row1.CreateCell(1).SetCellValue("创建时间"); row1.CreateCell(2).SetCellValue("业务类别"); row1.CreateCell(3).SetCellValue("业务细项"); 
+            row1.CreateCell(4).SetCellValue("委托单位"); 
+            row1.CreateCell(5).SetCellValue("结算单位");row1.CreateCell(6).SetCellValue("经营单位"); row1.CreateCell(7).SetCellValue("企业编号"); row1.CreateCell(8).SetCellValue("订单编号");            
             row1.CreateCell(9).SetCellValue("操作需求"); row1.CreateCell(10).SetCellValue("结算备注"); row1.CreateCell(11).SetCellValue("文本1"); row1.CreateCell(12).SetCellValue("文本2");
             row1.CreateCell(13).SetCellValue("数字1"); row1.CreateCell(14).SetCellValue("数字2"); row1.CreateCell(15).SetCellValue("日期1"); row1.CreateCell(16).SetCellValue("人员1");
             row1.CreateCell(17).SetCellValue("日期2"); row1.CreateCell(18).SetCellValue("人员2"); 
@@ -430,12 +444,12 @@ namespace MvcPlatform.Controllers
                 NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
                 rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["SUBMITTIME"].ToString());
                 rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["CREATETIME"].ToString());
-                rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["ENTRUSTTYPENAME"].ToString());
-                rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["CUSTOMERNAME"].ToString());
-                rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["CLEARUNITNAME"].ToString());
+                rowtemp.CreateCell(2).SetCellValue(GetName(dt.Rows[i]["ENTRUSTTYPE"].ToString(),common_data_entrust));
+                rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["BUSIITEMNAME"].ToString());
+                rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["CUSTOMERNAME"].ToString());
 
-                rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
-                rowtemp.CreateCell(6).SetCellValue(getName(dt.Rows[i]["BUSITYPE"].ToString(), common_data_busi));
+                rowtemp.CreateCell(5).SetCellValue(dt.Rows[i]["CLEARUNITNAME"].ToString());
+                rowtemp.CreateCell(6).SetCellValue(dt.Rows[i]["BUSIUNITNAME"].ToString());
                 rowtemp.CreateCell(7).SetCellValue(dt.Rows[i]["CUSNO"].ToString());
                 rowtemp.CreateCell(8).SetCellValue(dt.Rows[i]["CODE"].ToString());
 
@@ -463,7 +477,7 @@ namespace MvcPlatform.Controllers
             return Extension.getPathname(filename, book);
         }
 
-        public string getName(string curstatus, string dec_insp_status)
+        public string GetName(string curstatus, string dec_insp_status)
         {
             string statusname = "";
             JArray jarray = JArray.Parse(dec_insp_status);
@@ -476,7 +490,7 @@ namespace MvcPlatform.Controllers
 
         #endregion
 
-        #region label配置
+        #region 显示配置
 
         public string LoadList_customscost()
         {
@@ -484,7 +498,7 @@ namespace MvcPlatform.Controllers
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             string sql = QueryCondition_customscost();
 
-            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "a.busitypecode", "asc"));
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "a.entrusttypecode,a.busiitemcode,a.ORIGINNAME", "asc"));
             var json = JsonConvert.SerializeObject(dt, iso);
 
             return "{rows:" + json + ",total:" + totalProperty + "}";
@@ -495,13 +509,13 @@ namespace MvcPlatform.Controllers
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
 
             string where = "";
-            if (!string.IsNullOrEmpty(Request["busitypeid"]))
+            if (!string.IsNullOrEmpty(Request["entrusttype"]))
             {
-                where += " and a.busitypecode='" + Request["busitypeid"].Trim() + "'";
+                where += " and a.entrusttypecode='" + Request["entrusttype"].Trim() + "'";
             }
-            if (!string.IsNullOrEmpty(Request["entrusttype"]))//判断查询条件1是否有值
+            if (!string.IsNullOrEmpty(Request["busiitemcode"]))//判断查询条件1是否有值
             {
-                where += " and a.busiitemcode='" + Request["entrusttype"].Trim() + "'";
+                where += " and a.busiitemcode='" + Request["busiitemcode"].Trim() + "'";
             }
 
             string sql = "select a.* from web_customscost a where 1=1" + where;
@@ -544,24 +558,24 @@ namespace MvcPlatform.Controllers
             if (string.IsNullOrEmpty(json.Value<string>("ID")))
             {
                 sql = @"insert into web_customscost (Id
-                                        ,Busitypecode,Busitypename,Busiitemcode,Busiitemname,Originname,Configname
+                                        ,entrusttypecode,entrusttypename,Busiitemcode,Busiitemname,Originname,Configname
                                         ,Createuserid,Createusername
                                         )
                         values (web_customscost_id.nextval
                                     ,'{0}','{1}','{2}','{3}','{4}','{5}'
                                     ,'{6}','{7}')";
                 sql = string.Format(sql
-                    , json.Value<string>("BUSITYPECODE"), json.Value<string>("BUSITYPENAME"), json.Value<string>("BUSIITEMCODE"), json.Value<string>("BUSIITEMNAME"), json.Value<string>("ORIGINNAME"), json.Value<string>("CONFIGNAME")
+                    , json.Value<string>("ENTRUSTTYPECODE"), json.Value<string>("ENTRUSTTYPENAME"), json.Value<string>("BUSIITEMCODE"), json.Value<string>("BUSIITEMNAME"), json.Value<string>("ORIGINNAME"), json.Value<string>("CONFIGNAME")
                     , json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
                     );
             }
             else
             {
-                sql = @"update web_customscost set busitypecode='{1}',busitypename='{2}',busiitemcode='{3}',busiitemname='{4}',Originname='{5}'
+                sql = @"update web_customscost set entrusttypecode='{1}',entrusttypename='{2}',busiitemcode='{3}',busiitemname='{4}',Originname='{5}'
                                     ,Configname='{6}',createuserid='{7}',createusername='{8}' 
                         where id='{0}'";
                 sql = string.Format(sql, json.Value<string>("ID")
-                   , json.Value<string>("BUSITYPECODE"), json.Value<string>("BUSITYPENAME"), json.Value<string>("BUSIITEMCODE"), json.Value<string>("BUSIITEMNAME"), json.Value<string>("ORIGINNAME")
+                   , json.Value<string>("ENTRUSTTYPECODE"), json.Value<string>("ENTRUSTTYPENAME"), json.Value<string>("BUSIITEMCODE"), json.Value<string>("BUSIITEMNAME"), json.Value<string>("ORIGINNAME")
                    , json.Value<string>("CONFIGNAME"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
                    );
             }
@@ -587,8 +601,8 @@ namespace MvcPlatform.Controllers
                 strWhere = " and t1.id not in ('" + json.Value<string>("ID") + "') ";
             }
 
-            string sqlStr = "select * from WEB_CUSTOMSCOST t1 where t1.BUSITYPECODE='{0}' and t1.BUSIITEMCODE='{1}' and t1.ORIGINNAME='{2}' " + strWhere;
-            sqlStr = string.Format(sqlStr, json.Value<string>("BUSITYPECODE"), json.Value<string>("BUSIITEMCODE"), json.Value<string>("ORIGINNAME"));
+            string sqlStr = "select * from WEB_CUSTOMSCOST t1 where t1.ENTRUSTTYPECODE='{0}' and t1.BUSIITEMCODE='{1}' and t1.ORIGINNAME='{2}' " + strWhere;
+            sqlStr = string.Format(sqlStr, json.Value<string>("ENTRUSTTYPECODE"), json.Value<string>("BUSIITEMCODE"), json.Value<string>("ORIGINNAME"));
             DataTable dt = DBMgr.GetDataTable(sqlStr);
             if (dt.Rows.Count > 0)
             {
@@ -601,7 +615,7 @@ namespace MvcPlatform.Controllers
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string sql = QueryCondition_customscost();
-            sql += " order by a.busitypecode asc";
+            sql += " order by a.entrusttypecode,a.busiitemcode,a.ORIGINNAME asc";
 
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
@@ -620,19 +634,19 @@ namespace MvcPlatform.Controllers
 
             //添加一个导出成功sheet
             NPOI.SS.UserModel.ISheet sheet_S;
-            string filename = "label配置.xls";
+            string filename = "显示配置.xls";
 
-            sheet_S = book.CreateSheet("label配置");
+            sheet_S = book.CreateSheet("显示配置");
 
             NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
-            row1.CreateCell(0).SetCellValue("业务类型编号"); row1.CreateCell(1).SetCellValue("业务类型名称"); row1.CreateCell(2).SetCellValue("业务细项编号"); row1.CreateCell(3).SetCellValue("业务细项名称");
+            row1.CreateCell(0).SetCellValue("业务类别编号"); row1.CreateCell(1).SetCellValue("业务类别名称"); row1.CreateCell(2).SetCellValue("业务细项编号"); row1.CreateCell(3).SetCellValue("业务细项名称");
             row1.CreateCell(4).SetCellValue("文本名称"); row1.CreateCell(5).SetCellValue("配置名称"); row1.CreateCell(6).SetCellValue("创建人"); 
 
             for (int i = 0; i < dt.Rows.Count; i++)
             {
                 NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
-                rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["BUSITYPECODE"].ToString());
-                rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["BUSITYPENAME"].ToString());
+                rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["ENTRUSTTYPECODE"].ToString());
+                rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["ENTRUSTTYPENAME"].ToString());
                 rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["BUSIITEMCODE"].ToString());
                 rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["BUSIITEMNAME"].ToString());
                 rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["ORIGINNAME"].ToString());
@@ -658,7 +672,7 @@ namespace MvcPlatform.Controllers
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             string sql = QueryCondition_customsconfig();
 
-            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "a.busitypecode", "asc"));
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "a.entrusttypecode,a.busiitemcode", "asc"));
             var json = JsonConvert.SerializeObject(dt, iso);
 
             return "{rows:" + json + ",total:" + totalProperty + "}";
@@ -669,14 +683,10 @@ namespace MvcPlatform.Controllers
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
 
             string where = "";
-            if (!string.IsNullOrEmpty(Request["busitypeid"]))
+            if (!string.IsNullOrEmpty(Request["entrusttype"]))
             {
-                where += " and a.busitypecode='" + Request["busitypeid"].Trim() + "'";
+                where += " and a.entrusttypecode='" + Request["entrusttype"].Trim() + "'";
             }
-            //if (!string.IsNullOrEmpty(Request["entrusttype"]))//判断查询条件1是否有值
-            //{
-            //    where += " and a.busiitemcode='" + Request["entrusttype"].Trim() + "'";
-            //}
             if (!string.IsNullOrEmpty(Request["busiitemcode"]))
             {
                 where += " and a.busiitemcode like '%" + Request["busiitemcode"].Trim() + "%'";
@@ -710,21 +720,21 @@ namespace MvcPlatform.Controllers
             if (string.IsNullOrEmpty(json.Value<string>("ID")))
             {
                 sql = @"insert into web_customsconfig (ID,starttime,enable
-                                    ,busitypecode,busitypename,busiitemcode,busiitemname,createuserid,createusername
+                                    ,entrusttypecode,entrusttypename,busiitemcode,busiitemname,createuserid,createusername
                                     )
                         values (web_customsconfig_id.nextval,sysdate,1
                                     ,'{0}','{1}','{2}','{3}','{4}','{5}')";
                 sql = string.Format(sql
-                    , json.Value<string>("BUSITYPECODE"), json.Value<string>("BUSITYPENAME"), json.Value<string>("BUSIITEMCODE"), json.Value<string>("BUSIITEMNAME"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
+                    , json.Value<string>("ENTRUSTTYPECODE"), json.Value<string>("ENTRUSTTYPENAME"), json.Value<string>("BUSIITEMCODE"), json.Value<string>("BUSIITEMNAME"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
                     );
             }
             else
             {
-                sql = @"update web_customsconfig set busitypecode='{1}',busitypename='{2}',busiitemcode='{3}',busiitemname='{4}',enable='{5}'
+                sql = @"update web_customsconfig set entrusttypecode='{1}',entrusttypename='{2}',busiitemcode='{3}',busiitemname='{4}',enable='{5}'
                                     ,createuserid='{6}',createusername='{7}',remark='{8}',starttime=sysdate where id='{0}'
                                     ";
                 sql = string.Format(sql, json.Value<string>("ID")
-                   , json.Value<string>("BUSITYPECODE"), json.Value<string>("BUSITYPENAME"), json.Value<string>("BUSIITEMCODE"), json.Value<string>("BUSIITEMNAME"), json.Value<string>("ENABLE")
+                   , json.Value<string>("ENTRUSTTYPECODE"), json.Value<string>("ENTRUSTTYPENAME"), json.Value<string>("BUSIITEMCODE"), json.Value<string>("BUSIITEMNAME"), json.Value<string>("ENABLE")
                    , json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"), json.Value<string>("REMARK")
                    );
             }
@@ -750,7 +760,7 @@ namespace MvcPlatform.Controllers
                 strWhere = " and t1.id not in ('" + json.Value<string>("ID") + "') ";
             }
 
-            string sqlStr = @"select * from web_customsconfig t1 where t1.busitypecode='" + json.Value<string>("BUSITYPECODE") + "' and t1.busiitemcode='" + json.Value<string>("BUSIITEMCODE") + "'";
+            string sqlStr = @"select * from web_customsconfig t1 where t1.entrusttypecode='" + json.Value<string>("ENTRUSTTYPECODE") + "' and t1.busiitemcode='" + json.Value<string>("BUSIITEMCODE") + "'";
             sqlStr += strWhere;
             DataTable dt = DBMgr.GetDataTable(sqlStr);
             if (dt.Rows.Count > 0)
@@ -758,7 +768,7 @@ namespace MvcPlatform.Controllers
                 msg = "业务类型+业务细项代码重复！";
             }
 
-            string sqlStr2 = @"select * from web_customsconfig t1 where t1.busitypecode='" + json.Value<string>("BUSITYPECODE") + "' and t1.busiitemname='" + json.Value<string>("BUSIITEMNAME") + "'";
+            string sqlStr2 = @"select * from web_customsconfig t1 where t1.entrusttypecode='" + json.Value<string>("ENTRUSTTYPECODE") + "' and t1.busiitemname='" + json.Value<string>("BUSIITEMNAME") + "'";
             sqlStr2 += strWhere;
             DataTable dt2 = DBMgr.GetDataTable(sqlStr2);
             if (dt2.Rows.Count > 0)
@@ -817,7 +827,7 @@ namespace MvcPlatform.Controllers
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string sql = QueryCondition_customsconfig();
-            sql += " order by a.busitypecode asc";
+            sql += " order by a.entrusttypecode,a.busiitemcode asc";
 
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
@@ -841,14 +851,14 @@ namespace MvcPlatform.Controllers
             sheet_S = book.CreateSheet("业务细项");
 
             NPOI.SS.UserModel.IRow row1 = sheet_S.CreateRow(0);
-            row1.CreateCell(0).SetCellValue("业务类型编号"); row1.CreateCell(1).SetCellValue("业务类型名称"); row1.CreateCell(2).SetCellValue("业务细项编号"); row1.CreateCell(3).SetCellValue("业务细项名称"); 
+            row1.CreateCell(0).SetCellValue("业务类别编号"); row1.CreateCell(1).SetCellValue("业务类别名称"); row1.CreateCell(2).SetCellValue("业务细项编号"); row1.CreateCell(3).SetCellValue("业务细项名称"); 
             row1.CreateCell(4).SetCellValue("创建时间");row1.CreateCell(5).SetCellValue("是否启用"); row1.CreateCell(6).SetCellValue("创建人"); row1.CreateCell(7).SetCellValue("启禁用人"); 
             
             for (int i = 0; i < dt.Rows.Count; i++)
             {
                 NPOI.SS.UserModel.IRow rowtemp = sheet_S.CreateRow(i + 1);
-                rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["BUSITYPECODE"].ToString());
-                rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["BUSITYPENAME"].ToString());
+                rowtemp.CreateCell(0).SetCellValue(dt.Rows[i]["ENTRUSTTYPECODE"].ToString());
+                rowtemp.CreateCell(1).SetCellValue(dt.Rows[i]["ENTRUSTTYPENAME"].ToString());
                 rowtemp.CreateCell(2).SetCellValue(dt.Rows[i]["BUSIITEMCODE"].ToString());
                 rowtemp.CreateCell(3).SetCellValue(dt.Rows[i]["BUSIITEMNAME"].ToString());
                 rowtemp.CreateCell(4).SetCellValue(dt.Rows[i]["STARTTIME"].ToString());

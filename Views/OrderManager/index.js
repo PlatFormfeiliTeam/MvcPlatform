@@ -1,5 +1,5 @@
-﻿var common_data_jydw = [], common_data_wtdw = [], common_data_busi = [];
-var store_busitype; var columns_order = [];
+﻿var common_data_jydw = [], common_data_wtdw = [], common_data_entrust = [];
+var store_entrust;
 Ext.onReady(function () {
     Ext.Ajax.request({//对公共基础数据发起一次请求
         url: "/Common/Ini_Base_Data",
@@ -8,9 +8,9 @@ Ext.onReady(function () {
             var commondata = Ext.decode(response.responseText);
             common_data_jydw = commondata.jydw;//经营单位
             common_data_wtdw = commondata.wtdw;//委托单位
-            common_data_busi = commondata.busi;//业务类型
+            common_data_entrust = commondata.entrust;//业务类别
             
-            store_busitype = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME', 'CODENAME'], data: common_data_busi });
+            store_entrust = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME', 'CODENAME'], data: common_data_entrust });
 
             initSearch_OrderM();
             bindgrid();
@@ -45,17 +45,11 @@ function initSearch_OrderM() {
         name: 'CUSNO'
     });
 
-    //业务类型
-    //var store_busitype = Ext.create('Ext.data.JsonStore', {
-    //    fields: ['CODE', 'NAME', 'CODENAME'],
-    //    data: common_data_busi
-    //});
-
-    var combo_BUSITYPE = Ext.create('Ext.form.field.ComboBox', {
-        id: 'combo_BUSITYPE',
-        name: 'BUSITYPEID',
-        store: store_busitype,
-        fieldLabel: '业务类型',//tabIndex: 3
+    var combo_ENTRUST = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_ENTRUST',
+        name: 'ENTRUSTTYPECODE',
+        store: store_entrust,
+        fieldLabel: '业务类别',//tabIndex: 3
         displayField: 'CODENAME',
         valueField: 'CODE',
         triggerAction: 'all',
@@ -72,13 +66,13 @@ function initSearch_OrderM() {
                 };
             },
             change: function (combo, newValue, oldValue, eOpts) {
-                combo_ENTRUSTTYPE.reset();
+                combo_BUSIITEMCODE.reset();
                 Ext.Ajax.request({
                     url: "/OrderManager/Ini_Base_Data_BUSIITEM",
-                    params: { busitype: newValue },
+                    params: { entrusttype: newValue },
                     success: function (response, opts) {
                         var commondata = Ext.decode(response.responseText);//业务细项
-                        store_ENTRUSTTYPE.loadData(commondata.ywxx);
+                        store_BUSIITEMCODE.loadData(commondata.ywxx);
 
                         change_ini_label();
                     }
@@ -154,14 +148,14 @@ function initSearch_OrderM() {
     });
 
     //业务细项
-    var store_ENTRUSTTYPE = Ext.create('Ext.data.JsonStore', {
+    var store_BUSIITEMCODE = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME', 'CODENAME']//,data: common_data_ywxx
     });
 
-    var combo_ENTRUSTTYPE = Ext.create('Ext.form.field.ComboBox', {
-        id: 'combo_ENTRUSTTYPE',
-        name: 'ENTRUSTTYPE',
-        store: store_ENTRUSTTYPE,
+    var combo_BUSIITEMCODE = Ext.create('Ext.form.field.ComboBox', {
+        id: 'combo_BUSIITEMCODE',
+        name: 'BUSIITEMCODE',
+        store: store_BUSIITEMCODE,
         fieldLabel: '业务细项',//tabIndex: 3
         displayField: 'CODENAME',
         valueField: 'CODE',
@@ -234,8 +228,8 @@ function initSearch_OrderM() {
             labelWidth: 80
         },
         items: [
-        { layout: 'column', border: 0, items: [s_combo_busiunitname, field_CUSNO,combo_BUSITYPE, condate] },
-        { layout: 'column', border: 0, items: [combo_wtdw, field_CODE, combo_ENTRUSTTYPE, condate2] }
+        { layout: 'column', border: 0, items: [s_combo_busiunitname, field_CUSNO, combo_ENTRUST, condate] },
+        { layout: 'column', border: 0, items: [combo_wtdw, field_CODE, combo_BUSIITEMCODE, condate2] }
         ]
     });
 
@@ -251,44 +245,9 @@ function initSearch_OrderM() {
 }
 
 function bindgrid() {
-    columns_order = [
-                { xtype: 'rownumberer', width: 35 },
-                { header: 'ID', dataIndex: 'ID', hidden: true, locked: true },
-                { header: '业务完成', dataIndex: 'SUBMITTIME', width: 130, locked: true },
-                { header: '创建时间', dataIndex: 'CREATETIME', width: 130, locked: true },
-                {
-                    header: '业务类型', dataIndex: 'BUSITYPE', width: 90, renderer: function renderOrder(value, cellmeta, record, rowIndex, columnIndex, store) {
-                        var rtn = "";
-                        if (value) {
-                            var rec = store_busitype.findRecord('CODE', value);
-                            if (rec) {
-                                rtn = rec.get("NAME");
-                            }
-                        }
-                        return rtn;
-                    }
-                },
-                { header: '业务细项', dataIndex: 'ENTRUSTTYPENAME', width: 100, locked: true },
-                { header: '委托单位', dataIndex: 'CUSTOMERNAME', width: 130, locked: true },
-                { header: '结算单位', dataIndex: 'CLEARUNITNAME', width: 130, locked: true },
-                { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 130, locked: true },
-                { header: '企业编号', dataIndex: 'CUSNO', width: 100 },
-                { header: '订单编号', dataIndex: 'CODE', width: 100 },
-                { header: '操作需求', dataIndex: 'DOREQUEST', width: 130 },
-                { header: '结算备注', dataIndex: 'CLEARREMARK', width: 130 },
-                { header: '文本1', dataIndex: 'TEXTONE', width: 100 },
-                { header: '文本2', dataIndex: 'TEXTTWO', width: 100 },
-                { header: '数字1', dataIndex: 'NUMONE', width: 100 },
-                { header: '数字2', dataIndex: 'NUMTWO', width: 100 },
-                { header: '日期1', dataIndex: 'DATEONE', width: 100 },
-                { header: '人员1', dataIndex: 'USERNAMEONE', width: 100 },
-                { header: '日期2', dataIndex: 'DATETWO', width: 100 },
-                { header: '人员2', dataIndex: 'USERNAMETWO', width: 100 }
-    ];
-
     var store_Trade = Ext.create('Ext.data.JsonStore', {
         fields: ['ID', 'BUSITYPE', 'CREATETIME', 'SUBMITTIME', 'ENTRUSTTYPE', 'CUSTOMERCODE', 'CUSTOMERNAME', 'CLEARUNIT', 'CLEARUNITNAME'
-                , 'BUSIUNITCODE', 'BUSIUNITNAME', 'CODE', 'CUSNO', 'DOREQUEST', 'CLEARREMARK', 'ENTRUSTTYPENAME'
+                , 'BUSIUNITCODE', 'BUSIUNITNAME', 'CODE', 'CUSNO', 'DOREQUEST', 'CLEARREMARK', 'BUSIITEMCODE', 'BUSIITEMNAME'
                 , 'TEXTONE', 'TEXTTWO', 'NUMONE', 'NUMTWO', 'DATEONE', 'DATETWO', 'USERNAMEONE', 'USERNAMETWO'],
         pageSize: 20,
         proxy: {
@@ -305,9 +264,9 @@ function bindgrid() {
             beforeload: function () {
                 store_Trade.getProxy().extraParams = {
                     OnlySelf: Ext.get('OnlySelfi').el.dom.className,
-                    BUSIUNITCODE: Ext.getCmp('s_combo_busiunitname').getValue(), CUSNO: Ext.getCmp('field_CUSNO').getValue(), busitypeid: Ext.getCmp('combo_BUSITYPE').getValue(),
+                    BUSIUNITCODE: Ext.getCmp('s_combo_busiunitname').getValue(), CUSNO: Ext.getCmp('field_CUSNO').getValue(), entrusttype: Ext.getCmp('combo_ENTRUST').getValue(),
                     start_date: Ext.Date.format(Ext.getCmp("start_date").getValue(), 'Y-m-d H:i:s'), end_date: Ext.Date.format(Ext.getCmp("end_date").getValue(), 'Y-m-d H:i:s'),
-                    CUSTOMERCODE: Ext.getCmp('combo_wtdw').getValue(), CODE: Ext.getCmp('field_CODE').getValue(), entrusttype: Ext.getCmp('combo_ENTRUSTTYPE').getValue(),
+                    CUSTOMERCODE: Ext.getCmp('combo_wtdw').getValue(), CODE: Ext.getCmp('field_CODE').getValue(), busiitemcode: Ext.getCmp('combo_BUSIITEMCODE').getValue(),
                     start_date2: Ext.Date.format(Ext.getCmp("start_date2").getValue(), 'Y-m-d H:i:s'), end_date2: Ext.Date.format(Ext.getCmp("end_date2").getValue(), 'Y-m-d H:i:s')
                 }
                 var TEXTONE = ""; var TEXTTWO = "";var NUMONE = ""; var NUMTWO = "";                
@@ -344,11 +303,44 @@ function bindgrid() {
         selModel: { selType: 'checkboxmodel' },
         bbar: pgbar,
         enableColumnHide: false,
-        columns: columns_order,
+        columns: [
+                { xtype: 'rownumberer', width: 35 },
+                { header: 'ID', dataIndex: 'ID', hidden: true, locked: true },
+                { header: '业务完成', dataIndex: 'SUBMITTIME', width: 130, locked: true },
+                { header: '创建时间', dataIndex: 'CREATETIME', width: 130, locked: true },
+                {
+                    header: '业务类别', dataIndex: 'ENTRUSTTYPE', width: 120, locked: true, renderer: function renderOrder(value, cellmeta, record, rowIndex, columnIndex, store) {
+                        var rtn = "";
+                        if (value) {
+                            var rec = store_entrust.findRecord('CODE', value);
+                            if (rec) {
+                                rtn = rec.get("NAME");
+                            }
+                        }
+                        return rtn;
+                    }
+                },
+                { header: '业务细项', dataIndex: 'BUSIITEMNAME', width: 120, locked: true },
+                { header: '委托单位', dataIndex: 'CUSTOMERNAME', width: 130, locked: true },
+                { header: '结算单位', dataIndex: 'CLEARUNITNAME', width: 130, locked: true },
+                { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 130, locked: true },
+                { header: '企业编号', dataIndex: 'CUSNO', width: 100 },
+                { header: '订单编号', dataIndex: 'CODE', width: 100 },
+                { header: '操作需求', dataIndex: 'DOREQUEST', width: 130 },
+                { header: '结算备注', dataIndex: 'CLEARREMARK', width: 130 },
+                { header: '文本1', dataIndex: 'TEXTONE', width: 100 },
+                { header: '文本2', dataIndex: 'TEXTTWO', width: 100 },
+                { header: '数字1', dataIndex: 'NUMONE', width: 100 },
+                { header: '数字2', dataIndex: 'NUMTWO', width: 100 },
+                { header: '日期1', dataIndex: 'DATEONE', width: 100 },
+                { header: '人员1', dataIndex: 'USERNAMEONE', width: 100 },
+                { header: '日期2', dataIndex: 'DATETWO', width: 100 },
+                { header: '人员2', dataIndex: 'USERNAMETWO', width: 100 }
+        ],
         listeners:
         {
             'itemdblclick': function (view, record, item, index, e) {
-                opencenterwin("/OrderManager/Create?ordercode=" + record.get("CODE") + "&entrusttype=" + record.get("ENTRUSTTYPE"), 1600, 900);
+                opencenterwin("/OrderManager/Create?ordercode=" + record.get("CODE") + "&busiitemcode=" + record.get("BUSIITEMCODE"), 1600, 900);
             }
         },
         viewConfig: {
@@ -372,7 +364,7 @@ function EditOrderM() {
         return;
     }
 
-    opencenterwin("/OrderManager/Create?ordercode=" + recs[0].get("CODE") + "&entrusttype=" + recs[0].get("ENTRUSTTYPE"), 1600, 900);
+    opencenterwin("/OrderManager/Create?ordercode=" + recs[0].get("CODE") + "&busiitemcode=" + recs[0].get("BUSIITEMCODE"), 1600, 900);
 }
 
 function changeOnlySelfStyle() {
@@ -390,12 +382,12 @@ function changeOnlySelfStyle() {
 function Reset() {
     Ext.getCmp("s_combo_busiunitname").setValue("");
     Ext.getCmp("field_CUSNO").setValue("");
-    Ext.getCmp("combo_BUSITYPE").setValue("");
+    Ext.getCmp("combo_ENTRUST").setValue("");
     Ext.getCmp("start_date").setValue("");
     Ext.getCmp("end_date").setValue("");
     Ext.getCmp("combo_wtdw").setValue("");
     Ext.getCmp("field_CODE").setValue("");
-    Ext.getCmp("combo_ENTRUSTTYPE").setValue("");
+    Ext.getCmp("combo_BUSIITEMCODE").setValue("");
     Ext.getCmp("start_date2").setValue("");
     Ext.getCmp("end_date2").setValue("");
 }
@@ -527,12 +519,12 @@ function change_ini_label() {
         Ext.getCmp("field_DATEONE").setFieldLabel("日期1"); Ext.getCmp("field_DATETWO").setFieldLabel("日期2");
         Ext.getCmp("field_USERNAMEONE").setFieldLabel("人员1"); Ext.getCmp("field_USERNAMETWO").setFieldLabel("人员2");
 
-        var f_busitype = Ext.getCmp("combo_BUSITYPE").getValue();
-        var f_entrusttype = Ext.getCmp("combo_ENTRUSTTYPE").getValue();
+        var f_entrusttype = Ext.getCmp("combo_ENTRUST").getValue();
+        var f_busiitemcode = Ext.getCmp("combo_BUSIITEMCODE").getValue();
 
         Ext.Ajax.request({
             url: "/OrderManager/Getlabelname",
-            params: { busitype: f_busitype, entrusttype: f_entrusttype },
+            params: { entrusttype: f_entrusttype, busiitemcode: f_busiitemcode },
             success: function (response, opts) {
                 var json = Ext.decode(response.responseText);
                 var jsonobj = json.fieldcolumn;
@@ -617,16 +609,25 @@ function DeleteOrderM() {
         return;
     }
 
-    if (recs[0].get("SUBMITTIME") != "" && recs[0].get("SUBMITTIME") != null) {
+    var bf = false; ordercodes = "";
+    Ext.each(recs, function (rec) {
+        if (rec.get("SUBMITTIME") != "" && rec.get("SUBMITTIME") != null) {
+            bf = true;
+        } else {
+            ordercodes += "'" + rec.get("CODE") + "',";
+        }
+    });
+    if (bf) {
         Ext.MessageBox.alert('提示', '订单业务已完成,不能删除！');
         return;
     }
+    ordercodes = ordercodes.substr(0, ordercodes.length - 1);
 
     Ext.MessageBox.confirm("提示", "确定要删除所选择的记录吗？", function (btn) {
         if (btn == 'yes') {
             Ext.Ajax.request({
                 url: '/OrderManager/DeleteOrderM',
-                params: { ordercode: recs[0].get("CODE") },
+                params: { ordercodes: ordercodes },
                 success: function (response, success, option) {
                     var res = Ext.decode(response.responseText);
                     if (res.success) {
@@ -661,11 +662,11 @@ function ExportOrderM() {
     }
 
     var data = {
-        common_data_busi: JSON.stringify(common_data_busi),
+        common_data_entrust: JSON.stringify(common_data_entrust),
         OnlySelf: Ext.get('OnlySelfi').el.dom.className,
-        BUSIUNITCODE: Ext.getCmp('s_combo_busiunitname').getValue(), CUSNO: Ext.getCmp('field_CUSNO').getValue(), busitypeid: Ext.getCmp('combo_BUSITYPE').getValue(),
+        BUSIUNITCODE: Ext.getCmp('s_combo_busiunitname').getValue(), CUSNO: Ext.getCmp('field_CUSNO').getValue(), entrusttype: Ext.getCmp('combo_ENTRUST').getValue(),
         start_date: Ext.Date.format(Ext.getCmp("start_date").getValue(), 'Y-m-d H:i:s'), end_date: Ext.Date.format(Ext.getCmp("end_date").getValue(), 'Y-m-d H:i:s'),
-        CUSTOMERCODE: Ext.getCmp('combo_wtdw').getValue(), CODE: Ext.getCmp('field_CODE').getValue(), entrusttype: Ext.getCmp('combo_ENTRUSTTYPE').getValue(),
+        CUSTOMERCODE: Ext.getCmp('combo_wtdw').getValue(), CODE: Ext.getCmp('field_CODE').getValue(), busiitemcode: Ext.getCmp('combo_BUSIITEMCODE').getValue(),
         start_date2: Ext.Date.format(Ext.getCmp("start_date2").getValue(), 'Y-m-d H:i:s'), end_date2: Ext.Date.format(Ext.getCmp("end_date2").getValue(), 'Y-m-d H:i:s'),
         TEXTONE: TEXTONE, TEXTTWO: TEXTTWO, NUMONE: NUMONE, NUMTWO: NUMTWO,
         DATEONE: DATEONE, DATETWO: DATETWO, USERNAMEONE: USERNAMEONE, USERNAMETWO: USERNAMETWO
