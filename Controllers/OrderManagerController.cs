@@ -23,28 +23,28 @@ namespace MvcPlatform.Controllers
 
         public ActionResult Index()
         {
-            ViewBag.navigator = "订单中心>>关务服务2";
+            ViewBag.navigator = "订单中心>>关务服务";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
 
         public ActionResult Create()
         {
-            ViewBag.navigator = "订单中心>>关务服务2";
+            ViewBag.navigator = "订单中心>>关务服务";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
 
         public ActionResult ConfigItem()
         {
-            ViewBag.navigator = "关务服务2>>显示配置";
+            ViewBag.navigator = "关务服务>>显示配置";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
 
         public ActionResult BusitypeDetailBaseConfig()
         {
-            ViewBag.navigator = "关务服务2>>业务细项配置";
+            ViewBag.navigator = "关务服务>>业务细项配置";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
