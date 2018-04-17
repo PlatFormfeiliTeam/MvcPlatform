@@ -4691,7 +4691,9 @@ namespace MvcPlatform.Controllers
                                       where l.ASSOCIATENO is not null and l.isinvalid=0 and i.isinvalid=0 and (i.STATUS!=130 and i.STATUS!=110)    
 									   ) b on ort.ASSOCIATENO=b.ASSOCIATENO */ 
                                 left join list_verification lv on lda.declarationcode=lv.declarationcode 
-                           where (det.STATUS=130 or det.STATUS=110) and det.isinvalid=0 and ort.isinvalid=0 " + where +
+                           where (det.STATUS=130 or det.STATUS=110) and det.isinvalid=0 and ort.isinvalid=0  and ort.receiverunitcode not in (select receiveunitcode
+          from cusdoctool.list_UnAuthorized
+         where busiunitcode = '" + json_user.Value<string>("CUSTOMERHSCODE") + "' and enabled = '1' )" + where +
                         @"  and a.ordercode is null 
                             /*and b.ASSOCIATENO is null*/ ";
                              
@@ -4930,7 +4932,7 @@ namespace MvcPlatform.Controllers
                                             where ort2.isinvalid=0 and ldc.isinvalid=0
                                             )c on ort.ASSOCIATENO = c.ASSOCIATENO and ort.code<>c.code 
                                 left join list_verification lv on lda.declarationcode=lv.declarationcode 
-                           where (det.STATUS=130 or det.STATUS=110) and det.isinvalid=0 and ort.isinvalid=0 " + where +
+                           where (det.STATUS=130 or det.STATUS=110) and det.isinvalid=0 and ort.isinvalid=0 and  ort.receiverunitcode not in(select receiveunitcode from cusdoctool.list_UnAuthorized where busiunitcode = '3223640047'  and enabled = '1' )" + where +
                         @"  and a.ordercode is null 
                             and b.ASSOCIATENO is null ";
             return sql;

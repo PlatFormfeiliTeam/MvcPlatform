@@ -144,7 +144,7 @@ namespace MvcPlatform.Controllers
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string sql = @"select t.CUSTOMERID,t.NAME,t.EMAIL,t.TELEPHONE,t.MOBILEPHONE,t.IMGPATH,t.COMPANYNAMES,t.TYPE,t.REALNAME,
-                         b.SCENEDECLAREID,b.SCENEINSPECTID,b.Name COMPANYNAME,b.ISCUSTOMER,b.WEIGHTCHECK,b.BUSITYPES
+                         b.SCENEDECLAREID,b.SCENEINSPECTID,b.Name COMPANYNAME,b.ISCUSTOMER,b.WEIGHTCHECK,b.BUSITYPES,b.isreceiver
                          from Sys_User t left join cusdoc.Sys_Customer b on t.CustomerId=b.Id
                          where t.id='" + json_user.GetValue("ID") + "'";
             DataTable dt = DBMgr.GetDataTable(sql);
@@ -161,6 +161,90 @@ namespace MvcPlatform.Controllers
 
             return "{data:" + json + ",a:"+a+"}";
         }
+
+        public string GetIsCompany()
+        {
+            
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string strWhere = String.Empty;
+
+            if (!string.IsNullOrEmpty(Request["NAME_S1"]))
+            {
+                strWhere += " and sc.CODE like '%" + Request["NAME_S1"] + "%' ";
+            }
+            if (!string.IsNullOrEmpty(Request["REALNAME_S1"]))
+            {
+                strWhere += " and sc.NAME like '%" + Request["REALNAME_S1"] + "%' ";
+            }
+
+            string sql = @"select sc.*, lu.receiveunitcode as isempower
+                                from cusdoc.Sys_Customer sc
+                                left join cusdoctool.list_UnAuthorized lu
+                                  on sc.hscode = lu.busiunitcode and  lu.receiveunitcode = '" +
+                         json_user.Value<string>("CUSTOMERCODE") + "' and lu.enabled  = '1' where sc.iscompany = '1' and sc.enabled = '1'" + strWhere;
+            DataTable dt = DBMgrBase.GetDataTable(GetPageSql1(sql));
+            string json = JsonConvert.SerializeObject(dt);
+            return "{rows:" + json + ",total:" + totalProperty + "}";
+        }
+
+        public string Insert_list_UnAuthorized()
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string IDS = Request["IDS"].ToString();
+            String[] array = IDS.Split(',');
+            int fail = 0;
+            int success = 0;
+            int j = 0;
+            string sql_update = string.Empty;
+            for (int i = 0; i < array.Length; i++)
+            {
+                string sql_select = @"select hscode from Sys_Customer where code = '{0}'";
+                sql_select = String.Format(sql_select,array[i].ToString());
+                DataTable dt_sql_select = DBMgrBase.GetDataTable(sql_select);
+
+                if (string.IsNullOrEmpty(dt_sql_select.Rows[0]["HSCODE"].ToString()))
+                {
+                    fail = fail + 1;
+                }
+                else
+                {
+                    string sql_list_UnAuthorized = @"select * from cusdoctool.list_UnAuthorized where receiveunitcode = '" + json_user.Value<string>("CUSTOMERCODE") + "' and busiunitcode = '" + dt_sql_select.Rows[0]["HSCODE"].ToString() + "'";
+                    DataTable dt = DBMgrBase.GetDataTable(sql_list_UnAuthorized);
+                    if (dt.Rows.Count > 0)
+                    {
+                        if (dt.Rows[0]["enabled"].ToString() == "1")
+                        {
+                            sql_update = "update cusdoctool.list_UnAuthorized set enabled = '0' where receiveunitcode = '" + json_user.Value<string>("CUSTOMERCODE") +
+                                         "' and busiunitcode = '" + dt_sql_select.Rows[0]["HSCODE"].ToString() + "' ";
+                        }
+                        else
+                        {
+                            sql_update = "update cusdoctool.list_UnAuthorized set enabled = '1' where receiveunitcode = '" + json_user.Value<string>("CUSTOMERCODE") +
+                                         "' and busiunitcode = '" + dt_sql_select.Rows[0]["HSCODE"].ToString() + "' ";
+                        }
+                        j = DBMgrBase.ExecuteNonQuery(sql_update);
+
+                    }
+                    else
+                    {
+                        string sql = @"insert into cusdoctool.list_UnAuthorized(id,receiveunitcode,busiunitcode,enabled,userid,username) values(cusdoctool.list_unauthorized_id.nextval,'{0}','{1}','{2}','{3}','{4}')";
+                        sql = String.Format(sql, json_user.Value<string>("CUSTOMERCODE"), dt_sql_select.Rows[0]["HSCODE"].ToString(), 1, json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"));
+                        j = DBMgrBase.ExecuteNonQuery(sql);
+                    }
+                    if (j>0)
+                    {
+                        success = success + 1;
+                    }
+                    
+                }
+
+               
+            }
+            
+            return "{\"success\":\"" + success + "\",\"fail\":\"" + fail + "\"}";
+
+        }
+
         public string loaduserInfo_m()
         {
             string strWhere = string.Empty;
@@ -211,6 +295,19 @@ namespace MvcPlatform.Controllers
             string sql = "select count(1) from ( " + tempsql + " )";
             totalProperty = Convert.ToInt32(DBMgr.GetDataTable(sql).Rows[0][0]);
             string order = "CREATETIME";
+            string asc = " desc";
+            string pageSql = @"SELECT * FROM (SELECT * FROM (SELECT tt.*, ROWNUM AS rowno FROM ({0} ORDER BY {1} {2}) tt) WHERE rowno <= {4}) table_alias WHERE table_alias.rowno >= {3}";
+            pageSql = string.Format(pageSql, tempsql, order, asc, start + 1, limit + start);
+            return pageSql;
+        }
+
+        private string GetPageSql1(string tempsql)
+        {
+            int start = Convert.ToInt32(Request["start"]);
+            int limit = Convert.ToInt32(Request["limit"]);
+            string sql = "select count(1) from ( " + tempsql + " )";
+            totalProperty = Convert.ToInt32(DBMgr.GetDataTable(sql).Rows[0][0]);
+            string order = "code";
             string asc = " desc";
             string pageSql = @"SELECT * FROM (SELECT * FROM (SELECT tt.*, ROWNUM AS rowno FROM ({0} ORDER BY {1} {2}) tt) WHERE rowno <= {4}) table_alias WHERE table_alias.rowno >= {3}";
             pageSql = string.Format(pageSql, tempsql, order, asc, start + 1, limit + start);

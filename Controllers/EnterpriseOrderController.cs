@@ -1109,7 +1109,7 @@ namespace MvcPlatform.Controllers
             }
 
             where += " and ISINVALID=0 ";
-            string sql = @"select * from LIST_ORDER where instr('" + busitypeid + "',BUSITYPE)>0 and BUSIUNITCODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "' " + where;
+            string sql = @"select * from LIST_ORDER lo where instr('" + busitypeid + "',BUSITYPE)>0 and BUSIUNITCODE='" + json_user.Value<string>("CUSTOMERHSCODE") + "' and lo.receiverunitcode not in (select receiveunitcode from cusdoctool.list_UnAuthorized where busiunitcode = '" + json_user.Value<string>("CUSTOMERHSCODE") + "' and enabled = '1') " + where;
             return sql;
         }
 

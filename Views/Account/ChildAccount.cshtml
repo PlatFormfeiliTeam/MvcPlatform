@@ -11,6 +11,7 @@
 <script src="~/Views/Account/supplier.js?t=@Version"></script>
 <script src="~/Views/Account/sysconfig.js?t=@Version"></script>
 <script src="~/Views/Account/form_chat.js?t=@Version"></script>
+<script src="~/Views/Account/form_empower.js?t=@Version"></script>
 <style type="text/css">
     .x-panel-header-default {
         background-image: none;
@@ -20,7 +21,7 @@
 </style>
 <script type="text/javascript">
     var store_user, field_ID, field_PASSWORD, field_TYPE, treepanel;
-    var formpanel, form_psd, formuser_panel, form_supplier, gridpanel, form_sysconfig,formchat_panel;
+    var formpanel, form_psd, formuser_panel, form_supplier, gridpanel, form_sysconfig, formchat_panel, formempower_panel;
 
     Ext.onReady(function () {
         Ext.Ajax.request({
@@ -30,6 +31,7 @@
                 console.log(data);
                 form_user_init();
                 form_chat_init();
+                from_init_empower();
                 var items = [{ title: '基本信息', items: [formuser_panel] }];
                 if (data.data.TYPE == 1 && !data.data.PARENTID) {//如果是主账户
                     subaccount_init(); init_search();
@@ -41,7 +43,12 @@
                         items.push({ title: '供应商设置', items: [form_supplier] });
                         items.push({ title: '系统参数', items: [form_sysconfig] });
                     }
-                }
+                };
+                //如果是接单单位
+                if (data.data.ISRECEIVER == 1) {
+                    items.push({ title: '授权配置', items: [formempower_panel] });
+                };
+                
                 items.push({ title: '微信账号绑定', items: [formchat_panel] });
                 var tabpanel = Ext.create('Ext.tab.Panel', {
                     items: items,
