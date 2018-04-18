@@ -20,7 +20,7 @@
     //企业编号
     var field_CUSNO = Ext.create('Ext.form.field.Text', {
         id: 'CUSNO',
-        name: 'CUSNO',//tabIndex: 5,        
+        name: 'CUSNO', tabIndex: 1,
         fieldLabel: '企业编号'
     });
 
@@ -31,9 +31,9 @@
     });
     var combo_ENTRUSTTYPE = Ext.create('Ext.form.field.ComboBox', {
         id: 'combo_ENTRUSTTYPE',
-        name: 'ENTRUSTTYPE',
+        name: 'ENTRUSTTYPE', tabIndex: 2,
         store: store_ENTRUSTTYPE,
-        fieldLabel: '业务类别',//tabIndex: 3
+        fieldLabel: '业务类别', 
         displayField: 'CODENAME',
         valueField: 'CODE',
         triggerAction: 'all',
@@ -81,9 +81,9 @@
 
     var combo_BUSIITEMCODE = Ext.create('Ext.form.field.ComboBox', {
         id: 'combo_BUSIITEMCODE',
-        name: 'BUSIITEMCODE',
+        name: 'BUSIITEMCODE', tabIndex: 3,
         store: store_BUSIITEMCODE,
-        fieldLabel: '业务细项',//tabIndex: 3
+        fieldLabel: '业务细项',
         displayField: 'CODENAME',
         valueField: 'CODE',
         triggerAction: 'all',
@@ -121,14 +121,14 @@
     })
     var combo_wtdw = Ext.create('Ext.form.field.ComboBox', {
         id: 'combo_wtdw',
-        name: 'CUSTOMERCODE',
+        name: 'CUSTOMERCODE', tabIndex: 5,
         store: store_wtdw,
         hideTrigger: true,
         fieldLabel: '委托单位', forceSelection: true,
         displayField: 'NAME',
         valueField: 'CODE',
         triggerAction: 'all',
-        queryMode: 'local', tabIndex: 2,
+        queryMode: 'local', 
         anyMatch: true,
         listeners: {
             focus: function (cb) {
@@ -155,7 +155,7 @@
     });
     var combo_jydw = Ext.create('Ext.form.field.ComboBox', {//经营单位 这个数据比较多需要根据输入字符到后台动态模糊匹配,如果取不到点击添加按钮从总库进行选择，同时添加到自有客户库
         id: 'combo_jydw',
-        name: 'BUSIUNITCODE',
+        name: 'BUSIUNITCODE', tabIndex: 4,
         store: store_jydw,
         displayField: 'NAME',
         valueField: 'CODE',
@@ -206,13 +206,13 @@
     })
     var combo_jsdw = Ext.create('Ext.form.field.ComboBox', {
         id: 'combo_jsdw',
-        name: 'CLEARUNIT',
+        name: 'CLEARUNIT', tabIndex: 6,
         store: store_jsdw,
         hideTrigger: true,
         fieldLabel: '结算单位', forceSelection: true, flex: .95,
         displayField: 'NAME',
         valueField: 'CODE',
-        triggerAction: 'all', tabIndex: 4,
+        triggerAction: 'all', 
         queryMode: 'local',
         anyMatch: true,
         listeners: {
@@ -262,7 +262,7 @@
     //操作需求
     var field_DOREQUEST = Ext.create('Ext.form.field.Text', {
         id: 'field_DOREQUEST',
-        flex: 1, margin: 0, tabIndex: 6,
+        flex: 1, margin: 0, tabIndex: 7,
         name: 'DOREQUEST'
     });
     var container_DOREQUEST = {
@@ -276,7 +276,7 @@
     //结算备注
     var field_CLEARREMARK = Ext.create('Ext.form.field.Text', {
         id: 'field_CLEARREMARK',
-        flex: 1, margin: 0, tabIndex: 7,
+        flex: 1, margin: 0, tabIndex: 8,
         name: 'CLEARREMARK'
     });
     var container_CLEARREMARK = {
@@ -295,30 +295,30 @@
 
     var field_TEXTONE = Ext.create('Ext.form.field.Text', {
         id: 'field_TEXTONE',
-        name: 'TEXTONE',//tabIndex: 5,        
+        name: 'TEXTONE', tabIndex: 9,
         fieldLabel: '文本1'
     });
     var field_TEXTTWO = Ext.create('Ext.form.field.Text', {
         id: 'field_TEXTTWO',
-        name: 'TEXTTWO',//tabIndex: 5,        
+        name: 'TEXTTWO', tabIndex: 12,
         fieldLabel: '文本2'
     });
 
     var field_NUMONE = Ext.create('Ext.form.field.Number', {
         id: 'field_NUMONE',
-        name: 'NUMONE', hideTrigger: true,//tabIndex: 5,        
+        name: 'NUMONE', hideTrigger: true, tabIndex: 10,
         fieldLabel: '数字1'
     });
     var field_NUMTWO = Ext.create('Ext.form.field.Number', {
         id: 'field_NUMTWO',
-        name: 'NUMTWO', hideTrigger: true,//tabIndex: 5,        
+        name: 'NUMTWO', hideTrigger: true, tabIndex: 13,
         fieldLabel: '数字2'
     });
 
     //日期1
     var field_DATEONE = Ext.create('Ext.form.field.Date', {
         id: 'field_DATEONE',
-        name: 'DATEONE', format: 'Y-m-d',
+        name: 'DATEONE', format: 'Y-m-d', tabIndex: 11,
         fieldLabel: '日期1',
         listeners: {
             change: function (me, newValue, oldValue, eOpts) {
@@ -335,7 +335,7 @@
     //人员1
     var field_USERNAMEONE = Ext.create('Ext.form.field.Text', {
         id: 'field_USERNAMEONE',
-        name: 'USERNAMEONE',
+        name: 'USERNAMEONE', 
         fieldLabel: '人员1',
         readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
@@ -344,7 +344,7 @@
     //日期2
     var field_DATETWO = Ext.create('Ext.form.field.Date', {
         id: 'field_DATETWO',
-        name: 'DATETWO', format: 'Y-m-d',
+        name: 'DATETWO', format: 'Y-m-d', tabIndex: 14,
         fieldLabel: '日期2',
         listeners: {
             change: function (me, newValue, oldValue, eOpts) {
@@ -361,7 +361,7 @@
     //人员2
     var field_USERNAMETWO = Ext.create('Ext.form.field.Text', {
         id: 'field_USERNAMETWO',
-        name: 'USERNAMETWO',
+        name: 'USERNAMETWO', 
         fieldLabel: '人员2',
         readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
