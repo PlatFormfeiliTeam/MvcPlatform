@@ -179,10 +179,10 @@ namespace MvcPlatform.Controllers
 
             string sql = @"select sc.*, lu.receiveunitcode as isempower
                                 from cusdoc.Sys_Customer sc
-                                left join cusdoctool.list_UnAuthorized lu
+                                left join list_UnAuthorized lu
                                   on sc.hscode = lu.busiunitcode and  lu.receiveunitcode = '" +
                          json_user.Value<string>("CUSTOMERCODE") + "' and lu.enabled  = '1' where sc.iscompany = '1' and sc.enabled = '1'" + strWhere;
-            DataTable dt = DBMgrBase.GetDataTable(GetPageSql1(sql));
+            DataTable dt = DBMgr.GetDataTable(GetPageSql1(sql));
             string json = JsonConvert.SerializeObject(dt);
             return "{rows:" + json + ",total:" + totalProperty + "}";
         }
