@@ -205,6 +205,7 @@ namespace MvcPlatform.Controllers
 
         public string CompleteOrderM()
         {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string ordercode = Request["ordercode"]; string result = "{success:true}";
 
             string sql = @"select SUBMITTIME from list_order where code='" + ordercode + "'";
@@ -214,7 +215,7 @@ namespace MvcPlatform.Controllers
                 return "{success:false,flag:'E'}";
             }
 
-            sql = @"update list_order set SUBMITTIME=sysdate where code='" + ordercode + "'";
+            sql = @"update list_order set SUBMITTIME=sysdate,SUBMITUSERID='" + json_user.Value<string>("ID") + "',SUBMITUSERNAME='" + json_user.Value<string>("REALNAME") + "' where code='" + ordercode + "'";
             DBMgr.ExecuteNonQuery(sql);
             
             return result;
