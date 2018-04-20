@@ -150,7 +150,7 @@ function bindgrid() {
                     }
                 },
                 { header: '创建人', dataIndex: 'CREATEUSERNAME', width: 160 },
-                { header: '启禁用人', dataIndex: 'ENABLEUSERNAME', width: 160 }
+                //{ header: '启禁用人', dataIndex: 'ENABLEUSERNAME', width: 160 }
         ],
         listeners:
         {
