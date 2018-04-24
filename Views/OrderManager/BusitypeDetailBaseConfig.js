@@ -1,5 +1,18 @@
 ﻿var common_data_entrust = [];
 var store_entrust;
+
+Ext.apply(Ext.form.TextField.prototype, {
+    validator: function(text) {
+        if (this.allowBlank == false && Ext.util.Format.trim(text).length == 0) {
+            if (text.length > 0) {
+                return '非法字符';
+            }
+        } else
+            return true;
+    }
+});
+
+
 Ext.onReady(function () {
     Ext.Ajax.request({//对公共基础数据发起一次请求
         url: "/Common/Ini_Base_Data",
