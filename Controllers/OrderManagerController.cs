@@ -735,7 +735,7 @@ namespace MvcPlatform.Controllers
                                     ,createuserid='{6}',createusername='{7}',remark='{8}',starttime=sysdate where id='{0}'
                                     ";
                 sql = string.Format(sql, json.Value<string>("ID")
-                   , json.Value<string>("ENTRUSTTYPECODE"), json.Value<string>("ENTRUSTTYPENAME"), json.Value<string>("BUSIITEMCODE"), json.Value<string>("BUSIITEMNAME"), json.Value<string>("ENABLE")
+                   , json.Value<string>("ENTRUSTTYPECODE"), json.Value<string>("ENTRUSTTYPENAME"), json.Value<string>("BUSIITEMCODE").Trim(), json.Value<string>("BUSIITEMNAME").Trim(), json.Value<string>("ENABLE")
                    , json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"), json.Value<string>("REMARK")
                    );
             }
@@ -761,7 +761,7 @@ namespace MvcPlatform.Controllers
                 strWhere = " and t1.id not in ('" + json.Value<string>("ID") + "') ";
             }
 
-            string sqlStr = @"select * from web_customsconfig t1 where t1.entrusttypecode='" + json.Value<string>("ENTRUSTTYPECODE") + "' and t1.busiitemcode='" + json.Value<string>("BUSIITEMCODE") + "'";
+            string sqlStr = @"select * from web_customsconfig t1 where t1.entrusttypecode='" + json.Value<string>("ENTRUSTTYPECODE") + "' and t1.busiitemcode='" + json.Value<string>("BUSIITEMCODE").Trim() + "'";
             sqlStr += strWhere;
             DataTable dt = DBMgr.GetDataTable(sqlStr);
             if (dt.Rows.Count > 0)
@@ -769,7 +769,7 @@ namespace MvcPlatform.Controllers
                 msg = "业务类型+业务细项代码重复！";
             }
 
-            string sqlStr2 = @"select * from web_customsconfig t1 where t1.entrusttypecode='" + json.Value<string>("ENTRUSTTYPECODE") + "' and t1.busiitemname='" + json.Value<string>("BUSIITEMNAME") + "'";
+            string sqlStr2 = @"select * from web_customsconfig t1 where t1.entrusttypecode='" + json.Value<string>("ENTRUSTTYPECODE") + "' and t1.busiitemname='" + json.Value<string>("BUSIITEMNAME").Trim() + "'";
             sqlStr2 += strWhere;
             DataTable dt2 = DBMgr.GetDataTable(sqlStr2);
             if (dt2.Rows.Count > 0)
