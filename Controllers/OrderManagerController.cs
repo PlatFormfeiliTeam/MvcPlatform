@@ -516,7 +516,7 @@ namespace MvcPlatform.Controllers
             }
             if (!string.IsNullOrEmpty(Request["busiitemcode"]))//判断查询条件1是否有值
             {
-                where += " and a.busiitemcode='" + Request["busiitemcode"].Trim() + "'";
+                where += " and a.busiitemcode like '%" + Request["busiitemcode"].Trim() + "%'";
             }
 
             string sql = "select a.* from web_customscost a where 1=1" + where;
@@ -566,7 +566,7 @@ namespace MvcPlatform.Controllers
                                     ,'{0}','{1}','{2}','{3}','{4}','{5}'
                                     ,'{6}','{7}')";
                 sql = string.Format(sql
-                    , json.Value<string>("ENTRUSTTYPECODE"), json.Value<string>("ENTRUSTTYPENAME"), json.Value<string>("BUSIITEMCODE"), json.Value<string>("BUSIITEMNAME"), json.Value<string>("ORIGINNAME"), json.Value<string>("CONFIGNAME")
+                    , json.Value<string>("ENTRUSTTYPECODE"), json.Value<string>("ENTRUSTTYPENAME"), json.Value<string>("BUSIITEMCODE"), json.Value<string>("BUSIITEMNAME"), json.Value<string>("ORIGINNAME"), json.Value<string>("CONFIGNAME").Trim()
                     , json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
                     );
             }
@@ -577,7 +577,7 @@ namespace MvcPlatform.Controllers
                         where id='{0}'";
                 sql = string.Format(sql, json.Value<string>("ID")
                    , json.Value<string>("ENTRUSTTYPECODE"), json.Value<string>("ENTRUSTTYPENAME"), json.Value<string>("BUSIITEMCODE"), json.Value<string>("BUSIITEMNAME"), json.Value<string>("ORIGINNAME")
-                   , json.Value<string>("CONFIGNAME"), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
+                   , json.Value<string>("CONFIGNAME").Trim(), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
                    );
             }
             int i = DBMgr.ExecuteNonQuery(sql);
