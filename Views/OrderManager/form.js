@@ -1,4 +1,7 @@
-﻿function form_ini() {
+﻿var getMoney=0;
+var costMoney=0;
+var getReallyMoney = getMoney - costMoney;
+function form_ini() {
     var label_baseinfo = {
         xtype: 'label',
         margin: '5',
@@ -296,23 +299,31 @@
     var field_TEXTONE = Ext.create('Ext.form.field.Text', {
         id: 'field_TEXTONE',
         name: 'TEXTONE', tabIndex: 9,
-        fieldLabel: '文本1'
+        fieldLabel: '文本1',
+        readOnly: true,
+        fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
     var field_TEXTTWO = Ext.create('Ext.form.field.Text', {
         id: 'field_TEXTTWO',
         name: 'TEXTTWO', tabIndex: 12,
-        fieldLabel: '文本2'
+        fieldLabel: '文本2',
+        readOnly: true,
+        fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
 
     var field_NUMONE = Ext.create('Ext.form.field.Number', {
         id: 'field_NUMONE',
         name: 'NUMONE', hideTrigger: true, tabIndex: 10,
-        fieldLabel: '数字1'
+        fieldLabel: '数字1',
+        readOnly: true,
+        fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
     var field_NUMTWO = Ext.create('Ext.form.field.Number', {
         id: 'field_NUMTWO',
         name: 'NUMTWO', hideTrigger: true, tabIndex: 13,
-        fieldLabel: '数字2'
+        fieldLabel: '数字2',
+        readOnly: true,
+        fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
 
     //日期1
@@ -320,6 +331,8 @@
         id: 'field_DATEONE',
         name: 'DATEONE', format: 'Y-m-d', tabIndex: 11,
         fieldLabel: '日期1',
+        readOnly: true,
+        fieldStyle: 'background-color: #CECECE; background-image: none;',
         listeners: {
             change: function (me, newValue, oldValue, eOpts) {
                 if (newValue != "") {
@@ -346,6 +359,8 @@
         id: 'field_DATETWO',
         name: 'DATETWO', format: 'Y-m-d', tabIndex: 14,
         fieldLabel: '日期2',
+        readOnly: true,
+        fieldStyle: 'background-color: #CECECE; background-image: none;',
         listeners: {
             change: function (me, newValue, oldValue, eOpts) {
                 if (newValue != "") {
@@ -416,26 +431,38 @@ function change_ini_label() {
 
             for (var i = 0; i < jsonobj.length; i++) {
                 switch (jsonobj[i].ORIGINNAME) {
-                    case "文本1":
+                    case "文本1":                        
                         Ext.getCmp("field_TEXTONE").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        Ext.getCmp("field_TEXTONE").setReadOnly(false);
+                        Ext.getCmp("field_TEXTONE").setFieldStyle('background-color: #fff; background-image: none;');
                         break;
                     case "文本2":
                         Ext.getCmp("field_TEXTTWO").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        Ext.getCmp("field_TEXTTWO").setReadOnly(false);
+                        Ext.getCmp("field_TEXTTWO").setFieldStyle('background-color: #fff; background-image: none;');
                         break;
                     case "数字1":
                         Ext.getCmp("field_NUMONE").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        Ext.getCmp("field_NUMONE").setReadOnly(false);
+                        Ext.getCmp("field_NUMONE").setFieldStyle('background-color: #fff; background-image: none;');
                         break;
                     case "数字2":
                         Ext.getCmp("field_NUMTWO").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        Ext.getCmp("field_NUMTWO").setReadOnly(false);
+                        Ext.getCmp("field_NUMTWO").setFieldStyle('background-color: #fff; background-image: none;');
                         break;
                     case "日期1":
                         Ext.getCmp("field_DATEONE").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        Ext.getCmp("field_DATEONE").setReadOnly(false);
+                        Ext.getCmp("field_DATEONE").setFieldStyle('background-color: #fff; background-image: none;');
                         break;
                     case "日期2":
                         Ext.getCmp("field_DATETWO").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        Ext.getCmp("field_DATETWO").setReadOnly(false);
+                        Ext.getCmp("field_DATETWO").setFieldStyle('background-color: #fff; background-image: none;');
                         break;
                     case "人员1":
-                        Ext.getCmp("field_USERNAMEONE").setFieldLabel(jsonobj[i].CONFIGNAME);
+                        Ext.getCmp("field_USERNAMEONE").setFieldLabel(jsonobj[i].CONFIGNAME);                       
                         break;
                     case "人员2":
                         Ext.getCmp("field_USERNAMETWO").setFieldLabel(jsonobj[i].CONFIGNAME);
@@ -526,7 +553,7 @@ function form_ini_cost() {
     var label_baseinfo = {
         xtype: 'label',
         margin: '5',
-        html: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;费用明细</span></h4>'
+        html: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;费用明细[应收费用:' + getMoney + ';应付费用:'+costMoney+';毛利:'+getReallyMoney+']</span></h4>'
     }
     var tbar = Ext.create('Ext.toolbar.Toolbar', {
         items: [label_baseinfo]
@@ -565,7 +592,8 @@ function form_ini_cost_west() {
         { header: '费用名称', dataIndex: 'FEECODENAME', width: 130 },
         {
             header: '金额', dataIndex: 'COST', width: 80, summaryType: 'sum', summaryRenderer: function (value, summaryData, dataIndex) {
-                return "合计：" + value;
+                costMoney = value;
+                return  "合计：" + value;
             }
         },
         { header: '币制', dataIndex: 'CURRENCYNAME', width: 80 },
@@ -601,6 +629,7 @@ function form_ini_cost_east() {
         { header: '费用名称', dataIndex: 'FEECODENAME', width: 130 },
         {
             header: '金额', dataIndex: 'COST', width: 80, summaryType: 'sum', summaryRenderer: function (value, summaryData, dataIndex) {
+                getMoney = value;
                 return "合计：" + value;
             }
         },
