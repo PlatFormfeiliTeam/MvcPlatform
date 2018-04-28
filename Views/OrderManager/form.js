@@ -553,7 +553,7 @@ function form_ini_cost() {
     var label_baseinfo = {
         xtype: 'label',
         margin: '5',
-        html: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;费用明细[应收费用:' + getMoney + ';应付费用:'+costMoney+';毛利:'+getReallyMoney+']</span></h4>'
+        html: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;费用明细&nbsp[应收费用:' + getMoney + ';应付费用:' + costMoney + ';毛利:' + getReallyMoney + ']</span></h4>'
     }
     var tbar = Ext.create('Ext.toolbar.Toolbar', {
         items: [label_baseinfo]

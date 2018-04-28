@@ -120,7 +120,7 @@ function initSearch_OrderM() {
             }
         }
     });
-    var condate = Ext.create('Ext.form.FieldContainer', { fieldLabel: '创建日期', layout: 'hbox', columnWidth: .33, items: [start_date, end_date] });
+    var condate = Ext.create('Ext.form.FieldContainer', { fieldLabel: '接单日期', layout: 'hbox', columnWidth: .33, items: [start_date, end_date] });
 
     //委托单位
     var store_wtdw = Ext.create('Ext.data.JsonStore', {
