@@ -178,8 +178,9 @@ function initSearch_OrderM() {
         }
     });
 
+
     var start_date2 = Ext.create('Ext.form.field.Date', {
-        id: 'start_date2', name: 'start_date2', format: 'Y-m-d', emptyText: '开始日期', flex: .5, margin: 0,//tabIndex: 7,
+        id: 'start_date2', name: 'start_date2', format: 'Y-m-d', emptyText: '开始日期', flex: .5, margin: 0,width:'35%',//tabIndex: 7,
         listeners: {
             focus: function (cb) {
                 var con = Ext.Date.format(Ext.getCmp("end_date2").getValue(), 'Y-m-d');
@@ -198,7 +199,7 @@ function initSearch_OrderM() {
         }
     });
     var end_date2 = Ext.create('Ext.form.field.Date', {
-        id: 'end_date2', name: 'end_date2', format: 'Y-m-d', emptyText: '结束日期', flex: .5, margin: 0,//tabIndex: 8,
+        id: 'end_date2', name: 'end_date2', format: 'Y-m-d', emptyText: '结束日期', flex: .5, margin: 0,width:'35%',//tabIndex: 8,
         listeners: {
             focus: function (cb) {
                 var con = Ext.Date.format(Ext.getCmp("start_date2").getValue(), 'Y-m-d');
@@ -216,7 +217,32 @@ function initSearch_OrderM() {
             }
         }
     });
-    var condate2 = Ext.create('Ext.form.FieldContainer', { fieldLabel: '业务完成', layout: 'hbox', columnWidth: .33, items: [start_date2, end_date2] });
+
+    //var check_box = Ext.create('Ext.form.field.Checkbox', {
+    //    margin:'0',
+    //    defaultType: 'checkboxfield', name: 'ischeck',
+    //    inputValue: '1',
+    //    id: 'ischeck'
+    //});
+    var store_ENABLED_S = Ext.create('Ext.data.JsonStore', {
+        fields: ['CODE', 'NAME'],
+        data: [{ "CODE": 0, "NAME": "业务未完成" }, { "CODE": 1, "NAME": "业务已完成" }]
+    });
+
+    var combo_ENABLED_S = Ext.create('Ext.form.field.ComboBox', {
+        margin: '0',
+        id: 'combo_ENABLED_S',
+        name: 'combo_ENABLED_S',
+        store: store_ENABLED_S,
+        queryMode: 'local',
+        anyMatch: true,
+        displayField: 'NAME',
+        valueField: 'CODE',
+        width: '30%',
+        emptyText: '是否完成',
+    });
+
+    var condate2 = Ext.create('Ext.form.FieldContainer', { fieldLabel: '业务完成', layout: 'hbox', columnWidth: .33, items: [start_date2, end_date2, combo_ENABLED_S] });
 
 
     var formpanel = Ext.create('Ext.form.Panel', {
@@ -248,7 +274,7 @@ function bindgrid() {
     var store_Trade = Ext.create('Ext.data.JsonStore', {
         fields: ['ID', 'BUSITYPE', 'CREATETIME', 'SUBMITTIME', 'ENTRUSTTYPE', 'CUSTOMERCODE', 'CUSTOMERNAME', 'CLEARUNIT', 'CLEARUNITNAME'
                 , 'BUSIUNITCODE', 'BUSIUNITNAME', 'CODE', 'CUSNO', 'DOREQUEST', 'CLEARREMARK', 'BUSIITEMCODE', 'BUSIITEMNAME'
-                , 'TEXTONE', 'TEXTTWO', 'NUMONE', 'NUMTWO', 'DATEONE', 'DATETWO', 'USERNAMEONE', 'USERNAMETWO'],
+                , 'TEXTONE', 'TEXTTWO', 'NUMONE', 'NUMTWO', 'DATEONE', 'DATETWO', 'USERNAMEONE', 'USERNAMETWO','NAME','GETMONEY'],
         pageSize: 20,
         proxy: {
             type: 'ajax',
@@ -267,7 +293,8 @@ function bindgrid() {
                     BUSIUNITCODE: Ext.getCmp('s_combo_busiunitname').getValue(), CUSNO: Ext.getCmp('field_CUSNO').getValue(), entrusttype: Ext.getCmp('combo_ENTRUST').getValue(),
                     start_date: Ext.Date.format(Ext.getCmp("start_date").getValue(), 'Y-m-d H:i:s'), end_date: Ext.Date.format(Ext.getCmp("end_date").getValue(), 'Y-m-d H:i:s'),
                     CUSTOMERCODE: Ext.getCmp('combo_wtdw').getValue(), CODE: Ext.getCmp('field_CODE').getValue(), busiitemcode: Ext.getCmp('combo_BUSIITEMCODE').getValue(),
-                    start_date2: Ext.Date.format(Ext.getCmp("start_date2").getValue(), 'Y-m-d H:i:s'), end_date2: Ext.Date.format(Ext.getCmp("end_date2").getValue(), 'Y-m-d H:i:s')
+                    start_date2: Ext.Date.format(Ext.getCmp("start_date2").getValue(), 'Y-m-d H:i:s'), end_date2: Ext.Date.format(Ext.getCmp("end_date2").getValue(), 'Y-m-d H:i:s'),
+                    combo_ENABLED_S: Ext.getCmp('combo_ENABLED_S').getValue()
                 }
                 var TEXTONE = ""; var TEXTTWO = "";var NUMONE = ""; var NUMTWO = "";                
                 var DATEONE = ""; var DATETWO = ""; var USERNAMEONE = ""; var USERNAMETWO = "";
@@ -326,6 +353,8 @@ function bindgrid() {
                 { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 130, locked: true },
                 { header: '企业编号', dataIndex: 'CUSNO', width: 100 },
                 { header: '订单编号', dataIndex: 'CODE', width: 100 },
+                { header: '应收费用状态', dataIndex: 'NAME', width: 100 },
+                { header: '毛利', dataIndex: 'GETMONEY', width: 100 },
                 { header: '操作需求', dataIndex: 'DOREQUEST', width: 130 },
                 { header: '结算备注', dataIndex: 'CLEARREMARK', width: 130 },
                 { header: '文本1', dataIndex: 'TEXTONE', width: 100 },
@@ -390,6 +419,7 @@ function Reset() {
     Ext.getCmp("combo_BUSIITEMCODE").setValue("");
     Ext.getCmp("start_date2").setValue("");
     Ext.getCmp("end_date2").setValue("");
+    Ext.getCmp("combo_ENABLED_S").setValue("");
 }
 
 function seniorOrderM(pgbar) {

@@ -78,6 +78,7 @@ namespace MvcPlatform.Controllers
 
         public string QueryCondition()
         {
+            
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
 
             string where = "";
@@ -163,12 +164,27 @@ namespace MvcPlatform.Controllers
                 where += " and a.USERNAMETWO='" + Request["USERNAMETWO"].Trim() + "'";
             }
 
+
+            if (Request["combo_ENABLED_S"] == "0")
+            {
+                    string a = Request["combo_ENABLED_S"];
+                    where += " and a.SUBMITTIME is null";
+            }
+            else if (Request["combo_ENABLED_S"] == "1")
+            {
+                    where += " and a.SUBMITTIME is not null";
+            } 
+            
+
+            
             string sql = @"select a.ID,a.BUSITYPE,a.CREATETIME,a.SUBMITTIME,a.ENTRUSTTYPE,a.CUSTOMERCODE,a.CUSTOMERNAME,a.CLEARUNIT,a.CLEARUNITNAME 
                                 ,a.BUSIUNITCODE,a.BUSIUNITNAME,a.CODE,a.CUSNO,a.DOREQUEST,a.CLEARREMARK
                                 ,a.BUSIITEMCODE,a.BUSIITEMNAME
                                 ,a.TEXTONE,a.TEXTTWO,a.NUMONE,a.NUMTWO,to_char(a.DATEONE,'yyyy-mm-dd') DATEONE,to_char(a.DATETWO,'yyyy-mm-dd') DATETWO
-                                ,a.USERNAMEONE,a.USERIDONE,a.USERNAMETWO,a.USERIDTWO 
+                                ,a.USERNAMEONE,a.USERIDONE,a.USERNAMETWO,a.USERIDTWO,fc.name,fc.getmoney 
                         from LIST_ORDER a 
+                        left join (select fo.cost-fo.paycost as getmoney,fs.name,fo.code from finance_order fo left join finance_status fs on fo.paystatus = fs.code) fc
+                        on fc.code = a.code
                         where a.ISINVALID=0 and a.busitype='70'";
 
             string rolestr = "";
