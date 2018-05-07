@@ -110,7 +110,7 @@ function initSearch_CustomsCost() {
 
 function bindgrid() {
     var store_Trade = Ext.create('Ext.data.JsonStore', {
-        fields: ['ENTRUSTTYPECODE', 'ENTRUSTTYPENAME', 'BUSIITEMCODE', 'BUSIITEMNAME', 'ORIGINNAME', 'CONFIGNAME', 'CREATEUSERID', 'CREATEUSERNAME', 'ID'],
+        fields: ['ENTRUSTTYPECODE', 'ENTRUSTTYPENAME', 'BUSIITEMCODE', 'BUSIITEMNAME', 'ORIGINNAME', 'CONFIGNAME', 'CREATEUSERID', 'CREATEUSERNAME', 'ID','REMARK'],
         pageSize: 20,
         proxy: {
             type: 'ajax',
@@ -303,6 +303,14 @@ function form_ini_win(recs) {
         blankText: '配置名称不可为空!',
     });
 
+    //修改原因
+    var change_reason = Ext.create('Ext.form.field.Text', {
+        id: 'REMARK',
+        name: 'REMARK',
+        fieldLabel: '修改原因',
+        hidden: true
+    });
+
     var formpanel_Win = Ext.create('Ext.form.Panel', {
         id: 'formpanel_Win',
         minHeight: 150,
@@ -320,6 +328,7 @@ function form_ini_win(recs) {
                 { layout: 'column', height: 42, border: 0, items: [combo_BUSIITEMCODE] },
                 { layout: 'column', height: 42, border: 0, items: [combo_ORIGINNAME] },
                 { layout: 'column', height: 42, border: 0, items: [field_CONFIGNAME] },
+                { layout: 'column', height: 42, border: 0, items: [change_reason] },
                 field_id, field_ENTRUSTTYPENAME, field_BUSIITEMNAME
         ],
         buttonAlign: 'center',
@@ -338,7 +347,12 @@ function form_ini_win(recs) {
                         if (data.success) {
                             Ext.MessageBox.alert("提示","保存成功！", function () {
                                 Ext.getCmp("pgbar").moveFirst();
-                                Ext.getCmp("win_d").close();
+                                Ext.getCmp("combo_ENTRUST").setValue("");
+                                Ext.getCmp("combo_BUSIITEMCODE").setValue("");
+                                Ext.getCmp("combo_ORIGINNAME").setValue("");
+                                Ext.getCmp("CONFIGNAME").setValue("");
+                                Ext.getCmp("REMARK").setValue("");
+                                //Ext.getCmp("win_d").close();
                             });
                         }
                         else {
@@ -354,14 +368,18 @@ function form_ini_win(recs) {
 function form_ini_config(ID, recs) {
     form_ini_win(recs);
 
-    if (ID != "") {   
+    if (ID != "") {
+        Ext.getCmp('REMARK').hidden = false;
+        Ext.getCmp('REMARK').allowBlank = false;
+        Ext.getCmp('REMARK').blankText = '修改原因不可为空!';
         Ext.getCmp('formpanel_Win').getForm().setValues(recs);
+
     }
     var win = Ext.create("Ext.window.Window", {
         id: "win_d",
         title: '业务细项',
         width: 500,
-        height: 240,
+        height: 300,
         modal: true,
         items: [Ext.getCmp('formpanel_Win')]
     });

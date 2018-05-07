@@ -244,6 +244,45 @@ function initSearch_OrderM() {
 
     var condate2 = Ext.create('Ext.form.FieldContainer', { fieldLabel: '业务完成', layout: 'hbox', columnWidth: .33, items: [start_date2, end_date2, combo_ENABLED_S] });
 
+    var field_clearremark = Ext.create('Ext.form.field.Text', {
+        id: 'field_clearremark',
+        name: 'field_clearremark', margin: 0, width: '69.5%'
+    });
+
+    var store_clearremark = Ext.create('Ext.data.JsonStore', {
+        fields: ['CODE', 'NAME'],
+        data: [{ "CODE": 0, "NAME": "空" }, { "CODE": 1, "NAME": "不为空" }]
+    });
+
+    var combo_clearremark = Ext.create('Ext.form.field.ComboBox', {
+        margin: '0',
+        id: 'combo_clearremark',
+        name: 'combo_clearremark',
+        store: store_clearremark,
+        queryMode: 'local',
+        anyMatch: true,
+        displayField: 'NAME',
+        valueField: 'CODE',
+        emptyText: '是否为空',
+        width: '30%',
+        listeners: {
+            select: function () {
+                var getClearremark = Ext.getCmp('combo_clearremark').getValue();
+                if (getClearremark == '0') {
+                    Ext.getCmp("field_clearremark").setValue("");
+                    Ext.getCmp('field_clearremark').setReadOnly(true);
+                    Ext.getCmp('field_clearremark').setFieldStyle('background-color: #CECECE; background-image: none;');
+                } else if (getClearremark == '1') {
+                    Ext.getCmp('field_clearremark').setReadOnly(false);
+                    Ext.getCmp("field_clearremark").setFieldStyle('background-color: #fff; background-image: none;');
+                }
+            }
+        }
+    });
+
+    
+
+    var condate3 = Ext.create('Ext.form.FieldContainer', { fieldLabel: '结算备注', layout: 'hbox', columnWidth: 0.44, items: [combo_clearremark, field_clearremark] });
 
     var formpanel = Ext.create('Ext.form.Panel', {
         id: 'formpanel',
@@ -255,7 +294,8 @@ function initSearch_OrderM() {
         },
         items: [
         { layout: 'column', border: 0, items: [s_combo_busiunitname, field_CUSNO, combo_ENTRUST, condate] },
-        { layout: 'column', border: 0, items: [combo_wtdw, field_CODE, combo_BUSIITEMCODE, condate2] }
+        { layout: 'column', border: 0, items: [combo_wtdw, field_CODE, combo_BUSIITEMCODE, condate2] },
+        { layout: 'column', border: 0, items: [condate3] }
         ]
     });
 
@@ -274,7 +314,7 @@ function bindgrid() {
     var store_Trade = Ext.create('Ext.data.JsonStore', {
         fields: ['ID', 'BUSITYPE', 'CREATETIME', 'SUBMITTIME', 'ENTRUSTTYPE', 'CUSTOMERCODE', 'CUSTOMERNAME', 'CLEARUNIT', 'CLEARUNITNAME'
                 , 'BUSIUNITCODE', 'BUSIUNITNAME', 'CODE', 'CUSNO', 'DOREQUEST', 'CLEARREMARK', 'BUSIITEMCODE', 'BUSIITEMNAME'
-                , 'TEXTONE', 'TEXTTWO', 'NUMONE', 'NUMTWO', 'DATEONE', 'DATETWO', 'USERNAMEONE', 'USERNAMETWO','NAME','GETMONEY'],
+                , 'TEXTONE', 'TEXTTWO', 'NUMONE', 'NUMTWO', 'DATEONE', 'DATETWO', 'USERNAMEONE', 'USERNAMETWO', 'NAME', 'GETMONEY', 'CLEARREMARK'],
         pageSize: 20,
         proxy: {
             type: 'ajax',
@@ -294,7 +334,7 @@ function bindgrid() {
                     start_date: Ext.Date.format(Ext.getCmp("start_date").getValue(), 'Y-m-d H:i:s'), end_date: Ext.Date.format(Ext.getCmp("end_date").getValue(), 'Y-m-d H:i:s'),
                     CUSTOMERCODE: Ext.getCmp('combo_wtdw').getValue(), CODE: Ext.getCmp('field_CODE').getValue(), busiitemcode: Ext.getCmp('combo_BUSIITEMCODE').getValue(),
                     start_date2: Ext.Date.format(Ext.getCmp("start_date2").getValue(), 'Y-m-d H:i:s'), end_date2: Ext.Date.format(Ext.getCmp("end_date2").getValue(), 'Y-m-d H:i:s'),
-                    combo_ENABLED_S: Ext.getCmp('combo_ENABLED_S').getValue()
+                    combo_ENABLED_S: Ext.getCmp('combo_ENABLED_S').getValue(), combo_clearremark: Ext.getCmp('combo_clearremark').getValue(), field_clearremark: Ext.getCmp('field_clearremark').getValue()
                 }
                 var TEXTONE = ""; var TEXTTWO = "";var NUMONE = ""; var NUMTWO = "";                
                 var DATEONE = ""; var DATETWO = ""; var USERNAMEONE = ""; var USERNAMETWO = "";
@@ -420,6 +460,8 @@ function Reset() {
     Ext.getCmp("start_date2").setValue("");
     Ext.getCmp("end_date2").setValue("");
     Ext.getCmp("combo_ENABLED_S").setValue("");
+    Ext.getCmp("combo_clearremark").setValue("");
+    Ext.getCmp("field_clearremark").setValue("");
 }
 
 function seniorOrderM(pgbar) {

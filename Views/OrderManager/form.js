@@ -1,5 +1,5 @@
-﻿var getMoney=0;
-var costMoney=0;
+﻿var getMoney = 0;
+var costMoney = 0;
 var getReallyMoney = getMoney - costMoney;
 function form_ini() {
     var label_baseinfo = {
@@ -238,14 +238,14 @@ function form_ini() {
     //创建人员
     var field_CREATEUSERNAME = Ext.create('Ext.form.field.Text', {
         name: 'CREATEUSERNAME',
-        fieldLabel: '创建人员',
+        fieldLabel: '接单人员',
         readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
     //创建时间
     var field_CREATETIME = Ext.create('Ext.form.field.Text', {
         id: 'field_CREATETIME',
         name: 'CREATETIME',
-        fieldLabel: '创建时间',
+        fieldLabel: '接单时间',
         readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;'
     });
 
@@ -272,7 +272,7 @@ function form_ini() {
         columnWidth: 1,
         xtype: 'fieldcontainer',
         layout: 'hbox',
-        fieldLabel: '操作需求',
+        fieldLabel: '操作备注',
         items: [field_DOREQUEST]
     }
 
@@ -535,7 +535,11 @@ function loadform_OrderM() {
             Ext.getCmp('gridpanel_costwest').store.loadData(data.cost_west);
             Ext.getCmp('gridpanel_costeast').store.loadData(data.cost_east);
 
-            if (data.formdata.SUBMITTIME != "" && data.formdata.SUBMITTIME != null) {
+            console.log(data.curuser.ID);
+            console.log(data.curuser.REALNAME);
+            console.log(data.curuser.CUSTOMERCODE);
+
+            if (data.formdata.SUBMITTIME != "" && data.formdata.SUBMITTIME != null && data.curuser.REALNAME != '何晓冰') {
                 document.getElementById("btn_submitorder").disabled = true;
             } else {
                 document.getElementById("btn_submitorder").disabled = false;
@@ -547,25 +551,47 @@ function loadform_OrderM() {
 }
 
 function form_ini_cost() {
+    
     form_ini_cost_west();
     form_ini_cost_east();
+    var getAll = Ext.create('Ext.form.field.Text', {
+        id: 'getAll',
+        name: 'getAll',
+        readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;'
+    });
 
+    var getAll1 = Ext.create('Ext.form.field.Text', {
+        id: 'getAll1',
+        name: 'getAll1',
+        readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;'
+    });
+    var getAll2 = Ext.create('Ext.form.field.Text', {
+        id: 'getAll2',
+        name: 'getAll2',
+        readOnly: true, fieldStyle: 'background-color: #CECECE; background-image: none;'
+    });
     var label_baseinfo = {
+        id:'',
         xtype: 'label',
         margin: '5',
-        html: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;费用明细&nbsp[应收费用:' + getMoney + ';应付费用:' + costMoney + ';毛利:' + getReallyMoney + ']</span></h4>'
+        html: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;费用明细</span></h4>'
     }
     var tbar = Ext.create('Ext.toolbar.Toolbar', {
         items: [label_baseinfo]
     });
 
+    
+    
     var panel_cost = Ext.create('Ext.panel.Panel', {
         id: 'panel_cost',
         renderTo: 'div_form_cost',
-        border: 0, layout: 'column',
+        border: 0, 
         //title: '费用明细',
         tbar: tbar,
-        items: [Ext.getCmp("gridpanel_costwest"), { columnWidth: .04 }, Ext.getCmp("gridpanel_costeast")]
+        items: [{ layout: 'column', border: 0, items: [getAll, getAll1,getAll2] }
+            , { layout: 'column', border: 0, items: [Ext.getCmp("gridpanel_costwest"), { columnWidth: .04 }, Ext.getCmp("gridpanel_costeast")] },
+                
+        ]
     });
 }
 
@@ -591,10 +617,7 @@ function form_ini_cost_west() {
         { header: '结算单位', dataIndex: 'CUSTOMERNAME', width: 130 },
         { header: '费用名称', dataIndex: 'FEECODENAME', width: 130 },
         {
-            header: '金额', dataIndex: 'COST', width: 80, summaryType: 'sum', summaryRenderer: function (value, summaryData, dataIndex) {
-                costMoney = value;
-                return  "合计：" + value;
-            }
+            header: '金额', dataIndex: 'COST', width: 80, summaryType: 'sum', summaryRenderer: getAll
         },
         { header: '币制', dataIndex: 'CURRENCYNAME', width: 80 },
         { header: '费用状态', dataIndex: 'STATUSNAME', width: 80 }
@@ -628,10 +651,7 @@ function form_ini_cost_east() {
         { header: '结算单位', dataIndex: 'CUSTOMERNAME', width: 130 },
         { header: '费用名称', dataIndex: 'FEECODENAME', width: 130 },
         {
-            header: '金额', dataIndex: 'COST', width: 80, summaryType: 'sum', summaryRenderer: function (value, summaryData, dataIndex) {
-                getMoney = value;
-                return "合计：" + value;
-            }
+            header: '金额', dataIndex: 'COST', width: 80, summaryType: 'sum', summaryRenderer:getAll1
         },
         { header: '币制', dataIndex: 'CURRENCYNAME', width: 80},
         { header: '费用状态', dataIndex: 'STATUSNAME', width: 80 }
@@ -641,4 +661,21 @@ function form_ini_cost_east() {
         },
         forceFit: true
     });
+
+    
+};
+
+function getAll(value, summaryData, dataIndex) {
+    costMoney = value;
+     Ext.getCmp('getAll').setValue('应付费用为:'+costMoney);
+    
+    return "合计：" + value;
+}
+
+function getAll1(value, summaryData, dataIndex) {
+    getMoney = value;
+    Ext.getCmp('getAll1').setValue('应收费用为:' + getMoney);
+    getReallyMoney = Ext.getCmp('getAll1').getValue().substring(6) - Ext.getCmp('getAll').getValue().substring(6);
+    Ext.getCmp('getAll2').setValue('毛利为:'+getReallyMoney);
+    return "合计：" + value;
 }

@@ -173,9 +173,22 @@ namespace MvcPlatform.Controllers
             else if (Request["combo_ENABLED_S"] == "1")
             {
                     where += " and a.SUBMITTIME is not null";
-            } 
-            
+            }
 
+
+            if (!string.IsNullOrEmpty(Request["field_clearremark"]))
+            {
+                where += "and a.CLEARREMARK like '%" + Request["field_clearremark"] + "%'";
+            }
+
+            if (Request["combo_clearremark"] == "0")
+            {
+                where += " and a.CLEARREMARK  is null";
+            }
+            else if (Request["combo_clearremark"] == "1")
+            {
+                where += " and a.CLEARREMARK is not null";
+            }
             
             string sql = @"select a.ID,a.BUSITYPE,a.CREATETIME,a.SUBMITTIME,a.ENTRUSTTYPE,a.CUSTOMERCODE,a.CUSTOMERNAME,a.CLEARUNIT,a.CLEARUNITNAME 
                                 ,a.BUSIUNITCODE,a.BUSIUNITNAME,a.CODE,a.CUSNO,a.DOREQUEST,a.CLEARREMARK
@@ -183,7 +196,7 @@ namespace MvcPlatform.Controllers
                                 ,a.TEXTONE,a.TEXTTWO,a.NUMONE,a.NUMTWO,to_char(a.DATEONE,'yyyy-mm-dd') DATEONE,to_char(a.DATETWO,'yyyy-mm-dd') DATETWO
                                 ,a.USERNAMEONE,a.USERIDONE,a.USERNAMETWO,a.USERIDTWO,fc.name,fc.getmoney 
                         from LIST_ORDER a 
-                        left join (select fo.cost-fo.paycost as getmoney,fs.name,fo.code from finance_order fo left join finance_status fs on fo.paystatus = fs.code) fc
+                        left join (select nvl(fo.cost,0)-nvl(fo.paycost,0) as getmoney,fs.name,fo.code from finance_order fo left join finance_status fs on fo.status = fs.code) fc
                         on fc.code = a.code
                         where a.ISINVALID=0 and a.busitype='70'";
 
@@ -589,11 +602,11 @@ namespace MvcPlatform.Controllers
             else
             {
                 sql = @"update web_customscost set entrusttypecode='{1}',entrusttypename='{2}',busiitemcode='{3}',busiitemname='{4}',Originname='{5}'
-                                    ,Configname='{6}',createuserid='{7}',createusername='{8}' 
+                                    ,Configname='{6}',createuserid='{7}',createusername='{8}',remark='{9}' 
                         where id='{0}'";
                 sql = string.Format(sql, json.Value<string>("ID")
                    , json.Value<string>("ENTRUSTTYPECODE"), json.Value<string>("ENTRUSTTYPENAME"), json.Value<string>("BUSIITEMCODE"), json.Value<string>("BUSIITEMNAME"), json.Value<string>("ORIGINNAME")
-                   , json.Value<string>("CONFIGNAME").Trim(), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME")
+                   , json.Value<string>("CONFIGNAME").Trim(), json_user.Value<string>("ID"), json_user.Value<string>("REALNAME"),json.Value<string>("REMARK")
                    );
             }
             int i = DBMgr.ExecuteNonQuery(sql);
