@@ -535,10 +535,6 @@ function loadform_OrderM() {
             Ext.getCmp('gridpanel_costwest').store.loadData(data.cost_west);
             Ext.getCmp('gridpanel_costeast').store.loadData(data.cost_east);
 
-            console.log(data.curuser.ID);
-            console.log(data.curuser.REALNAME);
-            console.log(data.curuser.CUSTOMERCODE);
-
             if (data.formdata.SUBMITTIME != "" && data.formdata.SUBMITTIME != null && data.curuser.REALNAME != '何晓冰') {
                 document.getElementById("btn_submitorder").disabled = true;
             } else {

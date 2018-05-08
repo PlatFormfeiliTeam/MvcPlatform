@@ -399,6 +399,53 @@ namespace MvcPlatform.Controllers
                 else//修改
                 {
                     ordercode = Request["ordercode"];
+                    //未修改之前的单据（业务类别，业务细项，结算单位，文本1，文本2，数字1，数字2）和修改后的对比
+                    sql = @"select * from LIST_ORDER where code = '{0}'";
+                    sql = string.Format(sql,ordercode);
+                    int costecpflag = 0;
+                    DataTable beforeChange = DBMgr.GetDataTable(sql);
+                    if (beforeChange.Rows[0]["ENTRUSTTYPE"].ToString() != json.Value<string>("ENTRUSTTYPE"))
+                    {
+                        costecpflag = 2;
+                    }
+
+                    if (beforeChange.Rows[0]["BUSIITEMCODE"].ToString() != json.Value<string>("BUSIITEMCODE"))
+                    {
+                        costecpflag = 2;
+                    }
+
+                    if (beforeChange.Rows[0]["CLEARUNIT"].ToString() != json.Value<string>("CLEARUNIT"))
+                    {
+                        costecpflag = 2;
+                    }
+
+                    if (beforeChange.Rows[0]["TEXTONE"].ToString() != json.Value<string>("TEXTONE"))
+                    {
+                        costecpflag = 2;
+                    }
+
+                    if (beforeChange.Rows[0]["TEXTTWO"].ToString() != json.Value<string>("TEXTTWO"))
+                    {
+                        costecpflag = 2;
+                    }
+
+                    if (beforeChange.Rows[0]["NUMONE"].ToString() != json.Value<string>("NUMONE"))
+                    {
+                        costecpflag = 2;
+                    }
+
+                    if (beforeChange.Rows[0]["NUMTWO"].ToString() != json.Value<string>("NUMTWO"))
+                    {
+                        costecpflag = 2;
+                    }
+
+                    if (costecpflag == 2)
+                    {
+                        sql = @"UPDATE LIST_ORDER SET COSTECPFLAG = '{0}' where code = '{1}'";
+                        sql = string.Format(sql,costecpflag,ordercode);
+                        int j = DBMgr.ExecuteNonQuery(sql);
+                    }
+                    
                     sql = @"UPDATE LIST_ORDER SET BUSITYPE='{1}',ENTRUSTTYPE='{2}',CUSTOMERCODE='{3}',CUSTOMERNAME='{4}',BUSIUNITCODE='{5}'             
                             ,BUSIUNITNAME='{6}',CLEARUNIT='{7}',CLEARUNITNAME='{8}',CUSNO='{9}',DOREQUEST='{10}'         
                             ,CLEARREMARK='{11}',RECEIVERUNITCODE='{12}',RECEIVERUNITNAME='{13}',TEXTONE='{14}',TEXTTWO='{15}'
