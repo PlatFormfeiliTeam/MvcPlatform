@@ -643,7 +643,7 @@ function ExportDecl() {
 
 
 
-function ExportDeclFile(arg)
+function ExportDeclFile(arg,judge)
 {
     var recs
     if (arg == 'select') {
@@ -661,7 +661,7 @@ function ExportDeclFile(arg)
             waitMsg: '正在下载,请稍后...',
             url: '/Common/ExportDeclFile',
             method: 'post',
-            params: { codelist: codelist },
+            params: { codelist: codelist, judge: judge },
             success: function (form, action) {
                 window.location.href = url + action.result.url;
             },
@@ -698,8 +698,8 @@ function ExportDeclFile(arg)
                             CONDITION7: Ext.getCmp('CONDITION7').getValue(), VALUE7: Ext.getCmp("CONDITION7_1").getValue(),
                             CONDITION8: Ext.getCmp('CONDITION8').getValue(),
                             VALUE8_1: Ext.Date.format(Ext.getCmp("CONDITION8_1").getValue(), 'Y-m-d H:i:s'),
-                            VALUE8_2: Ext.Date.format(Ext.getCmp("CONDITION8_2").getValue(), 'Y-m-d H:i:s')
-
+                            VALUE8_2: Ext.Date.format(Ext.getCmp("CONDITION8_2").getValue(), 'Y-m-d H:i:s'),
+                            judge:judge
 
                         },
                         success: function (form, action) {

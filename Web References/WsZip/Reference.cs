@@ -74,10 +74,12 @@ namespace MvcPlatform.WsZip {
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://tempuri.org/getZipFile", RequestNamespace="http://tempuri.org/", ResponseNamespace="http://tempuri.org/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string getZipFile(string filedata, string customer) {
+        public string getZipFile(string filedata, string customer,string judge) {
             object[] results = this.Invoke("getZipFile", new object[] {
                         filedata,
-                        customer});
+                        customer,
+                        judge
+            });
             return ((string)(results[0]));
         }
         

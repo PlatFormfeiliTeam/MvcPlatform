@@ -5243,8 +5243,10 @@ namespace MvcPlatform.Controllers
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             string customer = json_user.Value<string>("CUSTOMERID");
+            string judge = Request["judge"].ToString();
+            
             WsZip.WsZip wz = new WsZip.WsZip();
-            string url = wz.getZipFile(codelist, customer);
+            string url = wz.getZipFile(codelist, customer, judge);
             if (url == "error")
             {
                 return "{success:false}";
