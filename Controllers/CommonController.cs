@@ -1479,7 +1479,7 @@ namespace MvcPlatform.Controllers
                         from list_declaration det     
                             left join list_order ort on det.ordercode = ort.code 
                             left join cusdoc.sys_customer cus on ort.receiverunitcode = cus.code 
-                            left join list_declaration_after lda on det.code=lda.code and lda.csid=1
+                            inner join list_declaration_after lda on det.code=lda.code and lda.csid=1
                             left join (select ordercode from list_declaration ld where ld.isinvalid=0 and ld.STATUS!=130 and ld.STATUS!=110) a on det.ordercode=a.ordercode
                             left join list_verification lv on lda.declarationcode=lv.declarationcode ";
 
