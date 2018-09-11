@@ -271,7 +271,8 @@ namespace MvcPlatform.Controllers
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             string sql = QueryCondition();
 
-            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "a.createtime", "desc"));
+            //DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "a.createtime", "desc"));
+            DataTable dt = DBMgr.GetDataTable(GetPageSql(sql, "a.SUBMITTIME", "desc"));
             var json = JsonConvert.SerializeObject(dt, iso);
 
             var json_senior = "[]";
@@ -802,8 +803,16 @@ namespace MvcPlatform.Controllers
                                     from list_declaration  
                                     GROUP BY ordercode) d on a.code = d.ordercode ";
             }
-
-            if (bf_inspcode == true || bf_clearcecode == true)
+            //新增
+            if (bf_inspcode)
+            {
+                sql += @" left join (select ordercode,listagg(to_char(inspectioncode),',') within group(order by code) as inspectioncode                                           
+                                    from list_declaration
+                                    GROUP BY ordercode) e on a.code = e.ordercode ";
+            }
+            //修改的内容
+            //if (bf_inspcode == true || bf_clearcecode == true)
+            if (bf_clearcecode == true)
             {
                 sql += @" left join (select ordercode,listagg(to_char(inspectioncode),',') within group(order by code) as inspectioncode 
                                            ,listagg(to_char(clearancecode),',') within group(order by code) as clearancecode 
@@ -1467,7 +1476,7 @@ namespace MvcPlatform.Controllers
             }
 
             string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.ISPRINT,det.SHEETNUM,det.modifyflag,det.transname as pretransname,
-                              det.delordertime,det.delorderusername,det.modordertime,det.modorderusername,det.modfinishtime,det.modfinishusername,
+                              det.delordertime,det.delorderusername,det.modordertime,det.modorderusername,det.modfinishtime,det.modfinishusername,det.inspectioncode,det.inspstatus,
                               lda.declarationcode,to_char(lda.reptime,'yyyy-mm-dd') reptime,lda.contractno,lda.goodsnum,lda.goodsnw,lda.goodsgw,lda.blno,
                               lda.transname,lda.voyageno,lda.portcode,
                               lda.trademethod,lda.declkind DECLWAY,lda.declkind DECLWAYNAME,  
@@ -4142,7 +4151,7 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(16).SetCellValue("件数");row1.CreateCell(17).SetCellValue("重量"); row1.CreateCell(18).SetCellValue("张数"); row1.CreateCell(19).SetCellValue("删改单");
                 row1.CreateCell(20).SetCellValue("订单编号"); row1.CreateCell(21).SetCellValue("客户编号"); row1.CreateCell(22).SetCellValue("删单日期"); row1.CreateCell(23).SetCellValue("删单人");
                 row1.CreateCell(24).SetCellValue("改单日期"); row1.CreateCell(25).SetCellValue("改单人"); row1.CreateCell(26).SetCellValue("改单完成日期"); row1.CreateCell(27).SetCellValue("改单完成人");
-                
+                row1.CreateCell(28).SetCellValue("报检单号"); row1.CreateCell(29).SetCellValue("报检状态");
                 
 
                 //将数据逐步写入sheet_S各个行
@@ -4197,6 +4206,8 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(25).SetCellValue(dt.Rows[i]["MODORDERUSERNAME"].ToString());
                     rowtemp.CreateCell(26).SetCellValue(dt.Rows[i]["MODFINISHTIME"].ToString());
                     rowtemp.CreateCell(27).SetCellValue(dt.Rows[i]["MODFINISHUSERNAME"].ToString());
+                    rowtemp.CreateCell(28).SetCellValue(dt.Rows[i]["INSPECTIONCODE"].ToString());
+                    rowtemp.CreateCell(29).SetCellValue(getInspStatus(dt.Rows[i]["INSPSTATUS"].ToString()));
 
                 }
             }
@@ -4212,7 +4223,7 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(16).SetCellValue("重量");row1.CreateCell(17).SetCellValue("张数"); row1.CreateCell(18).SetCellValue("删改单"); row1.CreateCell(19).SetCellValue("订单编号");
                 row1.CreateCell(20).SetCellValue("客户编号"); row1.CreateCell(21).SetCellValue("删单日期"); row1.CreateCell(22).SetCellValue("删单人");row1.CreateCell(23).SetCellValue("改单日期");
                  row1.CreateCell(24).SetCellValue("改单人"); row1.CreateCell(25).SetCellValue("改单完成日期"); row1.CreateCell(26).SetCellValue("改单完成人");
-
+                row1.CreateCell(27).SetCellValue("报检单号"); row1.CreateCell(28).SetCellValue("报检状态");
 
                 //将数据逐步写入sheet_S各个行
                 for (int i = 0; i < dt.Rows.Count; i++)
@@ -4265,6 +4276,8 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(24).SetCellValue(dt.Rows[i]["MODORDERUSERNAME"].ToString());
                     rowtemp.CreateCell(25).SetCellValue(dt.Rows[i]["MODFINISHTIME"].ToString());
                     rowtemp.CreateCell(26).SetCellValue(dt.Rows[i]["MODFINISHUSERNAME"].ToString());
+                    rowtemp.CreateCell(27).SetCellValue(dt.Rows[i]["INSPECTIONCODE"].ToString());
+                    rowtemp.CreateCell(28).SetCellValue(getInspStatus(dt.Rows[i]["INSPSTATUS"].ToString()));
                 }
             }
             #endregion
@@ -4279,6 +4292,7 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(16).SetCellValue("张数");row1.CreateCell(17).SetCellValue("删改单"); row1.CreateCell(18).SetCellValue("订单编号"); row1.CreateCell(19).SetCellValue("客户编号");
                 row1.CreateCell(20).SetCellValue("删单日期"); row1.CreateCell(21).SetCellValue("删单人");row1.CreateCell(22).SetCellValue("改单日期"); row1.CreateCell(23).SetCellValue("改单人");
                  row1.CreateCell(24).SetCellValue("改单完成日期"); row1.CreateCell(25).SetCellValue("改单完成人");
+                 row1.CreateCell(26).SetCellValue("报检单号"); row1.CreateCell(27).SetCellValue("报检状态");
 
                 //将数据逐步写入sheet_S各个行
                 for (int i = 0; i < dt.Rows.Count; i++)
@@ -4330,6 +4344,8 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["MODORDERUSERNAME"].ToString());
                     rowtemp.CreateCell(24).SetCellValue(dt.Rows[i]["MODFINISHTIME"].ToString());
                     rowtemp.CreateCell(25).SetCellValue(dt.Rows[i]["MODFINISHUSERNAME"].ToString());
+                    rowtemp.CreateCell(26).SetCellValue(dt.Rows[i]["INSPECTIONCODE"].ToString());
+                    rowtemp.CreateCell(27).SetCellValue(getInspStatus(dt.Rows[i]["INSPSTATUS"].ToString()));
 
                 }
             }
@@ -4345,7 +4361,7 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(16).SetCellValue("件数");row1.CreateCell(17).SetCellValue("重量"); row1.CreateCell(18).SetCellValue("张数"); row1.CreateCell(19).SetCellValue("多单关联号"); 
                 row1.CreateCell(20).SetCellValue("删改单"); row1.CreateCell(21).SetCellValue("订单编号"); row1.CreateCell(22).SetCellValue("客户编号");row1.CreateCell(23).SetCellValue("删单日期"); 
                 row1.CreateCell(24).SetCellValue("删单人");row1.CreateCell(25).SetCellValue("改单日期"); row1.CreateCell(26).SetCellValue("改单人"); row1.CreateCell(27).SetCellValue("改单完成日期");
-                row1.CreateCell(28).SetCellValue("改单完成人");
+                row1.CreateCell(28).SetCellValue("改单完成人"); row1.CreateCell(29).SetCellValue("报检单号"); row1.CreateCell(30).SetCellValue("报检状态");
 
                 //将数据逐步写入sheet_S各个行
                 for (int i = 0; i < dt.Rows.Count; i++)
@@ -4400,6 +4416,8 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(26).SetCellValue(dt.Rows[i]["MODORDERUSERNAME"].ToString());
                     rowtemp.CreateCell(27).SetCellValue(dt.Rows[i]["MODFINISHTIME"].ToString());
                     rowtemp.CreateCell(28).SetCellValue(dt.Rows[i]["MODFINISHUSERNAME"].ToString());
+                    rowtemp.CreateCell(29).SetCellValue(dt.Rows[i]["INSPECTIONCODE"].ToString());
+                    rowtemp.CreateCell(30).SetCellValue(getInspStatus(dt.Rows[i]["INSPSTATUS"].ToString()));
 
                 }
             }
@@ -4415,6 +4433,7 @@ namespace MvcPlatform.Controllers
                 row1.CreateCell(16).SetCellValue("张数") ;row1.CreateCell(17).SetCellValue("删改单"); row1.CreateCell(18).SetCellValue("订单编号"); row1.CreateCell(19).SetCellValue("客户编号");
                 row1.CreateCell(20).SetCellValue("删单日期"); row1.CreateCell(21).SetCellValue("删单人");row1.CreateCell(22).SetCellValue("改单日期"); row1.CreateCell(23).SetCellValue("改单人");
                 row1.CreateCell(24).SetCellValue("改单完成日期"); row1.CreateCell(25).SetCellValue("改单完成人");
+                row1.CreateCell(26).SetCellValue("报检单号"); row1.CreateCell(27).SetCellValue("报检状态");
 
                 //将数据逐步写入sheet_S各个行
                 for (int i = 0; i < dt.Rows.Count; i++)
@@ -4466,6 +4485,8 @@ namespace MvcPlatform.Controllers
                     rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["MODORDERUSERNAME"].ToString());
                     rowtemp.CreateCell(24).SetCellValue(dt.Rows[i]["MODFINISHTIME"].ToString());
                     rowtemp.CreateCell(25).SetCellValue(dt.Rows[i]["MODFINISHUSERNAME"].ToString());
+                    rowtemp.CreateCell(26).SetCellValue(dt.Rows[i]["INSPECTIONCODE"].ToString());
+                    rowtemp.CreateCell(27).SetCellValue(getInspStatus(dt.Rows[i]["INSPSTATUS"].ToString()));
 
                 }
             }
@@ -4480,6 +4501,31 @@ namespace MvcPlatform.Controllers
             return Extension.getPathname("报关单文件.xls", book);
         }
         
+        //获取报关单状态的值
+        public string getInspStatus(string inspstatus)
+        {
+            string ret = string.Empty;
+            switch (inspstatus)
+            {
+                case "50":
+                    ret = "审核完成";
+                    break;
+                case "100":
+                    ret = "报检申报";
+                    break;
+                case "115":
+                    ret = "申报退单";
+                    break;
+                case "155":
+                    ret = "报检查验";
+                    break;
+                case "160":
+                    ret = "报检放行";
+                    break;
+            }
+            return ret;
+        }
+
         public string LoadDeclarationList_E()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
@@ -4675,7 +4721,7 @@ namespace MvcPlatform.Controllers
             }
             where += @" and lda.BUSIUNITCODE ='" + json_user.Value<string>("CUSTOMERHSCODE") + "' and ort.BUSITYPE in('10','11','20','21','30','31','50','51')"; //+"' and ort.BUSITYPE not in('40','41')";
 
-            string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.SHEETNUM,det.modifyflag,
+            string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.SHEETNUM,det.modifyflag,det.inspstatus,det.inspectioncode,
                               lda.declarationcode,to_char(lda.reptime,'yyyy-mm-dd') reptime,lda.contractno,lda.goodsnum,lda.goodsnw,lda.goodsgw,lda.blno,
                               lda.transname,lda.voyageno,lda.busiunitcode,lda.busiunitname,lda.portcode,
                               lda.trademethod,lda.declkind DECLWAY,lda.declkind DECLWAYNAME,lda.REPUNITNAME,
@@ -4909,7 +4955,7 @@ namespace MvcPlatform.Controllers
             }
             where += @" and lda.BUSIUNITCODE ='" + json_user.Value<string>("CUSTOMERHSCODE") + "' and ort.BUSITYPE in('40','41')";
 
-            string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.SHEETNUM,det.modifyflag,
+            string sql = @"select det.ID,det.CODE,det.ORDERCODE, det.CUSTOMSSTATUS ,det.SHEETNUM,det.modifyflag,det.inspectioncode,det.inspstatus,
                               lda.declarationcode,to_char(lda.reptime,'yyyy-mm-dd') reptime,lda.contractno,lda.goodsnum,lda.goodsnw,lda.goodsgw,lda.blno,
                               lda.transname,lda.voyageno,lda.busiunitcode,lda.busiunitname,lda.portcode,
                               lda.trademethod,lda.declkind DECLWAY,lda.declkind DECLWAYNAME,lda.REPUNITNAME,
@@ -4970,8 +5016,8 @@ namespace MvcPlatform.Controllers
             row1.CreateCell(8).SetCellValue("提运单号"); row1.CreateCell(9).SetCellValue("申报方式"); row1.CreateCell(10).SetCellValue("报关方式"); row1.CreateCell(11).SetCellValue("贸易方式");
             row1.CreateCell(12).SetCellValue("合同协议号"); row1.CreateCell(13).SetCellValue("件数"); row1.CreateCell(14).SetCellValue("重量"); row1.CreateCell(15).SetCellValue("张数");
             row1.CreateCell(16).SetCellValue("订单编号"); row1.CreateCell(17).SetCellValue("客户编号"); row1.CreateCell(18).SetCellValue("进/出"); row1.CreateCell(19).SetCellValue("两单关联号");
-            row1.CreateCell(20).SetCellValue("多单关联号"); row1.CreateCell(21).SetCellValue("删改单"); row1.CreateCell(22).SetCellValue("比对状态"); row1.CreateCell(23).SetCellValue("未通过原因"); 
-
+            row1.CreateCell(20).SetCellValue("多单关联号"); row1.CreateCell(21).SetCellValue("删改单"); row1.CreateCell(22).SetCellValue("比对状态"); row1.CreateCell(23).SetCellValue("未通过原因");
+            row1.CreateCell(24).SetCellValue("报检单号"); row1.CreateCell(25).SetCellValue("报检状态");
 
 
             //将数据逐步写入sheet_S各个行
@@ -5021,6 +5067,8 @@ namespace MvcPlatform.Controllers
                 rowtemp.CreateCell(21).SetCellValue(getStatusName(dt.Rows[i]["MODIFYFLAG"].ToString(), modifyflag_data));
                 rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["VERSTATUS"].ToString());
                 rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["NOTE"].ToString());
+                rowtemp.CreateCell(24).SetCellValue(dt.Rows[i]["INSPECTIONCODE"].ToString());
+                rowtemp.CreateCell(25).SetCellValue(getInspStatus(dt.Rows[i]["INSPSTATUS"].ToString()));
             }
 
 
@@ -5064,8 +5112,8 @@ namespace MvcPlatform.Controllers
             row1.CreateCell(8).SetCellValue("提运单号"); row1.CreateCell(9).SetCellValue("申报方式"); row1.CreateCell(10).SetCellValue("报关方式"); row1.CreateCell(11).SetCellValue("贸易方式");
             row1.CreateCell(12).SetCellValue("合同协议号"); row1.CreateCell(13).SetCellValue("件数"); row1.CreateCell(14).SetCellValue("重量"); row1.CreateCell(15).SetCellValue("张数");
             row1.CreateCell(16).SetCellValue("订单编号"); row1.CreateCell(17).SetCellValue("客户编号"); row1.CreateCell(18).SetCellValue("进/出"); row1.CreateCell(19).SetCellValue("两单关联号");
-            row1.CreateCell(20).SetCellValue("多单关联号"); row1.CreateCell(21).SetCellValue("删改单"); row1.CreateCell(22).SetCellValue("关联企业"); row1.CreateCell(23).SetCellValue("比对状态"); 
-            row1.CreateCell(24).SetCellValue("未通过原因"); 
+            row1.CreateCell(20).SetCellValue("多单关联号"); row1.CreateCell(21).SetCellValue("删改单"); row1.CreateCell(22).SetCellValue("关联企业"); row1.CreateCell(23).SetCellValue("比对状态");
+            row1.CreateCell(24).SetCellValue("未通过原因"); row1.CreateCell(25).SetCellValue("报检单号"); row1.CreateCell(26).SetCellValue("报检状态"); 
 
 
 
@@ -5117,6 +5165,8 @@ namespace MvcPlatform.Controllers
                 rowtemp.CreateCell(22).SetCellValue(dt.Rows[i]["BUSIUNITNAME_ASS"].ToString());
                 rowtemp.CreateCell(23).SetCellValue(dt.Rows[i]["VERSTATUS"].ToString());
                 rowtemp.CreateCell(24).SetCellValue(dt.Rows[i]["NOTE"].ToString());
+                rowtemp.CreateCell(25).SetCellValue(dt.Rows[i]["INSPECTIONCODE"].ToString());
+                rowtemp.CreateCell(26).SetCellValue(getInspStatus(dt.Rows[i]["INSPSTATUS"].ToString()));
             }
 
 

@@ -56,7 +56,7 @@ Ext.onReady(function () {
                         'BUSIUNITCODE', 'BUSIUNITNAME', 'PORTCODE', 'TRADEMETHOD', 'DECLWAY', 'DECLWAYNAME',
                         'BUSITYPE', 'CONTRACTNOORDER', 'REPWAYID', 'REPWAYNAME', 'TOTALNO', 'DIVIDENO', 'SECONDLADINGBILLNO',
                         'CUSNO', 'IETYPE', 'ASSOCIATENO', 'CORRESPONDNO', 'CUSTOMERNAME',
-                        'VERSTATUS', 'NOTE'
+                        'VERSTATUS', 'NOTE', 'INSPSTATUS', 'INSPECTIONCODE'
                 ],
                 pageSize: 22,
                 proxy: {
@@ -103,12 +103,14 @@ Ext.onReady(function () {
                 { xtype: 'rownumberer', width: 45 },
                 { header: 'ID', dataIndex: 'ID', sortable: true, hidden: true },
                 { header: '海关状态', dataIndex: 'CUSTOMSSTATUS', width: 90, locked: true },
+                { header: '报检状态', dataIndex: 'INSPSTATUS', width: 90, locked: true, renderer: renderinspstatus },
                 { header: '合同发票号', dataIndex: 'CONTRACTNOORDER', width: 140 },
                 { header: '总单号', dataIndex: 'TOTALNO', width: 100, hidden: (busitypeid != '10' && busitypeid != '11') },
                 { header: '分单号', dataIndex: 'DIVIDENO', width: 100, hidden: (busitypeid != '10' && busitypeid != '11') },
                 { header: '海运提单号', dataIndex: 'SECONDLADINGBILLNO', width: 140, hidden: (busitypeid != '20' && busitypeid != '21') },
                 { header: '打印标志', dataIndex: 'ISPRINT', width: 70, renderer: render },
                 { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 140, locked: true, renderer: render },
+                { header: '报检单号', dataIndex: 'INSPECTIONCODE', width: 140, locked: true },
                 { header: '委托单位', dataIndex: 'CUSTOMERNAME', width: 100, locked: role == 'supplier', hidden: role == 'customer' },
                 { header: '申报日期', dataIndex: 'REPTIME', width: 140 },
                 { header: '进/出', dataIndex: 'IETYPE', width: 80, hidden: busitypeid != '40-41' },
@@ -693,6 +695,27 @@ function render(value, cellmeta, record, rowIndex, columnIndex, store) {
         if (value != null && VOYAGENO != null) {
             rtn = value + '/' + VOYAGENO;
         }
+    }
+    return rtn;
+}
+
+
+//报检状态返回数值
+function renderinspstatus(value, cellmeta, record, rowIndex, columnIndex, store) {
+    var rtn = "";
+    if (value == 50) {
+        rtn = "审核完成";
+    }
+    if (value == 100) {
+        rtn = "报检申报";
+    }
+    if (value == 115) {
+        rtn = "申报退单";
+    }
+    if (value == 155) {
+        rtn = "报检查验";
+    } if (value == 160) {
+        rtn = "报检放行";
     }
     return rtn;
 }

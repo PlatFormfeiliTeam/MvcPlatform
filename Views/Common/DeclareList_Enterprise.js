@@ -411,7 +411,7 @@ function gridpanelBind() {
         fields: ['ID', 'PREDECLCODE', 'DECLARATIONCODE', 'CUSTOMSSTATUS', 'CODE', 'MODIFYFLAG', 'REPTIME', 'TRANSNAME', 'BUSIUNITCODE', 'CUSTOMERNAME', 'IETYPE',
                 'BUSIUNITNAME', 'PORTCODE', 'BLNO', 'REPWAYID', 'REPWAYNAME', 'DECLWAY', 'DECLWAYNAME', 'TRADEMETHOD', 'CONTRACTNO', 'GOODSNUM',
                 'GOODSNW', 'GOODSGW', 'SHEETNUM', 'ORDERCODE', 'CUSNO', 'ASSOCIATENO', 'CORRESPONDNO', 'BUSITYPE', 'CONTRACTNOORDER', 'REPUNITNAME',
-                'VERSTATUS', 'NOTE'
+                'VERSTATUS', 'NOTE', 'INSPSTATUS', 'INSPECTIONCODE'
         ],
         pageSize: 22,
         proxy: {
@@ -469,7 +469,7 @@ function gridpanelBind() {
         columns_old = [
         { xtype: 'rownumberer', width: 35 },
         { header: 'ID', dataIndex: 'ID', sortable: true, hidden: true },
-        { header: '海关状态', dataIndex: 'CUSTOMSSTATUS', width: 90, locked: true },
+        { header: '海关状态', dataIndex: 'CUSTOMSSTATUS', width: 90, locked: true },       
         {
             header: '比对状态', dataIndex: 'VERSTATUS', width: 90, locked: true, renderer: function (value, meta, record) {
                 if (value == "比对未通过") {
@@ -479,6 +479,8 @@ function gridpanelBind() {
             }
         },
         { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 140, locked: true, renderer: render },
+        { header: '报检单号', dataIndex: 'INSPECTIONCODE', width: 140, locked: true },
+        { header: '报检状态', dataIndex: 'INSPSTATUS', width: 90, locked: true, renderer: renderinspstatus },
         { header: '申报单位', dataIndex: 'REPUNITNAME', width: 200 },
         { header: '合同发票号', dataIndex: 'CONTRACTNOORDER', width: 140, locked: true, },
         { header: '申报日期', dataIndex: 'REPTIME', width: 140 },
@@ -513,6 +515,26 @@ function gridpanelBind() {
 
 
 
+}
+
+//报检状态返回数值
+function renderinspstatus(value, cellmeta, record, rowIndex, columnIndex, store) {
+    var rtn = "";
+    if (value == 50) {
+        rtn = "审核完成";
+    }
+    if (value == 100) {
+        rtn = "报检申报";
+    }
+    if (value == 115) {
+        rtn = "申报退单";
+    }
+    if (value == 155) {
+        rtn = "报检查验";
+    } if (value == 160) {
+        rtn = "报检放行";
+    }
+    return rtn;
 }
 
 function render(value, cellmeta, record, rowIndex, columnIndex, store) {
