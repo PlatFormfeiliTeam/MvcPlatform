@@ -32,6 +32,16 @@ var common_data_busitype_Not_Domestic = [
 var declarationsearch_js_condition4_data = [{ "NAME": "订单委托日期", "CODE": "SUBMITTIME" }, { "NAME": "申报日期", "CODE": "REPTIME" }];
 
 //查询区域 查询条件1 /Common/loadcondition1
+var search_js_condition1_StationField = [{ "NAME": "企业编号", "CODE": "CUSNO" }, { "NAME": "分单号", "CODE": "DIVIDENO" }, { "NAME": "合同发票号", "CODE": "CONTRACTNO" }, { "NAME": "报关单号", "CODE": "DECLARATIONCODE" }];
+var search_js_condition2_StationField = [{ "NAME": "进出境关别", "CODE": "PORTCODE" }, { "NAME": "监管方式", "CODE": "TRADEWAY" }, { "NAME": "业务类型", "CODE": "BUSITYPE" }];
+var search_js_condition3_StationField = [{ "NAME": "业务状态", "CODE": "STATUS" }, { "NAME": "报检标志", "CODE": "INSPFLAG" }, { "NAME": "舱单", "CODE": "MANIFEST" }];
+var search_js_condition4_StationField = [{ "NAME": "委托日期", "CODE": "SUBMITTIME" }, { "NAME": "受理日期", "CODE": "ACCEPTTIME" }
+    , { "NAME": "制单完成日期", "CODE": "MOENDTIME" }, { "NAME": "审单完成日期", "CODE": "COENDTIME" }
+    , { "NAME": "复审完成日期", "CODE": "RECOENDTIME" }, { "NAME": "申报日期", "CODE": "REPSTARTTIME" }
+    , { "NAME": "申报完成日期", "CODE": "REPENDTIME" }, { "NAME": "通关放行日期", "CODE": "PASSTIME" }
+];
+
+//查询区域 查询条件1 /Common/loadcondition1
 var search_js_condition1_data = [{ "NAME": "经营单位", "CODE": "BUSIUNITCODE" }, { "NAME": "申报关区", "CODE": "CUSTOMDISTRICTCODE" }, { "NAME": "进口口岸", "CODE": "PORTCODE" }, { "NAME": "申报方式", "CODE": "REPWAYID" }];
 //查询区域 查询条件2 /Common/loadcondition2
 var search_js_condition2_data = [{ "NAME": "订单编号", "CODE": "CODE" }, { "NAME": "客户编号", "CODE": "CUSNO" }, { "NAME": "分单号", "CODE": "DIVIDENO" }

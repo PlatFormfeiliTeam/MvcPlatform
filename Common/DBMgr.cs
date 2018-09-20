@@ -100,6 +100,37 @@ namespace MvcPlatform.Common
             orclCon.Close();
             return retcount;
         }
+        public static int ExecuteNonQueryBatch(List<string> listSqls)
+        {
+            OracleConnection Conn = null;
+            OracleCommand Cmd = new OracleCommand();
+            OracleTransaction trans = null;
+            try
+            {
+                int count = 0;
+                Conn = new OracleConnection(ConnectionString);
+                Cmd.Connection = Conn;
+                Cmd.CommandType = CommandType.Text;
+
+                Conn.Open();
+                trans = Conn.BeginTransaction();
+                Cmd.Transaction = trans;
+                foreach (string strSql in listSqls)
+                {
+                    Cmd.CommandText = strSql;
+                    count += Cmd.ExecuteNonQuery();
+                }
+                trans.Commit();
+                Conn.Close();
+                return count;
+            }
+            catch (Exception)
+            {
+                trans.Rollback();
+                Conn.Close();
+                throw;
+            }
+        }
 
         public static int ExecuteNonQueryParm(string sql, OracleParameter[] parms)
         {

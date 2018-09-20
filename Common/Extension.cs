@@ -47,7 +47,7 @@ namespace MvcPlatform.Common
             //else
             //{
                 //2016-08-02增加字段报关服务单位SCENEDECLAREID 报检服务单位SCENEINSPECTID 因为订单里面创建时取当前用户的默认值 故提前放到缓存
-                //CUSTOMERID 这个字段在sysuser表中有
+            //CUSTOMERID 这个字段在sysuser表中有 
                 string sql = @"select c.NAME as CUSTOMERNAME,c.HSCODE as CUSTOMERHSCODE,c.CIQCODE as CUSTOMERCIQCODE,c.CODE CUSTOMERCODE
                                     ,c.SCENEDECLAREID,c.SCENEINSPECTID,d.NAME as REPUNITNAME,e.NAME as INSPUNITNAME,c.ISRECEIVER,c.ISCUSTOMER
                                     ,c.DOCSERVICECOMPANY
@@ -641,8 +641,8 @@ namespace MvcPlatform.Common
             //}
             //else
             //{
-                sql = "SELECT CODE,NAME||'('||CODE||')' NAME FROM BASE_COMPANY where CODE is not null and enabled=1";
-                json_jydw = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+            sql = "SELECT CODE,NAME||'('||CODE||')' NAME FROM BASE_COMPANY where CODE is not null and enabled=1";
+            json_jydw = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
             //    db.StringSet("common_data:jydw", json_jydw);
             //}
 
@@ -972,7 +972,7 @@ namespace MvcPlatform.Common
             //}
 
 
-            //业务类别
+            //委托类型
             string json_entrusttype = "[]";
             //if (db.KeyExists("common_data:entrust"))
             //{
@@ -985,20 +985,88 @@ namespace MvcPlatform.Common
             //db.StringSet("common_data:entrust", json_entrusttype);
             //}
 
+            //业务类型
+            string json_busitype = "[]";
+            sql = @"select a.CODE,a.NAME||'('||a.CODE||')' NAME from SYS_busitype a where enabled=1 order by a.code ";
+            json_busitype = JsonConvert.SerializeObject(DBMgrBase.GetDataTable(sql));
+
+            //业务状态
+            string json_status = "[]";
+            sql = @"select a.CODE,a.NAME||'('||a.CODE||')' NAME from SYS_status a  order by a.code ";
+            json_status = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
+
+            //驻场管理的 业务状态
+            DataTable dtStationFieldStatus = new DataTable();
+            dtStationFieldStatus.Columns.Add("CODE", typeof(int));
+            dtStationFieldStatus.Columns.Add("NAME", typeof(string));
+            dtStationFieldStatus.Rows.Add("10", "已委托(10)");
+            dtStationFieldStatus.Rows.Add("15", "已受理(15)");
+            dtStationFieldStatus.Rows.Add("30", "制单完成(30)");
+            dtStationFieldStatus.Rows.Add("50", "审单完成(50)");
+            dtStationFieldStatus.Rows.Add("55", "复审完成(55)");
+            dtStationFieldStatus.Rows.Add("100", "申报中(100)");
+            dtStationFieldStatus.Rows.Add("120", "申报完成(120)");
+            dtStationFieldStatus.Rows.Add("160", "通关放行(160)");
+            string json_StationFieldStatus = "[]";
+            json_StationFieldStatus = JsonConvert.SerializeObject(dtStationFieldStatus);
+
+            //是或否
+            DataTable dtYesOrNot = new DataTable();
+            dtYesOrNot.Columns.Add("CODE", typeof(int));
+            dtYesOrNot.Columns.Add("NAME", typeof(string));
+            dtYesOrNot.Rows.Add("0", "否(0)");
+            dtYesOrNot.Rows.Add("1", "是(1)");
+            string json_YesOrNot = "[]";
+            json_YesOrNot = JsonConvert.SerializeObject(dtYesOrNot);
+
+            //删改单
+            DataTable dtModify = new DataTable();
+            dtModify.Columns.Add("CODE", typeof(int));
+            dtModify.Columns.Add("NAME", typeof(string));
+            dtModify.Rows.Add("0", "正常(0)");
+            dtModify.Rows.Add("1", "删单(1)");
+            dtModify.Rows.Add("2", "改单(2)");
+            dtModify.Rows.Add("3", "改单完成(3)");
+            string json_Modify = "[]";
+            json_Modify = JsonConvert.SerializeObject(dtModify);
+
+            //海关状态
+            DataTable dtCUSTOMSSTATUS = new DataTable();
+            dtCUSTOMSSTATUS.Columns.Add("CODE", typeof(string));
+            dtCUSTOMSSTATUS.Columns.Add("NAME", typeof(string));
+            dtCUSTOMSSTATUS.Rows.Add("暂存未申报", "暂存未申报");
+            dtCUSTOMSSTATUS.Rows.Add("申报退单", "申报退单");
+            dtCUSTOMSSTATUS.Rows.Add("申报挂起", "申报挂起");
+            dtCUSTOMSSTATUS.Rows.Add("已申报", "已申报");
+            dtCUSTOMSSTATUS.Rows.Add("提前转关生成", "提前转关生成");
+            dtCUSTOMSSTATUS.Rows.Add("申报完成", "申报完成");
+            dtCUSTOMSSTATUS.Rows.Add("现场申报", "现场申报");
+            dtCUSTOMSSTATUS.Rows.Add("布控查验", "布控查验");
+            dtCUSTOMSSTATUS.Rows.Add("已放行", "已放行");
+            dtCUSTOMSSTATUS.Rows.Add("已结关", "已结关");
+            dtCUSTOMSSTATUS.Rows.Add("删单或异常", "删单或异常");
+            string json_CUSTOMSSTATUS = "[]";
+            json_CUSTOMSSTATUS = JsonConvert.SerializeObject(dtCUSTOMSSTATUS);
+
 
             //费用状态
-            string json_fyzt= "[]";
+            string json_fyzt = "[]";
             //if (db.KeyExists("common_data:fyzt"))
             //{
             //    json_fyzt = db.StringGet("common_data:fyzt");
             //}
             //else
             //{
-                sql = @"select a.*,NAME||'('||CODE||')' CODENAME from finance_status a order by code";
-                json_fyzt = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
+            sql = @"select a.*,NAME||'('||CODE||')' CODENAME from finance_status a order by code";
+            json_fyzt = JsonConvert.SerializeObject(DBMgr.GetDataTable(sql));
             //    db.StringSet("common_data:fyzt", json_fyzt);
             //}
-           
+
+            if (ParaType == "AddStationField")//驻场管理 新增界面
+            {
+                return "{jydw:" + json_jydw + ",ywlx:" + json_busitype + ",sbgq:" + json_sbgq + ",myfs:" + json_myfs
+                    + ",Modify:" + json_Modify + ",CUSTOMSSTATUS:" + json_CUSTOMSSTATUS + ",curuser:" + json_user + ",status:" + json_status + "}";
+            }
 
             if (ParaType == "predata")//ListPreData.cshtml 导入用的
             {
@@ -1028,7 +1096,9 @@ namespace MvcPlatform.Common
                 + ",myfs:" + json_myfs + ",containertype:" + json_containertype + ",containersize:" + json_containersize + ",truckno:" + json_truckno
                 + ",relacontainer:" + json_relacontainer + ",mzbz:" + json_mzbz + ",jylb:" + json_jylb + ",json_sbkb:" + json_sbkb
                 + ",inspbzzl:" + json_inspbzzl + ",adminurl:'" + AdminUrl + "',curuser:" + json_user
-                + ",dzfwdw:" + json_dzfwdw + ",inspmyfs:" + json_inspmyfs + ",wtdw:" + json_wtdw + ",isreceiver:'" + ISRECEIVER + "'}";
+                + ",dzfwdw:" + json_dzfwdw + ",inspmyfs:" + json_inspmyfs + ",wtdw:" + json_wtdw + ",ywlx:" + json_busitype
+                + ",StationFieldStatus:" + json_StationFieldStatus + ",YesOrNot:" + json_YesOrNot
+                + ",isreceiver:'" + ISRECEIVER + "'}";
         }
 
 
