@@ -212,6 +212,7 @@ TOTALNO,DIVIDENO,MANIFEST,INSPFLAG,REMARK,RECEIVERUNITCODE,RECEIVERUNITNAME,CREA
 
                 //  strSql="update RESIDENT_ORDER set ";
                 strSql = string.Empty;
+                string sysdate = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
                 status = "10";//已委托
                 if (jsonOrderTimedata.Value<string>("SUBMITTIME") != "null" && jsonOrderTimedata.Value<string>("SUBMITTIME") != "")//
@@ -220,7 +221,7 @@ TOTALNO,DIVIDENO,MANIFEST,INSPFLAG,REMARK,RECEIVERUNITCODE,RECEIVERUNITNAME,CREA
                 }
                 else
                 {
-                    strSql += " SUBMITTIME=sysdate,SUBMITUSERID='" + json_user.Value<string>("ID") + "',SUBMITUSERNAME='" + json_user.Value<string>("REALNAME") + "', ";
+                    strSql += " SUBMITTIME=to_date('" + sysdate + "','yyyy/mm/dd hh24:mi:ss'),SUBMITUSERID='" + json_user.Value<string>("ID") + "',SUBMITUSERNAME='" + json_user.Value<string>("REALNAME") + "', ";
                 }
                 if (jsonOrderTimedata.Value<string>("ACCEPTTIME") != "null" && jsonOrderTimedata.Value<string>("ACCEPTTIME") != "")
                 {
@@ -279,7 +280,7 @@ values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}',sysdate,'{8}','{9}')";
                 }
 
                 DBMgr.ExecuteNonQueryBatch(listSqls);
-                return "{success:true,code:'" + code + "'}";
+                return "{success:true,code:'" + code + "',status:" + status + ",SUBMITTIME:'" + sysdate + "',SUBMITUSERNAME:'" + json_user.Value<string>("REALNAME") + "',SUBMITUSERID:'" + json_user.Value<string>("ID") + "'}";
             }
             catch (Exception ex)
             {

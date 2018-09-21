@@ -28,9 +28,6 @@ function initQuery() {
         flex: .35,
        // value: 'CUSNO'
     })
-    //var store_1_1 = Ext.create("Ext.data.JsonStore", {
-    //    fields: ["CODE", "NAME"]
-    //});
     var field_1_1 = Ext.create('Ext.form.field.Text', {
         id: 'CONDITION1_1',
         margin: 0,
@@ -124,13 +121,16 @@ function initQuery() {
         listeners: {
             change: function () {
                 combo_3_1.reset();
-                if (combo_3.getValue() == "STATUS" ) {
+                if (combo_3.getValue() == "STATUS") {
+                    combo_3_1.minChars = "1";
                     store_3_1.loadData(common_data_StationFieldStatus);
                 }
                 if (combo_3.getValue() == "INSPFLAG") {
+                    combo_3_1.minChars = "1";
                     store_3_1.loadData(common_data_YesOrNot);
                 }
                 if (combo_3.getValue() == "MANIFEST") {
+                    combo_3_1.minChars = "1";
                     store_3_1.loadData(common_data_YesOrNot);
                 }
             }
@@ -148,8 +148,17 @@ function initQuery() {
         margin: 0,
         flex: .65,
         anyMatch: true,
-       // editable: true,
-        queryMode: 'local'
+        // editable: true,
+        forceSelection: true,
+        queryMode: 'local',
+        listeners:
+         {
+          change: function () {
+              if (combo_3_1.getValue() == null) {
+                  combo_3_1.reset();
+              }
+          }
+        }
     });
     var condition3 = {
         xtype: 'fieldcontainer',
@@ -306,15 +315,15 @@ function initQuery() {
         change: function () {
               combo_6_1.reset();
             if (combo_6.getValue() == "PORTCODE") {
-              // combo_6_1.minChars = "4";
+               combo_6_1.minChars = "1";
                store_6_1.loadData(common_data_sbgq);
               }
             if (combo_6.getValue() == "TRADEWAY") {
-            //  combo_6_1.minChars = "4";
+              combo_6_1.minChars = "1";
               store_6_1.loadData(common_data_myfs);
              }
            if (combo_6.getValue() == "BUSITYPE") {
-            //  combo_6_1.minChars = "2";
+              combo_6_1.minChars = "1";
               store_6_1.loadData(common_data_ywlx);
              }
            }
@@ -335,7 +344,15 @@ function initQuery() {
         anyMatch: true,
         queryMode: 'local',
         forceSelection: true,
-        flex: .65
+        flex: .65,
+        listeners:
+        {
+          change: function () {
+              if (combo_6_1.getValue() == null) {
+                  combo_6_1.reset();
+              }
+          }
+        }
     })
     var condition6 = {
         xtype: 'fieldcontainer',
@@ -362,12 +379,15 @@ function initQuery() {
             change: function () {
                 combo_7_1.reset();
                 if (combo_7.getValue() == "STATUS") {
+                    combo_7_1.minChars = "1";
                     store_7_1.loadData(common_data_StationFieldStatus);
                 }
                 if (combo_7.getValue() == "INSPFLAG") {
+                    combo_7_1.minChars = "1";
                     store_7_1.loadData(common_data_YesOrNot);
                 }
                 if (combo_7.getValue() == "MANIFEST") {
+                    combo_7_1.minChars = "1";
                     store_7_1.loadData(common_data_YesOrNot);
                 }
             }
@@ -386,8 +406,17 @@ function initQuery() {
         margin: 0,
         flex: .65,
         anyMatch: true,
-       // editable: false,
-        queryMode: 'local'
+        // editable: false,
+        queryMode: 'local',
+        forceSelection: true,
+        listeners:
+         {
+          change: function () {
+              if (combo_7_1.getValue() == null) {
+                  combo_7_1.reset();
+              }
+          }
+         }
     });
     var condition7 = {
         xtype: 'fieldcontainer',

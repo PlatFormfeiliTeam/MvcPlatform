@@ -74,7 +74,13 @@
         listeners: {
             blur: function (th, e, eOpts) {
                 field_BUSIUNITNAME.setValue(th.rawValue);
-            }
+            },
+            change: function () {
+                 if (combo_BUSIUNITCODE.getValue() == null) {
+                     combo_BUSIUNITCODE.reset();
+                     field_BUSIUNITNAME.reset();
+                  }
+              }           
         }
     });
     //经营单位名称
@@ -124,6 +130,13 @@
         anyMatch: true,
         columnWidth: .25,
         labelWidth: 60,
+        listeners:{
+          change: function () {
+              if (combo_busitype.getValue() == null) {
+                  combo_busitype.reset();
+              }
+          }
+        }
     });
 
     //进出境关别
@@ -146,6 +159,14 @@
         anyMatch: true,
         columnWidth: .25,
         labelWidth: 60,
+        minChars: '1',
+        listeners:{
+          change: function () {
+              if (combo_portcode.getValue() == null) {
+                  combo_portcode.reset();
+              }
+          }
+        }
     });
 
     //监管方式
@@ -168,6 +189,14 @@
         anyMatch: true,
         columnWidth: .25,
         labelWidth: 60,
+        minChars: '1',
+        listeners: {
+            change: function () {
+                if (combo_TRADEWAY2.getValue() == null) {
+                    combo_TRADEWAY2.reset();
+                }
+            }
+        }
     });
 
     //总单号
@@ -215,7 +244,7 @@
     });
 
     //件数
-    var field_GOODSNUM2 = Ext.create('Ext.form.field.Text', {
+    var field_GOODSNUM2 = Ext.create('Ext.form.field.Number', {
         id: 'GOODSNUM2',
         name: 'GOODSNUM2',
         tabIndex: 10,
@@ -224,14 +253,17 @@
         margin: 0,
         // columnWidth: .4,
         labelWidth: 60,
+        allowDecimals: false,
+        hideTrigger :true,
     });
     //毛重
-    var field_GOODGW2 = Ext.create('Ext.form.field.Text', {
+    var field_GOODGW2 = Ext.create('Ext.form.field.Number', {
         id: 'GOODGW2',
         name: 'GOODGW2',
         margin: 0,
         tabIndex: 11,
         flex: 0.5,
+        hideTrigger: true,
     });
     //毛重件数
     var field_GOODSNUM_GOODGW = {
@@ -381,6 +413,8 @@ function form_ini_decl() {
         fieldLabel: '报关单号',
         // columnWidth: .25,
         labelWidth: 60,
+        maxLength: 18,
+        minLength:18,
     });
 
     //监管方式中文
@@ -411,9 +445,16 @@ function form_ini_decl() {
         flex: 1,
         margin: 0,
         tabIndex: 13,
+        minChars: '1',
         listeners: {
             blur: function (th, e, eOpts) {
                 field_TRADEWAYNAME.setValue(th.rawValue);
+            },
+            change: function () {
+                if (combo_TRADEWAY.getValue() == null) {
+                    combo_TRADEWAY.reset();
+                    field_TRADEWAYNAME.reset();
+                }
             }
         }
 
@@ -427,7 +468,7 @@ function form_ini_decl() {
     }
 
     //张数
-    var field_SHEETNUM = Ext.create('Ext.form.field.Text', {
+    var field_SHEETNUM = Ext.create('Ext.form.field.Number', {
         id: 'SHEETNUM',
         name: 'SHEETNUM',
         tabIndex: 14,
@@ -435,6 +476,8 @@ function form_ini_decl() {
         fieldLabel: '张数',
         // columnWidth: .25,
         labelWidth: 60,
+        allowDecimals: false,
+        hideTrigger: true,
     });
     //删改单
     var store_MODIFYFLAG = Ext.create('Ext.data.JsonStore', {
@@ -456,6 +499,14 @@ function form_ini_decl() {
         anyMatch: true,
        // columnWidth: .25,
         labelWidth: 60,
+        minChars: '1',
+        listeners: {
+            change: function () {
+                if (combo_MODIFYFLAG.getValue() == null) {
+                    combo_MODIFYFLAG.reset();
+                }
+            }
+        }
     });
     //海关状态
     var store_CUSTOMSSTATUS = Ext.create('Ext.data.JsonStore', {
@@ -477,9 +528,17 @@ function form_ini_decl() {
         anyMatch: true,
         // columnWidth: .25,
         labelWidth: 60,
+        minChars: '1',
+        listeners: {
+            change: function () {
+                if (combo_CUSTOMSSTATUS.getValue() == null) {
+                    combo_CUSTOMSSTATUS.reset();
+                }
+            }
+        }
     });
     //件数
-    var field_GOODSNUM = Ext.create('Ext.form.field.Text', {
+    var field_GOODSNUM = Ext.create('Ext.form.field.Number', {
         id: 'GOODSNUM',
         name: 'GOODSNUM',
         tabIndex: 17,
@@ -487,10 +546,12 @@ function form_ini_decl() {
         fieldLabel: '件数',
         // columnWidth: .25,
         labelWidth: 60,
+        allowDecimals: false,
+        hideTrigger: true,
     });
 
     //毛重
-    var field_GOODGW = Ext.create('Ext.form.field.Text', {
+    var field_GOODGW = Ext.create('Ext.form.field.Number', {
         id: 'GOODGW',
         name: 'GOODGW',
         tabIndex: 18,
@@ -498,6 +559,7 @@ function form_ini_decl() {
           fieldLabel: '毛重',
         // columnWidth: .25,
           labelWidth: 60,
+          hideTrigger: true,
     });
     //备注
     var field_REMARK = Ext.create('Ext.form.field.Text', {
@@ -524,10 +586,11 @@ function form_ini_decl() {
                         store_declGrid.remove(rec);
                         store_declGrid.insert(rownum, formdata);
                     }
-                    //field_DECLARATIONCODE.focus();
+                    //
                     formpanel_decl.getForm().reset();
                     rownum = -1;
-                   // field_DECLARATIONCODE.focus();
+                    Ext.getCmp('GOODGW2').focus();
+                    //field_DECLARATIONCODE.focus();//combo_TRADEWAY  field_DECLARATIONCODE field_GOODGW2
                 }
             }
         }
@@ -1079,6 +1142,12 @@ function create_save() {
                     //    msg = "业务信息保存成功，费用明细保存失败！";
                     //}
                     Ext.getCmp('field_CODE').setValue(data.code);
+                    Ext.getCmp('combo_STATUS').setValue(data.status);
+
+                    Ext.getCmp('SUBMITTIME').setValue(data.SUBMITTIME);
+                    Ext.getCmp('SUBMITUSERNAME').setValue(data.SUBMITUSERNAME);
+                    Ext.getCmp('SUBMITUSERID').setValue(data.SUBMITUSERID);
+
                     resetTimeFlag();
                     Ext.MessageBox.alert("提示", "保存成功", function () {
                         //loadform_CusService();
