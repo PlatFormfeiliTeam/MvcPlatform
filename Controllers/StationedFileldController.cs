@@ -23,19 +23,19 @@ namespace MvcPlatform.Controllers
 
         public ActionResult EntryStationFileld()
         {
-            ViewBag.navigator = "现场服务>>驻场管理";
+            ViewBag.navigator = "订单中心>>驻场服务";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
         public ActionResult AddStationField()//
         {
-            ViewBag.navigator = "现场服务>>驻场管理>>新增";
+            ViewBag.navigator = "订单中心>>驻场服务>>新增/修改";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
         public ActionResult WebSiteQuery()//
         {
-            ViewBag.navigator = "现场服务>>网站速查";
+            ViewBag.navigator = "订单中心>>网站速查";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
@@ -122,8 +122,12 @@ where 1=1 " + getQueryCondition()+" and RECEIVERUNITCODE='" +json_user.Value<str
 
         private DataTable GetData(string strSql)
         {
-            int start = 1 + Convert.ToInt32(Request["start"]);
+            int start = Convert.ToInt32(Request["start"]);
             int limit = Convert.ToInt32(Request["limit"]);
+
+            start = start / limit + 1;
+
+          //  int start = 1 + Convert.ToInt32(Request["start"]);
             string sql = "select count(1) from ( " + strSql + " )";
             totalProperty = Convert.ToInt32(DBMgr.GetDataTable(sql).Rows[0][0]);
 
