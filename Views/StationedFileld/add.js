@@ -414,7 +414,8 @@ function form_ini_decl() {
         // columnWidth: .25,
         labelWidth: 60,
         maxLength: 18,
-        minLength:18,
+        minLength: 18,
+        msgTarget: 'side',
     });
 
     //监管方式中文
@@ -574,23 +575,23 @@ function form_ini_decl() {
             specialkey: function (field, e) {
                 if (e.getKey() == e.ENTER)
                 {
-                    if (!formpanel_decl.getForm().isValid()) {
-                        return;
+                    if (formpanel_decl.getForm().isValid()) {
+
+                        var formdata = formpanel_decl.getForm().getValues();
+                        if (rownum < 0) {
+                            store_declGrid.insert(store_declGrid.data.length, formdata);
+                        }
+                        else {//修改模式
+                            var rec = store_declGrid.getAt(rownum);
+                            store_declGrid.remove(rec);
+                            store_declGrid.insert(rownum, formdata);
+                        }
+                        //
+                        formpanel_decl.getForm().reset();
+                        rownum = -1;
+                        Ext.getCmp('GOODGW2').focus();
+                        //field_DECLARATIONCODE.focus();//combo_TRADEWAY  field_DECLARATIONCODE field_GOODGW2
                     }
-                    var formdata = formpanel_decl.getForm().getValues();
-                    if (rownum < 0) {
-                        store_declGrid.insert(store_declGrid.data.length, formdata);
-                    }
-                    else {//修改模式
-                        var rec = store_declGrid.getAt(rownum);
-                        store_declGrid.remove(rec);
-                        store_declGrid.insert(rownum, formdata);
-                    }
-                    //
-                    formpanel_decl.getForm().reset();
-                    rownum = -1;
-                    Ext.getCmp('GOODGW2').focus();
-                    //field_DECLARATIONCODE.focus();//combo_TRADEWAY  field_DECLARATIONCODE field_GOODGW2
                 }
             }
         }

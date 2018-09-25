@@ -1,0 +1,120 @@
+﻿@{
+    ViewBag.Title = "WebSiteQuery";
+    Layout = "~/Views/Shared/Empty.cshtml";
+    string Version = System.Configuration.ConfigurationManager.AppSettings["Version"];
+}
+
+<link href="/js/Extjs42/resources/css/ext-all.css" rel="stylesheet" />
+<script src="/js/Extjs42/bootstrap.js" type="text/javascript"></script>
+<link href="/css/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+<script src="/js/pan.js?t=@Version" type="text/javascript"></script>
+<script src="/js/commondata.js?t=@Version"></script>
+
+<style type="text/css">
+    #menu {
+        background-color: #d9e7f8;
+        width: 100%;
+        height: 30px;
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+        #menu li {
+            float: left;
+            width: 130px;
+            list-style: none;
+            height: 30px;
+            padding-top: 5px;
+            text-align: center;
+        }
+</style>
+
+<script type="text/javascript">
+
+    Ext.onReady(function () {
+
+        var paneltop = Ext.create('Ext.panel.Panel', {
+            id: 'paneltop',
+            border: 0,
+            region: 'center',
+           // height: 430,
+            contentEl: 'content'
+        })
+
+        //订单编号
+        var field_CODE = Ext.create('Ext.form.field.Text', {
+            id: 'field_CODE',
+            name: 'CODE',
+            fieldLabel: '订单编号',
+            readOnly: true,
+            flex: 1,
+            columnWidth: .25,
+            labelWidth: 60,
+        });
+
+        var label_baseinfo = {
+            xtype: 'label',
+            margin: '5',
+            html: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;订单信息</span></h4>'
+        }
+        var tbar = Ext.create('Ext.toolbar.Toolbar', {
+            items: [label_baseinfo, '->']
+        });
+
+        formpanel = Ext.create('Ext.form.Panel', {
+            id: 'formpanel',
+            renderTo: 'div_form',
+            tbar: tbar,
+            Height: 150,
+            fieldDefaults: {
+                margin: '5',
+                columnWidth: 0.24
+            },
+            items: [
+            { layout: 'column', border: 0, items: [field_CODE] },
+            //{ layout: 'column', border: 0, items: [condition5, condition6, condition7, condition8] }
+            ]
+        });
+
+
+        var menu_store = Ext.create('Ext.data.JsonStore', {
+            fields: ['NAME', 'URL'],
+            data: menu_js_data_StationField
+        });
+        var i = 0;
+        $.each(menu_store.data.items, function (idx, item) {
+                i++
+                if (i == 1) {
+                    $("#menu").append("<li style=\"background-color: #2a6496\" ref=\"" + item.data.URL + "\">" + item.data.NAME + "</li>")
+                    $("#content").attr("src", item.data.URL);
+                }
+                else {
+                    $("#menu").append("<li ref=\"" + item.data.URL + "\">" + item.data.NAME + "</li>")
+                }
+        });
+
+        setHeight();
+        Ext.get(window).on('resize', function () { setHeight(); });
+
+        function setHeight() {
+            var windowHeight = $(window).height();
+            $("#content").height = 200;
+
+            //var paneltop_height = Ext.getCmp('paneltop').getSize().height;
+            //var formpanel_height = Ext.getCmp('formpanel').getSize().height;
+
+            ////var B_height = Ext.getCmp('panel_buttom').getSize().height;
+            ////Ext.getCmp('panel_top').setHeight(V_height - B_height);
+           // Ext.getCmp('paneltop').setHeight(windowHeight - 200);
+            
+        }
+
+    });
+
+</script>
+
+
+<div>
+    <ul id="menu"></ul>
+</div>
+<iframe id="content" name="frame" width=100% height="600px" security="restricted" sandbox="allow-scripts  allow-forms allow-same-origin" ></iframe>
+<div id="div_form" style="width:100%;height:200px"></div>

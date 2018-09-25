@@ -12,6 +12,8 @@ using System.Data;
 
 namespace MvcPlatform.Controllers
 {
+    [Authorize]
+    [Filters.AuthFilter]
     public class StationedFileldController : Controller
     {
         int totalProperty = 0;
@@ -25,9 +27,15 @@ namespace MvcPlatform.Controllers
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
-        public ActionResult AddStationField()
+        public ActionResult AddStationField()//
         {
             ViewBag.navigator = "现场服务>>驻场管理>>新增";
+            ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
+            return View();
+        }
+        public ActionResult WebSiteQuery()//
+        {
+            ViewBag.navigator = "现场服务>>网站速查";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
@@ -297,7 +305,9 @@ values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}',sysdate,'{8}','{9}')";
             string formOrderData = "{}";
             string formDeclData = "[]";
 
-            string strSql = "select * from RESIDENT_ORDER where code='"+ordercode+"'";
+            string strSql = @"select code,cusno,busitype,tradeway as TRADEWAY2,portcode,busiunitcode,busiunitname,busiunitnum
+,goodsnum as GOODSNUM2,goodgw as GOODGW2,contractno,totalno,divideno,manifest,status,inspflag,remark as REMARK2,submittime,submituserid,submitusername,accepttime,acceptuserid,acceptusername,moendtime,moendid,moendname,coendtime,coendid,coendname,recoendtime,recoendid,recoendname,repstarttime,repstartid,repstartname,rependtime
+,rependid,rependname,passtime,passid,passname,receiverunitcode,receiverunitname,createtime,declcodeqty,declarationcode from RESIDENT_ORDER where code='"+ordercode+"'";
             formOrderData = JsonConvert.SerializeObject(DBMgr.GetDataTable(strSql), iso).TrimStart('[').TrimEnd(']');
 
             strSql = "select * from RESIDENT_DECLARATION where ordercode='"+ordercode+"' order by NO";

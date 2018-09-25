@@ -107,6 +107,13 @@
     <submenu>/OrderManager/Create</submenu>
   </rootmenu>
 
+  <!-- 驻厂服务-->
+  <rootmenu>
+    <menu>/StationedFileld/EntryStationFileld</menu>
+    <submenu>/StationedFileld/AddStationField</submenu>
+    <submenu>/StationedFileld/WebSiteQuery</submenu>
+  </rootmenu>
+
   <!-- 报关单管理-->
   
   <rootmenu>

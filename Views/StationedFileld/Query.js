@@ -589,7 +589,7 @@ function del() {
         var aaa = sel[i].data.STATUS;
         if (sel[i].data.STATUS != null && sel[i].data.STATUS != "已委托")
         {
-            Ext.MessageBox.alert('提示','只可以删除已委托的单子');
+            Ext.MessageBox.alert('提示','只能删除已委托的单子');
             return;
         }
     }

@@ -78,7 +78,12 @@ var orders_tatus = {
     '0': "草稿", '10': "已委托", '15': "已受理", '20': "制单中", '30': "制单完成", '40': "审核中", '50': "审核完成", '60': "待预录"
     , '70': "预录中", '80': "预录完成", '90': "审核校验完成", '100': "申报中", '105': "提前转关生成", '110': "提前申报完成"
     , '120': "申报完成", '130': "申报完结", '140': "资料整理", '150': "现场报关", '160': "现场放行"
-}
+};
+
+//驻厂服务 网站速查
+var menu_js_data_StationField = [
+      { "NAME": "快件舱单确认信息查询", "URL": "http://www.haiguan.info/onlinesearch/gateway/FormHeadRtnAndEntryHead.aspx" }
+];
 
 //1,查询条件：草稿、已委托、申报中、申报完结、未完结（差的是没有申报完结的范围）
 //去掉订单状态：查询，列表展示；查询时，选的是报关状态，where条件就是报关状态=。。。
@@ -98,7 +103,7 @@ var menu_js_data = [{ "NAME": "I跟踪", "URL": "http://www.igenzong.com/air/tra
                     { "NAME": "海勃", "URL": "http://www.hb56.com/Main.aspx", "busitypeid": "20" },
                     { "NAME": "新舱单信息查询", "URL": "http://query.customs.gov.cn/MNFTQ/ ", "busitypeid": "21" },
                     { "NAME": "新舱单信息查询", "URL": "http://query.customs.gov.cn/MNFTQ/ ", "busitypeid": "20" }
-]
+];
 
 var modifyflag_data = [{ "NAME": "正常", "CODE": "0" }, { "NAME": "删单", "CODE": "1" }, { "NAME": "改单", "CODE": "2" }, { "NAME": "改单完成", "CODE": "3" }];
 var verstatus_data_search = [{ "NAME": "未比对", "CODE": "未比对" }, { "NAME": "比对中", "CODE": "比对中" }, { "NAME": "比对通过", "CODE": "比对通过" }, { "NAME": "比对未通过", "CODE": "比对未通过" }];
