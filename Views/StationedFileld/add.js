@@ -712,7 +712,8 @@ function form_ini_time() {
             render: function (p) {
                 p.getEl().on('dblclick', function () {
                     if (txtACCEPTTIME.getValue() == null || txtACCEPTTIME.getValue() == "") {
-                        txtACCEPTTIME.setValue(Ext.Date.format(new Date(), 'Y-m-d H:i:s')); //new Date()
+                        getServerTime('ACCEPTTIME');
+                        //txtACCEPTTIME.setValue(Ext.Date.format(new Date(), 'Y-m-d H:i:s')); //new Date()
                         txtACCEPTUSERNAME.setValue(common_data_curuser.REALNAME);
                         txtACCEPTUSERID.setValue(common_data_curuser.ID);
                         flagACCEPTTIME = 0;
@@ -767,7 +768,8 @@ function form_ini_time() {
             render: function (p) {
                 p.getEl().on('dblclick', function () {
                     if (txtMOENDTIME.getValue() == null || txtMOENDTIME.getValue() == "") {
-                        txtMOENDTIME.setValue(Ext.Date.format(new Date(), 'Y-m-d H:i:s')); //new Date()
+                        getServerTime('MOENDTIME');
+                       // txtMOENDTIME.setValue(Ext.Date.format(new Date(), 'Y-m-d H:i:s')); //new Date()
                         txtMOENDNAME.setValue(common_data_curuser.REALNAME);
                         txtMOENDID.setValue(common_data_curuser.ID);
                         flagMOENDTIME = 0;
@@ -822,7 +824,8 @@ function form_ini_time() {
             render: function (p) {
                 p.getEl().on('dblclick', function () {
                     if (txtCOENDTIME.getValue() == null || txtCOENDTIME.getValue() == "") {
-                        txtCOENDTIME.setValue(Ext.Date.format(new Date(), 'Y-m-d H:i:s')); //new Date()
+                        getServerTime('COENDTIME');
+                       // txtCOENDTIME.setValue(Ext.Date.format(new Date(), 'Y-m-d H:i:s')); //new Date()
                         txtCOENDNAME.setValue(common_data_curuser.REALNAME);
                         txtCOENDID.setValue(common_data_curuser.ID);
                         flagCOENDTIME = 0;
@@ -877,7 +880,8 @@ function form_ini_time() {
             render: function (p) {
                 p.getEl().on('dblclick', function () {
                     if (txtRECOENDTIME.getValue() == null || txtRECOENDTIME.getValue() == "") {
-                        txtRECOENDTIME.setValue(Ext.Date.format(new Date(), 'Y-m-d H:i:s')); //new Date()
+                        getServerTime('RECOENDTIME');
+                        //txtRECOENDTIME.setValue(Ext.Date.format(new Date(), 'Y-m-d H:i:s')); //new Date()
                         txtRECOENDNAME.setValue(common_data_curuser.REALNAME);
                         txtRECOENDID.setValue(common_data_curuser.ID);
                         flagRECOENDTIME = 0;
@@ -932,7 +936,8 @@ function form_ini_time() {
             render: function (p) {
                 p.getEl().on('dblclick', function () {
                     if (txtREPSTARTTIME.getValue() == null || txtREPSTARTTIME.getValue() == "") {
-                        txtREPSTARTTIME.setValue(Ext.Date.format(new Date(), 'Y-m-d H:i:s')); //new Date()
+                        getServerTime('REPSTARTTIME');
+                       // txtREPSTARTTIME.setValue(Ext.Date.format(new Date(), 'Y-m-d H:i:s')); //new Date()
                         txtREPSTARTNAME.setValue(common_data_curuser.REALNAME);
                         txtREPSTARTID.setValue(common_data_curuser.ID);
                         flagREPSTARTTIME = 0;
@@ -987,7 +992,8 @@ function form_ini_time() {
             render: function (p) {
                 p.getEl().on('dblclick', function () {
                     if (txtREPENDTIME.getValue() == null || txtREPENDTIME.getValue() == "") {
-                        txtREPENDTIME.setValue(Ext.Date.format(new Date(), 'Y-m-d H:i:s')); //new Date()
+                        getServerTime('REPENDTIME');
+                        //txtREPENDTIME.setValue(Ext.Date.format(new Date(), 'Y-m-d H:i:s')); //new Date()
                         txtREPENDNAME.setValue(common_data_curuser.REALNAME);
                         txtREPENDID.setValue(common_data_curuser.ID);
                         flagREPENDTIME = 0;
@@ -1042,7 +1048,8 @@ function form_ini_time() {
             render: function (p) {
                 p.getEl().on('dblclick', function () {
                     if (txtPASSTIME.getValue() == null || txtPASSTIME.getValue() == "") {
-                        txtPASSTIME.setValue(Ext.Date.format(new Date(), 'Y-m-d H:i:s')); //new Date()
+                        getServerTime('PASSTIME');
+                       // txtPASSTIME.setValue(Ext.Date.format(new Date(), 'Y-m-d H:i:s')); //new Date()
                         txtPASSNAME.setValue(common_data_curuser.REALNAME);
                         txtPASSID.setValue(common_data_curuser.ID);
                         flagPASSTIME = 0;
@@ -1127,6 +1134,13 @@ function create_save() {
     var formOrderTimedata = Ext.encode(Ext.getCmp('formpanel_time').getForm().getValues());
     var formDeclData = Ext.encode(Ext.pluck(Ext.data.StoreManager.lookup('store_declGrid').data.items, 'data'));
 
+    //if (Ext.getCmp('SUBMITTIME').getValue() == null || Ext.getCmp('SUBMITTIME').getValue() == "") {
+    //    getServerTime('SUBMITTIME');
+    //    // txtPASSTIME.setValue(Ext.Date.format(new Date(), 'Y-m-d H:i:s')); //new Date()
+    //    Ext.getCmp('SUBMITUSERNAME').setValue(common_data_curuser.REALNAME);
+    //    Ext.getCmp('SUBMITUSERID').setValue(common_data_curuser.ID);
+    //}
+
     var mask = new Ext.LoadMask(Ext.get(Ext.getBody()), { msg: "数据保存中，请稍等..." });
     mask.show();
     Ext.Ajax.request({
@@ -1142,12 +1156,15 @@ function create_save() {
                     //if (data.detail == "f") {
                     //    msg = "业务信息保存成功，费用明细保存失败！";
                     //}
-                    Ext.getCmp('field_CODE').setValue(data.code);
-                    Ext.getCmp('combo_STATUS').setValue(data.status);
 
-                    Ext.getCmp('SUBMITTIME').setValue(data.SUBMITTIME);
-                    Ext.getCmp('SUBMITUSERNAME').setValue(data.SUBMITUSERNAME);
-                    Ext.getCmp('SUBMITUSERID').setValue(data.SUBMITUSERID);
+                    Ext.getCmp("formpanel_form").getForm().setValues(data.formOrderData);
+                    Ext.getCmp("formpanel_time").getForm().setValues(data.formOrderData);
+
+                    Ext.getCmp('gridpanel_declGrid').store.loadData(data.formDeclData);
+
+                    //Ext.getCmp('SUBMITTIME').setValue(data.SUBMITTIME);
+                    //Ext.getCmp('SUBMITUSERNAME').setValue(data.SUBMITUSERNAME);
+                    //Ext.getCmp('SUBMITUSERID').setValue(data.SUBMITUSERID);
 
                     resetTimeFlag();
                     Ext.MessageBox.alert("提示", "保存成功", function () {
@@ -1179,6 +1196,19 @@ function loadform_CusService() {
             Ext.getCmp("formpanel_time").getForm().setValues(data.formOrderData);
 
             Ext.getCmp('gridpanel_declGrid').store.loadData(data.formDeclData);
+
+        }
+    });
+}
+
+function getServerTime(time) {
+    Ext.Ajax.request({
+        url: "/StationedFileld/getServerTime",
+      //  params: { ordercode: ordercode },
+        success: function (response, opts) {
+            var data = Ext.decode(response.responseText);
+            //txtACCEPTTIME.setValue(Ext.Date.format(new Date(), 'Y-m-d H:i:s')); //new Date()
+            Ext.getCmp(time).setValue(data.time)
 
         }
     });

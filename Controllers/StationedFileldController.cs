@@ -23,13 +23,13 @@ namespace MvcPlatform.Controllers
 
         public ActionResult EntryStationFileld()
         {
-            ViewBag.navigator = "订单中心>>驻场服务";
+            ViewBag.navigator = "订单中心>>驻厂服务";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
         public ActionResult AddStationField()//
         {
-            ViewBag.navigator = "订单中心>>驻场服务>>新增/修改";
+            ViewBag.navigator = "订单中心>>驻厂服务>>新增/修改";
             ViewBag.IfLogin = !string.IsNullOrEmpty(HttpContext.User.Identity.Name);
             return View();
         }
@@ -290,9 +290,9 @@ values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}',sysdate,'{8}','{9}')";
                     listSqls.Add(strSql);
                     count++;
                 }
-
                 DBMgr.ExecuteNonQueryBatch(listSqls);
-                return "{success:true,code:'" + code + "',status:" + status + ",SUBMITTIME:'" + sysdate + "',SUBMITUSERNAME:'" + json_user.Value<string>("REALNAME") + "',SUBMITUSERID:'" + json_user.Value<string>("ID") + "'}";
+                //保存成功后在重新拉一下数据
+                return loadrecord(code);
             }
             catch (Exception ex)
             {
@@ -300,9 +300,17 @@ values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}',sysdate,'{8}','{9}')";
             }
         }
 
-        public string loadrecord()
+        public string loadrecord(string ordercode="")
         {
-            string ordercode = Request["ordercode"];
+            if (ordercode == "")
+            {
+                ordercode = Request["ordercode"];
+            }
+            if (ordercode == "")
+            {
+                return "{success:false,msg:'订单编号为空'}";
+            }
+
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
@@ -317,7 +325,7 @@ values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}',sysdate,'{8}','{9}')";
             strSql = "select * from RESIDENT_DECLARATION where ordercode='"+ordercode+"' order by NO";
             formDeclData = JsonConvert.SerializeObject(DBMgr.GetDataTable(strSql), iso);
 
-            return "{formOrderData:" + formOrderData + ",formDeclData:" + formDeclData + "}";
+            return "{success:true,formOrderData:" + formOrderData + ",formDeclData:" + formDeclData + "}";
         }
 
         public string DeleteOrder()
@@ -363,6 +371,11 @@ where d.ordercode='" + obj.Value<string>("CODE") + "'";
             {
                 return "{success:false,msg:'保存失败：" + ex.Message + "'}";
             }
+        }
+
+        public string getServerTime()
+        {
+            return "{success:true,time:'"+System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")+"'}";
         }
 
 

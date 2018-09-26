@@ -30,16 +30,11 @@
 
 <script type="text/javascript">
 
+    var condition = getQueryString("condition");
+    var rowIndex = getQueryString("rowIndex"); 
+    var currentPage = getQueryString("currentPage");
+
     Ext.onReady(function () {
-
-        var paneltop = Ext.create('Ext.panel.Panel', {
-            id: 'paneltop',
-            border: 0,
-            region: 'center',
-           // height: 430,
-            contentEl: 'content'
-        })
-
         //订单编号
         var field_CODE = Ext.create('Ext.form.field.Text', {
             id: 'field_CODE',
@@ -47,31 +42,226 @@
             fieldLabel: '订单编号',
             readOnly: true,
             flex: 1,
-            columnWidth: .25,
-            labelWidth: 60,
+            fieldStyle: 'background-color: #E0E0E0; background-image: none;',
+            //columnWidth: .25,
+            //labelWidth: 60,
+        });
+        //企业编号
+        var field_CUSNO = Ext.create('Ext.form.field.Text', {
+            id: 'field_CUSNO',
+            name: 'CUSNO',
+            fieldLabel: '企业编号',
+            readOnly: true,
+            flex: 1,
+            fieldStyle: 'background-color: #E0E0E0; background-image: none;',
+            //columnWidth: .25,
+            //labelWidth: 60,
         });
 
+        //合同号
+        var field_CONTRACTNO = Ext.create('Ext.form.field.Text', {
+            id: 'field_CONTRACTNO',
+            name: 'CONTRACTNO',
+            fieldLabel: '合同号',
+            readOnly: true,
+            flex: 1,
+            fieldStyle: 'background-color: #E0E0E0; background-image: none;',
+            //columnWidth: .25,
+            //labelWidth: 60,
+        });
+        //进出境关别
+        var store_portcode = Ext.create('Ext.data.JsonStore', {
+            fields: ['CODE', 'NAME'],
+           // data: common_data_sbgq
+        });
+        var com_PORTCODE = Ext.create('Ext.form.field.Text', {
+            id: 'field_PORTCODE',
+            name: 'PORTCODE',
+            fieldLabel: '进出境关别',
+            readOnly: true,
+            flex: 1,
+            //columnWidth: .25,
+            //labelWidth: 60,
+
+            hideTrigger: true,
+            store: store_portcode,
+            displayField: 'NAME',
+            valueField: 'CODE',
+            triggerAction: 'all',
+            forceSelection: true,
+            queryMode: 'local',
+            anyMatch: true,
+            fieldStyle: 'background-color: #E0E0E0; background-image: none;',
+        });
+        //监管方式
+        var store_TRADEWAY = Ext.create('Ext.data.JsonStore', {
+            fields: ['CODE', 'NAME'],
+            //data: common_data_myfs
+        });
+        var com_TRADEWAY = Ext.create('Ext.form.field.Text', {
+            id: 'field_TRADEWAY',
+            name: 'TRADEWAY',
+            fieldLabel: '监管方式',
+            readOnly: true,
+            flex: 1,
+            //columnWidth: .25,
+            //labelWidth: 60,
+
+            hideTrigger: true,
+            store: store_TRADEWAY,
+            displayField: 'NAME',
+            valueField: 'CODE',
+            triggerAction: 'all',
+            forceSelection: true,
+            queryMode: 'local',
+            anyMatch: true,
+            fieldStyle: 'background-color: #E0E0E0; background-image: none;',
+        });
+
+        //经营单位名称
+        var field_BUSIUNITNAME = Ext.create('Ext.form.field.Text', {
+            id: 'field_BUSIUNITNAME',
+            name: 'BUSIUNITNAME',
+            fieldLabel: '经营单位',
+            readOnly: true,
+            flex: 1,
+            fieldStyle: 'background-color: #E0E0E0; background-image: none;',
+            //columnWidth: .25,
+            //labelWidth: 60,
+        });
+
+        //总单号
+        var field_TOTALNO = Ext.create('Ext.form.field.Text', {
+            id: 'field_TOTALNO',
+            name: 'TOTALNO',
+            fieldLabel: '总单号',
+            readOnly: true,
+            flex: 1,
+            fieldStyle: 'background-color: #E0E0E0; background-image: none;',
+            //columnWidth: .25,
+            //labelWidth: 60,
+        });
+        //分单号
+        var field_DIVIDENO = Ext.create('Ext.form.field.Text', {
+            id: 'field_DIVIDENO',
+            name: 'DIVIDENO',
+            fieldLabel: '分单号',
+            readOnly: true,
+            flex: 1,
+            fieldStyle: 'background-color: #E0E0E0; background-image: none;',
+            //columnWidth: .25,
+            //labelWidth: 60,
+        });
+
+        //件数
+        var field_GOODSNUM = Ext.create('Ext.form.field.Text', {
+            id: 'GOODSNUM',
+            name: 'GOODSNUM',
+            //tabIndex: 10,
+            readOnly: true,
+            flex: 0.5,
+            fieldLabel: '件数/毛重',
+            margin: 0,
+            fieldStyle: 'background-color: #E0E0E0; background-image: none;',
+            // columnWidth: .4,
+          //  labelWidth: 60,
+            //allowDecimals: false,
+            //hideTrigger: true,
+        });
+        //毛重
+        var field_GOODGW = Ext.create('Ext.form.field.Text', {
+            id: 'GOODGW',
+            name: 'GOODGW',
+            readOnly: true,
+            margin: 0,
+           // tabIndex: 11,
+            flex: 0.5,
+            fieldStyle: 'background-color: #E0E0E0; background-image: none;',
+          //  hideTrigger: true,
+        });
+        //毛重件数
+        var field_GOODSNUM_GOODGW = {
+            xtype: 'fieldcontainer',
+            layout: 'hbox',
+            columnWidth: 0.25,
+            items: [field_GOODSNUM, field_GOODGW]
+        }
+
+        //舱单
+        var chk_MANIFEST = Ext.create('Ext.form.field.Checkbox', {
+            id: 'MANIFEST',
+            name: 'MANIFEST',
+            //tabIndex: 12,
+            flex: 1,
+            fieldLabel: '舱单',
+            //columnWidth: .1,
+            //labelWidth: 60,
+        });
+
+        //保存
+        //var ExtBtnSave = Ext.create('Ext.button.Button', {
+        //    text: '保存',
+        //   // baseCls: 'btn btn-primary btn-sm',
+        //    iconCls: 'fa fa-hand-o-up',
+
+        //    handler: function () {
+        //        alert('You clicked the button!');
+        //    }
+        //});
+
+        var bbar_r = '<div class="btn-group" role="group">'
+            + '<button type="button" onclick="create_save()" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;保存</button>'
++ '</div>';
+        var bbar = Ext.create('Ext.toolbar.Toolbar', {
+            items: ['->', bbar_r]//bbar_l, 
+        });
+
+        var formpanel_btn = Ext.create('Ext.form.Panel', {
+            id: 'div_form_btn',
+            //renderTo: 'div_form_btn',
+            border: 0,
+            bbar: bbar
+        });
+
+        ////上一条
+        var field_Last = '<a href="javascript:reload(-);" style="font-size:16px;">上一条</a>&nbsp;&nbsp;&nbsp;&nbsp;';
+        //var field_Last = Ext.create('Ext.form.Label', {
+        //    id: 'field_Last',
+        //    html: '<a href="javascript:reload(-);" style="font-size:16px;">上一条</a>&nbsp;&nbsp;&nbsp;&nbsp;',
+        //    // flex: 1,
+        //});
+        ////下一条
+        var field_Next = '<a href="javascript:reload(+);" style="font-size:16px;">下一条</a>&nbsp;&nbsp;&nbsp;&nbsp;';
+        //var field_Next = Ext.create('Ext.form.Label', {
+        //    id: 'field_Next',
+        //    html: '<a href="javascript:reload(+);" style="font-size:16px;">下一条</a>&nbsp;&nbsp;&nbsp;&nbsp;',
+        //    // flex: 1,
+        //});
         var label_baseinfo = {
             xtype: 'label',
             margin: '5',
             html: '<h4 style="margin-top:2px;margin-bottom:2px"><span class="label label-default"><i class="fa fa-chevron-circle-down"></i>&nbsp;订单信息</span></h4>'
         }
         var tbar = Ext.create('Ext.toolbar.Toolbar', {
-            items: [label_baseinfo, '->']
+            items: [label_baseinfo, '->', field_Last, field_Next]
         });
 
         formpanel = Ext.create('Ext.form.Panel', {
             id: 'formpanel',
             renderTo: 'div_form',
             tbar: tbar,
+            bbar:bbar,
             Height: 150,
             fieldDefaults: {
                 margin: '5',
-                columnWidth: 0.24
+                columnWidth: 0.25,
+                labelAlign: 'right',
+                labelWidth: 70,
             },
             items: [
-            { layout: 'column', border: 0, items: [field_CODE] },
-            //{ layout: 'column', border: 0, items: [condition5, condition6, condition7, condition8] }
+            { layout: 'column', border: 0, items: [field_CODE, field_CUSNO] },//, field_Last, field_Next
+            { layout: 'column', border: 0, items: [field_CONTRACTNO, com_PORTCODE, com_TRADEWAY, field_BUSIUNITNAME] },
+            { layout: 'column', border: 0, items: [field_TOTALNO, field_DIVIDENO, field_GOODSNUM_GOODGW, chk_MANIFEST] },
             ]
         });
 
@@ -96,8 +286,25 @@
         Ext.get(window).on('resize', function () { setHeight(); });
 
         function setHeight() {
+
             var windowHeight = $(window).height();
-            $("#content").height = 200;
+            var windowWidth = $(window).width();
+            $("#content").height(windowHeight - 230);
+            Ext.getCmp('formpanel').setWidth(windowWidth);
+           // Ext.getCmp('formpanel_btn').setWidth(windowWidth);
+
+            //$("#content").on("load", function () {//iframe加载完后 高度自适应。
+            //    //var frameObj = document.getElementById("content").contentDocument || document.getElementById("content").contentWindow.document;
+            //    //   frame_height = frameObj.documentElement.scrollHeight;
+
+            //    var windowHeight = $(window).height();
+            //    $("#content").height(windowHeight-300);
+            //});
+
+            //var windowHeight = $(window).height();
+            //var frameObj = document.getElementById("content").contentDocument ;
+            //var frame_height = frameObj.documentElement.scrollHeight;
+            //$("#frameObj").height(400);
 
             //var paneltop_height = Ext.getCmp('paneltop').getSize().height;
             //var formpanel_height = Ext.getCmp('formpanel').getSize().height;
@@ -116,5 +323,6 @@
 <div>
     <ul id="menu"></ul>
 </div>
-<iframe id="content" name="frame" width=100% height="600px" security="restricted" sandbox="allow-scripts  allow-forms allow-same-origin" ></iframe>
-<div id="div_form" style="width:100%;height:200px"></div>
+<iframe id="content" name="frame" width=100%  security="restricted" sandbox="allow-scripts  allow-forms allow-same-origin" ></iframe>
+<div id="div_form" width=100% ></div>
+@*<div id="div_form_btn" width=100%></div>*@
