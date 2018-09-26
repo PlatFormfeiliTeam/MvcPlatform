@@ -1218,8 +1218,9 @@ function CopyAdd() {
     var formOrderdata = Ext.getCmp('formpanel_form').getForm().getValues() ;
     Ext.getCmp('formpanel_form').getForm().reset();
 
-    var aa = formOrderdata.BUSIUNITCODE;
+    // var aa = formOrderdata.BUSIUNITCODE; field_BUSIUNITNAME
     Ext.getCmp('combo_BUSIUNITCODE').setValue(formOrderdata.BUSIUNITCODE);
+    Ext.getCmp('field_BUSIUNITNAME').setValue(formOrderdata.BUSIUNITNAME);
     Ext.getCmp('combo_busitype').setValue(formOrderdata.BUSITYPE);
     Ext.getCmp('combo_portcode').setValue(formOrderdata.PORTCODE);
     Ext.getCmp('combo_TRADEWAY2').setValue(formOrderdata.TRADEWAY2);
