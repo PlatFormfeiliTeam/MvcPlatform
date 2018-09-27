@@ -248,30 +248,72 @@
         id: 'GOODSNUM2',
         name: 'GOODSNUM2',
         tabIndex: 10,
-        flex: 0.5,
-        fieldLabel: '件数/毛重',
-        margin: 0,
+        flex: 1,
+        fieldLabel: '件数',
+        //margin: 0,
         // columnWidth: .4,
+        columnWidth: .25,
         labelWidth: 60,
         allowDecimals: false,
-        hideTrigger :true,
+        hideTrigger: true,
+        msgTarget: 'side',
     });
     //毛重
     var field_GOODGW2 = Ext.create('Ext.form.field.Number', {
         id: 'GOODGW2',
         name: 'GOODGW2',
-        margin: 0,
+       // margin: 0,
         tabIndex: 11,
-        flex: 0.5,
+        flex: 1,
         hideTrigger: true,
+        fieldLabel: '毛重',
+        labelWidth: 60,
+        columnWidth: .25,
+        msgTarget: 'side',
     });
-    //毛重件数
-    var field_GOODSNUM_GOODGW = {
-        xtype: 'fieldcontainer',
-        layout: 'hbox',
-        columnWidth: 0.25,
-        items: [field_GOODSNUM2, field_GOODGW2]
-    }
+    ////毛重件数
+    //var field_GOODSNUM_GOODGW = {
+    //    xtype: 'fieldcontainer',
+    //    layout: 'hbox',
+    //    columnWidth: 0.25,
+    //    items: [field_GOODSNUM2, field_GOODGW2]
+    //}
+
+    //货运代理
+    var field_SHIPPINGAGENT = Ext.create('Ext.form.field.Text', {
+        id: 'SHIPPINGAGENT',
+        name: 'SHIPPINGAGENT',
+        tabIndex: 12,
+        flex: 1,
+        fieldLabel: '货运代理',
+        columnWidth: .25,
+        labelWidth: 60,
+    });
+    //报检备注
+    var field_INSPREMARK = Ext.create('Ext.form.field.Text', {
+        id: 'INSPREMARK',
+        name: 'INSPREMARK',
+        tabIndex: 13,
+        flex: 1,
+        fieldLabel: '报检备注',
+        columnWidth: .25,
+        labelWidth: 60,
+    });
+    //商品项数
+    var field_COMMODITYNUM = Ext.create('Ext.form.field.Number', {
+        id: 'COMMODITYNUM',
+        name: 'COMMODITYNUM',
+        tabIndex: 14,
+        flex: 1,
+        fieldLabel: '商品项数',
+        //margin: 0,
+        // columnWidth: .4,
+        columnWidth: .25,
+        labelWidth: 60,
+        allowDecimals: false,
+        hideTrigger: true,
+        msgTarget: 'side',
+    });
 
     //舱单
     var chk_MANIFEST = Ext.create('Ext.form.field.Checkbox', {
@@ -315,7 +357,8 @@
         items: [
            { layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [field_CODE, field_BUSIUNITCODE_BUSIUNITNAME, field_CUSNO, combo_busitype] },//combo_TRADEWAY
            { layout: 'column', height: 30, border: 0, items: [combo_portcode, combo_TRADEWAY2, field_TOTALNO, field_DIVIDENO] },
-           { layout: 'column', height: 30, border: 0, items: [field_CONTRACTNO, field_REMARK2,field_GOODSNUM_GOODGW, chk_MANIFEST, chk_INSPFLAG] },
+           { layout: 'column', height: 30, border: 0, items: [field_CONTRACTNO, field_REMARK2, field_GOODSNUM2, field_GOODGW2] },
+           { layout: 'column', height: 30, border: 0, items: [field_SHIPPINGAGENT,field_INSPREMARK,field_COMMODITYNUM, chk_MANIFEST, chk_INSPFLAG] },
         ]
     });
 }
@@ -408,7 +451,7 @@ function form_ini_decl() {
     var field_DECLARATIONCODE = Ext.create('Ext.form.field.Text', {
         id: 'DECLARATIONCODE',
         name: 'DECLARATIONCODE',
-        tabIndex: 12,
+        tabIndex: 15,
        // flex: 0.5,
         fieldLabel: '报关单号',
         // columnWidth: .25,
@@ -445,7 +488,7 @@ function form_ini_decl() {
         labelWidth: 60,
         flex: 1,
         margin: 0,
-        tabIndex: 13,
+        tabIndex: 16,
         minChars: '1',
         listeners: {
             blur: function (th, e, eOpts) {
@@ -472,13 +515,14 @@ function form_ini_decl() {
     var field_SHEETNUM = Ext.create('Ext.form.field.Number', {
         id: 'SHEETNUM',
         name: 'SHEETNUM',
-        tabIndex: 14,
+        tabIndex: 17,
         // flex: 0.5,
         fieldLabel: '张数',
         // columnWidth: .25,
         labelWidth: 60,
         allowDecimals: false,
         hideTrigger: true,
+        msgTarget: 'side',
     });
     //删改单
     var store_MODIFYFLAG = Ext.create('Ext.data.JsonStore', {
@@ -495,7 +539,7 @@ function form_ini_decl() {
         valueField: 'CODE',
         triggerAction: 'all',
         forceSelection: true,
-        tabIndex: 15,
+        tabIndex: 18,
         queryMode: 'local',
         anyMatch: true,
        // columnWidth: .25,
@@ -524,7 +568,7 @@ function form_ini_decl() {
         valueField: 'CODE',
         triggerAction: 'all',
         forceSelection: true,
-        tabIndex: 16,
+        tabIndex: 19,
         queryMode: 'local',
         anyMatch: true,
         // columnWidth: .25,
@@ -542,31 +586,33 @@ function form_ini_decl() {
     var field_GOODSNUM = Ext.create('Ext.form.field.Number', {
         id: 'GOODSNUM',
         name: 'GOODSNUM',
-        tabIndex: 17,
+        tabIndex: 20,
        // flex: 0.5,
         fieldLabel: '件数',
         // columnWidth: .25,
         labelWidth: 60,
         allowDecimals: false,
         hideTrigger: true,
+        msgTarget: 'side',
     });
 
     //毛重
     var field_GOODGW = Ext.create('Ext.form.field.Number', {
         id: 'GOODGW',
         name: 'GOODGW',
-        tabIndex: 18,
+        tabIndex: 21,
       //  flex: 0.5,
           fieldLabel: '毛重',
         // columnWidth: .25,
           labelWidth: 60,
           hideTrigger: true,
+          msgTarget: 'side',
     });
     //备注
     var field_REMARK = Ext.create('Ext.form.field.Text', {
         id: 'REMARK',
         name: 'REMARK',
-        tabIndex: 19,
+        tabIndex: 22,
         //  flex: 0.5,
         fieldLabel: '备注',
         // columnWidth: .25,
@@ -589,7 +635,7 @@ function form_ini_decl() {
                         //
                         formpanel_decl.getForm().reset();
                         rownum = -1;
-                        Ext.getCmp('GOODGW2').focus();
+                        Ext.getCmp('COMMODITYNUM').focus();
                         //field_DECLARATIONCODE.focus();//combo_TRADEWAY  field_DECLARATIONCODE field_GOODGW2
                     }
                 }

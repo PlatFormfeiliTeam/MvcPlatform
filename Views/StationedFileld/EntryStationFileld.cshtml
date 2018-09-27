@@ -10,6 +10,7 @@
 <script src="/js/pan.js?t=@Version" type="text/javascript"></script>
 <script src="/js/commondata.js?t=@Version"></script>
 <script src="~/Views/StationedFileld/Query.js?t=@Version"></script>
+<script src="~/Views/StationedFileld/BatchMaintance.js?t=@Version"></script>
 
 
 <script type="text/javascript">
@@ -17,6 +18,8 @@
     var formpanel, gridpanel;
     var common_data_jydw = [], common_data_sbfs = [], common_data_sbgq = [], common_data_bgfs = [], common_data_bzzl = [], common_data_myfs = [], common_data_ywlx = [];
     var common_data_YesOrNot = [], common_data_StationFieldStatus = [];
+    //var listSqls = [],strSql;
+    var queryflag;
     Ext.onReady(function () {
         Ext.Ajax.request({//对公共基础数据发起一次请求
             url: "/Common/Ini_Base_Data",
@@ -48,7 +51,8 @@
 
                 Ext.regModel('TRADE', {
                     fields: ['CODE','SUBMITTIME','STATUS','INSPFLAG','CUSNO','CONTRACTNO','TOTALNO','DIVIDENO','MANIFEST','GOODSNUM','BUSITYPE','PORTCODE','TRADEWAY'
-,'REMARK','DECLCODEQTY','DECLARATIONCODE','BUSIUNITNAME','ACCEPTTIME','MOENDTIME','COENDTIME', 'RECOENDTIME','REPSTARTTIME','REPENDTIME','PASSTIME'
+, 'REMARK', 'DECLCODEQTY', 'DECLARATIONCODE', 'BUSIUNITNAME', 'ACCEPTTIME', 'MOENDTIME', 'COENDTIME', 'RECOENDTIME', 'REPSTARTTIME', 'REPENDTIME', 'PASSTIME'
+, 'SHIPPINGAGENT', 'INSPREMARK', 'COMMODITYNUM'
                     ]
                 })
                 store_Trade = Ext.create('Ext.data.JsonStore', {
@@ -60,24 +64,14 @@
                         reader: {
                             root: 'rows',
                             type: 'json',
-                            totalProperty: 'total'
+                            totalProperty: 'total',
                         }
                     },
                     autoLoad: true,
                     listeners: {
                         beforeload: function () {
-                            store_Trade.getProxy().extraParams = {
-                                CONDITION1: Ext.getCmp('CONDITION1').getValue(), VALUE1: Ext.getCmp("CONDITION1_1").getValue(),
-                                CONDITION2: Ext.getCmp('CONDITION2').getValue(), VALUE2: Ext.getCmp("CONDITION2_1").getValue(),
-                                CONDITION3: Ext.getCmp('CONDITION3').getValue(), VALUE3: Ext.getCmp("CONDITION3_1").getValue(),
-                                CONDITION4: Ext.getCmp('CONDITION4').getValue(), VALUE4_1: Ext.Date.format(Ext.getCmp("CONDITION4_1").getValue(), 'Y-m-d'), VALUE4_2: Ext.Date.format(Ext.getCmp("CONDITION4_2").getValue(), 'Y-m-d'),
-
-                                CONDITION5: Ext.getCmp('CONDITION5').getValue(), VALUE5: Ext.getCmp("CONDITION5_1").getValue(),
-                                CONDITION6: Ext.getCmp('CONDITION6').getValue(), VALUE6: Ext.getCmp("CONDITION6_1").getValue(),
-                                CONDITION7: Ext.getCmp('CONDITION7').getValue(), VALUE7: Ext.getCmp("CONDITION7_1").getValue(),
-                                CONDITION8: Ext.getCmp('CONDITION8').getValue(), VALUE8_1: Ext.Date.format(Ext.getCmp("CONDITION8_1").getValue(), 'Y-m-d'), VALUE8_2: Ext.Date.format(Ext.getCmp("CONDITION8_2").getValue(), 'Y-m-d')
-                            }
-                        }
+                            store_Trade.getProxy().extraParams = getCondition();
+                        },
                     }
                 })
                 pgbar = Ext.create('Ext.toolbar.Paging', {
@@ -120,6 +114,9 @@
                     { header: '报关套数', dataIndex: 'DECLCODEQTY', width: 70 },
                     { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 100 },
                     { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 100 },
+                    { header: '货运代理', dataIndex: 'SHIPPINGAGENT', width: 100 },
+                    { header: '报检备注', dataIndex: 'INSPREMARK', width: 100 },
+                    { header: '商品项数', dataIndex: 'COMMODITYNUM', width: 70 },
                     { header: '受理时间', dataIndex: 'ACCEPTTIME', width: 130 },
                     { header: '制单完成时间', dataIndex: 'MOENDTIME', width: 130 },
                     { header: '审单完成时间', dataIndex: 'COENDTIME', width: 130 },
@@ -142,8 +139,13 @@
         })
     })
 
-    function Select() {
+    function Select(flag) {
+        //if (flag == 0) {
+        //}
+        //else if (flag == 1) {
+        //}
         pgbar.moveFirst();
+
     }
     function Open() {
         opencenterwin("/StationedFileld/AddStationField", 1600, 900);
@@ -171,6 +173,21 @@ var condition='{'+
        opencenterwin("/StationedFileld/WebSiteQuery?condition=" + condition + '&rowIndex=' + rowIndex + '&currentPage=' + currentPage, 1200, 800);
     }
 
+    function getCondition() {
+        var condition = {
+            CONDITION1: Ext.getCmp('CONDITION1').getValue(), VALUE1: Ext.getCmp("CONDITION1_1").getValue(),
+            CONDITION2: Ext.getCmp('CONDITION2').getValue(), VALUE2: Ext.getCmp("CONDITION2_1").getValue(),
+            CONDITION3: Ext.getCmp('CONDITION3').getValue(), VALUE3: Ext.getCmp("CONDITION3_1").getValue(),
+            CONDITION4: Ext.getCmp('CONDITION4').getValue(), VALUE4_1: Ext.Date.format(Ext.getCmp("CONDITION4_1").getValue(), 'Y-m-d'), VALUE4_2: Ext.Date.format(Ext.getCmp("CONDITION4_2").getValue(), 'Y-m-d'),
+
+            CONDITION5: Ext.getCmp('CONDITION5').getValue(), VALUE5: Ext.getCmp("CONDITION5_1").getValue(),
+            CONDITION6: Ext.getCmp('CONDITION6').getValue(), VALUE6: Ext.getCmp("CONDITION6_1").getValue(),
+            CONDITION7: Ext.getCmp('CONDITION7').getValue(), VALUE7: Ext.getCmp("CONDITION7_1").getValue(),
+            CONDITION8: Ext.getCmp('CONDITION8').getValue(), VALUE8_1: Ext.Date.format(Ext.getCmp("CONDITION8_1").getValue(), 'Y-m-d'), VALUE8_2: Ext.Date.format(Ext.getCmp("CONDITION8_2").getValue(), 'Y-m-d'),
+        }
+        return condition;
+    }
+
 </script>
 
 
@@ -182,11 +199,12 @@ var condition='{'+
         <div class="btn-group" role="group">
             <button id="btnAdd" type="button" class="btn btn-primary btn-sm" onclick="Open()"><i class="fa fa-plus fa-fw"></i>&nbsp;新增</button>
             <button id="btnDelete" onclick="del()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-trash-o"></i>&nbsp;删除</button>
+            <button id="btn_mutiedit" type="button" class="btn btn-primary btn-sm dropdown-toggle" onclick="maintance()"><i class="fa fa-pencil-square-o fa-fw"></i>&nbsp;批量维护</button>
             @*<button id="btnWebSiteQuery" onclick="WebSiteQuery()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-truck"></i>&nbsp;网站速查</button>*@
         </div>
         <div class="btn-group fr" role="group">
-            <button onclick="Select()" class="btn btn-primary btn-sm"><i class="fa fa-search"></i>&nbsp;查询</button>
-            @*<button class="btn btn-primary btn-sm"><i class="fa fa-search"></i>&nbsp;追加查询</button>*@
+            <button onclick="Select(0)" class="btn btn-primary btn-sm"><i class="fa fa-search"></i>&nbsp;查询</button>
+            @*<button onclick="Select(1)" class="btn btn-primary btn-sm"><i class="fa fa-search"></i>&nbsp;追加查询</button>*@
             @*<button class="btn btn-primary btn-sm"><i class="fa fa-search"></i>&nbsp;高级查询</button>*@
             <button onclick="Reset()" class="btn btn-primary btn-sm"><i class="fa fa-refresh"></i>&nbsp;重置</button>
             @*<button class="btn btn-primary btn-sm"><i class="fa fa-level-down"></i>&nbsp;导出</button>*@

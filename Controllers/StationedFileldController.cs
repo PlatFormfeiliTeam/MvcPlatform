@@ -17,7 +17,8 @@ namespace MvcPlatform.Controllers
     public class StationedFileldController : Controller
     {
         int totalProperty = 0;
-        private readonly object objDelete = new object();
+        private static readonly object objDelete = new object();
+        private static readonly object objMaintance = new object();
         //
         // GET: /StationedFileld/
 
@@ -106,6 +107,7 @@ namespace MvcPlatform.Controllers
 case h.INSPFLAG when '0' then '否(0)' when '1' then '是(1)' end as INSPFLAG,
 case h.MANIFEST when '0' then '否(0)' when '1' then '是(1)' end as MANIFEST,
 h.CUSNO,h.CONTRACTNO,h.TOTALNO,h.DIVIDENO,h.GOODSNUM||'/'||h.GOODGW as GOODSNUM,busi.name as BUSITYPE,cus.name as PORTCODE,
+h.SHIPPINGAGENT, h.INSPREMARK, h.COMMODITYNUM,
 trade.name as TRADEWAY,h.REMARK,h.DECLCODEQTY,h.DECLARATIONCODE,h.BUSIUNITNAME,h.ACCEPTTIME,h.MOENDTIME,h.COENDTIME, h.RECOENDTIME,h.REPSTARTTIME,h.REPENDTIME,h.PASSTIME 
 from RESIDENT_ORDER h
 left join SYS_STATUS sta on sta.code=h.status
@@ -116,6 +118,20 @@ left join cusdoc.BASE_DECLTRADEWAY trade on trade.code=h.TRADEWAY
 where 1=1 " + getQueryCondition()+" and RECEIVERUNITCODE='" +json_user.Value<string>("CUSTOMERCODE")+"' order by h.SUBMITTIME desc";
             DataTable dt = GetData(strSql);
             var json = JsonConvert.SerializeObject(dt, iso);
+
+            //List<string> listSqls = new List<string>();
+            //object obj = Session["listSqls"];
+            //if (obj == null)
+            //{
+            //    listSqls.Add(strSql);
+            //    Session["listSqls"] = listSqls;
+            //}
+            //else
+            //{
+            //   listSqls = (List<string>)obj;
+            //   listSqls.Add(strSql);
+            //   Session["listSqls"] = listSqls;
+            //}
 
             return "{rows:" + json + ",total:" + totalProperty + "}";
         }
@@ -212,14 +228,15 @@ where 1=1 " + getQueryCondition()+" and RECEIVERUNITCODE='" +json_user.Value<str
                     BUSIUNITNAME = BUSIUNITNAME.Split('(')[0];
                 }
                 strSql = @"insert into RESIDENT_ORDER (code,cusno,busitype,tradeway,portcode,busiunitcode,busiunitname,goodsnum,goodgw,contractno,
-TOTALNO,DIVIDENO,MANIFEST,INSPFLAG,REMARK,RECEIVERUNITCODE,RECEIVERUNITNAME,CREATETIME,DECLCODEQTY,DECLARATIONCODE) 
-            values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}','{15}','{16}',sysdate,'{17}','{18}')";
+TOTALNO,DIVIDENO,MANIFEST,INSPFLAG,REMARK,RECEIVERUNITCODE,RECEIVERUNITNAME,CREATETIME,DECLCODEQTY,DECLARATIONCODE,SHIPPINGAGENT, INSPREMARK, COMMODITYNUM) 
+            values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}','{15}','{16}',sysdate,'{17}','{18}','{19}','{20}','{21}')";
                 strSql = string.Format(strSql, code, jsonOrderdata.Value<string>("CUSNO"), jsonOrderdata.Value<string>("BUSITYPE"), jsonOrderdata.Value<string>("TRADEWAY2")
                     , jsonOrderdata.Value<string>("PORTCODE"), jsonOrderdata.Value<string>("BUSIUNITCODE"), BUSIUNITNAME
                     , jsonOrderdata.Value<string>("GOODSNUM2"), jsonOrderdata.Value<string>("GOODGW2")
                     , jsonOrderdata.Value<string>("CONTRACTNO"), jsonOrderdata.Value<string>("TOTALNO"), jsonOrderdata.Value<string>("DIVIDENO")
                     , MANIFEST, INSPFLAG, jsonOrderdata.Value<string>("REMARK2")
-                    , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), DECLCODEQTY, DECLARATIONCODE);
+                    , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), DECLCODEQTY, DECLARATIONCODE
+                    , jsonOrderdata.Value<string>("SHIPPINGAGENT"), jsonOrderdata.Value<string>("INSPREMARK"), jsonOrderdata.Value<string>("COMMODITYNUM"));
                 listSqls.Add(strSql);
 
                 //  strSql="update RESIDENT_ORDER set ";
@@ -319,7 +336,8 @@ values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}',sysdate,'{8}','{9}')";
 
             string strSql = @"select code,cusno,busitype,tradeway as TRADEWAY2,portcode,busiunitcode,busiunitname,busiunitnum
 ,goodsnum as GOODSNUM2,goodgw as GOODGW2,contractno,totalno,divideno,manifest,status,inspflag,remark as REMARK2,submittime,submituserid,submitusername,accepttime,acceptuserid,acceptusername,moendtime,moendid,moendname,coendtime,coendid,coendname,recoendtime,recoendid,recoendname,repstarttime,repstartid,repstartname,rependtime
-,rependid,rependname,passtime,passid,passname,receiverunitcode,receiverunitname,createtime,declcodeqty,declarationcode from RESIDENT_ORDER where code='"+ordercode+"'";
+,rependid,rependname,passtime,passid,passname,receiverunitcode,receiverunitname,createtime,declcodeqty,declarationcode,
+SHIPPINGAGENT, INSPREMARK, COMMODITYNUM  from RESIDENT_ORDER where code='" + ordercode + "'";
             formOrderData = JsonConvert.SerializeObject(DBMgr.GetDataTable(strSql), iso).TrimStart('[').TrimEnd(']');
 
             strSql = "select * from RESIDENT_DECLARATION where ordercode='"+ordercode+"' order by NO";
@@ -378,6 +396,94 @@ where d.ordercode='" + obj.Value<string>("CODE") + "'";
             return "{success:true,time:'"+System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")+"'}";
         }
 
+        public string batchMaintance(string codes, string id)
+        {
+            try
+            {
+                string status = "";
+                string time = "";
+                string userid = "";
+                string username = "";
+                switch (id)
+                {
+                    case "maintance_ACCEPTTIME"://受理时间
+                        status = "15";
+                        userid = "ACCEPTUSERID";
+                        username = "ACCEPTUSERNAME";
+                        time = "ACCEPTTIME";
+                        break;
+                    case "maintance_MOENDTIME"://制单完成时间
+                        status = "30";
+                        userid = "MOENDID";
+                        username = "MOENDNAME";
+                        time = "MOENDTIME";
+                        break;
+                    case "maintance_COENDTIME"://审核完成时间
+                        status = "50";
+                        userid = "COENDID";
+                        username = "COENDNAME";
+                        time = "COENDTIME";
+                        break;
+                    case "maintance_RECOENDTIME"://复审完成时间
+                        status = "55";
+                        userid = "RECOENDID";
+                        username = "RECOENDNAME";
+                        time = "RECOENDTIME";
+                        break;
+                    case "maintance_REPSTARTTIME"://申报时间
+                        status = "100";
+                        userid = "REPSTARTID";
+                        username = "REPSTARTNAME";
+                        time = "REPSTARTTIME";
+                        break;
+                    case "maintance_REPENDTIME"://申报完成时间
+                        status = "120";
+                        userid = "REPENDID";
+                        username = "REPENDNAME";
+                        time = "REPENDTIME";
+                        break;
+                    case "maintance_PASSTIME"://通关放行时间
+                        status = "160";
+                        userid = "PASSID";
+                        username = "PASSNAME";
+                        time = "PASSTIME";
+                        break;
+
+                }
+
+                List<string> listSqls = getMainSqls(codes, status, time,userid, username);
+                int successQty = 0;
+                lock (objMaintance)
+                {
+                    successQty=DBMgr.ExecuteNonQueryBatch(listSqls);
+                }
+
+                return "{success:true,successQty:" + successQty + "}";
+            }
+            catch (Exception ex)
+            {
+                return "{success:false,msg:'保存失败：" + ex.Message + "'}";
+            }
+        }
+        private List<string> getMainSqls(string codes, string status, string time, string userid, string username)
+        {
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string[] listCodes = codes.Split(',');
+
+            List<string> listSqls = new List<string>();
+            string strSql = string.Empty;
+            foreach (string code in listCodes)
+            {
+                strSql = "update RESIDENT_ORDER set status={0} where code='{1}' and {2} is null and nvl(status,0)<{3}";
+                strSql = string.Format(strSql,status,code,time,status);
+                listSqls.Add(strSql);
+
+                strSql = "update RESIDENT_ORDER set {0}=sysdate,{1}='{2}',{3}='{4}' where code='{5}' and {6} is null ";
+                strSql = string.Format(strSql, time, userid, json_user.Value<string>("ID"), username, json_user.Value<string>("REALNAME"),code,time);
+                listSqls.Add(strSql);
+            }
+            return listSqls;
+        }
 
 
 
