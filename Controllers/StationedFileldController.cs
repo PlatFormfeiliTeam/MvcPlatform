@@ -54,15 +54,22 @@ namespace MvcPlatform.Controllers
         {
             //Request["start"]
             string condition = string.Empty;
-            if (Request["VALUE1"].ToString() != string.Empty)
-            {
 
-                condition += " and " + Request["CONDITION1"].ToString() + "='" + Request["VALUE1"].ToString() + "'";
+            if (Request["VALUE4_1"].ToString() != string.Empty)
+            {
+                condition += " and " + Request["CONDITION4"].ToString() + ">=to_date('" + Request["VALUE4_1"].ToString() + " 00:00:01','yyyy/mm/dd hh24:mi:ss')";
             }
-            if (Request["VALUE5"].ToString() != string.Empty)
+            if (Request["VALUE4_2"].ToString() != string.Empty)
             {
-
-                condition += " and " + Request["CONDITION5"].ToString() + "='" + Request["VALUE5"].ToString() + "'";
+                condition += " and " + Request["CONDITION4"].ToString() + "<=to_date('" + Request["VALUE4_2"].ToString() + " 23:59:59','yyyy/mm/dd hh24:mi:ss')";
+            }
+            if (Request["VALUE8_1"].ToString() != string.Empty)
+            {
+                condition += " and " + Request["CONDITION8"].ToString() + ">=to_date('" + Request["VALUE8_1"].ToString() + " 00:00:01','yyyy/mm/dd hh24:mi:ss')";
+            }
+            if (Request["VALUE8_2"].ToString() != string.Empty)
+            {
+                condition += " and " + Request["CONDITION8"].ToString() + "<=to_date('" + Request["VALUE8_2"].ToString() + " 23:59:59','yyyy/mm/dd hh24:mi:ss')";
             }
             //////
             if (Request["VALUE2"].ToString() != string.Empty)
@@ -86,22 +93,28 @@ namespace MvcPlatform.Controllers
 
                 condition += " and " + Request["CONDITION7"].ToString() + "='" + Request["VALUE7"].ToString() + "'";
             }
-            //
-            if (Request["VALUE4_1"].ToString() != string.Empty)
+            //////
+            if (Request["VALUE1"].ToString() != string.Empty)
             {
-                condition += " and " + Request["CONDITION4"].ToString() + ">=to_date('" + Request["VALUE4_1"].ToString() + " 00:00:01','yyyy/mm/dd hh24:mi:ss')";
+                if (Request["CONDITION1"].ToString() == "CUSNO")//企业编号模糊查询
+                {
+                    condition += " and " + Request["CONDITION1"].ToString() + " like '%" + Request["VALUE1"].ToString().Trim() + "%'";
+                }
+                else
+                {
+                    condition += " and " + Request["CONDITION1"].ToString() + "='" + Request["VALUE1"].ToString().Trim() + "'";
+                }
             }
-            if (Request["VALUE4_2"].ToString() != string.Empty)
+            if (Request["VALUE5"].ToString() != string.Empty)
             {
-                condition += " and " + Request["CONDITION4"].ToString() + "<=to_date('" + Request["VALUE4_2"].ToString() + " 23:59:59','yyyy/mm/dd hh24:mi:ss')";
-            }
-            if (Request["VALUE8_1"].ToString() != string.Empty)
-            {
-                condition += " and " + Request["CONDITION8"].ToString() + ">=to_date('" + Request["VALUE8_1"].ToString() + " 00:00:01','yyyy/mm/dd hh24:mi:ss')";
-            }
-            if (Request["VALUE8_2"].ToString() != string.Empty)
-            {
-                condition += " and " + Request["CONDITION8"].ToString() + "<=to_date('" + Request["VALUE8_2"].ToString() + " 23:59:59','yyyy/mm/dd hh24:mi:ss')";
+                if (Request["CONDITION5"].ToString() == "CUSNO")//企业编号模糊查询
+                {
+                    condition += " and " + Request["CONDITION5"].ToString() + " like '%" + Request["VALUE5"].ToString().Trim() + "%'";
+                }
+                else
+                {
+                    condition += " and " + Request["CONDITION5"].ToString() + "='" + Request["VALUE5"].ToString().Trim() + "'";
+                }
             }
             return condition;
         }
@@ -111,15 +124,22 @@ namespace MvcPlatform.Controllers
             JObject jsonCondition = (JObject)JsonConvert.DeserializeObject(con);
             //Request["start"]
             string condition = string.Empty;
-            if (jsonCondition.Value<string>("VALUE1") != string.Empty && jsonCondition.Value<string>("VALUE1") != "null")//VALUE1
+            /////////
+            if (jsonCondition.Value<string>("VALUE4_1") != string.Empty && jsonCondition.Value<string>("VALUE4_1") != "null")
             {
-
-                condition += " and " +jsonCondition.Value<string>("CONDITION1") + "='" +jsonCondition.Value<string>("VALUE1") + "'";
+                condition += " and " + jsonCondition.Value<string>("CONDITION4") + ">=to_date('" + jsonCondition.Value<string>("VALUE4_1") + " 00:00:01','yyyy/mm/dd hh24:mi:ss')";
             }
-            if (jsonCondition.Value<string>("VALUE5") != string.Empty && jsonCondition.Value<string>("VALUE5") != "null")
+            if (jsonCondition.Value<string>("VALUE4_2") != string.Empty && jsonCondition.Value<string>("VALUE4_2") != "null")
             {
-
-                condition += " and " +jsonCondition.Value<string>("CONDITION5") + "='" +jsonCondition.Value<string>("VALUE5")+ "'";
+                condition += " and " + jsonCondition.Value<string>("CONDITION4") + "<=to_date('" + jsonCondition.Value<string>("VALUE4_2") + " 23:59:59','yyyy/mm/dd hh24:mi:ss')";
+            }
+            if (jsonCondition.Value<string>("VALUE8_1") != string.Empty && jsonCondition.Value<string>("VALUE8_1") != "null")
+            {
+                condition += " and " + jsonCondition.Value<string>("CONDITION8") + ">=to_date('" + jsonCondition.Value<string>("VALUE8_1") + " 00:00:01','yyyy/mm/dd hh24:mi:ss')";
+            }
+            if (jsonCondition.Value<string>("VALUE8_2") != string.Empty && jsonCondition.Value<string>("VALUE8_2") != "null")
+            {
+                condition += " and " + jsonCondition.Value<string>("CONDITION8") + "<=to_date('" + jsonCondition.Value<string>("VALUE8_2") + " 23:59:59','yyyy/mm/dd hh24:mi:ss')";
             }
             //////
             if (jsonCondition.Value<string>("VALUE2") != string.Empty && jsonCondition.Value<string>("VALUE2") != "null")
@@ -143,23 +163,30 @@ namespace MvcPlatform.Controllers
 
                 condition += " and " +jsonCondition.Value<string>("CONDITION7") + "='" + jsonCondition.Value<string>("VALUE7") + "'";
             }
-            //
-            if (jsonCondition.Value<string>("VALUE4_1") != string.Empty && jsonCondition.Value<string>("VALUE4_1") != "null")
+            ////////
+            if (jsonCondition.Value<string>("VALUE1") != string.Empty && jsonCondition.Value<string>("VALUE1") != "null")//VALUE1
             {
-                condition += " and " +jsonCondition.Value<string>("CONDITION4")+ ">=to_date('" + jsonCondition.Value<string>("VALUE4_1") + " 00:00:01','yyyy/mm/dd hh24:mi:ss')";
+                if (jsonCondition.Value<string>("CONDITION1") == "CUSNO")//企业编号模糊查询
+                {
+                    condition += " and " + jsonCondition.Value<string>("CONDITION1") + " like '%" + jsonCondition.Value<string>("VALUE1").Trim() + "%'";
+                }
+                else
+                {
+                    condition += " and " + jsonCondition.Value<string>("CONDITION1") + "='" + jsonCondition.Value<string>("VALUE1").Trim() + "'";
+                }
             }
-            if (jsonCondition.Value<string>("VALUE4_2") != string.Empty && jsonCondition.Value<string>("VALUE4_2") != "null")
+            if (jsonCondition.Value<string>("VALUE5") != string.Empty && jsonCondition.Value<string>("VALUE5") != "null")
             {
-                condition += " and " +jsonCondition.Value<string>("CONDITION4") + "<=to_date('" + jsonCondition.Value<string>("VALUE4_2") + " 23:59:59','yyyy/mm/dd hh24:mi:ss')";
+                if (jsonCondition.Value<string>("CONDITION5") == "CUSNO")//企业编号模糊查询
+                {
+                    condition += " and " + jsonCondition.Value<string>("CONDITION5") + " like '%" + jsonCondition.Value<string>("VALUE5").Trim() + "%'";
+                }
+                else
+                {
+                    condition += " and " + jsonCondition.Value<string>("CONDITION5") + "='" + jsonCondition.Value<string>("VALUE5").Trim() + "'";
+                }
             }
-            if (jsonCondition.Value<string>("VALUE8_1") != string.Empty && jsonCondition.Value<string>("VALUE8_1") != "null" )
-            {
-                condition += " and " + jsonCondition.Value<string>("CONDITION8") + ">=to_date('" + jsonCondition.Value<string>("VALUE8_1") + " 00:00:01','yyyy/mm/dd hh24:mi:ss')";
-            }
-            if (jsonCondition.Value<string>("VALUE8_2") != string.Empty && jsonCondition.Value<string>("VALUE8_2") != "null")
-            {
-                condition += " and " +jsonCondition.Value<string>("CONDITION8")+ "<=to_date('" + jsonCondition.Value<string>("VALUE8_2") + " 23:59:59','yyyy/mm/dd hh24:mi:ss')";
-            }
+
             return condition;
         }
 
@@ -185,6 +212,7 @@ left join cusdoc.BASE_DECLTRADEWAY trade on trade.code=h.TRADEWAY ";
         {
             string strSql = @"select h.CODE as 订单编号,
 h.SUBMITTIME as 委托时间,
+h.SUBMITUSERNAME as 委托人,
 sta.name  as 状态,
 case h.INSPFLAG when '0' then '否(0)' when '1' then '是(1)' end  as 报检状态,
 case h.MANIFEST when '0' then '否(0)' when '1' then '是(1)' end  as 舱单,
@@ -205,12 +233,19 @@ h.SHIPPINGAGENT as 货物代理,
 h.INSPREMARK as 报检备注, 
 h.COMMODITYNUM as 商品项数,
 h.ACCEPTTIME as 受理时间,
+h.ACCEPTUSERNAME as 受理人,
 h.MOENDTIME as 制单完成时间,
+h.MOENDNAME as 制单完成人,
 h.COENDTIME as 审单完成时间, 
+h.COENDNAME as 审单完成人,
 h.RECOENDTIME as 复审完成时间,
+h.RECOENDNAME as 复审完成人,
 h.REPSTARTTIME as 申报时间,
+h.REPSTARTNAME as 申报人,
 h.REPENDTIME as 申报完成时间,
-h.PASSTIME as 通关放行时间 
+h.REPENDNAME as 申报完成人,
+h.PASSTIME as 通关放行时间 ,
+h.PASSNAME as 通关放行人
 from RESIDENT_ORDER h
 left join SYS_STATUS sta on sta.code=h.status
 left join cusdoc.sys_busitype busi on busi.code=h.BUSITYPE
@@ -375,13 +410,13 @@ left join RESIDENT_DECLARATION d on h.code=d.ordercode
                 strSql = @"insert into RESIDENT_ORDER (code,cusno,busitype,tradeway,portcode,busiunitcode,busiunitname,goodsnum,goodgw,contractno,
 TOTALNO,DIVIDENO,MANIFEST,INSPFLAG,REMARK,RECEIVERUNITCODE,RECEIVERUNITNAME,CREATETIME,DECLCODEQTY,DECLARATIONCODE,SHIPPINGAGENT, INSPREMARK, COMMODITYNUM) 
             values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}','{15}','{16}',sysdate,'{17}','{18}','{19}','{20}','{21}')";
-                strSql = string.Format(strSql, code, jsonOrderdata.Value<string>("CUSNO"), jsonOrderdata.Value<string>("BUSITYPE"), jsonOrderdata.Value<string>("TRADEWAY2")
+                strSql = string.Format(strSql, code, jsonOrderdata.Value<string>("CUSNO").Trim(), jsonOrderdata.Value<string>("BUSITYPE"), jsonOrderdata.Value<string>("TRADEWAY2")
                     , jsonOrderdata.Value<string>("PORTCODE"), jsonOrderdata.Value<string>("BUSIUNITCODE"), BUSIUNITNAME
                     , jsonOrderdata.Value<string>("GOODSNUM2"), jsonOrderdata.Value<string>("GOODGW2")
-                    , jsonOrderdata.Value<string>("CONTRACTNO"), jsonOrderdata.Value<string>("TOTALNO"), jsonOrderdata.Value<string>("DIVIDENO")
-                    , MANIFEST, INSPFLAG, jsonOrderdata.Value<string>("REMARK2")
+                    , jsonOrderdata.Value<string>("CONTRACTNO").Trim(), jsonOrderdata.Value<string>("TOTALNO").Trim(), jsonOrderdata.Value<string>("DIVIDENO").Trim()
+                    , MANIFEST, INSPFLAG, jsonOrderdata.Value<string>("REMARK2").Trim()
                     , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), DECLCODEQTY, DECLARATIONCODE
-                    , jsonOrderdata.Value<string>("SHIPPINGAGENT"), jsonOrderdata.Value<string>("INSPREMARK"), jsonOrderdata.Value<string>("COMMODITYNUM"));
+                    , jsonOrderdata.Value<string>("SHIPPINGAGENT").Trim(), jsonOrderdata.Value<string>("INSPREMARK").Trim(), jsonOrderdata.Value<string>("COMMODITYNUM"));
                 listSqls.Add(strSql);
 
                 //  strSql="update RESIDENT_ORDER set ";
