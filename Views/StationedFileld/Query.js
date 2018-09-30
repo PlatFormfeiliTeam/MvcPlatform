@@ -492,6 +492,7 @@ function initQuery() {
         items: [combo_8, date_8_1, date_8_2]
     }
     formpanel = Ext.create('Ext.form.Panel', {
+        id: 'formpanel_Query',
         renderTo: 'div_form',
         fieldDefaults: {
             margin: '5',

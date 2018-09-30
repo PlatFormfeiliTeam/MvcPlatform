@@ -9,6 +9,14 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using MvcPlatform.Common;
 using System.Data;
+using System.Net.Http.Headers;
+using System.Net.Http;
+using System.Net;
+using System.IO;
+
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;  //2007的版本及以上
+using NPOI.XSSF.Util;
 
 namespace MvcPlatform.Controllers
 {
@@ -19,6 +27,7 @@ namespace MvcPlatform.Controllers
         int totalProperty = 0;
         private static readonly object objDelete = new object();
         private static readonly object objMaintance = new object();
+
         //
         // GET: /StationedFileld/
 
@@ -97,25 +106,161 @@ namespace MvcPlatform.Controllers
             return condition;
         }
 
+        private string getQueryCondition2(string con)
+        {
+            JObject jsonCondition = (JObject)JsonConvert.DeserializeObject(con);
+            //Request["start"]
+            string condition = string.Empty;
+            if (jsonCondition.Value<string>("VALUE1") != string.Empty && jsonCondition.Value<string>("VALUE1") != "null")//VALUE1
+            {
+
+                condition += " and " +jsonCondition.Value<string>("CONDITION1") + "='" +jsonCondition.Value<string>("VALUE1") + "'";
+            }
+            if (jsonCondition.Value<string>("VALUE5") != string.Empty && jsonCondition.Value<string>("VALUE5") != "null")
+            {
+
+                condition += " and " +jsonCondition.Value<string>("CONDITION5") + "='" +jsonCondition.Value<string>("VALUE5")+ "'";
+            }
+            //////
+            if (jsonCondition.Value<string>("VALUE2") != string.Empty && jsonCondition.Value<string>("VALUE2") != "null")
+            {
+
+                condition += " and " +jsonCondition.Value<string>("CONDITION2") + "='" +jsonCondition.Value<string>("VALUE2") + "'";
+            }
+            if (jsonCondition.Value<string>("VALUE6") != string.Empty && jsonCondition.Value<string>("VALUE6") != "null")
+            {
+
+                condition += " and " +jsonCondition.Value<string>("CONDITION6") + "='" + jsonCondition.Value<string>("VALUE6") + "'";
+            }
+            //////
+            if (jsonCondition.Value<string>("VALUE3") != string.Empty && jsonCondition.Value<string>("VALUE3") != "null")
+            {
+
+                condition += " and " +jsonCondition.Value<string>("CONDITION3") + "='" + jsonCondition.Value<string>("VALUE3") + "'";
+            }
+            if (jsonCondition.Value<string>("VALUE7") != string.Empty && jsonCondition.Value<string>("VALUE7") != "null")
+            {
+
+                condition += " and " +jsonCondition.Value<string>("CONDITION7") + "='" + jsonCondition.Value<string>("VALUE7") + "'";
+            }
+            //
+            if (jsonCondition.Value<string>("VALUE4_1") != string.Empty && jsonCondition.Value<string>("VALUE4_1") != "null")
+            {
+                condition += " and " +jsonCondition.Value<string>("CONDITION4")+ ">=to_date('" + jsonCondition.Value<string>("VALUE4_1") + " 00:00:01','yyyy/mm/dd hh24:mi:ss')";
+            }
+            if (jsonCondition.Value<string>("VALUE4_2") != string.Empty && jsonCondition.Value<string>("VALUE4_2") != "null")
+            {
+                condition += " and " +jsonCondition.Value<string>("CONDITION4") + "<=to_date('" + jsonCondition.Value<string>("VALUE4_2") + " 23:59:59','yyyy/mm/dd hh24:mi:ss')";
+            }
+            if (jsonCondition.Value<string>("VALUE8_1") != string.Empty && jsonCondition.Value<string>("VALUE8_1") != "null" )
+            {
+                condition += " and " + jsonCondition.Value<string>("CONDITION8") + ">=to_date('" + jsonCondition.Value<string>("VALUE8_1") + " 00:00:01','yyyy/mm/dd hh24:mi:ss')";
+            }
+            if (jsonCondition.Value<string>("VALUE8_2") != string.Empty && jsonCondition.Value<string>("VALUE8_2") != "null")
+            {
+                condition += " and " +jsonCondition.Value<string>("CONDITION8")+ "<=to_date('" + jsonCondition.Value<string>("VALUE8_2") + " 23:59:59','yyyy/mm/dd hh24:mi:ss')";
+            }
+            return condition;
+        }
+
+
+
+        private string getListSql()
+        {
+            string strSql = @"select h.CODE,h.SUBMITTIME,sta.name as STATUS,
+case h.INSPFLAG when '0' then '否(0)' when '1' then '是(1)' end as INSPFLAG,
+case h.MANIFEST when '0' then '否(0)' when '1' then '是(1)' end as MANIFEST,
+h.CUSNO,h.CONTRACTNO,h.TOTALNO,h.DIVIDENO,h.GOODSNUM||'/'||h.GOODGW as GOODSNUM,busi.name as BUSITYPE,cus.name as PORTCODE,
+trade.name as TRADEWAY,h.REMARK,h.DECLCODEQTY,h.DECLARATIONCODE,h.BUSIUNITNAME,h.SHIPPINGAGENT, h.INSPREMARK, h.COMMODITYNUM,
+h.ACCEPTTIME,h.MOENDTIME,h.COENDTIME, h.RECOENDTIME,h.REPSTARTTIME,h.REPENDTIME,h.PASSTIME 
+from RESIDENT_ORDER h
+left join SYS_STATUS sta on sta.code=h.status
+left join cusdoc.sys_busitype busi on busi.code=h.BUSITYPE
+left join cusdoc.BASE_CUSTOMDISTRICT cus on cus.code=h.PORTCODE
+left join cusdoc.BASE_DECLTRADEWAY trade on trade.code=h.TRADEWAY ";
+
+            return strSql;
+        }
+        private string getSql_listExcel()
+        {
+            string strSql = @"select h.CODE as 订单编号,
+h.SUBMITTIME as 委托时间,
+sta.name  as 状态,
+case h.INSPFLAG when '0' then '否(0)' when '1' then '是(1)' end  as 报检状态,
+case h.MANIFEST when '0' then '否(0)' when '1' then '是(1)' end  as 舱单,
+h.CUSNO as 企业编号,
+h.CONTRACTNO as 合同号,
+h.TOTALNO as 总单号,
+h.DIVIDENO as 分单号,
+h.GOODSNUM as 件数,
+h.GOODGW as 毛重,
+busi.name  as 业务类型,
+cus.name  as 进出境关别,
+trade.name  as 监管方式,
+h.REMARK as 备注,
+h.DECLCODEQTY as 报关单套数,
+h.DECLARATIONCODE as 报关单号,
+h.BUSIUNITNAME as 经营单位名称,
+h.SHIPPINGAGENT as 货物代理,
+h.INSPREMARK as 报检备注, 
+h.COMMODITYNUM as 商品项数,
+h.ACCEPTTIME as 受理时间,
+h.MOENDTIME as 制单完成时间,
+h.COENDTIME as 审单完成时间, 
+h.RECOENDTIME as 复审完成时间,
+h.REPSTARTTIME as 申报时间,
+h.REPENDTIME as 申报完成时间,
+h.PASSTIME as 通关放行时间 
+from RESIDENT_ORDER h
+left join SYS_STATUS sta on sta.code=h.status
+left join cusdoc.sys_busitype busi on busi.code=h.BUSITYPE
+left join cusdoc.BASE_CUSTOMDISTRICT cus on cus.code=h.PORTCODE
+left join cusdoc.BASE_DECLTRADEWAY trade on trade.code=h.TRADEWAY ";
+
+            return strSql;
+        }
+
+        private string getSql_QDExcel()
+        {
+            string strSql = @"select
+
+h.SUBMITTIME as 委托时间,
+d.DECLARATIONCODE as 报关单号,
+h.CONTRACTNO as 合同号,
+h.TOTALNO ||'_'|| h.DIVIDENO as 总单号分单号,
+h.GOODSNUM as 件数,
+h.GOODGW as 毛重,
+h.SHIPPINGAGENT as 货物代理
+
+from RESIDENT_ORDER h
+left join RESIDENT_DECLARATION d on h.code=d.ordercode
+ ";
+
+            return strSql;
+        }
+
         public string LoadList()
         {
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
             //string sql = QueryCondition();
-            string strSql = @"select h.CODE,h.SUBMITTIME,sta.name as STATUS,
-case h.INSPFLAG when '0' then '否(0)' when '1' then '是(1)' end as INSPFLAG,
-case h.MANIFEST when '0' then '否(0)' when '1' then '是(1)' end as MANIFEST,
-h.CUSNO,h.CONTRACTNO,h.TOTALNO,h.DIVIDENO,h.GOODSNUM||'/'||h.GOODGW as GOODSNUM,busi.name as BUSITYPE,cus.name as PORTCODE,
-h.SHIPPINGAGENT, h.INSPREMARK, h.COMMODITYNUM,
-trade.name as TRADEWAY,h.REMARK,h.DECLCODEQTY,h.DECLARATIONCODE,h.BUSIUNITNAME,h.ACCEPTTIME,h.MOENDTIME,h.COENDTIME, h.RECOENDTIME,h.REPSTARTTIME,h.REPENDTIME,h.PASSTIME 
-from RESIDENT_ORDER h
-left join SYS_STATUS sta on sta.code=h.status
-left join cusdoc.sys_busitype busi on busi.code=h.BUSITYPE
-left join cusdoc.BASE_CUSTOMDISTRICT cus on cus.code=h.PORTCODE
-left join cusdoc.BASE_DECLTRADEWAY trade on trade.code=h.TRADEWAY 
 
-where 1=1 " + getQueryCondition()+" and RECEIVERUNITCODE='" +json_user.Value<string>("CUSTOMERCODE")+"' order by h.SUBMITTIME desc";
+//            string strSql = @"select h.CODE,h.SUBMITTIME,sta.name as STATUS,
+//case h.INSPFLAG when '0' then '否(0)' when '1' then '是(1)' end as INSPFLAG,
+//case h.MANIFEST when '0' then '否(0)' when '1' then '是(1)' end as MANIFEST,
+//h.CUSNO,h.CONTRACTNO,h.TOTALNO,h.DIVIDENO,h.GOODSNUM||'/'||h.GOODGW as GOODSNUM,busi.name as BUSITYPE,cus.name as PORTCODE,
+//trade.name as TRADEWAY,h.REMARK,h.DECLCODEQTY,h.DECLARATIONCODE,h.BUSIUNITNAME,h.SHIPPINGAGENT, h.INSPREMARK, h.COMMODITYNUM,
+//h.ACCEPTTIME,h.MOENDTIME,h.COENDTIME, h.RECOENDTIME,h.REPSTARTTIME,h.REPENDTIME,h.PASSTIME 
+//from RESIDENT_ORDER h
+//left join SYS_STATUS sta on sta.code=h.status
+//left join cusdoc.sys_busitype busi on busi.code=h.BUSITYPE
+//left join cusdoc.BASE_CUSTOMDISTRICT cus on cus.code=h.PORTCODE
+//left join cusdoc.BASE_DECLTRADEWAY trade on trade.code=h.TRADEWAY 
+//
+//where 1=1 " + getQueryCondition()+" and RECEIVERUNITCODE='" +json_user.Value<string>("CUSTOMERCODE")+"' order by h.SUBMITTIME desc";
+            string strSql = getListSql() + @" where 1=1 " + getQueryCondition() + " and RECEIVERUNITCODE='" + json_user.Value<string>("CUSTOMERCODE") + "' order by h.SUBMITTIME desc";
+
             DataTable dt = GetData(strSql);
             var json = JsonConvert.SerializeObject(dt, iso);
 
@@ -138,8 +283,8 @@ where 1=1 " + getQueryCondition()+" and RECEIVERUNITCODE='" +json_user.Value<str
 
         private DataTable GetData(string strSql)
         {
-            int start = Convert.ToInt32(Request["start"]);
-            int limit = Convert.ToInt32(Request["limit"]);
+           int start = Convert.ToInt32(Request["start"]);
+           int limit = Convert.ToInt32(Request["limit"]);
 
             start = start / limit + 1;
 
@@ -147,12 +292,12 @@ where 1=1 " + getQueryCondition()+" and RECEIVERUNITCODE='" +json_user.Value<str
             string sql = "select count(1) from ( " + strSql + " )";
             totalProperty = Convert.ToInt32(DBMgr.GetDataTable(sql).Rows[0][0]);
 
-            return GetQuerySqlPage(strSql, start, limit);
+            return DBMgr.GetDataTable(GetQuerySqlPage(strSql, start, limit)); 
         }
-        private DataTable GetQuerySqlPage(string strSql, int pageIndex, int pageSize)
+        private string GetQuerySqlPage(string strSql, int pageIndex, int pageSize)
         {
             string sql = @"SELECT * FROM (SELECT ROWNUM AS rowno, t.* FROM ( " + strSql + @" ) t WHERE ROWNUM <= " + pageIndex * pageSize + " ) table_alias  WHERE table_alias.rowno >  " + (pageIndex - 1) * pageSize;
-            return DBMgr.GetDataTable(sql);
+            return sql;
         }
 
         public string Create_Save()
@@ -485,6 +630,100 @@ where d.ordercode='" + obj.Value<string>("CODE") + "'";
             return listSqls;
         }
 
+        /// <summary>
+        /// 导出
+        /// </summary>
+        /// <param name="type">类型 0：列表导出 1：代理清单导出</param>
+        /// <returns></returns>
+        public ActionResult ExportExcel(string type,string condition)
+        {
+            string fileName = string.Empty;
+            switch (type)
+            {
+                case "0":
+                    fileName = "驻厂服务列表导出_" + System.DateTime.Now.ToString("yyyyMMdd") + ".xlsx";
+                    break;
+                case "1":
+                    fileName = "驻厂服务代理清单导出_" + System.DateTime.Now.ToString("yyyyMMdd") + ".xlsx";
+                    break;
+            }
+            //XSSFWorkbook workbook = new XSSFWorkbook();
+            //XSSFSheet sheet1 = (XSSFSheet)workbook.CreateSheet("驻厂服务");
+            //XSSFRow row1 = (XSSFRow)sheet1.CreateRow(0);
+
+           XSSFWorkbook workbook=  getExcelData(type, condition);
+
+            Models.NpoiMemoryStream ms = new Models.NpoiMemoryStream();
+            //MemoryStream ms = new MemoryStream();
+            ms.AllowClose = false;
+            workbook.Write(ms);
+            ms.Flush();
+            ms.Seek(0, SeekOrigin.Begin);
+            ms.AllowClose = true;
+            // ms.Seek(0, SeekOrigin.Begin);
+            // ms.Position = 0;
+
+            workbook.Close();
+
+            return File(ms, "application/vnd.ms-excel", fileName); 
+        }
+
+        private XSSFWorkbook getExcelData(string type, string condition)
+        {
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            XSSFSheet sheet1 = (XSSFSheet)workbook.CreateSheet("驻厂服务");
+            //XSSFRow row1 = (XSSFRow)sheet1.CreateRow(0);
+
+            JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+            string strSql =string.Empty;
+            switch (type)
+            {
+                case "0"://列表
+                    strSql = getSql_listExcel() + @" where 1=1 " + getQueryCondition2(condition) + " and RECEIVERUNITCODE='" + json_user.Value<string>("CUSTOMERCODE") + "' order by h.SUBMITTIME desc";
+                    break;
+                case "1"://代理清单
+                    strSql = getSql_QDExcel() + @" where 1=1 " + getQueryCondition2(condition) + " and RECEIVERUNITCODE='" + json_user.Value<string>("CUSTOMERCODE") + "' order by h.SUBMITTIME desc";
+                    break;
+            }
+            int qty = Convert.ToInt32(DBMgr.GetDataTable("select count(1) from ( " + strSql + " )").Rows[0][0]);
+
+            int index = 0;
+            int pageSize = 5000;
+            int num = qty / pageSize;//求整
+            int mod = qty % pageSize;//求余
+            if (mod > 0)
+            {
+                num += 1;
+            }
+            int lastCount = index ;
+            XSSFRow row1;
+            for (int i = 1; i <= num; i++)
+            {
+                DataTable dt = DBMgr.GetDataTable(GetQuerySqlPage(strSql,i,pageSize));
+
+                if (i == 1)
+                {
+                    row1 = (XSSFRow)sheet1.CreateRow(index);
+                    for (int j = 1; j < dt.Columns.Count; j++)
+                    {
+                        sheet1.SetColumnWidth(j - 1, 4000);
+                        row1.CreateCell(j-1).SetCellValue(dt.Columns[j].ColumnName);
+                    }
+                    index++;
+                }
+
+                for (int j = 0; j < dt.Rows.Count; j++)
+                {
+                    row1 = (XSSFRow)sheet1.CreateRow(index);
+                    for (int k = 1; k < dt.Columns.Count; k++)
+                    {
+                        row1.CreateCell(k-1).SetCellValue(dt.Rows[j][dt.Columns[k].ColumnName].ToString());
+                    }
+                    index++;
+                }
+            }
+            return workbook;
+        }
 
 
     }

@@ -11,6 +11,7 @@
 <script src="/js/commondata.js?t=@Version"></script>
 <script src="~/Views/StationedFileld/Query.js?t=@Version"></script>
 <script src="~/Views/StationedFileld/BatchMaintance.js?t=@Version"></script>
+<script src="~/Views/StationedFileld/ExportExcel.js?t=@Version"></script>
 
 
 <script type="text/javascript">
@@ -159,16 +160,7 @@
         var CODE = recs[0].data.CODE;
         var rowIndex = gridpanel.store.indexOf(recs[0]);
         var currentPage = gridpanel.store.currentPage;
-var condition='{'+
-        'CONDITION1:'+ Ext.getCmp('CONDITION1').getValue()+',VALUE1:'+ Ext.getCmp("CONDITION1_1").getValue()+','+
-        'CONDITION2:'+ Ext.getCmp('CONDITION2').getValue()+',VALUE2:'+ Ext.getCmp("CONDITION2_1").getValue()+','+
-        'CONDITION3:'+ Ext.getCmp('CONDITION3').getValue()+',VALUE3:'+ Ext.getCmp("CONDITION3_1").getValue()+','+
-        'CONDITION4:'+ Ext.getCmp('CONDITION4').getValue()+',VALUE4_1:'+ Ext.Date.format(Ext.getCmp("CONDITION4_1").getValue(), 'Y-m-d')+',VALUE4_2:'+ Ext.Date.format(Ext.getCmp("CONDITION4_2").getValue(), 'Y-m-d')+','+
-
-        'CONDITION5:'+ Ext.getCmp('CONDITION5').getValue()+',VALUE5:'+ Ext.getCmp("CONDITION5_1").getValue()+','+
-        'CONDITION6:'+ Ext.getCmp('CONDITION6').getValue()+',VALUE6:'+ Ext.getCmp("CONDITION6_1").getValue()+','+
-        'CONDITION7:'+ Ext.getCmp('CONDITION7').getValue()+',VALUE7:'+ Ext.getCmp("CONDITION7_1").getValue()+','+
-        'CONDITION8:'+ Ext.getCmp('CONDITION8').getValue()+',VALUE8_1:'+ Ext.Date.format(Ext.getCmp("CONDITION8_1").getValue(), 'Y-m-d')+',VALUE8_2:'+ Ext.Date.format(Ext.getCmp("CONDITION8_2").getValue(), 'Y-m-d')+'}'
+        var condition = getJsonCondition();
 
        opencenterwin("/StationedFileld/WebSiteQuery?condition=" + condition + '&rowIndex=' + rowIndex + '&currentPage=' + currentPage, 1200, 800);
     }
@@ -185,6 +177,19 @@ var condition='{'+
             CONDITION7: Ext.getCmp('CONDITION7').getValue(), VALUE7: Ext.getCmp("CONDITION7_1").getValue(),
             CONDITION8: Ext.getCmp('CONDITION8').getValue(), VALUE8_1: Ext.Date.format(Ext.getCmp("CONDITION8_1").getValue(), 'Y-m-d'), VALUE8_2: Ext.Date.format(Ext.getCmp("CONDITION8_2").getValue(), 'Y-m-d'),
         }
+        return condition;
+    }
+    function getJsonCondition() {
+        var condition = '{' +
+                'CONDITION1:\'' + Ext.getCmp('CONDITION1').getValue() + '\',VALUE1:\'' + Ext.getCmp("CONDITION1_1").getValue() + '\',' +
+                'CONDITION2:\'' + Ext.getCmp('CONDITION2').getValue() + '\',VALUE2:\'' + Ext.getCmp("CONDITION2_1").getValue() + '\',' +
+                'CONDITION3:\'' + Ext.getCmp('CONDITION3').getValue() + '\',VALUE3:\'' + Ext.getCmp("CONDITION3_1").getValue() + '\',' +
+                'CONDITION4:\'' + Ext.getCmp('CONDITION4').getValue() + '\',VALUE4_1:\'' + Ext.Date.format(Ext.getCmp("CONDITION4_1").getValue(), 'Y-m-d') + '\',VALUE4_2:\'' + Ext.Date.format(Ext.getCmp("CONDITION4_2").getValue(), 'Y-m-d') + '\',' +
+
+                'CONDITION5:\'' + Ext.getCmp('CONDITION5').getValue() + '\',VALUE5:\'' + Ext.getCmp("CONDITION5_1").getValue() + '\',' +
+                'CONDITION6:\'' + Ext.getCmp('CONDITION6').getValue() + '\',VALUE6:\'' + Ext.getCmp("CONDITION6_1").getValue() + '\',' +
+                'CONDITION7:\'' + Ext.getCmp('CONDITION7').getValue() + '\',VALUE7:\'' + Ext.getCmp("CONDITION7_1").getValue() + '\',' +
+                'CONDITION8:\'' + Ext.getCmp('CONDITION8').getValue() + '\',VALUE8_1:\'' + Ext.Date.format(Ext.getCmp("CONDITION8_1").getValue(), 'Y-m-d') + '\',VALUE8_2:\'' + Ext.Date.format(Ext.getCmp("CONDITION8_2").getValue(), 'Y-m-d') + '\'}'
         return condition;
     }
 
@@ -207,7 +212,7 @@ var condition='{'+
             @*<button onclick="Select(1)" class="btn btn-primary btn-sm"><i class="fa fa-search"></i>&nbsp;追加查询</button>*@
             @*<button class="btn btn-primary btn-sm"><i class="fa fa-search"></i>&nbsp;高级查询</button>*@
             <button onclick="Reset()" class="btn btn-primary btn-sm"><i class="fa fa-refresh"></i>&nbsp;重置</button>
-            @*<button class="btn btn-primary btn-sm"><i class="fa fa-level-down"></i>&nbsp;导出</button>*@
+            <button onclick="Export()" class="btn btn-primary btn-sm"><i class="fa fa-level-down"></i>&nbsp;导出</button>
 
         </div>
     </div>

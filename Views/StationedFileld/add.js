@@ -107,6 +107,9 @@
         fieldLabel: '企业编号',
         columnWidth: .25,
         labelWidth: 60,
+        maxLength: 50,
+        maxLengthText: '最大长度为50',
+        msgTarget: 'side',
     });
 
     //业务类型
@@ -208,6 +211,9 @@
         fieldLabel: '总单号',
         columnWidth: .25,
         labelWidth: 60,
+        maxLength: 50,
+        maxLengthText: '最大长度为50',
+        msgTarget: 'side',
     });
 
     //分单号
@@ -219,6 +225,9 @@
         fieldLabel: '分单号',
         columnWidth: .25,
         labelWidth: 60,
+        maxLength: 50,
+        maxLengthText: '最大长度为50',
+        msgTarget: 'side',
     });
 
     //合同发票号
@@ -230,6 +239,9 @@
         fieldLabel: '合同发票号',
         columnWidth: .25,
         labelWidth: 60,
+        maxLength: 50,
+        maxLengthText: '最大长度为50',
+        msgTarget: 'side',
     });
 
     //备注
@@ -241,6 +253,9 @@
         fieldLabel: '备注',
         columnWidth: .25,
         labelWidth: 60,
+        maxLength: 100,
+        maxLengthText: '最大长度为100',
+        msgTarget: 'side',
     });
 
     //件数
@@ -288,6 +303,9 @@
         fieldLabel: '货运代理',
         columnWidth: .25,
         labelWidth: 60,
+        maxLength: 50,
+        maxLengthText: '最大长度为50',
+        msgTarget: 'side',
     });
     //报检备注
     var field_INSPREMARK = Ext.create('Ext.form.field.Text', {
@@ -298,6 +316,9 @@
         fieldLabel: '报检备注',
         columnWidth: .25,
         labelWidth: 60,
+        maxLength: 100,
+        maxLengthText: '最大长度为100',
+        msgTarget: 'side',
     });
     //商品项数
     var field_COMMODITYNUM = Ext.create('Ext.form.field.Number', {
@@ -459,6 +480,15 @@ function form_ini_decl() {
         maxLength: 18,
         minLength: 18,
         msgTarget: 'side',
+        minLengthText: '报关单长度为18位',
+        maxLengthText: '报关单长度为18位',
+        listeners: {
+            specialkey: function (field, e) {
+                if (e.getKey() == e.ENTER) {
+                    field_DECLARATIONCODE.getValue();
+                }
+            }
+        }
     });
 
     //监管方式中文
