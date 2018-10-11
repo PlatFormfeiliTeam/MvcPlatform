@@ -335,6 +335,56 @@ left join RESIDENT_DECLARATION d on h.code=d.ordercode
             return sql;
         }
 
+        private bool checkContact_CusNO_BusiUnit_isRepeat(string code, string CONTRACTNO, string CUSNO, string BUSIUNITCODE)
+        {
+            string strSql = string.Empty;
+            if (CONTRACTNO != string.Empty)
+            {
+                strSql = "select code from RESIDENT_ORDER where CONTRACTNO='{0}'  and BUSIUNITCODE='{1}' ";
+                strSql = string.Format(strSql, CONTRACTNO, BUSIUNITCODE);
+                if (code != string.Empty)
+                {
+                    strSql += " and code<>'"+code+"'";
+                }
+            }
+            if (CUSNO != string.Empty)
+            {
+                if (strSql == string.Empty)
+                {
+                    strSql = "select code from RESIDENT_ORDER where CUSNO='{0}'  and BUSIUNITCODE='{1}' ";
+                    strSql = string.Format(strSql, CUSNO, BUSIUNITCODE);
+                    if (code != string.Empty)
+                    {
+                        strSql += " and code<>'" + code + "'";
+                    }
+                }
+                else
+                {
+                    strSql += "union select code from RESIDENT_ORDER where CUSNO='{0}'  and BUSIUNITCODE='{1}' ";
+                    strSql = string.Format(strSql, CUSNO, BUSIUNITCODE);
+                    if (code != string.Empty)
+                    {
+                        strSql += " and code<>'" + code + "'";
+                    }
+                }
+            }
+            if (strSql == string.Empty)//合同号和企业编号 都不填的话就当没有
+            {
+                return false;
+            }
+            else
+            {
+                if (DBMgr.GetDataTable(strSql).Rows.Count > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
         public string Create_Save()
         {
             try
@@ -346,6 +396,14 @@ left join RESIDENT_DECLARATION d on h.code=d.ordercode
                 JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
 
                 string code = jsonOrderdata.Value<string>("CODE");//
+
+                //检查是否有重复的 合同号和企业编号
+                if (checkContact_CusNO_BusiUnit_isRepeat
+      (code, jsonOrderdata.Value<string>("CONTRACTNO").Trim(), jsonOrderdata.Value<string>("CUSNO").Trim(),
+      jsonOrderdata.Value<string>("BUSIUNITCODE")))
+                {
+                    return "{success:false,msg:'保存失败：企业编号或者合同号重复，不可保存'}";
+                }
 
                 string flag = string.Empty;
 
@@ -408,15 +466,16 @@ left join RESIDENT_DECLARATION d on h.code=d.ordercode
                     BUSIUNITNAME = BUSIUNITNAME.Split('(')[0];
                 }
                 strSql = @"insert into RESIDENT_ORDER (code,cusno,busitype,tradeway,portcode,busiunitcode,busiunitname,goodsnum,goodgw,contractno,
-TOTALNO,DIVIDENO,MANIFEST,INSPFLAG,REMARK,RECEIVERUNITCODE,RECEIVERUNITNAME,CREATETIME,DECLCODEQTY,DECLARATIONCODE,SHIPPINGAGENT, INSPREMARK, COMMODITYNUM) 
-            values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}','{15}','{16}',sysdate,'{17}','{18}','{19}','{20}','{21}')";
+TOTALNO,DIVIDENO,MANIFEST,INSPFLAG,REMARK,RECEIVERUNITCODE,RECEIVERUNITNAME,CREATETIME,DECLCODEQTY,DECLARATIONCODE,SHIPPINGAGENT, INSPREMARK, COMMODITYNUM,UNITYCODE) 
+            values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}','{15}','{16}',sysdate,'{17}','{18}','{19}','{20}','{21}','{22}')";
                 strSql = string.Format(strSql, code, jsonOrderdata.Value<string>("CUSNO").Trim(), jsonOrderdata.Value<string>("BUSITYPE"), jsonOrderdata.Value<string>("TRADEWAY2")
                     , jsonOrderdata.Value<string>("PORTCODE"), jsonOrderdata.Value<string>("BUSIUNITCODE"), BUSIUNITNAME
                     , jsonOrderdata.Value<string>("GOODSNUM2"), jsonOrderdata.Value<string>("GOODGW2")
                     , jsonOrderdata.Value<string>("CONTRACTNO").Trim(), jsonOrderdata.Value<string>("TOTALNO").Trim(), jsonOrderdata.Value<string>("DIVIDENO").Trim()
                     , MANIFEST, INSPFLAG, jsonOrderdata.Value<string>("REMARK2").Trim()
                     , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), DECLCODEQTY, DECLARATIONCODE
-                    , jsonOrderdata.Value<string>("SHIPPINGAGENT").Trim(), jsonOrderdata.Value<string>("INSPREMARK").Trim(), jsonOrderdata.Value<string>("COMMODITYNUM"));
+                    , jsonOrderdata.Value<string>("SHIPPINGAGENT").Trim(), jsonOrderdata.Value<string>("INSPREMARK").Trim(), jsonOrderdata.Value<string>("COMMODITYNUM")
+                    , jsonOrderdata.Value<string>("UNITYCODE").Trim());
                 listSqls.Add(strSql);
 
                 //  strSql="update RESIDENT_ORDER set ";
@@ -517,7 +576,7 @@ values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}',sysdate,'{8}','{9}')";
             string strSql = @"select code,cusno,busitype,tradeway as TRADEWAY2,portcode,busiunitcode,busiunitname,busiunitnum
 ,goodsnum as GOODSNUM2,goodgw as GOODGW2,contractno,totalno,divideno,manifest,status,inspflag,remark as REMARK2,submittime,submituserid,submitusername,accepttime,acceptuserid,acceptusername,moendtime,moendid,moendname,coendtime,coendid,coendname,recoendtime,recoendid,recoendname,repstarttime,repstartid,repstartname,rependtime
 ,rependid,rependname,passtime,passid,passname,receiverunitcode,receiverunitname,createtime,declcodeqty,declarationcode,
-SHIPPINGAGENT, INSPREMARK, COMMODITYNUM  from RESIDENT_ORDER where code='" + ordercode + "'";
+SHIPPINGAGENT, INSPREMARK, COMMODITYNUM,UNITYCODE  from RESIDENT_ORDER where code='" + ordercode + "'";
             formOrderData = JsonConvert.SerializeObject(DBMgr.GetDataTable(strSql), iso).TrimStart('[').TrimEnd(']');
 
             strSql = "select * from RESIDENT_DECLARATION where ordercode='"+ordercode+"' order by NO";

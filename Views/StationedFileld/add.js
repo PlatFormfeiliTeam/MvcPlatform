@@ -358,6 +358,27 @@
         labelWidth: 60,
     });
 
+    //统一编号
+    var field_UNITYCODE = Ext.create('Ext.form.field.Text', {
+        id: 'UNITYCODE',
+        name: 'UNITYCODE',
+        tabIndex: 15,
+        // flex: 0.5,
+        fieldLabel: '统一编号',
+        //columnWidth: .5,
+        labelWidth: 60,
+        maxLength: 18,
+        msgTarget: 'side',
+        maxLengthText: '统一编号长度最多18位',
+        listeners: {
+            specialkey: function (field, e) {
+                if (e.getKey() == e.ENTER) {
+                    field_UNITYCODE.getValue();
+                }
+            }
+        }
+    });
+
 
     formpanel_form = Ext.create('Ext.form.Panel', {
         id: "formpanel_form",
@@ -368,7 +389,7 @@
         fieldDefaults: {
             margin: '0 5 10 0',
             labelWidth: 80,
-            columnWidth: .20,
+            columnWidth: .25,
             labelAlign: 'right',
             labelSeparator: '',
             msgTarget: 'under',
@@ -379,7 +400,8 @@
            { layout: 'column', height: 30, margin: '5 0 0 0', border: 0, items: [field_CODE, field_BUSIUNITCODE_BUSIUNITNAME, field_CUSNO, combo_busitype] },//combo_TRADEWAY
            { layout: 'column', height: 30, border: 0, items: [combo_portcode, combo_TRADEWAY2, field_TOTALNO, field_DIVIDENO] },
            { layout: 'column', height: 30, border: 0, items: [field_CONTRACTNO, field_REMARK2, field_GOODSNUM2, field_GOODGW2] },
-           { layout: 'column', height: 30, border: 0, items: [field_SHIPPINGAGENT,field_INSPREMARK,field_COMMODITYNUM, chk_MANIFEST, chk_INSPFLAG] },
+           { layout: 'column', height: 30, border: 0, items: [field_SHIPPINGAGENT, field_INSPREMARK, field_COMMODITYNUM, chk_MANIFEST, chk_INSPFLAG] },//
+           { layout: 'column', height: 30, border: 0, items: [field_UNITYCODE] },//
         ]
     });
 }
@@ -430,8 +452,8 @@ function form_ini_decl() {
         id: 'gridpanel_declGrid',
         renderTo: 'div_form_decl',
         store: store_declGrid,
-        minHeight: 200,
-        maxHeight: 200,
+        minHeight: 150,
+        maxHeight: 150,
         //margin: '5 0 0 0',
         //    flex: 1,
        // autoScroll: true,
