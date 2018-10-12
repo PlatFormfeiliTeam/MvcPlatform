@@ -74,7 +74,6 @@ namespace MvcPlatform.Controllers
             //////
             if (Request["VALUE2"].ToString() != string.Empty)
             {
-
                 condition += " and " + Request["CONDITION2"].ToString() + "='" + Request["VALUE2"].ToString() + "'";
             }
             if (Request["VALUE6"].ToString() != string.Empty)
@@ -85,13 +84,26 @@ namespace MvcPlatform.Controllers
             //////
             if (Request["VALUE3"].ToString() != string.Empty)
             {
-
-                condition += " and " + Request["CONDITION3"].ToString() + "='" + Request["VALUE3"].ToString() + "'";
+                if (Request["CONDITION3"].ToString() == "STATUS")//因为只有状态是数值型了，所以只好分开比较
+                {
+                    condition += " and " + Request["CONDITION3"].ToString() + Request["VALUE3_0"].ToString() + Request["VALUE3"].ToString();
+                }
+                else
+                {
+                    condition += " and " + Request["CONDITION3"].ToString() + "='" + Request["VALUE3"].ToString() + "'";
+                }
             }
             if (Request["VALUE7"].ToString() != string.Empty)
             {
-
-                condition += " and " + Request["CONDITION7"].ToString() + "='" + Request["VALUE7"].ToString() + "'";
+                if (Request["CONDITION7"].ToString() == "STATUS")//因为只有状态是数值型了，所以只好分开比较
+                {
+                    condition += " and " + Request["CONDITION7"].ToString() + Request["VALUE7_0"].ToString() + Request["VALUE7"].ToString();
+                }
+                else
+                {
+                    condition += " and " + Request["CONDITION7"].ToString() + "='" + Request["VALUE7"].ToString() + "'";
+                }
+                //condition += " and " + Request["CONDITION7"].ToString() + "='" + Request["VALUE7"].ToString() + "'";
             }
             //////
             if (Request["VALUE1"].ToString() != string.Empty)
@@ -155,13 +167,25 @@ namespace MvcPlatform.Controllers
             //////
             if (jsonCondition.Value<string>("VALUE3") != string.Empty && jsonCondition.Value<string>("VALUE3") != "null")
             {
-
-                condition += " and " +jsonCondition.Value<string>("CONDITION3") + "='" + jsonCondition.Value<string>("VALUE3") + "'";
+                if (jsonCondition.Value<string>("CONDITION3") == "STATUS")//因为只有状态是数值型了，所以只好分开比较
+                {
+                    condition += " and " + jsonCondition.Value<string>("CONDITION3") + jsonCondition.Value<string>("VALUE3_0") + jsonCondition.Value<string>("VALUE3");
+                }
+                else
+                {
+                    condition += " and " + jsonCondition.Value<string>("CONDITION3") + "='" + jsonCondition.Value<string>("VALUE3") + "'";
+                }
             }
             if (jsonCondition.Value<string>("VALUE7") != string.Empty && jsonCondition.Value<string>("VALUE7") != "null")
             {
-
-                condition += " and " +jsonCondition.Value<string>("CONDITION7") + "='" + jsonCondition.Value<string>("VALUE7") + "'";
+                if (jsonCondition.Value<string>("CONDITION7") == "STATUS")//因为只有状态是数值型了，所以只好分开比较
+                {
+                    condition += " and " + jsonCondition.Value<string>("CONDITION7") + jsonCondition.Value<string>("VALUE7_0") + jsonCondition.Value<string>("VALUE7");
+                }
+                else
+                {
+                    condition += " and " + jsonCondition.Value<string>("CONDITION7") + "='" + jsonCondition.Value<string>("VALUE7") + "'";
+                }
             }
             ////////
             if (jsonCondition.Value<string>("VALUE1") != string.Empty && jsonCondition.Value<string>("VALUE1") != "null")//VALUE1
@@ -197,6 +221,8 @@ namespace MvcPlatform.Controllers
             string strSql = @"select h.CODE,h.SUBMITTIME,sta.name as STATUS,
 case h.INSPFLAG when '0' then '否(0)' when '1' then '是(1)' end as INSPFLAG,
 case h.MANIFEST when '0' then '否(0)' when '1' then '是(1)' end as MANIFEST,
+case h.CHECKFLAG when '0' then '否(0)' when '1' then '是(1)' end as CHECKFLAG,
+h.CHECKREMARK,
 h.CUSNO,h.CONTRACTNO,h.TOTALNO,h.DIVIDENO,h.GOODSNUM||'/'||h.GOODGW as GOODSNUM,busi.name as BUSITYPE,cus.name as PORTCODE,
 trade.name as TRADEWAY,h.REMARK,h.DECLCODEQTY,h.DECLARATIONCODE,h.BUSIUNITNAME,h.SHIPPINGAGENT, h.INSPREMARK, h.COMMODITYNUM,
 h.ACCEPTTIME,h.MOENDTIME,h.COENDTIME, h.RECOENDTIME,h.REPSTARTTIME,h.REPENDTIME,h.PASSTIME 
@@ -279,21 +305,7 @@ left join RESIDENT_DECLARATION d on h.code=d.ordercode
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
             IsoDateTimeConverter iso = new IsoDateTimeConverter();//序列化JSON对象时,日期的处理格式 
             iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-            //string sql = QueryCondition();
 
-//            string strSql = @"select h.CODE,h.SUBMITTIME,sta.name as STATUS,
-//case h.INSPFLAG when '0' then '否(0)' when '1' then '是(1)' end as INSPFLAG,
-//case h.MANIFEST when '0' then '否(0)' when '1' then '是(1)' end as MANIFEST,
-//h.CUSNO,h.CONTRACTNO,h.TOTALNO,h.DIVIDENO,h.GOODSNUM||'/'||h.GOODGW as GOODSNUM,busi.name as BUSITYPE,cus.name as PORTCODE,
-//trade.name as TRADEWAY,h.REMARK,h.DECLCODEQTY,h.DECLARATIONCODE,h.BUSIUNITNAME,h.SHIPPINGAGENT, h.INSPREMARK, h.COMMODITYNUM,
-//h.ACCEPTTIME,h.MOENDTIME,h.COENDTIME, h.RECOENDTIME,h.REPSTARTTIME,h.REPENDTIME,h.PASSTIME 
-//from RESIDENT_ORDER h
-//left join SYS_STATUS sta on sta.code=h.status
-//left join cusdoc.sys_busitype busi on busi.code=h.BUSITYPE
-//left join cusdoc.BASE_CUSTOMDISTRICT cus on cus.code=h.PORTCODE
-//left join cusdoc.BASE_DECLTRADEWAY trade on trade.code=h.TRADEWAY 
-//
-//where 1=1 " + getQueryCondition()+" and RECEIVERUNITCODE='" +json_user.Value<string>("CUSTOMERCODE")+"' order by h.SUBMITTIME desc";
             string strSql = getListSql() + @" where 1=1 " + getQueryCondition() + " and RECEIVERUNITCODE='" + json_user.Value<string>("CUSTOMERCODE") + "' order by h.SUBMITTIME desc";
 
             DataTable dt = GetData(strSql);
@@ -443,6 +455,8 @@ left join RESIDENT_DECLARATION d on h.code=d.ordercode
                 string BUSIUNITNAME = jsonOrderdata.Value<string>("BUSIUNITNAME");
                 string MANIFEST = jsonOrderdata.Value<string>("MANIFEST");
                 string INSPFLAG = jsonOrderdata.Value<string>("INSPFLAG");
+                string CHECKFLAG = jsonOrderdata.Value<string>("CHECKFLAG");
+                string CHECKREMARK = jsonOrderdata.Value<string>("CHECKREMARK");
                 if (MANIFEST == "on" || MANIFEST == "true" || MANIFEST == "1")
                 {
                     MANIFEST = "1";
@@ -460,14 +474,26 @@ left join RESIDENT_DECLARATION d on h.code=d.ordercode
                 {
                     INSPFLAG = "0";
                 }
+                if (CHECKFLAG == "on" || CHECKFLAG == "true" || CHECKFLAG == "1")
+                {
+                    CHECKFLAG = "1";
+                }
+                else
+                {
+                    CHECKFLAG = "0";
+                }
+                if (CHECKREMARK == null)
+                {
+                    CHECKREMARK = string.Empty;
+                }
 
                 if (BUSIUNITNAME.Contains("("))
                 {
                     BUSIUNITNAME = BUSIUNITNAME.Split('(')[0];
                 }
                 strSql = @"insert into RESIDENT_ORDER (code,cusno,busitype,tradeway,portcode,busiunitcode,busiunitname,goodsnum,goodgw,contractno,
-TOTALNO,DIVIDENO,MANIFEST,INSPFLAG,REMARK,RECEIVERUNITCODE,RECEIVERUNITNAME,CREATETIME,DECLCODEQTY,DECLARATIONCODE,SHIPPINGAGENT, INSPREMARK, COMMODITYNUM,UNITYCODE) 
-            values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}','{15}','{16}',sysdate,'{17}','{18}','{19}','{20}','{21}','{22}')";
+TOTALNO,DIVIDENO,MANIFEST,INSPFLAG,REMARK,RECEIVERUNITCODE,RECEIVERUNITNAME,CREATETIME,DECLCODEQTY,DECLARATIONCODE,SHIPPINGAGENT, INSPREMARK, COMMODITYNUM,UNITYCODE,CHECKFLAG,CHECKREMARK) 
+            values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}','{15}','{16}',sysdate,'{17}','{18}','{19}','{20}','{21}','{22}','{23}','{24}')";
                 strSql = string.Format(strSql, code, jsonOrderdata.Value<string>("CUSNO").Trim(), jsonOrderdata.Value<string>("BUSITYPE"), jsonOrderdata.Value<string>("TRADEWAY2")
                     , jsonOrderdata.Value<string>("PORTCODE"), jsonOrderdata.Value<string>("BUSIUNITCODE"), BUSIUNITNAME
                     , jsonOrderdata.Value<string>("GOODSNUM2"), jsonOrderdata.Value<string>("GOODGW2")
@@ -475,7 +501,7 @@ TOTALNO,DIVIDENO,MANIFEST,INSPFLAG,REMARK,RECEIVERUNITCODE,RECEIVERUNITNAME,CREA
                     , MANIFEST, INSPFLAG, jsonOrderdata.Value<string>("REMARK2").Trim()
                     , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), DECLCODEQTY, DECLARATIONCODE
                     , jsonOrderdata.Value<string>("SHIPPINGAGENT").Trim(), jsonOrderdata.Value<string>("INSPREMARK").Trim(), jsonOrderdata.Value<string>("COMMODITYNUM")
-                    , jsonOrderdata.Value<string>("UNITYCODE").Trim());
+                    , jsonOrderdata.Value<string>("UNITYCODE").Trim(), CHECKFLAG, CHECKREMARK.Trim());
                 listSqls.Add(strSql);
 
                 //  strSql="update RESIDENT_ORDER set ";
@@ -576,7 +602,7 @@ values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}',sysdate,'{8}','{9}')";
             string strSql = @"select code,cusno,busitype,tradeway as TRADEWAY2,portcode,busiunitcode,busiunitname,busiunitnum
 ,goodsnum as GOODSNUM2,goodgw as GOODGW2,contractno,totalno,divideno,manifest,status,inspflag,remark as REMARK2,submittime,submituserid,submitusername,accepttime,acceptuserid,acceptusername,moendtime,moendid,moendname,coendtime,coendid,coendname,recoendtime,recoendid,recoendname,repstarttime,repstartid,repstartname,rependtime
 ,rependid,rependname,passtime,passid,passname,receiverunitcode,receiverunitname,createtime,declcodeqty,declarationcode,
-SHIPPINGAGENT, INSPREMARK, COMMODITYNUM,UNITYCODE  from RESIDENT_ORDER where code='" + ordercode + "'";
+SHIPPINGAGENT, INSPREMARK, COMMODITYNUM,UNITYCODE,CHECKFLAG,CHECKREMARK  from RESIDENT_ORDER where code='" + ordercode + "'";
             formOrderData = JsonConvert.SerializeObject(DBMgr.GetDataTable(strSql), iso).TrimStart('[').TrimEnd(']');
 
             strSql = "select * from RESIDENT_DECLARATION where ordercode='"+ordercode+"' order by NO";

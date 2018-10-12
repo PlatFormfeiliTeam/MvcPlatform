@@ -123,19 +123,48 @@ function initQuery() {
                 combo_3_1.reset();
                 if (combo_3.getValue() == "STATUS") {
                     combo_3_1.minChars = "1";
-                    store_3_1.loadData(common_data_StationFieldStatus);
+                    store_3_1.loadData(common_data_StationFieldStatus);//
+                    combo_3_0.setReadOnly(false);
                 }
-                if (combo_3.getValue() == "INSPFLAG") {
-                    combo_3_1.minChars = "1";
-                    store_3_1.loadData(common_data_YesOrNot);
+                else {
+                    combo_3_0.setValue("=");
+                    combo_3_0.setReadOnly(true);
                 }
-                if (combo_3.getValue() == "MANIFEST") {
+                if (combo_3.getValue() == "INSPFLAG" || combo_3.getValue() == "MANIFEST" || combo_3.getValue() == "CHECKFLAG") {
                     combo_3_1.minChars = "1";
                     store_3_1.loadData(common_data_YesOrNot);
                 }
             }
         }
     });
+
+    var store_3_0 = Ext.create("Ext.data.JsonStore", {
+        fields: ["CODE", "NAME"],
+        data: search_js_condition3_0_StationField,
+    });
+    var combo_3_0 = Ext.create("Ext.form.ComboBox", {
+        id: 'CONDITION3_0',
+        store: store_3_0,
+        displayField: 'NAME',
+        valueField: "CODE",
+        editable: false,
+        //hideTrigger: true,
+        margin: 0,
+        flex: 0.2,
+        anyMatch: true,
+        // editable: true,
+        forceSelection: true,
+        queryMode: 'local',
+        //listeners:
+        // {
+        //     change: function () {
+        //         if (combo_3_0.getValue() == null) {
+        //             combo_3_0.reset();
+        //         }
+        //     }
+        // }
+    });
+
     var store_3_1 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"]
     });
@@ -146,7 +175,7 @@ function initQuery() {
         valueField: "CODE",
         hideTrigger: true,
         margin: 0,
-        flex: .65,
+        flex: .45,
         anyMatch: true,
         // editable: true,
         forceSelection: true,
@@ -163,7 +192,7 @@ function initQuery() {
     var condition3 = {
         xtype: 'fieldcontainer',
         layout: 'hbox',
-        items: [combo_3, combo_3_1]
+        items: [combo_3, combo_3_0, combo_3_1]
     }
     var store_4 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
@@ -381,18 +410,47 @@ function initQuery() {
                 if (combo_7.getValue() == "STATUS") {
                     combo_7_1.minChars = "1";
                     store_7_1.loadData(common_data_StationFieldStatus);
+                    combo_7_0.setReadOnly(false);
+                } else {
+                    combo_7_0.setValue("=");
+                    combo_7_0.setReadOnly(true);
                 }
-                if (combo_7.getValue() == "INSPFLAG") {
-                    combo_7_1.minChars = "1";
-                    store_7_1.loadData(common_data_YesOrNot);
-                }
-                if (combo_7.getValue() == "MANIFEST") {
+
+                if (combo_7.getValue() == "INSPFLAG" || combo_7.getValue() == "MANIFEST" || combo_7.getValue() == "CHECKFLAG") {
                     combo_7_1.minChars = "1";
                     store_7_1.loadData(common_data_YesOrNot);
                 }
             }
         }
     });
+
+    var store_7_0 = Ext.create("Ext.data.JsonStore", {
+        fields: ["CODE", "NAME"],
+        data: search_js_condition3_0_StationField,
+    });
+    var combo_7_0 = Ext.create("Ext.form.ComboBox", {
+        id: 'CONDITION7_0',
+        store: store_7_0,
+        displayField: 'NAME',
+        valueField: "CODE",
+        editable: false,
+        //hideTrigger: true,
+        margin: 0,
+        flex: 0.2,
+        anyMatch: true,
+        // editable: true,
+        forceSelection: true,
+        queryMode: 'local',
+        //listeners:
+        // {
+        //     change: function () {
+        //         if (combo_7_0.getValue() == null) {
+        //             combo_7_0.reset();
+        //         }
+        //     }
+        // }
+    });
+
     var store_7_1 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"]
     });
@@ -404,7 +462,7 @@ function initQuery() {
         valueField: "CODE",
         hideTrigger: true,
         margin: 0,
-        flex: .65,
+        flex: .45,
         anyMatch: true,
         // editable: false,
         queryMode: 'local',
@@ -421,7 +479,7 @@ function initQuery() {
     var condition7 = {
         xtype: 'fieldcontainer',
         layout: 'hbox',
-        items: [combo_7, combo_7_1]
+        items: [combo_7,combo_7_0, combo_7_1]
     }
     var store_8 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
@@ -554,11 +612,13 @@ function Reset() {
     Ext.getCmp('CONDITION1_1').setValue("");
     Ext.getCmp('CONDITION2_1').setValue("");
     Ext.getCmp('CONDITION3_1').setValue("");
+    Ext.getCmp('CONDITION3_0').setValue("=");
     Ext.getCmp('CONDITION4_1').setValue(startTime);//
     Ext.getCmp('CONDITION4_2').setValue(new Date());
     Ext.getCmp('CONDITION5_1').setValue("");
     Ext.getCmp('CONDITION6_1').setValue("");
     Ext.getCmp('CONDITION7_1').setValue("");
+    Ext.getCmp('CONDITION7_0').setValue("=");
     Ext.getCmp('CONDITION8_1').setValue("");
     Ext.getCmp('CONDITION8_2').setValue("");
 }

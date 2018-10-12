@@ -214,6 +214,25 @@
         maxLength: 50,
         maxLengthText: '最大长度为50',
         msgTarget: 'side',
+        listeners: {
+            blur: function (th, e, eOpts) {
+                //field_TRADEWAYNAME.setValue(th.rawValue);
+                var val = field_TOTALNO.getValue(th.rawValue);
+                if (val.indexOf("_") != -1) {
+                    var strs = val.split('_');
+                    var DIVIDENO = "";
+                    for (var i = 0; i < strs.length; i++) {
+                        if (i == 0) {
+                            field_TOTALNO.setValue(strs[i]);
+                        }
+                        else {
+                            DIVIDENO += strs[i];
+                        }
+                    }
+                    field_DIVIDENO.setValue(DIVIDENO);
+                }
+            }
+        }
     });
 
     //分单号
@@ -379,6 +398,51 @@
         }
     });
 
+    //查验标志
+    var chk_CHECKFLAG = Ext.create('Ext.form.field.Checkbox', {
+        id: 'CHECKFLAG',
+        name: 'CHECKFLAG',
+        //tabIndex: 12,
+        flex: 0.1,
+        margin: 0,
+        fieldLabel: '查验标志',
+       // columnWidth: .1,
+        labelWidth: 60,
+        listeners: {
+            change: function (field, newValue, oldValue, eOpts) {
+                if (newValue) {//setReadOnly  setDisabled
+                    txt_CHECKREMARK.setDisabled(false);
+                } else {
+                    txt_CHECKREMARK.setDisabled(true);
+                    txt_CHECKREMARK.setValue("");
+                }
+            }
+        }
+    });
+    //查验备注
+    var txt_CHECKREMARK = Ext.create('Ext.form.field.Text', {
+        id: 'CHECKREMARK',
+        name: 'CHECKREMARK',
+        //tabIndex: 15,
+         flex: 0.2,
+       // fieldLabel: '统一编号',
+        //columnWidth: .5,
+         emptyText: '查验备注',
+         margin: 0,
+         disabled: true,
+       labelWidth: 0,
+        maxLength: 100,
+        msgTarget: 'side',
+        maxLengthText: '查验备注长度最多100位',
+    });
+    //查验备注 标志
+    var field_CHECKFLAG_CHECKREMARK = {
+        xtype: 'fieldcontainer',
+        layout: 'hbox',
+        columnWidth: 0.25,
+        items: [chk_CHECKFLAG, txt_CHECKREMARK]
+    }
+
 
     formpanel_form = Ext.create('Ext.form.Panel', {
         id: "formpanel_form",
@@ -401,7 +465,7 @@
            { layout: 'column', height: 30, border: 0, items: [combo_portcode, combo_TRADEWAY2, field_TOTALNO, field_DIVIDENO] },
            { layout: 'column', height: 30, border: 0, items: [field_CONTRACTNO, field_REMARK2, field_GOODSNUM2, field_GOODGW2] },
            { layout: 'column', height: 30, border: 0, items: [field_SHIPPINGAGENT, field_INSPREMARK, field_COMMODITYNUM, chk_MANIFEST, chk_INSPFLAG] },//
-           { layout: 'column', height: 30, border: 0, items: [field_UNITYCODE] },//
+           { layout: 'column', height: 30, border: 0, items: [field_UNITYCODE, field_CHECKFLAG_CHECKREMARK] },//
         ]
     });
 }
@@ -494,7 +558,7 @@ function form_ini_decl() {
     var field_DECLARATIONCODE = Ext.create('Ext.form.field.Text', {
         id: 'DECLARATIONCODE',
         name: 'DECLARATIONCODE',
-        tabIndex: 15,
+        tabIndex: 16,
        // flex: 0.5,
         fieldLabel: '报关单号',
         // columnWidth: .25,
@@ -540,7 +604,7 @@ function form_ini_decl() {
         labelWidth: 60,
         flex: 1,
         margin: 0,
-        tabIndex: 16,
+        tabIndex: 17,
         minChars: '1',
         listeners: {
             blur: function (th, e, eOpts) {
@@ -567,7 +631,7 @@ function form_ini_decl() {
     var field_SHEETNUM = Ext.create('Ext.form.field.Number', {
         id: 'SHEETNUM',
         name: 'SHEETNUM',
-        tabIndex: 17,
+        tabIndex: 18,
         // flex: 0.5,
         fieldLabel: '张数',
         // columnWidth: .25,
@@ -591,7 +655,7 @@ function form_ini_decl() {
         valueField: 'CODE',
         triggerAction: 'all',
         forceSelection: true,
-        tabIndex: 18,
+        tabIndex: 19,
         queryMode: 'local',
         anyMatch: true,
        // columnWidth: .25,
@@ -620,7 +684,7 @@ function form_ini_decl() {
         valueField: 'CODE',
         triggerAction: 'all',
         forceSelection: true,
-        tabIndex: 19,
+        tabIndex: 20,
         queryMode: 'local',
         anyMatch: true,
         // columnWidth: .25,
@@ -638,7 +702,7 @@ function form_ini_decl() {
     var field_GOODSNUM = Ext.create('Ext.form.field.Number', {
         id: 'GOODSNUM',
         name: 'GOODSNUM',
-        tabIndex: 20,
+        tabIndex: 21,
        // flex: 0.5,
         fieldLabel: '件数',
         // columnWidth: .25,
@@ -652,7 +716,7 @@ function form_ini_decl() {
     var field_GOODGW = Ext.create('Ext.form.field.Number', {
         id: 'GOODGW',
         name: 'GOODGW',
-        tabIndex: 21,
+        tabIndex: 22,
       //  flex: 0.5,
           fieldLabel: '毛重',
         // columnWidth: .25,
@@ -664,7 +728,7 @@ function form_ini_decl() {
     var field_REMARK = Ext.create('Ext.form.field.Text', {
         id: 'REMARK',
         name: 'REMARK',
-        tabIndex: 22,
+        tabIndex: 23,
         //  flex: 0.5,
         fieldLabel: '备注',
         // columnWidth: .25,
@@ -687,7 +751,7 @@ function form_ini_decl() {
                         //
                         formpanel_decl.getForm().reset();
                         rownum = -1;
-                        Ext.getCmp('COMMODITYNUM').focus();
+                        Ext.getCmp('UNITYCODE').focus();
                         //field_DECLARATIONCODE.focus();//combo_TRADEWAY  field_DECLARATIONCODE field_GOODGW2
                     }
                 }
