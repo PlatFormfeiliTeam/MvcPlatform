@@ -222,7 +222,7 @@ namespace MvcPlatform.Controllers
 case h.INSPFLAG when '0' then '否(0)' when '1' then '是(1)' end as INSPFLAG,
 case h.MANIFEST when '0' then '否(0)' when '1' then '是(1)' end as MANIFEST,
 case h.CHECKFLAG when '0' then '否(0)' when '1' then '是(1)' end as CHECKFLAG,
-h.CHECKREMARK,
+h.CHECKREMARK,h.UNITYCODE,
 h.CUSNO,h.CONTRACTNO,h.TOTALNO,h.DIVIDENO,h.GOODSNUM||'/'||h.GOODGW as GOODSNUM,busi.name as BUSITYPE,cus.name as PORTCODE,
 trade.name as TRADEWAY,h.REMARK,h.DECLCODEQTY,h.DECLARATIONCODE,h.BUSIUNITNAME,h.SHIPPINGAGENT, h.INSPREMARK, h.COMMODITYNUM,
 h.ACCEPTTIME,h.MOENDTIME,h.COENDTIME, h.RECOENDTIME,h.REPSTARTTIME,h.REPENDTIME,h.PASSTIME 
@@ -844,6 +844,224 @@ where d.ordercode='" + obj.Value<string>("CODE") + "'";
             }
             return workbook;
         }
+
+        public string Import_Excel()
+        {
+            string msg = "";
+            try
+            {
+                HttpPostedFileBase postedFile = Request.Files["import"];//获取上传信息对象  
+                IWorkbook workbook = new XSSFWorkbook(postedFile.InputStream);
+                ISheet sheet = workbook.GetSheetAt(0);
+
+                if (checkImportExcelIsPass(sheet))
+                {
+                    List<string> listSql = new List<string>();
+                    //List<string> listCusno = new List<string>();
+                    //List<string> listContractno = new List<string>();
+
+                    string strSql = string.Empty;
+                    List<string> excelField = getExcelField();
+                    JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
+
+                    for (int i = 4; i <= sheet.LastRowNum; i++)
+                    {
+                        IRow row = sheet.GetRow(i) as XSSFRow;
+
+                        string code = Extension.getOrderCode();
+                        string cusno = row.GetCell(1).ToStringSafe().Trim(); //业务编号
+                        string contractno = row.GetCell(0).ToStringSafe().Trim();//合同号
+                        //listCusno.Add(cusno);
+                        //listContractno.Add(contractno);
+
+                        string field = string.Empty;
+                        string values = string.Empty;
+                        for (int j = 0; j < excelField.Count; j++)
+                        {
+                            field += "," + excelField[j];
+                            string value = checkFieldisValid(excelField[j], row.GetCell(j).ToStringSafe().Trim());
+                            values += ",'" + value + "'";
+                        }
+
+                        strSql = @"insert into RESIDENT_ORDER (code,RECEIVERUNITCODE,RECEIVERUNITNAME,SUBMITUSERID,SUBMITUSERNAME,status,SUBMITTIME,CREATETIME" + field + @") 
+                            select '" + code + "','" + json_user.Value<string>("CUSTOMERCODE") + "','" + json_user.Value<string>("CUSTOMERNAME") +
+                                          "','" + json_user.Value<string>("ID") + "','" + json_user.Value<string>("REALNAME") + "',10,sysdate,sysdate" + values + @" from dual ";
+                        // where not exists (select code from RESIDENT_ORDER where CUSNO='" + cusno + "' or CONTRACTNO='" + contractno + "')";
+                        if (cusno != string.Empty && contractno != string.Empty)
+                        {
+                            strSql += " where not exists (select code from RESIDENT_ORDER where CUSNO='" + cusno + "' or CONTRACTNO='" + contractno + "')";
+                        }
+                        else if (cusno != string.Empty)
+                        {
+                            strSql += " where not exists (select code from RESIDENT_ORDER where CUSNO='" + cusno + "')";
+                        }
+                        else if (contractno != string.Empty)
+                        {
+                            strSql += " where not exists (select code from RESIDENT_ORDER where CONTRACTNO='" + contractno + "')";
+                        }
+                        listSql.Add(strSql);
+                    }
+                    string result = "保存成功";
+                    if (listSql.Count > 0)
+                    {
+                        List<int> listResult = DBMgr.ExecuteNonQueryBatch_ForStationedFileld(listSql);
+                        if (listResult.Count > 0)
+                        {
+                            result = "部分保存成功";
+                        }
+                    }
+                    msg = "{success:true,msg:'" + result + "'}";
+                }
+                else
+                {
+                    msg = "{success:false,msg:'excel不正确，请下载正确的Excel模板'}";
+                }
+            }
+            catch (Exception ex)
+            {
+                msg = "{success:false,msg:'保存失败:" + ex.Message + "'}";
+            }
+
+            return msg;
+        }
+
+        private string checkFieldisValid(string field,string value)
+        {
+            switch (field)
+            {
+                case "goodsnum"://件数 为整数
+                case "commoditynum"://商品项数
+                    try
+                    {
+                        Convert.ToInt32(value);
+                    }
+                    catch (Exception)
+                    {
+                        value = string.Empty;
+                    }
+                    break;
+                case "goodgw"://毛重
+                    try
+                    {
+                        Convert.ToDouble(value);
+                    }
+                    catch (Exception)
+                    {
+                        value = string.Empty;
+                    }
+                    break;
+                case "checkflag"://查验标志
+                case "inspflag"://法检标志
+                case "manifest"://舱单
+                    if (value != "1")
+                    {
+                        value = "0";
+                    }
+                    break;
+            }
+            return value;
+        }
+
+        private List<string> getExcelField()
+        {
+            //string cusno = row.GetCell(0).ToStringSafe().Trim(); //业务编号
+            //string busitype = row.GetCell(1).ToStringSafe().Trim(); //业务类型
+            //string tradeway = row.GetCell(2).ToStringSafe().Trim(); //监管方式
+            //string portcode = row.GetCell(3).ToStringSafe().Trim();//进出境关别
+            //string busiunitcode = row.GetCell(4).ToStringSafe().Trim();//经营单位代码
+            //string busiunitname = row.GetCell(5).ToStringSafe().Trim();//经营单位名称
+            //string goodsnum = row.GetCell(6).ToStringSafe().Trim();//件数
+            //string goodgw = row.GetCell(7).ToStringSafe().Trim(); //毛重
+            //string contractno = row.GetCell(8).ToStringSafe().Trim();//合同号
+            //string totalno = row.GetCell(9).ToStringSafe().Trim();//总单号
+            //string divideno = row.GetCell(10).ToStringSafe().Trim();//分单号
+            //string manifest = row.GetCell(11).ToStringSafe().Trim();//舱单
+            //string inspflag = row.GetCell(12).ToStringSafe().Trim();//法检标志
+            //string remark = row.GetCell(13).ToStringSafe().Trim();//备注
+            //string declarationcode = row.GetCell(14).ToStringSafe().Trim();//报关单
+            //string shippingagent = row.GetCell(15).ToStringSafe().Trim();//货运代理
+            //string inspremark = row.GetCell(16).ToStringSafe().Trim();//报检备注
+            //string commoditynum = row.GetCell(17).ToStringSafe().Trim();//商品项数
+            //string unitycode = row.GetCell(18).ToStringSafe().Trim();//统一编号
+            //string checkflag = row.GetCell(19).ToStringSafe().Trim();//查验标志
+            //string checkremark = row.GetCell(20).ToStringSafe().Trim();//查验备注
+            List<string> list = new List<string>() 
+                {
+                  "contractno", 
+                  "cusno", 
+                //  "declarationcode", 
+                  "totalno",
+                  "divideno", 
+                  "goodsnum",
+                  "goodgw",
+                  "shippingagent",
+                  "checkflag",
+                  "checkremark",
+                  "inspflag", 
+                  "inspremark",
+                  "manifest",      
+                  "remark",
+                  "commoditynum",
+                  "unitycode",                   
+                  "busitype", 
+                  "tradeway", 
+                  "portcode",
+                  "busiunitcode", 
+                  "busiunitname"  
+ };
+            return list;
+        }
+
+        /// <summary>
+        /// 检查excel是否正确
+        /// </summary>
+        /// <returns>true 合格 ，false 不合格</returns>
+        private bool checkImportExcelIsPass(ISheet sheet)
+        {
+            IRow row = sheet.GetRow(0) as XSSFRow;
+            if (row == null)
+            {
+                return false;
+            }
+            if (row.GetCell(0).ToStringSafe() != "驻厂服务模板")
+            {
+                return false;
+            }
+            row = sheet.GetRow(3) as XSSFRow;
+            if (row == null)
+            {
+                return false;
+            }
+            //
+            if (row.GetCell(0).ToStringSafe() != "合同号" ||//
+                row.GetCell(1).ToStringSafe() != "企业编号" ||//
+                row.GetCell(2).ToStringSafe() != "总单号" ||//
+                row.GetCell(3).ToStringSafe() != "分单号" ||//
+                row.GetCell(4).ToStringSafe() != "件数" ||//
+                row.GetCell(5).ToStringSafe() != "毛重" ||//
+                row.GetCell(6).ToStringSafe() != "货运代理" ||//
+                row.GetCell(7).ToStringSafe() != "查验标志" ||//
+                row.GetCell(8).ToStringSafe() != "查验备注" ||//
+                row.GetCell(9).ToStringSafe() != "法检标志" ||//
+                row.GetCell(10).ToStringSafe() != "报检备注" ||//
+                row.GetCell(11).ToStringSafe() != "舱单" ||//
+                row.GetCell(12).ToStringSafe() != "备注" ||//
+                row.GetCell(13).ToStringSafe() != "商品项数" ||//
+                row.GetCell(14).ToStringSafe() != "统一编号" ||//
+                row.GetCell(15).ToStringSafe() != "业务类型代码" ||//
+                row.GetCell(16).ToStringSafe() != "监管方式代码" ||//
+                row.GetCell(17).ToStringSafe() != "进出境关别代码" ||//
+                row.GetCell(18).ToStringSafe() != "经营单位代码" ||//
+                row.GetCell(19).ToStringSafe() != "经营单位名称" //
+                )//查验备注
+            {
+                return false;
+            }
+
+
+            return true;
+        }
+
 
 
     }

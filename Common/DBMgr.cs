@@ -202,5 +202,47 @@ namespace MvcPlatform.Common
             return retcount;
         }
 
+
+
+        public static List<int> ExecuteNonQueryBatch_ForStationedFileld(List<string> listSqls)
+        {
+            OracleConnection Conn = null;
+            OracleCommand Cmd = new OracleCommand();
+            OracleTransaction trans = null;
+            try
+            {
+                List<int> list = new List<int>();
+                int count = 0;
+                Conn = new OracleConnection(ConnectionString);
+                Cmd.Connection = Conn;
+                Cmd.CommandType = CommandType.Text;
+
+                Conn.Open();
+                trans = Conn.BeginTransaction();
+                Cmd.Transaction = trans;
+                for (int i = 0; i < listSqls.Count;i++ )
+                {
+                    Cmd.CommandText = listSqls[i];
+                    count = Cmd.ExecuteNonQuery();
+
+                    if (count == 0)
+                    {
+                        list.Add(i);
+                        //msg += "第" + (i + 1) + "笔     企业编号：" + listCusno [i]+ "    合同号：" + listContractno[i];
+                    }
+                }
+                trans.Commit();
+                Conn.Close();
+                return list;
+            }
+            catch (Exception)
+            {
+                trans.Rollback();
+                Conn.Close();
+                throw;
+            }
+        }
+
+
     }
 }

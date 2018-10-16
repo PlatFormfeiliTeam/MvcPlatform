@@ -12,6 +12,7 @@
 <script src="~/Views/StationedFileld/Query.js?t=@Version"></script>
 <script src="~/Views/StationedFileld/BatchMaintance.js?t=@Version"></script>
 <script src="~/Views/StationedFileld/ExportExcel.js?t=@Version"></script>
+<script src="~/Views/StationedFileld/Import.js?t=@Version"></script>
 
 
 <script type="text/javascript">
@@ -53,7 +54,7 @@
                 Ext.regModel('TRADE', {
                     fields: ['CODE','SUBMITTIME','STATUS','INSPFLAG','CUSNO','CONTRACTNO','TOTALNO','DIVIDENO','MANIFEST','GOODSNUM','BUSITYPE','PORTCODE','TRADEWAY'
 , 'REMARK', 'DECLCODEQTY', 'DECLARATIONCODE', 'BUSIUNITNAME', 'ACCEPTTIME', 'MOENDTIME', 'COENDTIME', 'RECOENDTIME', 'REPSTARTTIME', 'REPENDTIME', 'PASSTIME'
-, 'SHIPPINGAGENT', 'INSPREMARK', 'COMMODITYNUM', 'CHECKFLAG','CHECKREMARK'
+, 'SHIPPINGAGENT', 'INSPREMARK', 'COMMODITYNUM', 'CHECKFLAG', 'CHECKREMARK', 'UNITYCODE'
                     ]
                 })
                 store_Trade = Ext.create('Ext.data.JsonStore', {
@@ -114,7 +115,8 @@
                     { header: '监管方式', dataIndex: 'TRADEWAY', width: 70 },
                     { header: '备注', dataIndex: 'REMARK', width: 100 },
                     { header: '报关套数', dataIndex: 'DECLCODEQTY', width: 70 },
-                    { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 100 },
+                    { header: '统一编号', dataIndex: 'UNITYCODE', width: 100 },//
+                    { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 100 },//
                     { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 100 },
                     { header: '货运代理', dataIndex: 'SHIPPINGAGENT', width: 100 },
                     { header: '报检备注', dataIndex: 'INSPREMARK', width: 100 },//
@@ -208,6 +210,7 @@
             <button id="btnDelete" onclick="del()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-trash-o"></i>&nbsp;删除</button>
             <button id="btn_mutiedit" type="button" class="btn btn-primary btn-sm dropdown-toggle" onclick="maintance()"><i class="fa fa-pencil-square-o fa-fw"></i>&nbsp;批量维护</button>
             @*<button id="btnWebSiteQuery" onclick="WebSiteQuery()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-truck"></i>&nbsp;网站速查</button>*@
+            <button id="btnWebSiteQuery" onclick="Import()" type="button" class="btn btn-primary btn-sm"><i class="fa fa-upload"></i>&nbsp;导入</button>
         </div>
         <div class="btn-group fr" role="group">
             <button onclick="Select(0)" class="btn btn-primary btn-sm"><i class="fa fa-search"></i>&nbsp;查询</button>
