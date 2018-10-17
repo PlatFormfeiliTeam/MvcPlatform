@@ -30,9 +30,14 @@
 
 <script type="text/javascript">
 
-    var condition = getQueryString("condition");
-    var rowIndex = getQueryString("rowIndex"); 
-    var currentPage = getQueryString("currentPage");
+    //var condition = getQueryString("condition");
+    //var rowIndex = getQueryString("rowIndex"); 
+    //var currentPage = getQueryString("currentPage");
+    var store_Trade;
+    var grid,gridData;
+    var rowIndex = 0;
+    var currentPage, pageCount;
+    var pageSize = 20;
 
     Ext.onReady(function () {
         //订单编号
@@ -159,33 +164,33 @@
             name: 'GOODSNUM',
             //tabIndex: 10,
             readOnly: true,
-            flex: 0.5,
+            flex: 1,
             fieldLabel: '件数/毛重',
-            margin: 0,
+            //margin: 0,
             fieldStyle: 'background-color: #E0E0E0; background-image: none;',
             // columnWidth: .4,
           //  labelWidth: 60,
             //allowDecimals: false,
             //hideTrigger: true,
         });
-        //毛重
-        var field_GOODGW = Ext.create('Ext.form.field.Text', {
-            id: 'GOODGW',
-            name: 'GOODGW',
-            readOnly: true,
-            margin: 0,
-           // tabIndex: 11,
-            flex: 0.5,
-            fieldStyle: 'background-color: #E0E0E0; background-image: none;',
-          //  hideTrigger: true,
-        });
-        //毛重件数
-        var field_GOODSNUM_GOODGW = {
-            xtype: 'fieldcontainer',
-            layout: 'hbox',
-            columnWidth: 0.25,
-            items: [field_GOODSNUM, field_GOODGW]
-        }
+        ////毛重
+        //var field_GOODGW = Ext.create('Ext.form.field.Text', {
+        //    id: 'GOODGW',
+        //    name: 'GOODGW',
+        //    readOnly: true,
+        //    margin: 0,
+        //   // tabIndex: 11,
+        //    flex: 0.5,
+        //    fieldStyle: 'background-color: #E0E0E0; background-image: none;',
+        //  //  hideTrigger: true,
+        //});
+        ////毛重件数
+        //var field_GOODSNUM_GOODGW = {
+        //    xtype: 'fieldcontainer',
+        //    layout: 'hbox',
+        //    columnWidth: 0.25,
+        //    items: [field_GOODSNUM, field_GOODGW]
+        //}
 
         //舱单
         var chk_MANIFEST = Ext.create('Ext.form.field.Checkbox', {
@@ -210,7 +215,7 @@
         //});
 
         var bbar_r = '<div class="btn-group" role="group">'
-            + '<button type="button" onclick="create_save()" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;保存</button>'
+            + '<button type="button" onclick="save_MANIFEST()" id="btn_submitorder" class="btn btn-primary btn-sm"><i class="fa fa-hand-o-up"></i>&nbsp;保存</button>'
 + '</div>';
         var bbar = Ext.create('Ext.toolbar.Toolbar', {
             items: ['->', bbar_r]//bbar_l, 
@@ -224,17 +229,17 @@
         });
 
         ////上一条
-        var field_Last = '<a href="javascript:reload(-);" style="font-size:16px;">上一条</a>&nbsp;&nbsp;&nbsp;&nbsp;';
+        var field_Last = '<a id="field_Last" href="javascript:reload(0);" style="font-size:16px;">上一条</a>&nbsp;&nbsp;&nbsp;&nbsp;';
         //var field_Last = Ext.create('Ext.form.Label', {
         //    id: 'field_Last',
-        //    html: '<a href="javascript:reload(-);" style="font-size:16px;">上一条</a>&nbsp;&nbsp;&nbsp;&nbsp;',
+        //    html: '<a href="javascript:reload(0);" style="font-size:16px;">上一条</a>&nbsp;&nbsp;&nbsp;&nbsp;',
         //    // flex: 1,
         //});
         ////下一条
-        var field_Next = '<a href="javascript:reload(+);" style="font-size:16px;">下一条</a>&nbsp;&nbsp;&nbsp;&nbsp;';
+        var field_Next = '<a id="field_Next" href="javascript:reload(1);" style="font-size:16px;">下一条</a>&nbsp;&nbsp;&nbsp;&nbsp;';
         //var field_Next = Ext.create('Ext.form.Label', {
         //    id: 'field_Next',
-        //    html: '<a href="javascript:reload(+);" style="font-size:16px;">下一条</a>&nbsp;&nbsp;&nbsp;&nbsp;',
+        //    html: '<a href="javascript:reload(1);" style="font-size:16px;">下一条</a>&nbsp;&nbsp;&nbsp;&nbsp;',
         //    // flex: 1,
         //});
         var label_baseinfo = {
@@ -261,8 +266,26 @@
             items: [
             { layout: 'column', border: 0, items: [field_CODE, field_CUSNO] },//, field_Last, field_Next
             { layout: 'column', border: 0, items: [field_CONTRACTNO, com_PORTCODE, com_TRADEWAY, field_BUSIUNITNAME] },
-            { layout: 'column', border: 0, items: [field_TOTALNO, field_DIVIDENO, field_GOODSNUM_GOODGW, chk_MANIFEST] },
-            ]
+            { layout: 'column', border: 0, items: [field_TOTALNO, field_DIVIDENO, field_GOODSNUM, chk_MANIFEST] },
+            ],
+            listeners: {
+                afterrender: function (th, eOpts) {
+                    grid = opener.Ext.getCmp('gridpanel');//gridData
+                    gridData = grid.getStore().getRange(0);
+                    for (i = 0; i < gridData.length; i++)
+                    {
+                        if (gridData[i].data.MANIFEST == "是(1)") {
+                            gridData[i].data.MANIFEST = "1";
+                        }
+                        else {
+                            gridData[i].data.MANIFEST = "0";
+                        }
+                    }
+                    currentPage = grid.getStore().currentPage;
+                    pageCount = Math.ceil(grid.getStore().getTotalCount() / 20);; //Math.ceil
+                    initData();
+                }
+            }
         });
 
 
@@ -315,7 +338,120 @@
             
         }
 
+        Ext.regModel('TRADE', {
+            fields: ['CODE', 'SUBMITTIME', 'STATUS', 'INSPFLAG', 'CUSNO', 'CONTRACTNO', 'TOTALNO', 'DIVIDENO', 'MANIFEST', 'GOODSNUM', 'BUSITYPE', 'PORTCODE', 'TRADEWAY'
+, 'REMARK', 'DECLCODEQTY', 'DECLARATIONCODE', 'BUSIUNITNAME', 'ACCEPTTIME', 'MOENDTIME', 'COENDTIME', 'RECOENDTIME', 'REPSTARTTIME', 'REPENDTIME', 'PASSTIME'
+, 'SHIPPINGAGENT', 'INSPREMARK', 'COMMODITYNUM', 'CHECKFLAG', 'CHECKREMARK', 'UNITYCODE'
+            ]
+        })
+        store_Trade = Ext.create('Ext.data.JsonStore', {
+            model: 'TRADE',
+            pageSize: 20,
+        })
+
     });
+
+    function loadData(type) {
+        //var grid = opener.Ext.getCmp('gridpanel');//pgbar grid.getStore().getRange(0,store.getCount());    //得到grid所有的行 
+        if (type == 1) {
+            if (rowIndex < gridData.length-1) {
+                rowIndex++;
+                showData();
+            }
+            else {
+                //当index等于pagesize时就要判断是否重新加载数据
+                if (currentPage == pageCount) {
+                    Ext.MessageBox.alert('提示', '已经是最后一页！');
+                }
+                else {
+                    //加载上一页数据
+                    currentPage++;
+                    refreshData();
+                }
+            }
+        }
+        else {
+            if (rowIndex > 0) {
+                rowIndex--;
+                showData();
+            }
+            else {
+                //当index等于0时就要判断是否要重新加载数据了
+                if (currentPage == 1) {
+                    Ext.MessageBox.alert('提示', '已经是第一页！');
+                }
+                else {
+                    //加载上一页数据
+                    currentPage--;
+                    refreshData();
+                }
+            }
+        }
+    }
+
+    function refreshData() {
+        startrow = pageSize * (currentPage - 1);//(parseInt(currentPage) - 1);
+        store_Trade.proxy = opener.Ext.getCmp('gridpanel').getStore().getProxy();
+        store_Trade.getProxy().extraParams.start = startrow;
+        store_Trade.load(function (records, operation, success) {
+            gridData = records;
+            for (i = 0; i < gridData.length; i++) {
+                if (gridData[i].data.MANIFEST == "是(1)") {
+                    gridData[i].data.MANIFEST = "1";
+                }
+                else {
+                    gridData[i].data.MANIFEST = "0";
+                }
+            }
+
+            rowIndex = 0;
+            initData();
+            //currentPage = store_Trade.currentPage;
+            pageCount = Math.ceil(store_Trade.getTotalCount() / 20);; //Math.ceil
+        });
+    }
+
+    function showData() {
+        var data = gridData[rowIndex].data;
+        Ext.getCmp('formpanel').getForm().setValues(data);
+    }
+    function initData() {
+        if (gridData.length == 0) {
+            $("#field_Last").hide();//$("#field_Last").hide() btn_submitorder
+            $("#field_Next").hide();//Ext.getCmp('field_Next').setDisabled(true)
+            $("#btn_submitorder").hide();
+        } else {
+            showData();
+        }
+    }
+
+    function reload(type) {
+        loadData(type);
+    }
+
+    function save_MANIFEST() {
+        var ordercode = Ext.getCmp('field_CODE').getValue();
+        var MANIFEST = Ext.getCmp('MANIFEST').getValue();
+        Ext.Ajax.request({
+            url: '/StationedFileld/save_MANIFEST',
+            params: { ORDERCODE: ordercode, MANIFEST: MANIFEST },
+            success: function (response) {
+                var result = Ext.decode(response.responseText);
+                if (result.success) {
+                    if (MANIFEST) {
+                        gridData[rowIndex].data.MANIFEST = "1";
+                    } else {
+                        gridData[rowIndex].data.MANIFEST = "0";
+                    }
+                    Ext.MessageBox.alert('提示', '保存成功！');
+                }
+                else {
+                    Ext.MessageBox.alert('提示',result.msg);
+                }
+            }
+        });
+    }
+
 
 </script>
 

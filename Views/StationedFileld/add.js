@@ -1,5 +1,7 @@
-﻿function form_ini() {
+﻿var regInt = new RegExp("^[0-9]*[1-9][0-9]*$");//
+var regFloat = new RegExp("^\\d+(\\.\\d+)?$");//
 
+function form_ini() {
     //业务状态
     var store_STATUS = Ext.create('Ext.data.JsonStore', {
         fields: ['CODE', 'NAME'],
@@ -278,7 +280,7 @@
     });
 
     //件数
-    var field_GOODSNUM2 = Ext.create('Ext.form.field.Number', {
+    var field_GOODSNUM2 = Ext.create('Ext.form.field.Text', {
         id: 'GOODSNUM2',
         name: 'GOODSNUM2',
         tabIndex: 10,
@@ -288,12 +290,14 @@
         // columnWidth: .4,
         columnWidth: .25,
         labelWidth: 60,
-        allowDecimals: false,
+       // allowDecimals: false,
         hideTrigger: true,
         msgTarget: 'side',
+        regex: regInt,
+        regexText: '件数只能为整数',//regFloat
     });
     //毛重
-    var field_GOODGW2 = Ext.create('Ext.form.field.Number', {
+    var field_GOODGW2 = Ext.create('Ext.form.field.Text', {
         id: 'GOODGW2',
         name: 'GOODGW2',
        // margin: 0,
@@ -304,6 +308,8 @@
         labelWidth: 60,
         columnWidth: .25,
         msgTarget: 'side',
+        regex: regFloat,
+        regexText: '毛重只能为数字',//
     });
     ////毛重件数
     //var field_GOODSNUM_GOODGW = {
@@ -340,7 +346,7 @@
         msgTarget: 'side',
     });
     //商品项数
-    var field_COMMODITYNUM = Ext.create('Ext.form.field.Number', {
+    var field_COMMODITYNUM = Ext.create('Ext.form.field.Text', {
         id: 'COMMODITYNUM',
         name: 'COMMODITYNUM',
         tabIndex: 14,
@@ -350,9 +356,11 @@
         // columnWidth: .4,
         columnWidth: .25,
         labelWidth: 60,
-        allowDecimals: false,
+       // allowDecimals: false,
         hideTrigger: true,
         msgTarget: 'side',
+        regex: regInt,
+        regexText: '商品项数只能为整数',
     });
 
     //舱单
@@ -628,7 +636,7 @@ function form_ini_decl() {
     }
 
     //张数
-    var field_SHEETNUM = Ext.create('Ext.form.field.Number', {
+    var field_SHEETNUM = Ext.create('Ext.form.field.Text', {
         id: 'SHEETNUM',
         name: 'SHEETNUM',
         tabIndex: 18,
@@ -636,9 +644,11 @@ function form_ini_decl() {
         fieldLabel: '张数',
         // columnWidth: .25,
         labelWidth: 60,
-        allowDecimals: false,
+       // allowDecimals: false,
         hideTrigger: true,
         msgTarget: 'side',
+        regex: regInt,
+        regexText: '张数只能为整数',
     });
     //删改单
     var store_MODIFYFLAG = Ext.create('Ext.data.JsonStore', {
@@ -699,7 +709,7 @@ function form_ini_decl() {
         }
     });
     //件数
-    var field_GOODSNUM = Ext.create('Ext.form.field.Number', {
+    var field_GOODSNUM = Ext.create('Ext.form.field.Text', {
         id: 'GOODSNUM',
         name: 'GOODSNUM',
         tabIndex: 21,
@@ -707,13 +717,15 @@ function form_ini_decl() {
         fieldLabel: '件数',
         // columnWidth: .25,
         labelWidth: 60,
-        allowDecimals: false,
+       // allowDecimals: false,
         hideTrigger: true,
         msgTarget: 'side',
+        regex: regInt,
+        regexText: '件数只能为整数',
     });
 
     //毛重
-    var field_GOODGW = Ext.create('Ext.form.field.Number', {
+    var field_GOODGW = Ext.create('Ext.form.field.Text', {
         id: 'GOODGW',
         name: 'GOODGW',
         tabIndex: 22,
@@ -723,6 +735,8 @@ function form_ini_decl() {
           labelWidth: 60,
           hideTrigger: true,
           msgTarget: 'side',
+          regex: regFloat,
+          regexText: '毛重只能为数字',//
     });
     //备注
     var field_REMARK = Ext.create('Ext.form.field.Text', {

@@ -1063,6 +1063,32 @@ where d.ordercode='" + obj.Value<string>("CODE") + "'";
         }
 
 
+        public string save_MANIFEST(string ORDERCODE,string MANIFEST)
+        {
+            string msg = "{success:false,msg:'未知错误'}";
+            try
+            {
+                if (MANIFEST == "on" || MANIFEST == "true" || MANIFEST == "1")
+                {
+                    MANIFEST = "1";
+                }
+                else
+                {
+                    MANIFEST = "0";
+                }
+                string strSql = "update RESIDENT_ORDER set MANIFEST='" + MANIFEST + "'  where code='" + ORDERCODE + "'";
+                DBMgr.ExecuteNonQuery(strSql);
+
+                msg = "{success:true}";
+            }
+            catch (Exception ex)
+            {
+                msg = "{success:false,msg:'保存失败："+ex.Message+"'}";
+            }
+            return msg;
+        }
+
+
 
     }
 }
