@@ -1510,10 +1510,90 @@ namespace MvcPlatform.Controllers
             sql += @" where (det.STATUS=130 or det.STATUS=110) and det.isinvalid=0 and ort.isinvalid=0 
                         and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where
                     + @" and a.ordercode is null";
-
+            //加上条件如果委托类型是核注清单的则两单的状态为申报完结的则显示【之前是没有核注清单的,现在加上核注清单采用union的方式拼接sql】
             if (busitypeid == "40-41")
             {
+                //1.guiqing.he
                 sql += @" and b.ASSOCIATENO is null";
+                //2.yangyang.zhao
+                sql += @" union  select det.ID,
+                       det.CODE,
+                       det.ORDERCODE,
+                       det.CUSTOMSSTATUS,
+                       det.ISPRINT,
+                       det.SHEETNUM,
+                       det.modifyflag,
+                       det.transname as pretransname,
+                       det.delordertime,
+                       det.delorderusername,
+                       det.modordertime,
+                       det.modorderusername,
+                       det.modfinishtime,
+                       det.modfinishusername,
+                       det.inspectioncode,
+                       det.inspstatus,
+                       lda.declarationcode,
+                       to_char(lda.reptime, 'yyyy-mm-dd') reptime,
+                       lda.contractno,
+                       lda.goodsnum,
+                       lda.goodsnw,
+                       lda.goodsgw,
+                       lda.blno,
+                       lda.transname,
+                       lda.voyageno,
+                       lda.portcode,
+                       lda.trademethod,
+                       lda.declkind DECLWAY,
+                       lda.declkind DECLWAYNAME,
+                       ort.BUSITYPE,
+                       ort.CONTRACTNO CONTRACTNOORDER,
+                       ort.REPWAYID,
+                       ort.REPWAYID REPWAYNAME,
+                       ort.CUSNO,
+                       ort.IETYPE,
+                       ort.ASSOCIATENO,
+                       ort.CORRESPONDNO,
+                       ort.customercode,
+                       ort.CUSTOMERNAME,
+                       ort.CREATETIME,
+                       ort.busiunitcode,
+                       ort.busiunitname,
+                       ort.totalno,
+                       ort.divideno,
+                       ort.secondladingbillno,
+                       cus.SCENEDECLAREID,
+                       lv.status VERSTATUS,
+                       lv.NOTE
+                  from (with tab as (select l1.code, l1.associateno, l1.entrusttype
+                                       from list_order l1
+                                       left join list_order l2
+                                         on l1.associateno = l2.associateno
+                                      where l2.entrusttype = '10'
+                                        and l2.associateno is not null
+                                        and l1.code <> l2.code) 
+                         select ld.*
+                           from list_declaration ld
+                          inner join tab
+                             on ld.ordercode = tab.code
+                           left join (select ordercode
+                                        from list_declaration
+                                       where isinvalid = 0
+                                         and STATUS != 130
+                                         and STATUS != 110) a
+                             on ld.ordercode = a.ordercode
+                          where (ld.status = 130 or ld.status = 110)
+                            and a.ordercode is null) det        
+                           left join list_order ort
+                             on det.ordercode = ort.code         
+                           left join list_declaration_after lda
+                             on det.code = lda.code
+                            and lda.csid = 1         
+                           left join list_verification lv
+                             on lda.declarationcode = lv.declarationcode        
+                           left join cusdoc.sys_customer cus
+                             on ort.receiverunitcode = cus.code";
+                sql += @" where (det.STATUS=130 or det.STATUS=110) and det.isinvalid=0 and ort.isinvalid=0 
+                        and instr('" + busitypeid + "',ort.BUSITYPE)>0 " + where;
             }
 
             return sql;
