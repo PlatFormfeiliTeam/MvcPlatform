@@ -225,7 +225,7 @@ case h.CHECKFLAG when '0' then '否(0)' when '1' then '是(1)' end as CHECKFLAG,
 h.CHECKREMARK,h.UNITYCODE,
 h.CUSNO,h.CONTRACTNO,h.TOTALNO,h.DIVIDENO,h.GOODSNUM||'/'||h.GOODGW as GOODSNUM,busi.name as BUSITYPE,cus.name as PORTCODE,
 trade.name as TRADEWAY,h.REMARK,h.DECLCODEQTY,h.DECLARATIONCODE,h.BUSIUNITNAME,h.SHIPPINGAGENT, h.INSPREMARK, h.COMMODITYNUM,
-h.ACCEPTTIME,h.MOENDTIME,h.COENDTIME, h.RECOENDTIME,h.REPSTARTTIME,h.REPENDTIME,h.PASSTIME 
+h.ACCEPTTIME,h.MOENDTIME,h.COENDTIME, h.RECOENDTIME,h.REPSTARTTIME,h.REPENDTIME,h.PASSTIME,h.ARRANGETIME
 from RESIDENT_ORDER h
 left join SYS_STATUS sta on sta.code=h.status
 left join cusdoc.sys_busitype busi on busi.code=h.BUSITYPE
@@ -270,6 +270,8 @@ h.REPSTARTTIME as 申报时间,
 h.REPSTARTNAME as 申报人,
 h.REPENDTIME as 申报完成时间,
 h.REPENDNAME as 申报完成人,
+h.ARRANGETIME as 理单时间,
+h.ARRANGENAME as 理单人,
 h.PASSTIME as 通关放行时间 ,
 h.PASSNAME as 通关放行人
 from RESIDENT_ORDER h
@@ -547,6 +549,11 @@ TOTALNO,DIVIDENO,MANIFEST,INSPFLAG,REMARK,RECEIVERUNITCODE,RECEIVERUNITNAME,CREA
                     status = "120";//申报完成
                     strSql += " REPENDTIME=to_date('" + jsonOrderTimedata.Value<string>("REPENDTIME") + "','yyyy/mm/dd hh24:mi:ss'),REPENDID='" + jsonOrderTimedata.Value<string>("REPENDID") + "',REPENDNAME='" + jsonOrderTimedata.Value<string>("REPENDNAME") + "', ";
                 }
+                if (jsonOrderTimedata.Value<string>("ARRANGETIME") != "null" && jsonOrderTimedata.Value<string>("ARRANGETIME") != "")
+                {
+                    //status = "120";//申报完成
+                    strSql += " ARRANGETIME=to_date('" + jsonOrderTimedata.Value<string>("ARRANGETIME") + "','yyyy/mm/dd hh24:mi:ss'),ARRANGEID='" + jsonOrderTimedata.Value<string>("ARRANGEID") + "',ARRANGENAME='" + jsonOrderTimedata.Value<string>("ARRANGENAME") + "', ";
+                }
                 if (jsonOrderTimedata.Value<string>("PASSTIME") != "null" && jsonOrderTimedata.Value<string>("PASSTIME") != "")
                 {
                     status = "160";//通关放行
@@ -602,7 +609,7 @@ values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}',sysdate,'{8}','{9}')";
             string strSql = @"select code,cusno,busitype,tradeway as TRADEWAY2,portcode,busiunitcode,busiunitname,busiunitnum
 ,goodsnum as GOODSNUM2,goodgw as GOODGW2,contractno,totalno,divideno,manifest,status,inspflag,remark as REMARK2,submittime,submituserid,submitusername,accepttime,acceptuserid,acceptusername,moendtime,moendid,moendname,coendtime,coendid,coendname,recoendtime,recoendid,recoendname,repstarttime,repstartid,repstartname,rependtime
 ,rependid,rependname,passtime,passid,passname,receiverunitcode,receiverunitname,createtime,declcodeqty,declarationcode,
-SHIPPINGAGENT, INSPREMARK, COMMODITYNUM,UNITYCODE,CHECKFLAG,CHECKREMARK  from RESIDENT_ORDER where code='" + ordercode + "'";
+SHIPPINGAGENT, INSPREMARK, COMMODITYNUM,UNITYCODE,CHECKFLAG,CHECKREMARK,ARRANGETIME,ARRANGENAME,ARRANGEID  from RESIDENT_ORDER where code='" + ordercode + "'";
             formOrderData = JsonConvert.SerializeObject(DBMgr.GetDataTable(strSql), iso).TrimStart('[').TrimEnd(']');
 
             strSql = "select * from RESIDENT_DECLARATION where ordercode='"+ordercode+"' order by NO";

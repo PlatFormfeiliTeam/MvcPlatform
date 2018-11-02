@@ -54,7 +54,7 @@
                 Ext.regModel('TRADE', {
                     fields: ['CODE','SUBMITTIME','STATUS','INSPFLAG','CUSNO','CONTRACTNO','TOTALNO','DIVIDENO','MANIFEST','GOODSNUM','BUSITYPE','PORTCODE','TRADEWAY'
 , 'REMARK', 'DECLCODEQTY', 'DECLARATIONCODE', 'BUSIUNITNAME', 'ACCEPTTIME', 'MOENDTIME', 'COENDTIME', 'RECOENDTIME', 'REPSTARTTIME', 'REPENDTIME', 'PASSTIME'
-, 'SHIPPINGAGENT', 'INSPREMARK', 'COMMODITYNUM', 'CHECKFLAG', 'CHECKREMARK', 'UNITYCODE'
+, 'SHIPPINGAGENT', 'INSPREMARK', 'COMMODITYNUM', 'CHECKFLAG', 'CHECKREMARK', 'UNITYCODE', 'ARRANGETIME'
                     ]
                 })
                 store_Trade = Ext.create('Ext.data.JsonStore', {
@@ -130,6 +130,7 @@
                     { header: '复审完成时间', dataIndex: 'RECOENDTIME', width: 130 },
                     { header: '申报时间', dataIndex: 'REPSTARTTIME', width: 130 },
                     { header: '申报完成时间', dataIndex: 'REPENDTIME', width: 130 },
+                    { header: '理单时间', dataIndex: 'ARRANGETIME', width: 130 },
                     { header: '通关放行时间', dataIndex: 'PASSTIME', width: 130 }
                     ],
                     listeners:

@@ -1266,6 +1266,60 @@ function form_ini_time() {
         items: [txtPASSTIME, txtPASSNAME, txtPASSID]
     }
 
+    var txtARRANGETIME = Ext.create('Ext.form.field.Text', {
+        id: 'ARRANGETIME',
+        name: 'ARRANGETIME',
+        fieldLabel: '理单时间',
+        labelWidth: 60,
+        readOnly: true,
+        margin: 0,
+        flex: .7,
+        listeners: {
+            render: function (p) {
+                p.getEl().on('dblclick', function () {
+                    if (txtARRANGETIME.getValue() == null || txtARRANGETIME.getValue() == "") {
+                        getServerTime('ARRANGETIME');
+                        // txtPASSTIME.setValue(Ext.Date.format(new Date(), 'Y-m-d H:i:s')); //new Date()
+                        txtARRANGENAME.setValue(common_data_curuser.REALNAME);
+                        txtARRANGEID.setValue(common_data_curuser.ID);
+                        flagARRANGETIME = 0;
+                    }
+                });
+            },
+            specialkey: function (field, e) {
+                if (e.keyCode == 46) {
+                    //46 代表del键
+                    if (flagARRANGETIME == 0) {
+                        txtARRANGETIME.setValue(''); //new Date()
+                        txtARRANGENAME.setValue('');
+                        txtARRANGEID.setValue('');
+                    }
+                }
+            }
+        }
+    });
+    var txtARRANGENAME = Ext.create('Ext.form.field.Text', {
+        id: 'ARRANGENAME',
+        name: 'ARRANGENAME',
+        readOnly: true,
+        margin: 0,
+        flex: .3,
+    });
+    var txtARRANGEID = Ext.create('Ext.form.field.Text', {
+        id: 'ARRANGEID',
+        name: 'ARRANGEID',
+        //margin: 0,
+        //flex: .3,
+        hidden: true,
+    });
+    //理单时间
+    var date_arrangeTime = {
+        xtype: 'fieldcontainer',
+        layout: 'hbox',
+        columnWidth: 0.25,
+        items: [txtARRANGETIME, txtARRANGENAME, txtARRANGEID]
+    }
+
     ///////////////////////////
 
     formpanel_time = Ext.create('Ext.form.Panel', {
@@ -1286,7 +1340,8 @@ function form_ini_time() {
         },
         items: [
            { layout: 'column', height: 30, border: 0, margin: '5 0 0 0', items: [date_SUBMIT, date_ACCEPTTIME, date_MOENDTIME, date_COENDTIME] },
-           { layout: 'column', height: 30, border: 0, items: [date_RECOENDTIME, date_REPSTARTTIME, date_REPENDTIME, date_PASSTIME] }
+           { layout: 'column', height: 30, border: 0, items: [date_RECOENDTIME, date_REPSTARTTIME, date_REPENDTIME, date_arrangeTime] },
+           { layout: 'column', height: 30, border: 0, items: [date_PASSTIME] }//date_arrangeTime
 
         ]
     });
@@ -1300,6 +1355,7 @@ function resetTimeFlag() {
     flagREPSTARTTIME = 1;//0 代表可删除 1代表不可删除
     flagREPENDTIME = 1;//0 代表可删除 1代表不可删除
     flagPASSTIME = 1;//0 代表可删除 1代表不可删除
+    flagARRANGETIME = 1;
 }
 
 function create_save() {
