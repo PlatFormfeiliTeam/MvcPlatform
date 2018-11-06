@@ -254,6 +254,7 @@ trade.name  as 监管方式,
 h.REMARK as 备注,
 h.DECLCODEQTY as 报关单套数,
 h.DECLARATIONCODE as 报关单号,
+h.sheetnum as 报关单张数,
 h.BUSIUNITNAME as 经营单位名称,
 h.SHIPPINGAGENT as 货物代理,
 h.INSPREMARK as 报检备注, 
@@ -289,6 +290,7 @@ left join cusdoc.BASE_DECLTRADEWAY trade on trade.code=h.TRADEWAY ";
 
 h.SUBMITTIME as 委托时间,
 d.DECLARATIONCODE as 报关单号,
+d.sheetnum as 报关单张数,
 h.CONTRACTNO as 合同号,
 h.TOTALNO ||'_'|| h.DIVIDENO as 总单号分单号,
 h.GOODSNUM as 件数,
@@ -423,18 +425,27 @@ left join RESIDENT_DECLARATION d on h.code=d.ordercode
 
                 string DECLCODEQTY = string.Empty;
                 string DECLARATIONCODE = string.Empty;
-                if (jarryDeclData.Count > 0)
+                int sheetnum = 0;//SHEETNUM
+                for (int i = 0; i < jarryDeclData.Count; i++)
                 {
-                    DECLCODEQTY = jarryDeclData.Count.ToString();
-                    if (jarryDeclData.Count == 1)
+                    if (jarryDeclData[i]["SHEETNUM"].ToStringSafe() != string.Empty)
                     {
-                        DECLARATIONCODE = jarryDeclData[0].Value<string>("DECLARATIONCODE");
-                    }
-                    else
-                    {
-                        DECLARATIONCODE = jarryDeclData[0].Value<string>("DECLARATIONCODE") + "..."; ;
+                        sheetnum += Convert.ToInt32(jarryDeclData[i]["SHEETNUM"].ToStringSafe());
                     }
                 }
+
+                    if (jarryDeclData.Count > 0)
+                    {
+                        DECLCODEQTY = jarryDeclData.Count.ToString();
+                        if (jarryDeclData.Count == 1)
+                        {
+                            DECLARATIONCODE = jarryDeclData[0].Value<string>("DECLARATIONCODE");
+                        }
+                        else
+                        {
+                            DECLARATIONCODE = jarryDeclData[0].Value<string>("DECLARATIONCODE") + "..."; ;
+                        }
+                    }
                 string status = string.Empty;
 
                 List<string> listSqls = new List<string>();
@@ -494,8 +505,8 @@ left join RESIDENT_DECLARATION d on h.code=d.ordercode
                     BUSIUNITNAME = BUSIUNITNAME.Split('(')[0];
                 }
                 strSql = @"insert into RESIDENT_ORDER (code,cusno,busitype,tradeway,portcode,busiunitcode,busiunitname,goodsnum,goodgw,contractno,
-TOTALNO,DIVIDENO,MANIFEST,INSPFLAG,REMARK,RECEIVERUNITCODE,RECEIVERUNITNAME,CREATETIME,DECLCODEQTY,DECLARATIONCODE,SHIPPINGAGENT, INSPREMARK, COMMODITYNUM,UNITYCODE,CHECKFLAG,CHECKREMARK) 
-            values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}','{15}','{16}',sysdate,'{17}','{18}','{19}','{20}','{21}','{22}','{23}','{24}')";
+TOTALNO,DIVIDENO,MANIFEST,INSPFLAG,REMARK,RECEIVERUNITCODE,RECEIVERUNITNAME,CREATETIME,DECLCODEQTY,DECLARATIONCODE,SHIPPINGAGENT, INSPREMARK, COMMODITYNUM,UNITYCODE,CHECKFLAG,CHECKREMARK,SHEETNUM) 
+            values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}','{15}','{16}',sysdate,'{17}','{18}','{19}','{20}','{21}','{22}','{23}','{24}','{25}')";
                 strSql = string.Format(strSql, code, jsonOrderdata.Value<string>("CUSNO").Trim(), jsonOrderdata.Value<string>("BUSITYPE"), jsonOrderdata.Value<string>("TRADEWAY2")
                     , jsonOrderdata.Value<string>("PORTCODE"), jsonOrderdata.Value<string>("BUSIUNITCODE"), BUSIUNITNAME
                     , jsonOrderdata.Value<string>("GOODSNUM2"), jsonOrderdata.Value<string>("GOODGW2")
@@ -503,7 +514,7 @@ TOTALNO,DIVIDENO,MANIFEST,INSPFLAG,REMARK,RECEIVERUNITCODE,RECEIVERUNITNAME,CREA
                     , MANIFEST, INSPFLAG, jsonOrderdata.Value<string>("REMARK2").Trim()
                     , json_user.Value<string>("CUSTOMERCODE"), json_user.Value<string>("CUSTOMERNAME"), DECLCODEQTY, DECLARATIONCODE
                     , jsonOrderdata.Value<string>("SHIPPINGAGENT").Trim(), jsonOrderdata.Value<string>("INSPREMARK").Trim(), jsonOrderdata.Value<string>("COMMODITYNUM")
-                    , jsonOrderdata.Value<string>("UNITYCODE").Trim(), CHECKFLAG, CHECKREMARK.Trim());
+                    , jsonOrderdata.Value<string>("UNITYCODE").Trim(), CHECKFLAG, CHECKREMARK.Trim(),sheetnum);
                 listSqls.Add(strSql);
 
                 //  strSql="update RESIDENT_ORDER set ";
