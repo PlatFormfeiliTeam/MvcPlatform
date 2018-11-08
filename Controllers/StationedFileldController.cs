@@ -760,9 +760,9 @@ where d.ordercode='" + obj.Value<string>("CODE") + "'";
                 strSql = "update RESIDENT_ORDER set status={0} where code='{1}' and {2} is null and nvl(status,0)<{3}";
                 strSql = string.Format(strSql,status,code,time,status);
                 listSqls.Add(strSql);
-
-                strSql = "update RESIDENT_ORDER set {0}=sysdate,{1}='{2}',{3}='{4}' where code='{5}' and {6} is null ";
-                strSql = string.Format(strSql, time, userid, json_user.Value<string>("ID"), username, json_user.Value<string>("REALNAME"),code,time);
+                //
+                strSql = "update RESIDENT_ORDER set {0}=to_date('{1}','yyyy/mm/dd hh24:mi:ss'),{2}='{3}',{4}='{5}' where code='{6}' and {7} is null ";
+                strSql = string.Format(strSql, time, System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), userid, json_user.Value<string>("ID"), username, json_user.Value<string>("REALNAME"), code, time);
                 listSqls.Add(strSql);
             }
             return listSqls;
