@@ -792,6 +792,7 @@
                   + '<button type="button" onclick="browsefile()" class="btn btn-primary btn-sm"><i class="fa fa-exchange fa-fw"></i>&nbsp;浏览文件</button>'
                   + '<button type="button" onclick="removeFile()" class="btn btn-primary btn-sm" id="deletefile"><i class="fa fa-trash-o"></i>&nbsp;删除文件</button>'
                    + '<button type="button" onclick="printFile()" class="btn btn-primary btn-sm"><i class="fa fa-print"></i>&nbsp;打印文件</button>'
+            + '<button type="button" onclick="printBarcode()" class="btn btn-primary btn-sm"><i class="fa fa-print"></i>&nbsp;打印条码</button>'
               + '</div>';
     }
     else {
