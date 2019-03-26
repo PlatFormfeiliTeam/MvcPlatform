@@ -151,6 +151,10 @@ Ext.onReady(function () {
 
 //=======================================================JS init end======================================================
 
+
+
+
+
 function initSearch() {
     var store_1 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
