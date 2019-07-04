@@ -233,6 +233,71 @@
     <submenu>/Common/MultiPrint?menuxml=insp_mul_special</submenu>
     <submenu>/Common/ModifyMaintain?menuxml=insp_modify_special</submenu>
   </rootmenu>
+<!--核注清单管理-->
+  <rootmenu>
+    <menu>/Common/InventoryList?busitypeid=11&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=invt_airin</submenu>
+    <submenu>/Common/ClearanceStatus?menuxml=invt_cle_airin</submenu>
+    <submenu>/Common/FileConsult_Declare?menuxml=invt_cle_airin</submenu><!-- ClearanceStatus里的核注清单打印-->
+    <submenu>/Common/MultiPrint?menuxml=invt_mul_airin</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=invt_modify_airin</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/Common/InventoryList?busitypeid=10&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=invt_airout</submenu>
+    <submenu>/Common/ClearanceStatus?menuxml=invt_cle_airout</submenu>
+    <submenu>/Common/FileConsult_Declare?menuxml=invt_cle_airout</submenu><!-- ClearanceStatus里的核注清单打印-->
+    <submenu>/Common/MultiPrint?menuxml=invt_mul_airout</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=invt_modify_airout</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/Common/InventoryList?busitypeid=31&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=invt_landin</submenu>
+    <submenu>/Common/ClearanceStatus?menuxml=invt_cle_landin</submenu>
+    <submenu>/Common/FileConsult_Declare?menuxml=invt_cle_landin</submenu><!-- ClearanceStatus里的核注清单打印-->
+    <submenu>/Common/MultiPrint?menuxml=invt_mul_landin</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=invt_modify_landin</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/Common/InventoryList?busitypeid=30&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=invt_landout</submenu>
+    <submenu>/Common/ClearanceStatus?menuxml=invt_cle_landout</submenu>
+    <submenu>/Common/FileConsult_Declare?menuxml=invt_cle_landout</submenu><!-- ClearanceStatus里的核注清单打印-->
+    <submenu>/Common/MultiPrint?menuxml=invt_mul_landout</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=invt_modify_landout</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/Common/InventoryList?busitypeid=21&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=invt_seain</submenu>
+    <submenu>/Common/ClearanceStatus?menuxml=invt_cle_seain</submenu>
+    <submenu>/Common/FileConsult_Declare?menuxml=invt_cle_seain</submenu><!-- ClearanceStatus里的核注清单打印-->
+    <submenu>/Common/MultiPrint?menuxml=invt_mul_seain</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=invt_modify_seain</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/Common/InventoryList?busitypeid=20&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=invt_seaout</submenu>
+    <submenu>/Common/ClearanceStatus?menuxml=invt_cle_seaout</submenu>
+    <submenu>/Common/FileConsult_Declare?menuxml=invt_cle_seaout</submenu><!-- ClearanceStatus里的核注清单打印-->
+    <submenu>/Common/MultiPrint?menuxml=invt_mul_seaout</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=invt_modify_seaout</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/Common/InventoryList?busitypeid=40-41&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=invt_domestic</submenu>
+    <submenu>/Common/ClearanceStatus?menuxml=invt_cle_domestic</submenu>
+    <submenu>/Common/FileConsult_Declare?menuxml=invt_cle_domestic</submenu><!-- ClearanceStatus里的核注清单打印-->
+    <submenu>/Common/MultiPrint?menuxml=invt_mul_domestic</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=invt_modify_domestic</submenu>
+  </rootmenu>
+  <rootmenu>
+    <menu>/Common/InventoryList?busitypeid=50-51&amp;role=customer</menu>
+    <submenu>/Common/FileConsult?menuxml=invt_special</submenu>
+    <submenu>/Common/ClearanceStatus?menuxml=invt_cle_special</submenu>
+    <submenu>/Common/FileConsult_Declare?menuxml=invt_cle_special</submenu><!-- ClearanceStatus里的核注清单打印-->
+    <submenu>/Common/MultiPrint?menuxml=invt_mul_special</submenu>
+    <submenu>/Common/ModifyMaintain?menuxml=invt_modify_special</submenu>
+  </rootmenu>
   
   <!-- 客户服务->文件委托 -->
   <rootmenu>

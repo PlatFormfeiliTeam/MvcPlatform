@@ -36,7 +36,7 @@
                     data: common_data_sbfs
                 });
                 Ext.regModel('TRADE', {
-                    fields: ['ID', 'ENTRUSTTYPE', 'DECLSTATUS', 'INSPSTATUS', 'CODE', 'CUSNO', 'PORTCODE', 'TURNPRENO', 'SUBMITTIME',
+                    fields: ['ID', 'ENTRUSTTYPE', 'DECLSTATUS', 'INSPSTATUS', 'INVENTORYSTATUS', 'CODE', 'CUSNO', 'PORTCODE', 'TURNPRENO', 'SUBMITTIME',
                         'BUSIUNITCODE', 'BUSIUNITNAME', 'CUSTOMERNAME', 'CONTRACTNO', 'REPWAYID', 'GOODSNUM', 'GOODSGW', 'CUSTOMAREACODE',
                         'LAWFLAG', 'FIRSTLADINGBILLNO', 'SECONDLADINGBILLNO', 'ISINVALID', 'BUSITYPE', 'PRINTSTATUS', 'STATUS',
                         'ISCHECK', 'AUDITFLAG', 'INSPISCHECK', 'ISFUMIGATION'
@@ -90,8 +90,10 @@
                     { header: 'ID', dataIndex: 'ID', hidden: true, locked: true },
                     { header: '报关状态', dataIndex: 'DECLSTATUS', width: 90, renderer: renderOrder, locked: true },
                     { header: '报检状态', dataIndex: 'INSPSTATUS', width: 90, renderer: renderOrder, locked: true },
+                    { header: '核注状态', dataIndex: 'INVENTORYSTATUS', width: 70, renderer: renderOrder, locked: true },
                     { header: '订单编号', dataIndex: 'CODE', width: 100, locked: true },
                     { header: '客户编号', dataIndex: 'CUSNO', width: 130, locked: true },
+                    { header: '委托类型', dataIndex: 'ENTRUSTTYPE', width: 150, renderer: renderOrder, locked: true },
                     { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 180, sortable: true, locked: true },
                     { header: '合同号', dataIndex: 'CONTRACTNO', width: 100, locked: true },
                     { header: '打印状态', dataIndex: 'PRINTSTATUS', width: 70, locked: true, renderer: renderOrder },

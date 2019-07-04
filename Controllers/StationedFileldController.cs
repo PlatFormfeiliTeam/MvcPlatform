@@ -13,10 +13,15 @@ using System.Net.Http.Headers;
 using System.Net.Http;
 using System.Net;
 using System.IO;
-
+using NPOI.XSSF.UserModel;
+//using NPOI.XSSF.Util;
 using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;  //2007的版本及以上
-using NPOI.XSSF.Util;
+using NPOI.HSSF.UserModel;
+
+//using NPOI.SS.UserModel;
+//using NPOI.XSSF.UserModel;  //2007的版本及以上
+//using NPOI.XSSF.Util;
+
 
 namespace MvcPlatform.Controllers
 {
@@ -779,37 +784,44 @@ where d.ordercode='" + obj.Value<string>("CODE") + "'";
             switch (type)
             {
                 case "0":
-                    fileName = "驻厂服务列表导出_" + System.DateTime.Now.ToString("yyyyMMdd") + ".xlsx";
+                    fileName = "驻厂服务列表导出_" + System.DateTime.Now.ToString("yyyyMMdd") + ".xls";
                     break;
                 case "1":
-                    fileName = "驻厂服务代理清单导出_" + System.DateTime.Now.ToString("yyyyMMdd") + ".xlsx";
+                    fileName = "驻厂服务代理清单导出_" + System.DateTime.Now.ToString("yyyyMMdd") + ".xls";
                     break;
             }
             //XSSFWorkbook workbook = new XSSFWorkbook();
             //XSSFSheet sheet1 = (XSSFSheet)workbook.CreateSheet("驻厂服务");
             //XSSFRow row1 = (XSSFRow)sheet1.CreateRow(0);
+            try
+            {
+                HSSFWorkbook workbook = getExcelData(type, condition);
 
-           XSSFWorkbook workbook=  getExcelData(type, condition);
+                Models.NpoiMemoryStream ms = new Models.NpoiMemoryStream();
+                //MemoryStream ms = new MemoryStream();
+                ms.AllowClose = false;
+                workbook.Write(ms);
+                ms.Flush();
+                ms.Seek(0, SeekOrigin.Begin);
+                ms.AllowClose = true;
+                // ms.Seek(0, SeekOrigin.Begin);
+                // ms.Position = 0;
 
-            Models.NpoiMemoryStream ms = new Models.NpoiMemoryStream();
-            //MemoryStream ms = new MemoryStream();
-            ms.AllowClose = false;
-            workbook.Write(ms);
-            ms.Flush();
-            ms.Seek(0, SeekOrigin.Begin);
-            ms.AllowClose = true;
-            // ms.Seek(0, SeekOrigin.Begin);
-            // ms.Position = 0;
+                workbook.Close();
 
-            workbook.Close();
-
-            return File(ms, "application/vnd.ms-excel", fileName); 
+                return File(ms, "application/vnd.ms-excel", fileName); 
+            }
+            catch(Exception ex)
+            {
+                return View();
+            }
+           
         }
 
-        private XSSFWorkbook getExcelData(string type, string condition)
+        private HSSFWorkbook getExcelData(string type, string condition)
         {
-            XSSFWorkbook workbook = new XSSFWorkbook();
-            XSSFSheet sheet1 = (XSSFSheet)workbook.CreateSheet("驻厂服务");
+            HSSFWorkbook workbook = new HSSFWorkbook();
+            HSSFSheet sheet1 = (HSSFSheet)workbook.CreateSheet("驻厂服务");
             //XSSFRow row1 = (XSSFRow)sheet1.CreateRow(0);
 
             JObject json_user = Extension.Get_UserInfo(HttpContext.User.Identity.Name);
@@ -834,14 +846,14 @@ where d.ordercode='" + obj.Value<string>("CODE") + "'";
                 num += 1;
             }
             int lastCount = index ;
-            XSSFRow row1;
+            HSSFRow row1;
             for (int i = 1; i <= num; i++)
             {
                 DataTable dt = DBMgr.GetDataTable(GetQuerySqlPage(strSql,i,pageSize));
 
                 if (i == 1)
                 {
-                    row1 = (XSSFRow)sheet1.CreateRow(index);
+                    row1 = (HSSFRow)sheet1.CreateRow(index);
                     for (int j = 1; j < dt.Columns.Count; j++)
                     {
                         sheet1.SetColumnWidth(j - 1, 4000);
@@ -852,7 +864,7 @@ where d.ordercode='" + obj.Value<string>("CODE") + "'";
 
                 for (int j = 0; j < dt.Rows.Count; j++)
                 {
-                    row1 = (XSSFRow)sheet1.CreateRow(index);
+                    row1 = (HSSFRow)sheet1.CreateRow(index);
                     for (int k = 1; k < dt.Columns.Count; k++)
                     {
                         row1.CreateCell(k-1).SetCellValue(dt.Rows[j][dt.Columns[k].ColumnName].ToString());

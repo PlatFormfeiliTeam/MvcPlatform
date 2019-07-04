@@ -1,8 +1,7 @@
 ﻿//=======================================================JS init begin======================================================
 
-//传参示例 /Common/DeclareList?busitypeid=11&role=customer   
 var busitypeid = getQueryString_new("busitypeid"); var role = getQueryString_new("role");
-var pgbar; var store_sbfs; var store_bgfs; var store_busitype; var store_modifyflag;
+var pgbar; var store_sbfs; var store_bgfs; var store_busitype; var store_modifyflag; 
 var common_data_jydw = [], common_data_sbfs = [], common_data_bgfs = [], common_data_sbgq = [];
 var busitype = "";
 switch (busitypeid) {
@@ -25,7 +24,9 @@ switch (busitypeid) {
 }
 
 Ext.onReady(function () {
-
+    var bl_title = "提运单号";
+    if (busitypeid == "10" || busitypeid == "11")
+        bl_title = "总分单号";
     Ext.Ajax.request({
         url: "/Common/Ini_Base_Data",
         params: {
@@ -37,32 +38,21 @@ Ext.onReady(function () {
             common_data_sbfs = commondata.sbfs;//申报方式  这个基础数据调取出来的目的就是为了列表页字段显示时render处理
             common_data_bgfs = commondata.bgfs;//报关方式  这个基础数据调取出来的目的就是为了列表页字段显示时render处理
             common_data_sbgq = commondata.sbgq;//申报关区 进口口岸
-
             initSearch();  //查询区域
-
-            if (busitypeid == '50-51') {
-                Ext.getCmp('CONDITION2').setValue('DECLNO');
-            }
-            else {
-                Ext.getCmp('CONDITION2').setValue('CUSNO');
-            }
+            Ext.getCmp('CONDITION2').setValue('CUSNO');
             store_sbfs = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_sbfs });
             store_bgfs = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_bgfs });
             store_busitype = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: common_data_busitype });
             store_modifyflag = Ext.create('Ext.data.JsonStore', { fields: ['CODE', 'NAME'], data: modifyflag_data });
 
             var store = Ext.create('Ext.data.JsonStore', {
-                fields: ['ID', 'CODE', 'ORDERCODE', 'CUSTOMSSTATUS', 'ISPRINT', 'SHEETNUM', 'MODIFYFLAG', 'PRETRANSNAME',
-                        'DECLARATIONCODE', 'REPTIME', 'CONTRACTNO', 'GOODSNUM', 'GOODSNW', 'GOODSGW', 'BLNO', 'TRANSNAME', 'VOYAGENO',
-                        'BUSIUNITCODE', 'BUSIUNITNAME', 'PORTCODE', 'TRADEMETHOD', 'DECLWAY', 'DECLWAYNAME',
-                        'BUSITYPE', 'CONTRACTNOORDER', 'REPWAYID', 'REPWAYNAME', 'TOTALNO', 'DIVIDENO', 'SECONDLADINGBILLNO',
-                        'CUSNO', 'IETYPE', 'ASSOCIATENO', 'CORRESPONDNO', 'CUSTOMERNAME',
-                        'VERSTATUS', 'NOTE', 'INSPSTATUS', 'INSPECTIONCODE'
-                ],
+                fields: ['CODE','VERIFYDECLFLAGNAME', 'INVENTORYIOCHECKSTATUSNAME', 'INVENTORYCODE', 'BUSIUNITNAME', 'REPSTARTTIME', 'PORTNAME',
+                        'SUPERVISEMODENAME', 'DECLFLAGNAME', 'DECLTYPENAME', 'MODIFYFLAG', 'ORDERCODE', 'RELATIONBUSIUNITNAME',
+                        'CUSNO', 'SECONDLADINGBILLNO', 'COMPANYINSIDENO', 'SUBMITTIME', 'BUSITYPE'],
                 pageSize: 22,
                 proxy: {
                     type: 'ajax',
-                    url: '/Common/LoadDeclarationList',
+                    url: '/Common/LoadInventoryList',
                     reader: {
                         root: 'rows',
                         type: 'json',
@@ -86,15 +76,16 @@ Ext.onReady(function () {
                     }
                 }
             });
+
             Ext.tip.QuickTipManager.init();
             pgbar = Ext.create('Ext.toolbar.Paging', {
-                id: 'declare_grid_pgbar',
+                id: 'inventory_grid_pgbar',
                 displayMsg: '显示 {0} - {1} 条,共计 {2} 条',
                 store: store,
                 displayInfo: true
             });
             var gridpanel = Ext.create('Ext.grid.Panel', {
-                id: 'declare_grid',
+                id: 'inventory_grid',
                 store: store,
                 height: 535,
                 renderTo: 'appConId',
@@ -103,44 +94,24 @@ Ext.onReady(function () {
                 columns: [
                 { xtype: 'rownumberer', width: 45 },
                 { header: 'ID', dataIndex: 'ID', sortable: true, hidden: true },
-                { header: '海关状态', dataIndex: 'CUSTOMSSTATUS', width: 90, locked: true },
-                { header: '报检状态', dataIndex: 'INSPSTATUS', width: 90, locked: true, renderer: renderinspstatus },
-                { header: '合同发票号', dataIndex: 'CONTRACTNOORDER', width: 140 },
-                { header: '总单号', dataIndex: 'TOTALNO', width: 100, hidden: (busitypeid != '10' && busitypeid != '11') },
-                { header: '分单号', dataIndex: 'DIVIDENO', width: 100, hidden: (busitypeid != '10' && busitypeid != '11') },
-                { header: '海运提单号', dataIndex: 'SECONDLADINGBILLNO', width: 140, hidden: (busitypeid != '20' && busitypeid != '21') },
-                { header: '打印标志', dataIndex: 'ISPRINT', width: 70, renderer: render },
-                { header: '报关单号', dataIndex: 'DECLARATIONCODE', width: 140, locked: true, renderer: render },
-                { header: '报检单号', dataIndex: 'INSPECTIONCODE', width: 140, locked: true },
-                { header: '委托单位', dataIndex: 'CUSTOMERNAME', width: 100, locked: role == 'supplier', hidden: role == 'customer' },
-                { header: '申报日期', dataIndex: 'REPTIME', width: 140 },
-                { header: '进/出', dataIndex: 'IETYPE', width: 80, hidden: busitypeid != '40-41' },
-                { header: '两单关联号', dataIndex: 'ASSOCIATENO', width: 110, hidden: busitypeid != '40-41' },//两单关联号
-                { header: '运输工具名称', dataIndex: 'TRANSNAME', width: 150, renderer: render },
-                { header: busitypeid == '21' ? '船名' : '预录号', dataIndex: 'PRETRANSNAME', width: 150, hidden: (busitypeid != '21' && busitypeid != '50-51') },
-                { header: '业务类型', dataIndex: 'BUSITYPE', width: 90, renderer: render, hidden: (busitypeid != '40-41' && busitypeid != '50-51') },// 业务类型
-                { header: '出口口岸', dataIndex: 'PORTCODE', width: 80 },
-                { header: '提运单号', dataIndex: 'BLNO', width: 180 },
-                { header: '申报方式', dataIndex: 'REPWAYNAME', width: 100, renderer: render },
-                { header: '报关方式', dataIndex: 'DECLWAYNAME', width: 100, renderer: render },
-                { header: '贸易方式', dataIndex: 'TRADEMETHOD', width: 80 },
-                { header: '合同协议号', dataIndex: 'CONTRACTNO', width: 110 },
-                { header: '件数', dataIndex: 'GOODSNUM', width: 60 },
-                { header: '重量', dataIndex: 'GOODSGW', width: 60 },
-                { header: '张数', dataIndex: 'SHEETNUM', width: 60 },
-                { header: '删改单', dataIndex: 'MODIFYFLAG', width: 60, renderer: render },
-                { header: '多单关联号', dataIndex: 'CORRESPONDNO', width: 100, hidden: busitypeid != '40-41' },//多单关联号
+                { header: '业务类型', dataIndex: 'BUSITYPE', sortable: true, hidden: true },
+                { header: '预制核注清单编号', dataIndex: 'CODE', sortable: true, hidden: true },
+                { header: '核扣标志', dataIndex: 'VERIFYDECLFLAGNAME', width: 90, locked: true },
+                { header: '进出卡扣标志', dataIndex: 'INVENTORYIOCHECKSTATUSNAME', width: 90, locked: true },
+                { header: '清单编号', dataIndex: 'INVENTORYCODE', width: 140, renderer: render },
+                { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 150 },
+                { header: '合同号', dataIndex: 'COMPANYINSIDENO', width: 100 },
+                { header: '打印标志', dataIndex: 'ISPRINT', width: 70 },
+                { header: '申报日期', dataIndex: 'REPSTARTTIME', width: 140 },
+                { header: '进出口岸', dataIndex: 'PORTNAME', width: 80 },
+                { header: bl_title, dataIndex: 'SECONDLADINGBILLNO', width: 180 },
+                { header: '监管方式', dataIndex: 'SUPERVISEMODENAME', width: 100},
+                { header: '报关标志', dataIndex: 'DECLFLAGNAME', width: 100},
+                { header: '报关类型', dataIndex: 'DECLTYPENAME', width: 80 },
+                { header: '删改单', dataIndex: 'MODIFYFLAG', width: 60, renderer: render},
                 { header: '订单编号', dataIndex: 'ORDERCODE', width: 100 },
-                { header: '经营单位', dataIndex: 'BUSIUNITNAME', width: 140, locked: role == 'customer' },
                 { header: '客户编号', dataIndex: 'CUSNO', width: 125 },
-                {
-                    header: '比对状态', dataIndex: 'VERSTATUS', width: 90, renderer: function (value, meta, record) {
-                        if (value == "比对未通过") {
-                            meta.tdAttr = 'data-qtitle="<font color=red>未通过原因</font>" data-qtip="<font color=blue>' + record.get("NOTE") + '</font>"';
-                        }
-                        return value;
-                    }
-                }
+                { header: '关联收发货人', dataIndex: 'RELATIONBUSIUNITNAME', width: 125, hidden: (busitypeid != "50-51" && busitypeid != "40-41") }//海陆空不显示
                 ],
                 viewConfig: {
                     enableTextSelection: true
@@ -159,7 +130,7 @@ Ext.onReady(function () {
 function initSearch() {
     var store_1 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: [{ "NAME": "经营单位", "CODE": "BUSIUNITCODE" }, { "NAME": "申报方式", "CODE": "REPWAYNAME" }, { "NAME": "进出口岸", "CODE": "PORTCODE" }]
+        data: [{ "NAME": "经营单位", "CODE": "BUSIUNITCODE" }, { "NAME": "报关类型", "CODE": "DECLTYPE" }]
     });
     var combo_1 = Ext.create('Ext.form.field.ComboBox', {
         id: 'CONDITION1',
@@ -176,17 +147,13 @@ function initSearch() {
            {
                change: function (combo, newValue, oldValue, eOpts) {
                    combo_1_1.reset();
-                   if (newValue == "REPWAYNAME") {
-                       combo_1_1.minChars = 2;
-                       store_1_1.loadData(common_data_sbfs);
-                   }
                    if (newValue == "BUSIUNITCODE") {
                        combo_1_1.minChars = 4;
                        store_1_1.loadData(common_data_jydw);
                    }
-                   if (newValue == "PORTCODE") {
-                       combo_1_1.minChars = "1";
-                       store_1_1.loadData(common_data_sbgq);
+                   if (newValue == "DECLTYPE") {
+                       combo_1_1.minChars = 1;
+                       store_1_1.loadData(decltype_data);
                    }
                }
            }
@@ -214,25 +181,8 @@ function initSearch() {
         layout: 'hbox',
         items: [combo_1, combo_1_1]
     }
-    var declarationsearch_js_condition2_data = [{ "NAME": "客户编号", "CODE": "CUSNO" }, { "NAME": "提运单号", "CODE": "BLNO" }
-            , { "NAME": "订单编号", "CODE": "ORDERCODE" }, { "NAME": "报关单号", "CODE": "DECLNO" }
-            , { "NAME": "合同协议号", "CODE": "CONTRACTNO" }, { "NAME": "运输工具名称", "CODE": "TRANSNAME" }, { "NAME": "合同发票号", "CODE": "CONTRACTNOORDER" }];
-    if (busitypeid == "10" || busitypeid == "30") {  //如果是空运出口，或者是陆运出口
-        declarationsearch_js_condition2_data.push({ "NAME": "报关车号", "CODE": "DECLCARNO" });
-    }
-    if (busitypeid == "10" || busitypeid == "11") {
-        declarationsearch_js_condition2_data.push({ "NAME": "总单号", "CODE": "TOTALNO" });
-        declarationsearch_js_condition2_data.push({ "NAME": "分单号", "CODE": "DIVIDENO" });
-    }
-    if (busitypeid == "20" || busitypeid == "21") {
-        declarationsearch_js_condition2_data.push({ "NAME": "海关提单号", "CODE": "SECONDLADINGBILLNO" });
-    }
-    if (busitypeid == "21") {
-        declarationsearch_js_condition2_data.push({ "NAME": "船名", "CODE": "PRETRANSNAME" });
-    }
-    if (busitypeid == "50-51") {
-        declarationsearch_js_condition2_data.push({ "NAME": "预录号", "CODE": "PRETRANSNAME" });
-    }
+    var declarationsearch_js_condition2_data = [{ "NAME": "订单编号", "CODE": "ORDERCODE" }, { "NAME": "客户编号", "CODE": "CUSNO" },
+        { "NAME": "清单编号", "CODE": "INVENTORYCODE" }, { "NAME": "对应报关单号", "CODE": "CORRDECLFORMNO" }, { "预录入统一编号": "客户编号", "CODE": "PREUNITYCODE" }];
 
     var store_2 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
@@ -260,18 +210,17 @@ function initSearch() {
         items: [combo_2, field_2_1]
     }
 
-    var declarationsearch_js_condition3_data_dy = [{ "NAME": "已打印", "CODE": "1" }, { "NAME": "未打印", "CODE": "0" }];
-    var declarationsearch_js_condition3_data_hg = [{ "NAME": "已结关", "CODE": "已结关" }, { "NAME": "未结关", "CODE": "未结关" }];
 
     var store_3 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: [{ "NAME": "打印标志", "CODE": "DYBZ" }, { "NAME": "海关状态", "CODE": "HGZT" }, { "NAME": "删改单", "CODE": "SGD" }]
+        data: [{ "NAME": "核扣标志", "CODE": "VERIFYDECLFLAG" }, { "NAME": "进出卡扣标志", "CODE": "INVENTORYIOCHECKSTATUS" },
+            { "NAME": "报关标志", "CODE": "DECLFLAG" }, { "NAME": "删改单标志", "CODE": "MODIFYFLAG" }]
     });    
 
     var combo_3 = Ext.create("Ext.form.ComboBox", {
         id: 'CONDITION3',
         name: "CONDITION3",
-        value: "HGZT",
+        value: "VERIFYDECLFLAG",
         store: store_3,
         queryMode: 'local',
         editable: false,
@@ -283,13 +232,16 @@ function initSearch() {
             {
                 change: function (combo, newValue, oldValue, eOpts) {
                     combo_3_1.reset();
-                    if (newValue == "HGZT") {
-                        store_3_1.loadData(declarationsearch_js_condition3_data_hg);
+                    if (newValue == "VERIFYDECLFLAG") {
+                        store_3_1.loadData(verifydeclflag_data);
                     }
-                    if (newValue == "DYBZ") {
-                        store_3_1.loadData(declarationsearch_js_condition3_data_dy);
+                    if (newValue == "INVENTORYIOCHECKSTATUS") {
+                        store_3_1.loadData(inventoryiocheckstatus_data);
                     }
-                    if (newValue == "SGD") {
+                    if (newValue == "DECLFLAG") {
+                        store_3_1.loadData(declflag_data);
+                    }
+                    if (newValue == "MODIFYFLAG") {
                         store_3_1.loadData(modifyflag_data);
                     }
                 }
@@ -297,7 +249,7 @@ function initSearch() {
     });
     var store_3_1 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: declarationsearch_js_condition3_data_hg
+        data: verifydeclflag_data
     });
     var combo_3_1 = Ext.create("Ext.form.ComboBox", {
         id: 'CONDITION3_1',
@@ -328,8 +280,7 @@ function initSearch() {
     }
     var store_4 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: [{ "NAME": "订单委托日期", "CODE": "SUBMITTIME" }, { "NAME": "申报日期", "CODE": "REPTIME" }, { "NAME": "删单日期", "CODE": "DELORDERTIME" }
-            , { "NAME": "改单日期", "CODE": "MODORDERTIME" }, { "NAME": "改单完成日期", "CODE": "MODFINISHTIME" }]
+        data: [{ "NAME": "订单委托日期", "CODE": "SUBMITTIME" }, { "NAME": "申报日期", "CODE": "REPSTARTTIME" }]
     });
     var combo_4 = Ext.create("Ext.form.ComboBox", {
         id: 'CONDITION4',
@@ -402,7 +353,7 @@ function initSearch() {
     var combo_5 = Ext.create('Ext.form.field.ComboBox', {
         id: 'CONDITION5',
         name: "CONDITION5",
-        value: "REPWAYNAME",
+        value: "DECLTYPE",
         store: store_1,
         displayField: 'NAME',
         valueField: "CODE",
@@ -414,24 +365,20 @@ function initSearch() {
           {
               change: function (combo, newValue, oldValue, eOpts) {
                   combo_5_1.reset();
-                  if (newValue == "REPWAYNAME") {
-                      combo_5_1.minChars = 2;
-                      store_5_1.loadData(common_data_sbfs);
-                  }
                   if (newValue == "BUSIUNITCODE") {
                       combo_5_1.minChars = 4;
                       store_5_1.loadData(common_data_jydw);
                   }
-                  if (newValue == "PORTCODE") {
-                      combo_5_1.minChars = "1";
-                      store_5_1.loadData(common_data_sbgq);
+                  if (newValue == "DECLTYPE") {
+                      combo_5_1.minChars = 1;
+                      store_5_1.loadData(decltype_data);
                   }
               }
           }
     })
     var store_5_1 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: common_data_sbfs
+        data: decltype_data
     });
     var combo_5_1 = Ext.create('Ext.form.field.ComboBox', {
         id: 'CONDITION5_1',
@@ -444,7 +391,7 @@ function initSearch() {
         anyMatch: true,
         queryMode: 'local',
         forceSelection: true,
-        minChars: 2,
+        minChars: 1,
         flex: .65
     })
     var condition5 = {
@@ -457,7 +404,7 @@ function initSearch() {
         id: 'CONDITION6',
         name: "CONDITION6",
         store: store_2,
-        value: "BLNO",
+        value: "INVENTORYCODE",
         displayField: 'NAME',
         valueField: "CODE",
         editable: false,
@@ -479,7 +426,7 @@ function initSearch() {
     var combo_7 = Ext.create("Ext.form.ComboBox", {
         id: 'CONDITION7',
         name: "CONDITION7",
-        value: "DYBZ",
+        value: "INVENTORYIOCHECKSTATUS",
         store: store_3,
         queryMode: 'local',
         editable: false,
@@ -491,13 +438,16 @@ function initSearch() {
             {
                 change: function (combo, newValue, oldValue, eOpts) {
                     combo_7_1.reset();
-                    if (newValue == "HGZT") {
-                        store_7_1.loadData(declarationsearch_js_condition3_data_hg);
+                    if (newValue == "VERIFYDECLFLAG") {
+                        store_7_1.loadData(verifydeclflag_data);
                     }
-                    if (newValue == "DYBZ") {
-                        store_7_1.loadData(declarationsearch_js_condition3_data_dy);
+                    if (newValue == "INVENTORYIOCHECKSTATUS") {
+                        store_7_1.loadData(inventoryiocheckstatus_data);
                     }
-                    if (newValue == "SGD") {
+                    if (newValue == "DECLFLAG") {
+                        store_7_1.loadData(declflag_data);
+                    }
+                    if (newValue == "MODIFYFLAG") {
                         store_7_1.loadData(modifyflag_data);
                     }
                 }
@@ -505,7 +455,7 @@ function initSearch() {
     });
     var store_7_1 = Ext.create("Ext.data.JsonStore", {
         fields: ["CODE", "NAME"],
-        data: declarationsearch_js_condition3_data_dy
+        data: inventoryiocheckstatus_data
     });
     var combo_7_1 = Ext.create("Ext.form.ComboBox", {
         id: 'CONDITION7_1',
@@ -538,7 +488,7 @@ function initSearch() {
     var combo_8 = Ext.create("Ext.form.ComboBox", {
         id: 'CONDITION8',
         name: 'CONDITION8',
-        value: 'REPTIME',
+        value: 'REPSTARTTIME',
         margin: 0,
         flex: .35,
         store: store_4,
@@ -632,102 +582,52 @@ function initSearch() {
 function Reset() {
     Ext.getCmp("CONDITION1").setValue("BUSIUNITCODE");
     Ext.getCmp("CONDITION1_1").setValue("");
-    Ext.getCmp("CONDITION2").setValue("CUSNO");
+    Ext.getCmp("CONDITION2").setValue("ORDERCODE");
     Ext.getCmp("CONDITION2_1").setValue("");
-    Ext.getCmp("CONDITION3").setValue("HGZT");
+    Ext.getCmp("CONDITION3").setValue("VERIFYDECLFLAG");
     Ext.getCmp("CONDITION3_1").setValue("");
     Ext.getCmp("CONDITION4").setValue("SUBMITTIME");
     Ext.getCmp("CONDITION4_1").setValue("");
     Ext.getCmp("CONDITION4_2").setValue("");
 
-    Ext.getCmp("CONDITION5").setValue("REPWAYNAME");
+    Ext.getCmp("CONDITION5").setValue("DECLTYPE");
     Ext.getCmp("CONDITION5_1").setValue("");
-    Ext.getCmp("CONDITION6").setValue("BLNO");
+    Ext.getCmp("CONDITION6").setValue("INVENTORYCODE");
     Ext.getCmp("CONDITION6_1").setValue("");
-    Ext.getCmp("CONDITION7").setValue("DYBZ");
+    Ext.getCmp("CONDITION7").setValue("INVENTORYIOCHECKSTATUS");
     Ext.getCmp("CONDITION7_1").setValue("");
-    Ext.getCmp("CONDITION8").setValue("REPTIME");
+    Ext.getCmp("CONDITION8").setValue("REPSTARTTIME");
     Ext.getCmp("CONDITION8_1").setValue("");
     Ext.getCmp("CONDITION8_2").setValue("");
 }
 
 
+
+
+
+//查询
+function Select() {
+    pgbar.moveFirst();
+}
+
 function render(value, cellmeta, record, rowIndex, columnIndex, store) {
     var rtn = "";
     var dataindex = cellmeta.column.dataIndex;
-    if (dataindex == "DECLARATIONCODE" && value) {
+    if (dataindex == "INVENTORYCODE" && value) {
         rtn = "<div style='color:red;cursor:pointer; text-decoration:underline;' onclick='FileConsult(\"" + record.get("ORDERCODE") + "\",\"" + escape(record.get("BUSITYPE")) + "\",\"" + record.get("CODE") + "\")'>" + value + "</div>";
     }
     if (dataindex == "ISPRINT") {
         rtn = value == "0" ? "未打印" : "已打印";
-    } 
+    }
     if (dataindex == "MODIFYFLAG") {
         var rec = store_modifyflag.findRecord('CODE', value);
         if (rec) {
             rtn = rec.get("NAME");
         }
     }
-    if (dataindex == "REPWAYNAME" && value) {
-        var rec = store_sbfs.findRecord('CODE', value);
-        if (rec) {
-            rtn = rec.get("NAME");
-        }
-    }
-    if (dataindex == "DECLWAYNAME" && value) {
-        var rec = store_bgfs.findRecord('CODE', value);
-        if (rec) {
-            rtn = rec.get("NAME");
-        }
-    }
-    if (dataindex == "BUSITYPE" && value) {
-        var rec = store_busitype.findRecord('CODE', value);
-        if (rec) {
-            rtn = rec.get("NAME");
-        }
-    }
-    if (dataindex == "TRANSNAME") {
-        var VOYAGENO = record.get("VOYAGENO");
-
-        if (value == null && VOYAGENO == null) {
-            rtn = '';
-        }
-        if (value == null && VOYAGENO != null) {
-            rtn = '/' + VOYAGENO;
-        }
-        if (value != null && VOYAGENO == null) {
-            rtn = value;
-        }
-        if (value != null && VOYAGENO != null) {
-            rtn = value + '/' + VOYAGENO;
-        }
-    }
+   
+  
     return rtn;
-}
-
-
-//报检状态返回数值
-function renderinspstatus(value, cellmeta, record, rowIndex, columnIndex, store) {
-    var rtn = "";
-    if (value == 50) {
-        rtn = "审核完成";
-    }
-    if (value == 100) {
-        rtn = "报检申报";
-    }
-    if (value == 115) {
-        rtn = "申报退单";
-    }
-    if (value == 155) {
-        rtn = "报检查验";
-    } if (value == 160) {
-        rtn = "报检放行";
-    }
-    return rtn;
-}
-
-//查询
-function Select() {
-    pgbar.moveFirst();
 }
 
 //打开调阅信息
@@ -763,7 +663,7 @@ function FileConsult(ORDERCODE, BUSITYPE, PREDECLCODE) {
 }
 
 function ClickShowwinwj() {   //打开调阅信息
-    var recs = Ext.getCmp("declare_grid").getSelectionModel().getSelection();
+    var recs = Ext.getCmp("inventory_grid").getSelectionModel().getSelection();
     if (recs.length == 0) {
         Ext.MessageBox.alert('提示', '请选择需要调阅的记录！');
         return;
@@ -800,7 +700,7 @@ function ClickShowwinwj() {   //打开调阅信息
 }
 
 function MultiPrint() {
-    var recs = Ext.getCmp("declare_grid").getSelectionModel().getSelection();
+    var recs = Ext.getCmp("inventory_grid").getSelectionModel().getSelection();
     if (recs.length == 0) {
         Ext.MessageBox.alert('提示', '请选择需要打印的记录！');
         return;
@@ -818,32 +718,32 @@ function MultiPrint() {
     var menuxml = "";
     switch (recs[0].get("BUSITYPE")) {
         case "11":
-            menuxml = "dec_mul_airin";
+            menuxml = "invt_mul_airin";
             break;
         case "10":
-            menuxml = "dec_mul_airout";
+            menuxml = "invt_mul_airout";
             break;
         case "21":
-            menuxml = "dec_mul_seain";
+            menuxml = "invt_mul_seain";
             break;
         case "20":
-            menuxml = "dec_mul_seaout";
+            menuxml = "invt_mul_seaout";
             break;
         case "31":
-            menuxml = "dec_mul_landin";
+            menuxml = "invt_mul_landin";
             break;
         case "30":
-            menuxml = "dec_mul_landout";
+            menuxml = "invt_mul_landout";
             break;
         case "40": case "41":
-            menuxml = "dec_mul_domestic";
+            menuxml = "invt_mul_domestic";
             break;
         case "50": case "51":
-            menuxml = "dec_mul_special";
+            menuxml = "invt_mul_special";
             break;
     }
 
-    opencenterwin("/Common/MultiPrint?menuxml=" + menuxml + "&source=declare&data=" + data, 1100, 700);
+    opencenterwin("/Common/MultiPrint?menuxml=" + menuxml + "&source=invt&data=" + data, 1100, 700);
 }
 
 function openrwindow(url, width, height) {
@@ -855,48 +755,7 @@ function openrwindow(url, width, height) {
     window.open(url, '', 'height=' + iHeight + ',,innerHeight=' + iHeight + ',width=' + iWidth + ',innerWidth=' + iWidth + ',top=' + iTop + ',left=' + iLeft + ',location=yes,scrollbars=yes');
 }
 
-function Searchstatus() {
-    var recs = Ext.getCmp('declare_grid').getSelectionModel().getSelection();
-    if (recs.length == 0) {
-        Ext.MessageBox.alert('提示', '请选择需要维护的记录！');
-        return;
-    }
-    var id = recs[0].data.ID
-    var index = Ext.getCmp('declare_grid').store.indexOf(recs[0]);
-    var currentPage = Ext.getCmp('declare_grid').store.currentPage;
-
-    var menuxml = "";
-    switch (recs[0].get("BUSITYPE")) {
-        case "11":
-            menuxml = "dec_cle_airin";
-            break;
-        case "10":
-            menuxml = "dec_cle_airout";
-            break;
-        case "21":
-            menuxml = "dec_cle_seain";
-            break;
-        case "20":
-            menuxml = "dec_cle_seaout";
-            break;
-        case "31":
-            menuxml = "dec_cle_landin";
-            break;
-        case "30":
-            menuxml = "dec_cle_landout";
-            break;
-        case "40": case "41":
-            menuxml = "dec_cle_domestic";
-            break;
-        case "50": case "51":
-            menuxml = "dec_cle_special";
-            break;
-    }
-
-    openrwindow("/Common/ClearanceStatus?menuxml=" + menuxml + "&id=" + id + "&rowIndex=" + index + "&currentPage=" + currentPage, 1200, 800);
-}
-
-function ExportDecl() {
+function ExportInvt() {
 
     var myMask = new Ext.LoadMask(Ext.getBody(), { msg: "数据导出中，请稍等..." });
     myMask.show();
@@ -916,7 +775,7 @@ function ExportDecl() {
     }
 
     Ext.Ajax.request({
-        url: '/Common/ExportDeclList',
+        url: '/Common/ExportInvtList',
         params: data,
         success: function (response, option) {
             var json = Ext.decode(response.responseText);

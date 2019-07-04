@@ -1,5 +1,6 @@
 Web.config
 obj/Debug/
+obj/Release/
 bin/MvcPlatform.dll
 bin/MvcPlatform.dll.config
 bin/MvcPlatform.pdb
@@ -11,6 +12,7 @@ Declare/
 Web.Debug.config
 Web.Release.config
 ErrorLog
+
 <<<<<<< HEAD
 *.svn-base
 .svn/entries

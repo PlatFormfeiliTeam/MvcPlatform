@@ -203,6 +203,14 @@ function form_ini(type) {
             fieldLabel: '报检单备注', columnWidth: .50
         });
     }
+    if (type == "invt") {//报检单备注        
+        field_REMARK = Ext.create('Ext.form.field.Text', {
+            id: 'field_INVTREMARK',
+            tabIndex: 3,
+            name: 'INVTREMARK',
+            fieldLabel: '核注清单备注', columnWidth: .50
+        });
+    }
 
     var field_DELORDERUSERID = Ext.create('Ext.form.field.Hidden', { name: 'DELORDERUSERID' });
     var field_MODORDERUSERID = Ext.create('Ext.form.field.Hidden', { name: 'MODORDERUSERID' });

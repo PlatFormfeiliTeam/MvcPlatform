@@ -1672,8 +1672,14 @@ function renderOrder(value, cellmeta, record, rowIndex, columnIndex, store) {
                 rtn = "已作废";
             }
             else {
-                rtn = orders_tatus[value];
+                rtn = orders_tatus[value]; 
             }
+            break;
+        case "INVENTORYSTATUS":
+            rtn = invent_status[value];
+            break;
+        case "ENTRUSTTYPE":
+            rtn = entrusttype_data[value];
             break;
         case "BUSITYPE":
             var rec = store_busitype.findRecord('CODE', value);

@@ -10,8 +10,22 @@
 <script type="text/javascript">
     var data = getQueryString("data");
     var source = getQueryString("source");//这个页面报挂单列表页和报检单列表页共用，需要用source加以区分
+    var pagetitle = "";
     //G16062948480001 这个预制报关单号对应有多个报关文件
     Ext.onReady(function () {
+        if (source == "")
+        {
+            pagetitle = "报关单管理->批量打印";
+        }
+        else if (source == "")
+        {
+            pagetitle = "报检单管理->批量打印";
+        }
+        else if (source == "")
+        {
+            pagetitle = "核注清单管理->批量打印";
+        }
+
         Ext.Ajax.request({
             url: "/Common/GetFileNums",
             params: {
@@ -32,7 +46,7 @@
                         }
                     ];
                 }
-                else {
+                else if(source=="inspect") {
                     items = [
                       {
                           boxLabel: '<li style="list-style-type:none;">报检单<span class="badge">' + json_result.bjdnum + '</span></li>',
@@ -41,6 +55,15 @@
                       {
                           boxLabel: '<li style="list-style-type:none;">报检核准单<span class="badge">' + json_result.bjhzdnum + '</span></li>',
                           name: 'filetype', inputValue: '121', disabled: json_result.bjhzdnum == 0
+                      }
+                    ];
+                }
+                else if (source == "invt")
+                {
+                    items = [
+                      {
+                          boxLabel: '<li style="list-style-type:none;">核注清单<span class="badge">' + json_result.invtnum + '</span></li>',
+                          name: 'filetype', inputValue: '171'
                       }
                     ];
                 }
@@ -112,7 +135,7 @@
 
 
                 var formpanel = Ext.create('Ext.form.Panel', {
-                    title: source == 'declare' ? '报关单管理->批量打印' : '报检单管理->批量打印',
+                    title: pagetitle,
                     region: 'west',
                     width: 450,
                     items: [field_type, field_printmode, cbg_printtmp,{
